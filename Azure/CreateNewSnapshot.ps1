@@ -22,7 +22,6 @@ Select-AzureRmSubscription -SubscriptionId $subscriptionId
 
 $vm = Get-AzureRmVM -ResourceGroupName $sourceResourceGroupName -Name $vmName
 
-
 $osDiskId = $vm.StorageProfile.OsDisk.ManagedDisk.Id
 $dataDiskId = $vm.StorageProfile.DataDisks[0].ManagedDisk.Id
 
