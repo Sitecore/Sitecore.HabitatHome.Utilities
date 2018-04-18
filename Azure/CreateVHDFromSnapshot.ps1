@@ -59,7 +59,6 @@ foreach ($region in $config.regions) {
         Start-Sleep -s 30
         $progress | Get-AzureStorageBlobCopyState
     }
-
 }
 
 

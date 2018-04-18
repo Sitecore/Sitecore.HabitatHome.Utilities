@@ -10,7 +10,6 @@ if ($account.Account -eq $null) {
     Login-AzureRmAccount
 }
 
-
 #Provide the size of the virtual machine
 #Get all the vm sizes in a region using below script:
 #e.g. Get-AzureRmVMSize -Location westus
