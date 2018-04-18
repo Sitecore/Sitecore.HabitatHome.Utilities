@@ -1,10 +1,12 @@
 Param(
     [string] $subscriptionId,
+    [ValidateSet('na', 'ga', 'emea')]
+    [string]$region = 'na',
     [string] $deploymentName = "habitathome"
 )
 $account = Get-AzureRMContext | Select-Object Account
 
-if ($account.Account -eq $null){
+if ($account.Account -eq $null) {
     Login-AzureRmAccount
 }
 
@@ -13,23 +15,33 @@ if ($account.Account -eq $null){
 #Get all the vm sizes in a region using below script:
 #e.g. Get-AzureRmVMSize -Location westus
 $virtualMachineSize = 'Standard_DS12_V2_Promo'
-$location = 'eastus'
 
-###########     Set up the source
-
-
-$storageAccountId = "/subscriptions/8ae723fd-8e32-44bd-bd0e-f3f71631e11e/resourceGroups/habitathome-demo-snapshot/providers/Microsoft.Storage/storageAccounts/habitathomedemosnapshots"
 
 #########       SHOULD not need to modify the following     #############
 
+###########     Set up the source
 
-
-
-
-#Provide the name of the snapshot that will be used to create OS disk
-$osVHDUri ="https://habitathomedemosnapshots.blob.core.windows.net/snapshots/habitathome-os.vhd"
-#Provide the name of the snapshot that will be used to create Data disk
-$dataVHDUri ="https://habitathomedemosnapshots.blob.core.windows.net/snapshots/habitathome-data.vhd"
+switch ($region) {
+    na {
+        $storageAccountId = "/subscriptions/8ae723fd-8e32-44bd-bd0e-f3f71631e11e/resourceGroups/habitathome-demo-snapshot/providers/Microsoft.Storage/storageAccounts/habitathomedemosnapshots"
+        $storageContainerName = "habitathomedemosnapshots"
+        $location="eastus"
+    }
+    ga {
+        $storageAccountId = "/subscriptions/8ae723fd-8e32-44bd-bd0e-f3f71631e11e/resourceGroups/habitathome-demo-snapshot-ga/providers/Microsoft.Storage/storageAccounts/hhdemosnapshotsga"
+        $storageContainerName = "hhdemosnapshotsga"
+        $location="australiaeast"
+    }
+    emea {
+        $storageAccountId = "/subscriptions/8ae723fd-8e32-44bd-bd0e-f3f71631e11e/resourceGroups/habitathome-demo-snapshot-emea/providers/Microsoft.Storage/storageAccounts/hhdemosnapshotsemea"
+        $storageContainerName = "hhdemosnapshotsemea"
+        $location="ukwest"
+    }
+}
+  #Provide the name of the snapshot that will be used to create OS disk
+  $osVHDUri = ("https://{0}.blob.core.windows.net/snapshots/habitathome-os.vhd" -f $storageContainerName)
+  #Provide the name of the snapshot that will be used to create Data disk
+  $dataVHDUri = ("https://{0}.blob.core.windows.net/snapshots/habitathome-data.vhd" -f $storageContainerName)
 
 $resourceGroupName = $deploymentName
 
@@ -38,7 +50,7 @@ $osDiskName = ("{0}_osDisk" -f $deploymentName)
 $dataDiskName = ("{0}_data" -f $deploymentName)
 
 #Provide the name of an existing virtual network where virtual machine will be created
-$virtualNetworkName = ("{0}-vnet"-f $deploymentName)
+$virtualNetworkName = ("{0}-vnet" -f $deploymentName)
 
 #Provide the name of the virtual machine
 $virtualMachineName = ("{0}-vm" -f $deploymentName)
@@ -50,19 +62,19 @@ New-AzureRmResourceGroup -Name $resourceGroupName -Location $location
 
 # OS Disk
 $osDisk = New-AzureRmDisk -DiskName $osDiskName -Disk `
-    (New-AzureRmDiskConfig -AccountType PremiumLRS  `
-    -Location $location -CreateOption Import `
-    -StorageAccountId $storageAccountId `
-    -SourceUri $osVHDUri) `
+(New-AzureRmDiskConfig -AccountType PremiumLRS  `
+        -Location $location -CreateOption Import `
+        -StorageAccountId $storageAccountId `
+        -SourceUri $osVHDUri) `
     -ResourceGroupName $resourceGroupName
 
 # Data Disk
 
 $dataDisk = New-AzureRmDisk -DiskName $dataDiskName -Disk `
-    (New-AzureRmDiskConfig -AccountType PremiumLRS  `
-    -Location $location -CreateOption Import `
-    -StorageAccountId $storageAccountId `
-    -SourceUri $dataVHDUri) `
+(New-AzureRmDiskConfig -AccountType PremiumLRS  `
+        -Location $location -CreateOption Import `
+        -StorageAccountId $storageAccountId `
+        -SourceUri $dataVHDUri) `
     -ResourceGroupName $resourceGroupName
 
 # Virtual Machine Configuraiton
@@ -92,7 +104,7 @@ $smtpOutbound = New-AzureRmNetworkSecurityRuleConfig -Name "SMTP" -Description "
 $networkSecurityGroupName = ("{0}-nsg" -f $deploymentName)
 
 $nsg = New-AzureRmNetworkSecurityGroup -Name $networkSecurityGroupName -ResourceGroupName $resourceGroupName  -Location  $location `
- -SecurityRules $http, $https, $commerce, $idserver, $rdp, $smtpOutbound
+    -SecurityRules $http, $https, $commerce, $idserver, $rdp, $smtpOutbound
 
 $vnet = Get-AzureRmVirtualNetwork -Name $virtualNetworkName -ResourceGroupName $resourceGroupName
 
