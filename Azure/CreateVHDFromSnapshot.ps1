@@ -1,51 +1,67 @@
 Param(
-    [string] $subscriptionId,
-    [string] $deploymentName = "habitathome"
+    [string] $subscriptionId
+    
 )
+$config = Get-Content .\config.json | ConvertFrom-Json
+
 $account = Get-AzureRMContext | Select-Object Account
 
-if ($account.Account -eq $null){
+if ($account.Account -eq $null) {
     Login-AzureRmAccount
 }
 
+### DO NOT CHANGE
+$deploymentName = "habitathome"
 $snapshotResourceGroupName = ("{0}-demo-snapshot" -f $deploymentName)
-
 $osSnapshotName = ("{0}-os-snapshot" -f $deploymentName)
-$dataSnapshotName= ("{0}-data-snapshot" -f $deploymentName)
-
-$sasExpiryDuration = "3600"
-
-#Provide storage account name where you want to copy the snapshot. 
-$storageAccountName = "habitathomedemosnapshots"
-
-#Name of the storage container where the downloaded snapshot will be stored
-$storageContainerName = "snapshots"
-
-#Provide the key of the storage account where you want to copy snapshot. 
-$storageAccountKey = 'x94hCThqN2kA1dCRknLGRmZ2mMKAGH2r85989gw47N/OKNhj838OU8xM6Gv0QTZjE5TN1Vog8WpLs1hKwNhx+w=='
+$dataSnapshotName = ("{0}-data-snapshot" -f $deploymentName)
 
 #Provide the name of the VHD file to which snapshot will be copied.
 $osVHDFileName = ("{0}-os.vhd" -f $deploymentName)
-$dataVHDFileName=("{0}-data.vhd" -f $deploymentName)
+$dataVHDFileName = ("{0}-data.vhd" -f $deploymentName)
+
+
+$sasExpiryDuration = "10800"
 
 Select-AzureRmSubscription -SubscriptionId $subscriptionId
 
 Write-Host "Generating SAS tokens for snapshot(s)..." -ForegroundColor Green
 
-$osSAS = Grant-AzureRmSnapshotAccess -ResourceGroupName $snapshotResourceGroupName -SnapshotName $osSnapshotName  -DurationInSecond $sasExpiryDuration -Access Read 
 
-$dataSAS = Grant-AzureRmSnapshotAccess -ResourceGroupName $snapshotResourceGroupName -SnapshotName $dataSnapshotName  -DurationInSecond $sasExpiryDuration -Access Read 
+foreach ($region in $config.regions) {
 
-#Create the context for the storage account which will be used to copy snapshot to the storage account 
-$destinationContext = New-AzureStorageContext -StorageAccountName $storageAccountName -StorageAccountKey $storageAccountKey
+    Write-Host ("Creating VHDs in {0}" -f $region.location) -ForegroundColor Green
+    
+    $storageAccountName = $region.StorageAccountName
+    $keys = Get-AzureRmStorageAccountKey -ResourceGroupName $region.resourceGroupName -Name $region.StorageAccountName
+    $storageAccountKey = $keys[0].Value
+    $storageContainerName = $region.StorageContainerName
 
-Write-Host "Copying VHDs - this will take a while... " -ForegroundColor Green
-Write-Host "Copying OS Disk" -ForegroundColor Green
+    #Create the context for the storage account which will be used to copy snapshot to the storage account 
+    $destinationContext = New-AzureStorageContext -StorageAccountName $storageAccountName -StorageAccountKey $storageAccountKey
 
-$progress = Start-AzureStorageBlobCopy -AbsoluteUri $osSAS.AccessSAS -DestContainer $storageContainerName -DestContext $destinationContext -DestBlob $osVHDFileName
-$progress | Get-AzureStorageBlobCopyState -WaitForComplete
+    Write-Host "Copying VHDs - this will take a while... " -ForegroundColor Green
+    Write-Host "Copying OS Disk" -ForegroundColor Green
 
-Write-Host "Copying Data Disk" -ForegroundColor Green
+    $osSAS = Grant-AzureRmSnapshotAccess -ResourceGroupName $snapshotResourceGroupName -SnapshotName $osSnapshotName  -DurationInSecond $sasExpiryDuration -Access Read     
+    $progress = Start-AzureStorageBlobCopy -AbsoluteUri $osSAS.AccessSAS -DestContainer $storageContainerName -DestContext $destinationContext -DestBlob $osVHDFileName
+   
+    while (($progress | Get-AzureStorageBlobCopyState).Status -eq "Pending") {
+        Start-Sleep -s 30
+        $progress | Get-AzureStorageBlobCopyState
+    }
 
-$progress = Start-AzureStorageBlobCopy -AbsoluteUri $dataSAS.AccessSAS -DestContainer $storageContainerName -DestContext $destinationContext -DestBlob $dataVHDFileName
-$progress | Get-AzureStorageBlobCopyState -WaitForComplete
+    Write-Host "Copying Data Disk" -ForegroundColor Green
+
+    $dataSAS = Grant-AzureRmSnapshotAccess -ResourceGroupName $snapshotResourceGroupName -SnapshotName $dataSnapshotName  -DurationInSecond $sasExpiryDuration -Access Read 
+    $progress = Start-AzureStorageBlobCopy -AbsoluteUri $dataSAS.AccessSAS -DestContainer $storageContainerName -DestContext $destinationContext -DestBlob $dataVHDFileName
+    while (($progress | Get-AzureStorageBlobCopyState).Status -eq "Pending") {
+        Start-Sleep -s 30
+        $progress | Get-AzureStorageBlobCopyState
+    }
+
+}
+
+
+
+
