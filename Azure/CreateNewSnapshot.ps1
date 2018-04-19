@@ -1,22 +1,22 @@
 Param(
     [string] $subscriptionId,
-    [string] $sourceResourceGroupName = "habitathome"
+    [string] $sourceResourceGroupName = "habitathome",
+    [string] $snapshotPrefix = "habitathome",
+    [string] $location = "eastus",
+    [string] $snapshotDestinationResourceGroup = "habitathome-demo-snapshot",
+    [ValidateSet('xp', 'xc')]
+    [string]$demoType
 )
 $account = Get-AzureRMContext | Select-Object Account
 
-if ($account.Account -eq $null){
+if ($account.Account -eq $null) {
     Login-AzureRmAccount
 }
 
-$location = "eastus"
+$vmName = ("{0}-vm" -f $sourceResourceGroupName)
 
-$vmName =  ("{0}-vm" -f $sourceResourceGroupName)
-
-$osSnapshotName = "habitathome-os-snapshot"
-$dataSnapshotName= "habitathome-data-snapshot"
-
-#Provide storage account name where you want to copy the snapshot. 
-$snapshotResourceGroupName = "habitathome-demo-snapshot"
+$osSnapshotName = ("{0}{1}-os-snapshot" -f $snapshotPrefix, $demoType)
+$dataSnapshotName = ("{0}{1}-data-snapshot" -f $snapshotPrefix, $demoType)
 
 Select-AzureRmSubscription -SubscriptionId $subscriptionId
 
@@ -25,16 +25,16 @@ $vm = Get-AzureRmVM -ResourceGroupName $sourceResourceGroupName -Name $vmName
 $osDiskId = $vm.StorageProfile.OsDisk.ManagedDisk.Id
 $dataDiskId = $vm.StorageProfile.DataDisks[0].ManagedDisk.Id
 
-$osSnapshotConfig =  New-AzureRmSnapshotConfig `
--SourceUri $osDiskId `
--Location $location `
--CreateOption copy
+$osSnapshotConfig = New-AzureRmSnapshotConfig `
+    -SourceUri $osDiskId `
+    -Location $location `
+    -CreateOption copy
 
-New-AzureRmSnapshot -Snapshot $osSnapshotConfig -SnapshotName $osSnapshotName -ResourceGroupName $snapshotResourceGroupName
+New-AzureRmSnapshot -Snapshot $osSnapshotConfig -SnapshotName $osSnapshotName -ResourceGroupName $snapshotDestinationResourceGroup
 
-$dataSnapshotConfig =  New-AzureRmSnapshotConfig `
--SourceUri $dataDiskId `
--Location $location `
--CreateOption copy
+$dataSnapshotConfig = New-AzureRmSnapshotConfig `
+    -SourceUri $dataDiskId `
+    -Location $location `
+    -CreateOption copy
 
-New-AzureRmSnapshot -Snapshot $dataSnapshotConfig -SnapshotName $dataSnapshotName -ResourceGroupName $snapshotResourceGroupName
+New-AzureRmSnapshot -Snapshot $dataSnapshotConfig -SnapshotName $dataSnapshotName -ResourceGroupName $snapshotDestinationResourceGroup
