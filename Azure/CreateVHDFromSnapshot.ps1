@@ -1,5 +1,10 @@
 Param(
-    [string] $subscriptionId
+    [string] $subscriptionId,
+    [string] $snapshotPrefix = "habitathome",
+    [ValidateSet('xp', 'xc')]
+    [string]$demoType,
+    [switch] $skipRegions
+    
     
 )
 $config = Get-Content .\config.json | ConvertFrom-Json
@@ -11,14 +16,14 @@ if ($account.Account -eq $null) {
 }
 
 ### DO NOT CHANGE
-$deploymentName = "habitathome"
-$snapshotResourceGroupName = ("{0}-demo-snapshot" -f $deploymentName)
-$osSnapshotName = ("{0}-os-snapshot" -f $deploymentName)
-$dataSnapshotName = ("{0}-data-snapshot" -f $deploymentName)
+
+$snapshotResourceGroupName = ("{0}-demo-snapshot" -f $snapshotPrefix)
+$osSnapshotName = ("{0}{1}-os-snapshot" -f $snapshotPrefix, $demoType)
+$dataSnapshotName = ("{0}{1}-data-snapshot" -f $snapshotPrefix, $demoType)
 
 #Provide the name of the VHD file to which snapshot will be copied.
-$osVHDFileName = ("{0}-os.vhd" -f $deploymentName)
-$dataVHDFileName = ("{0}-data.vhd" -f $deploymentName)
+$osVHDFileName = ("{0}{1}-os.vhd" -f $snapshotPrefix, $demoType)
+$dataVHDFileName = ("{0}{1}-data.vhd" -f $snapshotPrefix, $demoType)
 
 
 $sasExpiryDuration = "10800"
@@ -29,7 +34,9 @@ Write-Host "Generating SAS tokens for snapshot(s)..." -ForegroundColor Green
 
 
 foreach ($region in $config.regions) {
-
+    if ($skipRegions -and $region.location -ne "eastus") {
+        Exit 0
+    }
     Write-Host ("Creating VHDs in {0}" -f $region.location) -ForegroundColor Green
     
     $storageAccountName = $region.StorageAccountName
@@ -60,7 +67,3 @@ foreach ($region in $config.regions) {
         $progress | Get-AzureStorageBlobCopyState
     }
 }
-
-
-
-
