@@ -2,6 +2,8 @@ Param(
     [string] $subscriptionId,
     [ValidateSet('na', 'ga', 'emea')]
     [string]$region = 'na',
+    [ValidateSet('xp', 'xc')]
+    [string]$demoType,
     [string] $deploymentName = "habitathome"
 )
 $account = Get-AzureRMContext | Select-Object Account
@@ -12,7 +14,9 @@ if ($account.Account -eq $null) {
 
 #Provide the size of the virtual machine
 #Get all the vm sizes in a region using below script:
-#e.g. Get-AzureRmVMSize -Location westus
+#e.g. Get-AzureRmVMSize -Location eastus 
+# available regions are "eastus", "australiaeast" and "ukwest"
+
 $virtualMachineSize = 'Standard_DS12_V2_Promo'
 
 
@@ -24,29 +28,31 @@ switch ($region) {
     na {
         $storageAccountId = "/subscriptions/8ae723fd-8e32-44bd-bd0e-f3f71631e11e/resourceGroups/habitathome-demo-snapshot/providers/Microsoft.Storage/storageAccounts/habitathomedemosnapshots"
         $storageContainerName = "habitathomedemosnapshots"
-        $location="eastus"
+        $location = "eastus"
     }
     ga {
         $storageAccountId = "/subscriptions/8ae723fd-8e32-44bd-bd0e-f3f71631e11e/resourceGroups/habitathome-demo-snapshot-ga/providers/Microsoft.Storage/storageAccounts/hhdemosnapshotsga"
         $storageContainerName = "hhdemosnapshotsga"
-        $location="australiaeast"
+        $location = "australiaeast"
     }
     emea {
         $storageAccountId = "/subscriptions/8ae723fd-8e32-44bd-bd0e-f3f71631e11e/resourceGroups/habitathome-demo-snapshot-emea/providers/Microsoft.Storage/storageAccounts/hhdemosnapshotsemea"
         $storageContainerName = "hhdemosnapshotsemea"
-        $location="ukwest"
+        $location = "ukwest"
     }
 }
-  #Provide the name of the snapshot that will be used to create OS disk
-  $osVHDUri = ("https://{0}.blob.core.windows.net/snapshots/habitathome-os.vhd" -f $storageContainerName)
-  #Provide the name of the snapshot that will be used to create Data disk
-  $dataVHDUri = ("https://{0}.blob.core.windows.net/snapshots/habitathome-data.vhd" -f $storageContainerName)
+$snapshotPrefix = ("habitathome{0}" -f $demoType)
+
+#Provide the name of the snapshot that will be used to create OS disk
+$osVHDUri = ("https://{0}.blob.core.windows.net/snapshots/{1}-os.vhd" -f $storageContainerName, $snapshotPrefix)
+#Provide the name of the snapshot that will be used to create Data disk
+$dataVHDUri = ("https://{0}.blob.core.windows.net/snapshots/{1}-data.vhd" -f $storageContainerName, $snapshotPrefix)
 
 $resourceGroupName = $deploymentName
 
 #Provide the name of the OS and data disks that will be created using the snapshot
-$osDiskName = ("{0}_osDisk" -f $deploymentName)
-$dataDiskName = ("{0}_data" -f $deploymentName)
+$osDiskName = ("{0}_osDisk" -f $deploymentName.Replace("-","_"))
+$dataDiskName = ("{0}_data" -f $deploymentName.Replace("-","_"))
 
 #Provide the name of an existing virtual network where virtual machine will be created
 $virtualNetworkName = ("{0}-vnet" -f $deploymentName)
@@ -102,13 +108,20 @@ $smtpOutbound = New-AzureRmNetworkSecurityRuleConfig -Name "SMTP" -Description "
 
 $networkSecurityGroupName = ("{0}-nsg" -f $deploymentName)
 
-$nsg = New-AzureRmNetworkSecurityGroup -Name $networkSecurityGroupName -ResourceGroupName $resourceGroupName  -Location  $location `
+if ($demoType -eq "xc"){
+    # Only open ports 50xx and 4200 for an XC demo 
+    $nsg = New-AzureRmNetworkSecurityGroup -Name $networkSecurityGroupName -ResourceGroupName $resourceGroupName  -Location  $location `
     -SecurityRules $http, $https, $commerce, $idserver, $rdp, $smtpOutbound
+}
+else {
+    $nsg = New-AzureRmNetworkSecurityGroup -Name $networkSecurityGroupName -ResourceGroupName $resourceGroupName  -Location  $location `
+    -SecurityRules $http, $https, $rdp, $smtpOutbound
+}
 
 $vnet = Get-AzureRmVirtualNetwork -Name $virtualNetworkName -ResourceGroupName $resourceGroupName
 
 # Create NIC in the first subnet of the virtual network
-$nic = New-AzureRmNetworkInterface -Name ("{0}_nic" -f $deploymentName)  -ResourceGroupName $resourceGroupName -Location $location -SubnetId $vnet.Subnets[0].Id -PublicIpAddressId $publicIp.Id -NetworkSecurityGroupId $nsg.Id
+$nic = New-AzureRmNetworkInterface -Name ("{0}_nic" -f $deploymentName.Replace("-","_"))  -ResourceGroupName $resourceGroupName -Location $location -SubnetId $vnet.Subnets[0].Id -PublicIpAddressId $publicIp.Id -NetworkSecurityGroupId $nsg.Id
 
 $VirtualMachine = Add-AzureRmVMNetworkInterface -VM $VirtualMachine -Id $nic.Id
 
