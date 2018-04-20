@@ -29,16 +29,19 @@ switch ($region) {
         $storageAccountId = "/subscriptions/8ae723fd-8e32-44bd-bd0e-f3f71631e11e/resourceGroups/habitathome-demo-snapshot/providers/Microsoft.Storage/storageAccounts/habitathomedemosnapshots"
         $storageContainerName = "habitathomedemosnapshots"
         $location = "eastus"
+        $timeZone = "Eastern Standard Time"
     }
     ga {
         $storageAccountId = "/subscriptions/8ae723fd-8e32-44bd-bd0e-f3f71631e11e/resourceGroups/habitathome-demo-snapshot-ga/providers/Microsoft.Storage/storageAccounts/hhdemosnapshotsga"
         $storageContainerName = "hhdemosnapshotsga"
         $location = "australiaeast"
+        $timeZone = "E. Australia Standard Time"
     }
     emea {
         $storageAccountId = "/subscriptions/8ae723fd-8e32-44bd-bd0e-f3f71631e11e/resourceGroups/habitathome-demo-snapshot-emea/providers/Microsoft.Storage/storageAccounts/hhdemosnapshotsemea"
         $storageContainerName = "hhdemosnapshotsemea"
         $location = "ukwest"
+        $timeZone = "GMT Standard Time"
     }
 }
 $snapshotPrefix = ("habitathome{0}" -f $demoType)
@@ -51,8 +54,8 @@ $dataVHDUri = ("https://{0}.blob.core.windows.net/snapshots/{1}-data.vhd" -f $st
 $resourceGroupName = $deploymentName
 
 #Provide the name of the OS and data disks that will be created using the snapshot
-$osDiskName = ("{0}_osDisk" -f $deploymentName.Replace("-","_"))
-$dataDiskName = ("{0}_data" -f $deploymentName.Replace("-","_"))
+$osDiskName = ("{0}_osDisk" -f $deploymentName.Replace("-", "_"))
+$dataDiskName = ("{0}_data" -f $deploymentName.Replace("-", "_"))
 
 #Provide the name of an existing virtual network where virtual machine will be created
 $virtualNetworkName = ("{0}-vnet" -f $deploymentName)
@@ -126,8 +129,10 @@ $nic = New-AzureRmNetworkInterface -Name ("{0}_nic" -f $deploymentName.Replace("
 $VirtualMachine = Add-AzureRmVMNetworkInterface -VM $VirtualMachine -Id $nic.Id
 
 #Create the virtual machine with Managed Disk
-$vm = New-AzureRmVM -VM $VirtualMachine -ResourceGroupName $resourceGroupName -Location $location
+New-AzureRmVM -VM $VirtualMachine -ResourceGroupName $resourceGroupName -Location $location
 $vm = Get-AzureRmVM -Name $virtualMachineName -ResourceGroupName $resourceGroupName
 $vm = Add-AzureRmVMDataDisk -VM $vm -Name $dataDiskName -CreateOption Attach -ManagedDiskId $dataDisk.id -Lun 1
 
 Update-AzureRmVM -VM $vm -ResourceGroupName $resourceGroupName
+
+.\EnableAutoShutdown.ps1 -SubscriptionId $subscriptionId -ResourceGroupName $resourceGroupName -VirtualMachineName $virtualMachineName -TimeZone $timeZone
