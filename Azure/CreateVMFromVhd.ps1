@@ -63,6 +63,39 @@ $virtualNetworkName = ("{0}-vnet" -f $deploymentName)
 #Provide the name of the virtual machine
 $virtualMachineName = ("{0}-vm" -f $deploymentName)
 
+
+Function Enable-AzureRMVmAutoShutdown {
+    Param 
+    (
+        [Parameter(Mandatory = $true)] 
+        [string] $SubscriptionId,
+        [Parameter(Mandatory = $true)] 
+        [string] $ResourceGroupName,
+        [Parameter(Mandatory = $true)]
+        [string] $VirtualMachineName,
+        [int] $ShutdownTime = 2200,
+        [string] $TimeZone = 'UTC'
+    )
+    Try {
+        $Location = (Get-AzureRmVM -ResourceGroupName $ResourceGroupName -Name $VirtualMachineName).Location
+        $VMResourceId = (Get-AzureRmVM -ResourceGroupName $ResourceGroupName -Name $VirtualMachineName).Id
+        $ScheduledShutdownResourceId = "/subscriptions/$SubscriptionId/resourceGroups/$ResourceGroupName/providers/microsoft.devtestlab/schedules/shutdown-computevm-$VirtualMachineName"
+
+        $Properties = @{}
+        $Properties.Add('status', 'Enabled')
+        $Properties.Add('taskType', 'ComputeVmShutdownTask')
+        $Properties.Add('dailyRecurrence', @{'time' = $ShutdownTime})
+        $Properties.Add('timeZoneId', $TimeZone)
+        $Properties.Add('notificationSettings', @{status = 'Disabled'; timeInMinutes = 15})
+        $Properties.Add('targetResourceId', $VMResourceId)
+    
+        New-AzureRmResource -Location $Location -ResourceId $ScheduledShutdownResourceId -Properties $Properties -Force
+    }
+    Catch {Write-Error $_}
+
+}
+
+
 #Set the context to the subscription Id where Managed Disks and VM will be created
 Select-AzureRmSubscription -SubscriptionId $subscriptionId
 
@@ -111,20 +144,20 @@ $smtpOutbound = New-AzureRmNetworkSecurityRuleConfig -Name "SMTP" -Description "
 
 $networkSecurityGroupName = ("{0}-nsg" -f $deploymentName)
 
-if ($demoType -eq "xc"){
+if ($demoType -eq "xc") {
     # Only open ports 50xx and 4200 for an XC demo 
     $nsg = New-AzureRmNetworkSecurityGroup -Name $networkSecurityGroupName -ResourceGroupName $resourceGroupName  -Location  $location `
-    -SecurityRules $http, $https, $commerce, $idserver, $rdp, $smtpOutbound
+        -SecurityRules $http, $https, $commerce, $idserver, $rdp, $smtpOutbound
 }
 else {
     $nsg = New-AzureRmNetworkSecurityGroup -Name $networkSecurityGroupName -ResourceGroupName $resourceGroupName  -Location  $location `
-    -SecurityRules $http, $https, $rdp, $smtpOutbound
+        -SecurityRules $http, $https, $rdp, $smtpOutbound
 }
 
 $vnet = Get-AzureRmVirtualNetwork -Name $virtualNetworkName -ResourceGroupName $resourceGroupName
 
 # Create NIC in the first subnet of the virtual network
-$nic = New-AzureRmNetworkInterface -Name ("{0}_nic" -f $deploymentName.Replace("-","_"))  -ResourceGroupName $resourceGroupName -Location $location -SubnetId $vnet.Subnets[0].Id -PublicIpAddressId $publicIp.Id -NetworkSecurityGroupId $nsg.Id
+$nic = New-AzureRmNetworkInterface -Name ("{0}_nic" -f $deploymentName.Replace("-", "_"))  -ResourceGroupName $resourceGroupName -Location $location -SubnetId $vnet.Subnets[0].Id -PublicIpAddressId $publicIp.Id -NetworkSecurityGroupId $nsg.Id
 
 $VirtualMachine = Add-AzureRmVMNetworkInterface -VM $VirtualMachine -Id $nic.Id
 
@@ -135,4 +168,4 @@ $vm = Add-AzureRmVMDataDisk -VM $vm -Name $dataDiskName -CreateOption Attach -Ma
 
 Update-AzureRmVM -VM $vm -ResourceGroupName $resourceGroupName
 
-.\EnableAutoShutdown.ps1 -SubscriptionId $subscriptionId -ResourceGroupName $resourceGroupName -VirtualMachineName $virtualMachineName -TimeZone $timeZone
+Enable-AzureRMVmAutoShutdown -SubscriptionId $subscriptionId -ResourceGroupName $resourceGroupName -VirtualMachineName $virtualMachineName -TimeZone $timeZone
