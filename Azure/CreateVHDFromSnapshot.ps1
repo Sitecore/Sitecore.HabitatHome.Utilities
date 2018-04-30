@@ -3,7 +3,7 @@ Param(
     [string] $snapshotPrefix = "habitathome",
     [ValidateSet('xp', 'xc')]
     [string]$demoType,
-    [switch] $skipRegions
+    [string[]] $regions = @("na", "emea", "ga")
     
     
 )
@@ -16,7 +16,7 @@ if ($account.Account -eq $null) {
 }
 
 ### DO NOT CHANGE
-
+$demoType = $demoType.ToLower()
 $snapshotResourceGroupName = ("{0}-demo-snapshot" -f $snapshotPrefix)
 $osSnapshotName = ("{0}{1}-os-snapshot" -f $snapshotPrefix, $demoType)
 $dataSnapshotName = ("{0}{1}-data-snapshot" -f $snapshotPrefix, $demoType)
@@ -33,16 +33,14 @@ Select-AzureRmSubscription -SubscriptionId $subscriptionId
 Write-Host "Generating SAS tokens for snapshot(s)..." -ForegroundColor Green
 
 
-foreach ($region in $config.regions) {
-    if ($skipRegions -and $region.location -ne "eastus") {
-        Exit 0
-    }
-    Write-Host ("Creating VHDs in {0}" -f $region.location) -ForegroundColor Green
-    
-    $storageAccountName = $region.StorageAccountName
-    $keys = Get-AzureRmStorageAccountKey -ResourceGroupName $region.resourceGroupName -Name $region.StorageAccountName
+foreach ($region in $regions) {
+    $region = $region.ToLower()
+    $configRegion = ($config.regions | Where-Object {$_.name -eq $region})
+    Write-Host ("Creating VHDs in {0}" -f $configRegion.location) -ForegroundColor Green
+    $storageAccountName = $configRegion.StorageAccountName
+    $keys = Get-AzureRmStorageAccountKey -ResourceGroupName $configRegion.resourceGroupName -Name $configRegion.StorageAccountName
     $storageAccountKey = $keys[0].Value
-    $storageContainerName = $region.StorageContainerName
+    $storageContainerName = $configRegion.StorageContainerName
 
     #Create the context for the storage account which will be used to copy snapshot to the storage account 
     $destinationContext = New-AzureStorageContext -StorageAccountName $storageAccountName -StorageAccountKey $storageAccountKey
@@ -51,19 +49,41 @@ foreach ($region in $config.regions) {
     Write-Host "Copying OS Disk" -ForegroundColor Green
 
     $osSAS = Grant-AzureRmSnapshotAccess -ResourceGroupName $snapshotResourceGroupName -SnapshotName $osSnapshotName  -DurationInSecond $sasExpiryDuration -Access Read     
-    $progress = Start-AzureStorageBlobCopy -AbsoluteUri $osSAS.AccessSAS -DestContainer $storageContainerName -DestContext $destinationContext -DestBlob $osVHDFileName
+    $progress = Start-AzureStorageBlobCopy -AbsoluteUri $osSAS.AccessSAS -DestContainer $storageContainerName -DestContext $destinationContext -DestBlob $osVHDFileName -Force
    
     while (($progress | Get-AzureStorageBlobCopyState).Status -eq "Pending") {
         Start-Sleep -s 30
         $progress | Get-AzureStorageBlobCopyState
     }
+    
+    $result = ($progress | Get-AzureStorageBlobCopyState)
+    
+    if ($result.Status -eq "Success") {
+        Write-Host ("Successful copy of OS Disk to {0}" -f $configRegion.location) -ForegroundColor Green
+    }
+    else {
+        $message = ("Error copying OS disk to region {0}" -f $configRegion.location)
+        Write-Host $message -ForegroundColor Red
+        Add-Content -Path (Join-Path $PWD "vhdcreation.log") -Value $message -Force
+    }
 
     Write-Host "Copying Data Disk" -ForegroundColor Green
 
     $dataSAS = Grant-AzureRmSnapshotAccess -ResourceGroupName $snapshotResourceGroupName -SnapshotName $dataSnapshotName  -DurationInSecond $sasExpiryDuration -Access Read 
-    $progress = Start-AzureStorageBlobCopy -AbsoluteUri $dataSAS.AccessSAS -DestContainer $storageContainerName -DestContext $destinationContext -DestBlob $dataVHDFileName
+    $progress = Start-AzureStorageBlobCopy -AbsoluteUri $dataSAS.AccessSAS -DestContainer $storageContainerName -DestContext $destinationContext -DestBlob $dataVHDFileName -Force
     while (($progress | Get-AzureStorageBlobCopyState).Status -eq "Pending") {
         Start-Sleep -s 30
         $progress | Get-AzureStorageBlobCopyState
+    }
+    
+    $result = ($progress | Get-AzureStorageBlobCopyState)
+    
+    if ($result.Status -eq "Success") {
+        Write-Host ("Successful copy of Data Disk to {0}" -f $configRegion.location) -ForegroundColor Green
+    }
+    else {
+        $message = ("Error copying data disk to region {0}" -f $configRegion.location)
+        Write-Host $message -ForegroundColor Red
+        Add-Content -Path (Join-Path $PWD "vhdcreation.log") -Value $message -Force
     }
 }

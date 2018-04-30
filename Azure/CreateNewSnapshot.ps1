@@ -1,6 +1,6 @@
 Param(
     [string] $subscriptionId,
-    [string] $sourceResourceGroupName = "habitathome",
+    [string] $sourceResourceGroupNamePrefix = "habitathome",
     [string] $snapshotPrefix = "habitathome",
     [string] $location = "eastus",
     [string] $snapshotDestinationResourceGroup = "habitathome-demo-snapshot",
@@ -12,7 +12,10 @@ $account = Get-AzureRMContext | Select-Object Account
 if ($account.Account -eq $null) {
     Login-AzureRmAccount
 }
+$demoType = $demoType.ToLower()
+$location = $location.ToLower()
 
+$sourceResourceGroupName = ("{0}{1}master" -f $sourceResourceGroupNamePrefix,$demoType)
 $vmName = ("{0}-vm" -f $sourceResourceGroupName)
 
 $osSnapshotName = ("{0}{1}-os-snapshot" -f $snapshotPrefix, $demoType)
