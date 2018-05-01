@@ -23,6 +23,8 @@ $virtualMachineSize = 'Standard_DS12_V2_Promo'
 #########       SHOULD not need to modify the following     #############
 
 ###########     Set up the source
+$region = $region.ToLower()
+$demoType = $demoType.ToLower()
 
 switch ($region) {
     na {

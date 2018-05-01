@@ -1,18 +1,21 @@
 {
     "regions" :[
         {
+            "name":"na",
             "location":"eastus",
             "resourceGroupName":"habitathome-demo-snapshot",
             "storageAccountName":"habitathomedemosnapshots",
             "storageContainerName":"snapshots"
         },
         {
+            "name":"emea",
             "location":"ukwest",
             "resourceGroupName":"habitathome-demo-snapshot-emea",
             "storageAccountName":"hhdemosnapshotsemea",
             "storageContainerName":"snapshots"
         },
         {
+            "name":"ga",
             "location":"australiaeast",
             "resourceGroupName":"habitathome-demo-snapshot-ga",
             "storageAccountName":"hhdemosnapshotsga",
