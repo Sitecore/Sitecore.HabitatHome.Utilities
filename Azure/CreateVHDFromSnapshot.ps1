@@ -32,7 +32,9 @@ Select-AzureRmSubscription -SubscriptionId $subscriptionId
 
 Write-Host "Generating SAS tokens for snapshot(s)..." -ForegroundColor Green
 
-
+if (Test-Path (Join-Path $PWD "vhdcreation.log") -PathType Leaf){
+    Remove-Item (Join-Path $PWD "vhdcreation.log") -Force
+}
 foreach ($region in $regions) {
     $region = $region.ToLower()
     $configRegion = ($config.regions | Where-Object {$_.name -eq $region})
@@ -52,7 +54,7 @@ foreach ($region in $regions) {
     $progress = Start-AzureStorageBlobCopy -AbsoluteUri $osSAS.AccessSAS -DestContainer $storageContainerName -DestContext $destinationContext -DestBlob $osVHDFileName -Force
    
     while (($progress | Get-AzureStorageBlobCopyState).Status -eq "Pending") {
-        Start-Sleep -s 30
+        Start-Sleep -s 60
         $progress | Get-AzureStorageBlobCopyState
     }
     
@@ -72,7 +74,7 @@ foreach ($region in $regions) {
     $dataSAS = Grant-AzureRmSnapshotAccess -ResourceGroupName $snapshotResourceGroupName -SnapshotName $dataSnapshotName  -DurationInSecond $sasExpiryDuration -Access Read 
     $progress = Start-AzureStorageBlobCopy -AbsoluteUri $dataSAS.AccessSAS -DestContainer $storageContainerName -DestContext $destinationContext -DestBlob $dataVHDFileName -Force
     while (($progress | Get-AzureStorageBlobCopyState).Status -eq "Pending") {
-        Start-Sleep -s 30
+        Start-Sleep -s 60
         $progress | Get-AzureStorageBlobCopyState
     }
     
