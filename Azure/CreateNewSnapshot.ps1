@@ -14,8 +14,7 @@ if ($account.Account -eq $null) {
 }
 $demoType = $demoType.ToLower()
 $location = $location.ToLower()
-
-$sourceResourceGroupName = ("{0}{1}master" -f $sourceResourceGroupNamePrefix,$demoType)
+$sourceResourceGroupName = ("{0}{1}master" -f $sourceResourceGroupNamePrefix, $demoType)
 $vmName = ("{0}-vm" -f $sourceResourceGroupName)
 
 $osSnapshotName = ("{0}{1}-os-snapshot" -f $snapshotPrefix, $demoType)
