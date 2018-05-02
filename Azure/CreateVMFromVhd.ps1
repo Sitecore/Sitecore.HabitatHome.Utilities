@@ -3,6 +3,7 @@ Param(
     [ValidateSet('na', 'ga', 'emea')]
     [string]$region = 'na',
     [ValidateSet('xp', 'xc')]
+    [Parameter(Mandatory=$true)]
     [string]$demoType,
     [string] $deploymentName = "habitathome"
 )
