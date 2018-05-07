@@ -268,7 +268,7 @@ Function Publish-IdentityServer{
 }
 Function Publish-BizFx {
     Write-Host "Publishing BizFx" -ForegroundColor Green
-    $bizFxSource = Join-Path $commerceAssets.installationFolder "Sitecore.BizFX.1.2.13/"
+    $bizFxSource = Join-Path $commerceAssets.installationFolder "Sitecore.BizFX.1.1.9/"
     $PublishLocation = Join-Path $publishPath "Habitat.Commerce.BizFx"
     if (Test-Path $PublishLocation){
         Remove-Item $PublishLocation -Force -Recurse
@@ -307,7 +307,7 @@ Function Install-Commerce {
         CommerceShopsServicesPort          = "5005"
         CommerceAuthoringServicesPort      = "5000"
         CommerceMinionsServicesPort        = "5010"     
-        SitecoreCommerceEnginePath          = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include "Sitecore.Commerce.Engine.2.2.56.zip" -Recurse) 
+        SitecoreCommerceEnginePath          = $(Join-Path $resourcePath "Publish\Habitat.Commerce.Engine")
         SitecoreBizFxServicesContentPath   = $(Join-Path $resourcePath "Publish\Habitat.Commerce.BizFX")
         SitecoreBizFxPostFix               = $site.prefix
         SitecoreIdentityServerPath      = $(Join-Path $resourcePath "Publish\Habitat.Commerce.IdentityServer")
