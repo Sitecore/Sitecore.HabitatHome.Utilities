@@ -1,0 +1,14 @@
+{
+  "Parameters": {    
+    "BaseUrl": { "Type": "string" }
+  },
+  "Modules": [ "SitecoreUtilityTasks" ],
+  "Tasks": {    
+    "PublishToWeb": {
+      "Type": "PublishToWeb",
+      "Params": {        
+        "BaseUrl": "[parameter('BaseUrl')]"
+      }
+    }
+  }     
+}

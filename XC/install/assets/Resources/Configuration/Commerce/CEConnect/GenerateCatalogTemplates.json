@@ -1,0 +1,14 @@
+{
+  "Parameters": {
+    "BaseUrl": { "Type": "string" }
+  },
+  "Modules": [ "SitecoreUtilityTasks" ],
+  "Tasks": {
+    "GenerateCatalogTemplates": {
+      "Type": "GenerateCatalogTemplates",
+      "Params": {
+        "BaseUrl": "[parameter('BaseUrl')]"
+      }
+    }
+  }
+}

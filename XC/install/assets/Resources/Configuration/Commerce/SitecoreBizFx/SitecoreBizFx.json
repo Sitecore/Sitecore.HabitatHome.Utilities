@@ -1,0 +1,134 @@
+﻿// -------------------------------------------------------------------------- //
+//         Sitecore Install Framework - Deploy Sitecore BizFx Services        //
+//                                                                            //
+//  Run this configuration to deploy Sitecore BizFx Services.                 //
+//                                                                            //
+//  NOTE: Only single line comments are accepted in configurations.           //
+// -------------------------------------------------------------------------- //
+{
+	"Parameters": {
+		"WebRoot": {
+			"Type": "string",
+			"Description": "The physical path of the configured Web Root for the environment"
+		  },
+		  "SitecoreBizFxPostFix":{
+			"Type": "string",
+			"Description": "String to add at the end of 'SitecoreBizFx' to make it unique to the instance"
+		},
+		"SitecoreBizFxServicesContentPath": {
+			"Type": "string",
+			"Description": "SitecoreBizFx Services Content Path"
+		},
+		"UserAccount": {
+			"Type": "psobject",
+			"DefaultValue": {
+				"UserName": "",
+				"Domain": "$env:COMPUTERNAME",
+				"Password": ""
+			}
+		},
+		"RootCertFileName": {
+			"Type": "string",
+			"Description": "The file name of the root certificate to be created.",
+			"DefaultValue": "SitecoreRootCert"
+		},
+		"CommerceAuthoringServicesPort": {
+			"Type": "string",
+			"Description": "Commerce Authoring Services port"
+		},
+		"EnvironmentName": {
+			"Type": "string",
+			"Description": "Name of the Authoring Environment"
+		}
+	},
+	"Variables": {
+		"SitecoreBizFxPhysicalPath": "[joinpath(parameter('WebRoot'), concat('\\SitecoreBizFx', parameter('SitecoreBizFxPostFix')))]",
+		// The name dns name of the root certificate.
+		"Root.Cert.DnsName": "[concat('DO_NOT_TRUST_', parameter('RootCertFileName'))]",
+		// The certificate store for the root certificate.
+		"Root.Cert.Store": "cert:\\LocalMachine\\Root"
+	},
+	"Modules": [
+		"ManageCommerceService",
+		"DeployCommerceContent",
+		"WindowsLocalUser"
+	],
+	"Tasks": {
+		"StopSite": {
+			"Type": "ManageWebsite",
+			"Params": {
+				"Name": "SitecoreBizFx",
+				"Action": "Stop",
+				"ErrorAction": "SilentlyContinue"
+			}
+		},
+		"RemoveSite": {
+			"Type": "ManageCommerceService",
+			"Params": {
+				"Name": "SitecoreBizFx",
+				"Action": "Remove-Website"
+			}
+		},
+		"StopAppPool": {
+			"Type": "ManageAppPool",
+			"Params": {
+				"Name": "SitecoreBizFx",
+				"Action": "Stop",
+				"ErrorAction": "SilentlyContinue"
+			}
+		},
+		"RemoveAppPool": {
+			"Type": "ManageCommerceService",
+			"Params": {
+				"Name": "SitecoreBizFx",
+				"Action": "Remove-WebAppPool"
+			}
+		},
+		"RemoveSiteFolder": {
+			"Type": "ManageCommerceService",
+			"Params": {
+				"Name": "Name",
+				"PhysicalPath": "[variable('SitecoreBizFxPhysicalPath')]",
+				"Action": "Remove-Item"
+			}
+		},
+		"DeployCommerceContent": {
+			"Type": "DeployCommerceContent",
+      "Params": {
+        "Name": "SitecoreBizFx",
+        "ServicesContentPath": "[parameter('SitecoreBizFxServicesContentPath')]",
+        "CommerceAuthoringServicesPort": "[parameter('CommerceAuthoringServicesPort')]",
+        "PhysicalPath": "[variable('SitecoreBizFxPhysicalPath')]",
+		"UserAccount": "[parameter('UserAccount')]",
+		"EnvironmentName":"[parameter('EnvironmentName')]"
+      }
+		},
+		"CreatePaths": {
+			"Type": "EnsurePath",
+			"Params": {
+				"Exists": [
+					"[variable('SitecoreBizFxPhysicalPath')]"
+				]
+			}
+		},
+		"CreateWebAppPool": {
+			"Type": "ManageCommerceService",
+			"Params": {
+				"Name": "SitecoreBizFx",
+				"Action": "Create-WebAppPool",
+				"UserAccount": "[parameter('UserAccount')]"
+			}
+		},
+		"CreateWebsite": {
+			"Type": "ManageCommerceService",
+			"Params": {
+				"Name": "SitecoreBizFx",
+				"Action": "Create-Website",
+				"AppPoolName": "SitecoreBizFx",
+				"PhysicalPath": "[variable('SitecoreBizFxPhysicalPath')]",
+				"Port": "4200",
+				"Signer": "[GetCertificate(variable('Root.Cert.DnsName'), variable('Root.Cert.Store'))]"
+			}
+		}
+	}
+}
