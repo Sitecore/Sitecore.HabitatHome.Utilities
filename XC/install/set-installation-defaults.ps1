@@ -1,6 +1,6 @@
 Param(
     [string] $ConfigurationFile = "configuration-xc0.json",
-    [string] $XPConfigurationFile = "C:\projects\sitecore.habitat\install\configuration-xp0.json"
+    [string] $XPConfigurationFile = (Resolve-Path "..\..\xp\install\configuration-xp0.json")
 )
 
 Write-Host "Setting Defaults and creating $ConfigurationFile" -foregroundColor Green
