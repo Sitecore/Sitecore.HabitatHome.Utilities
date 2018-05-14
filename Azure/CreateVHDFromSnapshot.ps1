@@ -3,7 +3,7 @@ Param(
     [string] $snapshotPrefix = "habitathome",
     [ValidateSet('xp', 'xc')]
     [string]$demoType,
-    [string[]] $regions = @("na", "emea", "ga")
+    [string[]] $regions = @("na", "emea", "ga", "ne")
     
     
 )
@@ -19,11 +19,9 @@ if ($account.Account -eq $null) {
 $demoType = $demoType.ToLower()
 $snapshotResourceGroupName = ("{0}-demo-snapshot" -f $snapshotPrefix)
 $osSnapshotName = ("{0}{1}-os-snapshot" -f $snapshotPrefix, $demoType)
-$dataSnapshotName = ("{0}{1}-data-snapshot" -f $snapshotPrefix, $demoType)
 
 #Provide the name of the VHD file to which snapshot will be copied.
 $osVHDFileName = ("{0}{1}-os.vhd" -f $snapshotPrefix, $demoType)
-$dataVHDFileName = ("{0}{1}-data.vhd" -f $snapshotPrefix, $demoType)
 
 
 $sasExpiryDuration = "10800"
@@ -32,7 +30,7 @@ Select-AzureRmSubscription -SubscriptionId $subscriptionId
 
 Write-Host "Generating SAS tokens for snapshot(s)..." -ForegroundColor Green
 
-if (Test-Path (Join-Path $PWD "vhdcreation.log") -PathType Leaf){
+if (Test-Path (Join-Path $PWD "vhdcreation.log") -PathType Leaf) {
     Remove-Item (Join-Path $PWD "vhdcreation.log") -Force
 }
 foreach ($region in $regions) {
@@ -67,15 +65,6 @@ foreach ($region in $regions) {
         $message = ("Error copying OS disk to region {0}" -f $configRegion.location)
         Write-Host $message -ForegroundColor Red
         Add-Content -Path (Join-Path $PWD "vhdcreation.log") -Value $message -Force
-    }
-
-    Write-Host "Copying Data Disk" -ForegroundColor Green
-
-    $dataSAS = Grant-AzureRmSnapshotAccess -ResourceGroupName $snapshotResourceGroupName -SnapshotName $dataSnapshotName  -DurationInSecond $sasExpiryDuration -Access Read 
-    $progress = Start-AzureStorageBlobCopy -AbsoluteUri $dataSAS.AccessSAS -DestContainer $storageContainerName -DestContext $destinationContext -DestBlob $dataVHDFileName -Force
-    while (($progress | Get-AzureStorageBlobCopyState).Status -eq "Pending") {
-        Start-Sleep -s 60
-        $progress | Get-AzureStorageBlobCopyState
     }
     
     $result = ($progress | Get-AzureStorageBlobCopyState)

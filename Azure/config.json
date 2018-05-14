@@ -20,6 +20,13 @@
             "resourceGroupName":"habitathome-demo-snapshot-ga",
             "storageAccountName":"hhdemosnapshotsga",
             "storageContainerName":"snapshots"
+        },
+        {
+            "name":"ne",
+            "location":"northeurope",
+            "resourceGroupName":"docker-demo-snapshot",
+            "storageAccountName":"dockersnapshots",
+            "storageContainerName":"snapshots"
         }
     ]
 }
