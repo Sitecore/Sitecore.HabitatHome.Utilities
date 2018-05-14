@@ -1,11 +1,12 @@
 Param(
     [string] $subscriptionId,
-    [ValidateSet('na', 'ga', 'emea')]
+    [ValidateSet('na', 'ga', 'emea','ne')]
     [string]$region = 'na',
     [ValidateSet('xp', 'xc')]
-    [Parameter(Mandatory=$true)]
+    [Parameter(Mandatory = $true)]
     [string]$demoType,
-    [string] $deploymentName = "habitathome"
+    [string] $deploymentName = "habitathome",
+    [string] $sourceSnapshotPrefix = "habitathome"
 )
 $account = Get-AzureRMContext | Select-Object Account
 
@@ -46,19 +47,23 @@ switch ($region) {
         $location = "ukwest"
         $timeZone = "GMT Standard Time"
     }
+    ne {
+        $storageAccountId = "/subscriptions/***REMOVED***/resourceGroups/docker-demo-snapshot/providers/Microsoft.Storage/storageAccounts/dockersnapshots"
+        $storageContainerName = "dockersnapshots"
+        $location = "northeurope"
+        $timeZone = "GMT Standard Time"
+    }
 }
-$snapshotPrefix = ("habitathome{0}" -f $demoType)
+$snapshotPrefix = ("{0}{1}" -f $sourceSnapshotPrefix, $demoType)
 
 #Provide the name of the snapshot that will be used to create OS disk
 $osVHDUri = ("https://{0}.blob.core.windows.net/snapshots/{1}-os.vhd" -f $storageContainerName, $snapshotPrefix)
-#Provide the name of the snapshot that will be used to create Data disk
-$dataVHDUri = ("https://{0}.blob.core.windows.net/snapshots/{1}-data.vhd" -f $storageContainerName, $snapshotPrefix)
 
 $resourceGroupName = $deploymentName
 
 #Provide the name of the OS and data disks that will be created using the snapshot
 $osDiskName = ("{0}_osDisk" -f $deploymentName.Replace("-", "_"))
-$dataDiskName = ("{0}_data" -f $deploymentName.Replace("-", "_"))
+
 
 #Provide the name of an existing virtual network where virtual machine will be created
 $virtualNetworkName = ("{0}-vnet" -f $deploymentName)
@@ -112,15 +117,6 @@ $osDisk = New-AzureRmDisk -DiskName $osDiskName -Disk `
         -SourceUri $osVHDUri) `
     -ResourceGroupName $resourceGroupName
 
-# Data Disk
-
-$dataDisk = New-AzureRmDisk -DiskName $dataDiskName -Disk `
-(New-AzureRmDiskConfig -AccountType PremiumLRS  `
-        -Location $location -CreateOption Import `
-        -StorageAccountId $storageAccountId `
-        -SourceUri $dataVHDUri) `
-    -ResourceGroupName $resourceGroupName
-
 # Virtual Machine Configuraiton
 
 #Initialize virtual machine configuration
@@ -167,8 +163,5 @@ $VirtualMachine = Add-AzureRmVMNetworkInterface -VM $VirtualMachine -Id $nic.Id
 #Create the virtual machine with Managed Disk
 New-AzureRmVM -VM $VirtualMachine -ResourceGroupName $resourceGroupName -Location $location
 $vm = Get-AzureRmVM -Name $virtualMachineName -ResourceGroupName $resourceGroupName
-$vm = Add-AzureRmVMDataDisk -VM $vm -Name $dataDiskName -CreateOption Attach -ManagedDiskId $dataDisk.id -Lun 1
-
-Update-AzureRmVM -VM $vm -ResourceGroupName $resourceGroupName
 
 Enable-AzureRMVmAutoShutdown -SubscriptionId $subscriptionId -ResourceGroupName $resourceGroupName -VirtualMachineName $virtualMachineName -TimeZone $timeZone
