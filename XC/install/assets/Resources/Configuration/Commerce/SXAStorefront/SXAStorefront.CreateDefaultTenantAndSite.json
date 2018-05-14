@@ -1,0 +1,57 @@
+{
+  "Parameters": {
+    "SiteName": {
+      "Type": "string",
+      "Description": "The name of the site."
+    },
+    "SiteRootUrl": {
+      "Type": "string",
+      "Description": "Site root url."
+    },
+    "SitecoreUsername": {
+      "Type": "string",
+      "Description": "Sitecore Admin Username"
+    },
+    "SitecoreUserPassword": {
+      "Type": "string",
+      "Description": "Sitecore Admin Password"
+    },
+    "ProjectConfigIncludeDir": {
+      "Type": "string",
+      "Description": "Path of the config directory for project configurations."
+    }
+  },
+  "Modules": [ "SitecoreUtilityTasks" ],
+  "Tasks": {
+    "EnableSPEWebAPI": {
+      "Type": "EnableConfigFiles",
+      "Params": {
+        "ConfigDir": "[parameter('ProjectConfigIncludeDir')]",
+        "ConfigFileList": [ "z.Sitecore.Commerce.XA.SPE.WebAPI.Enabler.config" ]
+      }
+    },
+    "RestartWebAppPoolOps": {
+      "Type": "ManageAppPool",
+      "Params": {
+        "Name": "[parameter('SiteName')]",
+        "Action": "restart"
+      }
+    },
+    "CreateDefaultStorefront": {
+      "Type": "CreateDefaultStorefront",
+      "Params": {
+        "BaseUrl": "[parameter('SiteRootUrl')]",
+        "SiteName": "",
+        "SitecoreUsername": "[parameter('SitecoreUsername')]",
+        "SitecoreUserPassword": "[parameter('SitecoreUserPassword')]"
+      }
+    },
+    "DisableSPEWebAPI": {
+      "Type": "DisableConfigFiles",
+      "Params": {
+        "ConfigDir": "[parameter('ProjectConfigIncludeDir')]",
+        "ConfigFileList": [ "z.Sitecore.Commerce.XA.SPE.WebAPI.Enabler.config" ]
+      }
+    }
+  }
+}

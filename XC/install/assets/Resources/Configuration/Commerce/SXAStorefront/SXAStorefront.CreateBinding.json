@@ -1,0 +1,126 @@
+{
+  "Parameters": {
+    "SiteName": {
+      "Type": "string",
+      "Description": "The name of the site."
+    },
+    "CertificateName": {
+      "Type": "string",
+      "Description": "The name of the certificate to be created."
+    },
+    "CertPath": {
+      "Type": "string",
+      "Description": "The physical path on disk where certificates will be stored.",
+      "DefaultValue": "c:\\certificates"
+    },
+    "RootCertFileName": {
+      "Type": "string",
+      "Description": "The file name of the root certificate to be created.",
+      "DefaultValue": "SitecoreRootCert"
+    },
+    "StorefrontHostName": {
+      "Type": "string",
+      "Description": "The host name of the storefront.",
+      "DefaultValue": "sxa.storefront.com"
+    }
+  },
+  "Variables": {
+    // The name dns name of the root certificate.
+    "Root.Cert.DnsName": "[concat('DO_NOT_TRUST_', parameter('RootCertFileName'))]",
+    // The certificate store for the root certificate.
+    "Root.Cert.Store": "cert:\\LocalMachine\\Root",
+    // The certificate store for the client certificate.
+    "Client.Cert.Store": "cert:\\LocalMachine\\My",
+    "Security.SSL.CertificateThumbprint": "[GetCertificateThumbprint(parameter('CertificateName'), variable('Client.Cert.Store'))]"
+  },
+  "Tasks": {
+    "CreatePaths": {
+      // Create the physical disk path.
+      "Type": "EnsurePath",
+      "Params": {
+        "Exists": [
+          "[parameter('CertPath')]"
+        ]
+      }
+    },
+    "CreateSignedCert": {
+      // Create a certificate signed by the root authority.
+      "Type": "NewSignedCertificate",
+      "Params": {
+        "Signer": "[GetCertificate(variable('Root.Cert.DnsName'), variable('Root.Cert.Store'))]",
+        "Path": "[parameter('CertPath')]",
+        "CertStoreLocation": "[variable('Client.Cert.Store')]",
+        "Name": "[parameter('CertificateName')]",
+        "DnsName": "[parameter('CertificateName')]"
+      }
+    },
+    "StopWebsite": {
+      // Stops the website if it is running.
+      "Type": "ManageWebsite",
+      "Params": {
+        "Name": "[parameter('SiteName')]",
+        "Action": "Stop"
+      }
+    },
+    "StopAppPool": {
+      // Stops the app pool if it is running.
+      "Type": "ManageAppPool",
+      "Params": {
+        "Name": "[parameter('SiteName')]",
+        "Action": "Stop"
+      }
+    },
+    "CreateBindingsWithThumprint": {
+      // Configures the site bindings for the website.
+      "Type": "WebBinding",
+      "Params": {
+        "SiteName": "[parameter('SiteName')]",
+        "Add": [
+          {
+            "HostHeader": "[parameter('StorefrontHostName')]",
+            "Protocol": "https",
+            "SSLFlags": 1,
+            "Thumbprint": "[variable('Security.SSL.CertificateThumbprint')]"
+          }
+        ]
+      }
+    },
+    "CreateBindings": {
+      // Configures the site bindings for the website.
+      "Type": "WebBinding",
+      "Params": {
+        "SiteName": "[parameter('SiteName')]",
+        "Add": [
+          {
+            "HostHeader": "[parameter('StorefrontHostName')]",
+            "Protocol": "http",
+            "Port": "80" 
+          } 
+        ]
+      }
+    },
+    "CreateHostHeader": {
+      // Sets a hostheader for the website.
+      "Type": "HostHeader",
+      "Params": {
+        "HostName": "[parameter('StorefrontHostName')]"
+      }
+    },
+    "StartAppPool": {
+      // Starts the app pool.
+      "Type": "ManageAppPool",
+      "Params": {
+        "Name": "[parameter('SiteName')]",
+        "Action": "Start"
+      }
+    },
+    "StartWebsite": {
+      // Starts the website.
+      "Type": "ManageWebsite",
+      "Params": {
+        "Name": "[parameter('SiteName')]",
+        "Action": "Start"
+      }
+    }
+  }
+}

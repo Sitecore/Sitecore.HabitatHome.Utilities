@@ -1,0 +1,27 @@
+{
+  "Parameters": {
+    "ModuleFullPath": { "Type": "string" },
+    "ModulesDirDst": { "Type": "string" },
+    "BaseUrl": { "Type": "string" }
+  },
+  "Modules": [ "SitecoreUtilityTasks" ],
+  "Tasks": {
+    "CheckPaths": {
+      "Type": "EnsurePath",
+      "Params": {
+        "Exists": [
+          "[parameter('ModuleFullPath')]",
+          "[parameter('ModulesDirDst')]"
+        ]
+      }
+    },
+    "InstallModule": {
+      "Type": "InstallModule",
+      "Params": {
+        "ModuleFullPath": "[parameter('ModuleFullPath')]",
+        "ModulesDirDst": "[parameter('ModulesDirDst')]",
+        "BaseUrl": "[parameter('BaseUrl')]"
+      }
+    }
+  }
+}
