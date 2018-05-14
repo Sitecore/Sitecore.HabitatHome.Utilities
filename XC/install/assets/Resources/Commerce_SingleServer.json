@@ -224,7 +224,7 @@
     "CommerceServicesPostFix": "[parameter('SitePrefix')]",
     "SiteUtilitiesDir": "[concat(parameter('InstallDir'), '\\SiteUtilityPages')]",
     "ModulesDirDst": "[concat(parameter('InstallDir'), '\\App_Data\\packages')]",
-    "UtilitiesBaseUrl": "[concat('http://', concat(parameter('SiteHostHeaderName'), '/SiteUtilityPages'))]",
+    "UtilitiesBaseUrl": "[concat('https://', concat(parameter('SiteHostHeaderName'), '/SiteUtilityPages'))]",
     "PackagesDirDst": "[concat(parameter('InstallDir'), '\\sitecore\\admin\\Packages')]",
     "CEMergeInputFile": "[concat(parameter('InstallDir'), '\\MergeFiles\\Sitecore.Commerce.Engine.Connectors.Merge.Config')]",
     "SXAMergeInputFile": "[concat(parameter('InstallDir'), '\\MergeFiles\\Merge.SXA.Storefront.config')]",
@@ -235,7 +235,7 @@
     "ContentSearchEnabledXpath": "//configuration/sitecore/settings/setting[@name='ContentSearch.Enabled']",
     "ConnectionString": "[concat('Data Source=.;Initial Catalog=', concat(parameter('SitecoreCoreDbName'), ';Integrated Security=True'))]",
     "ProjectConfigIncludeDir": "[concat(parameter('InstallDir'), '\\App_Config\\Include\\Project\\Commerce')]",
-    "SiteRootUrl": "[concat('http://', concat(parameter('SiteHostHeaderName')))]",
+    "SiteRootUrl": "[concat('https://', concat(parameter('SiteHostHeaderName')))]",
     "ContentSearchEnabledXpath": "//configuration/sitecore/settings/setting[@name='ContentSearch.Enabled']"
   },
   "Modules": [ "InstallSitecoreConfiguration", "ManageCommerceService", "SitecoreUtilityTasks" ],
