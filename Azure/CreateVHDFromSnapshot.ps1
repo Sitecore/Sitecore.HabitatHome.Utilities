@@ -19,7 +19,7 @@ if ($account.Account -eq $null) {
 $demoType = $demoType.ToLower()
 $snapshotResourceGroupName = ("{0}-demo-snapshot" -f $snapshotPrefix)
 $osSnapshotName = ("{0}{1}-os-snapshot" -f $snapshotPrefix, $demoType)
-
+Write-host ("Preparing to copy {0} from {1}" -f $osSnapshotName, $snapshotResourceGroupName)
 #Provide the name of the VHD file to which snapshot will be copied.
 $osVHDFileName = ("{0}{1}-os.vhd" -f $snapshotPrefix, $demoType)
 
@@ -28,7 +28,7 @@ $sasExpiryDuration = "10800"
 
 Select-AzureRmSubscription -SubscriptionId $subscriptionId
 
-Write-Host "Generating SAS tokens for snapshot(s)..." -ForegroundColor Green
+
 
 if (Test-Path (Join-Path $PWD "vhdcreation.log") -PathType Leaf) {
     Remove-Item (Join-Path $PWD "vhdcreation.log") -Force
@@ -47,9 +47,14 @@ foreach ($region in $regions) {
 
     Write-Host "Copying VHDs - this will take a while... " -ForegroundColor Green
     Write-Host "Copying OS Disk" -ForegroundColor Green
+    Write-Host "Generating SAS tokens for snapshot(s)..." -ForegroundColor Green
+    $osSAS = Grant-AzureRmSnapshotAccess -ResourceGroupName $snapshotResourceGroupName -SnapshotName $osSnapshotName -DurationInSecond $sasExpiryDuration -Access Read
+    $osSAS=$(az snapshot grant-access -g $snapshotResourceGroupName -n $osSnapshotName --duration-in-seconds $sasExpiryDuration -o tsv)
 
-    $osSAS = Grant-AzureRmSnapshotAccess -ResourceGroupName $snapshotResourceGroupName -SnapshotName $osSnapshotName  -DurationInSecond $sasExpiryDuration -Access Read     
-    $progress = Start-AzureStorageBlobCopy -AbsoluteUri $osSAS.AccessSAS -DestContainer $storageContainerName -DestContext $destinationContext -DestBlob $osVHDFileName -Force
+    #$osSAS = Grant-AzureRmSnapshotAccess -ResourceGroupName $snapshotResourceGroupName -SnapshotName $osSnapshotName  -DurationInSecond $sasExpiryDuration -Access Read -Verbose
+    #Write-Host ("SAS Token: {0}" -f $osSAS.AccessSAS)    
+    Write-Host ("SAS Token: {0}" -f $osSAS)    
+    $progress = Start-AzureStorageBlobCopy -AbsoluteUri $osSAS -DestContainer $storageContainerName -DestContext $destinationContext -DestBlob $osVHDFileName -Force
    
     while (($progress | Get-AzureStorageBlobCopyState).Status -eq "Pending") {
         Start-Sleep -s 60
