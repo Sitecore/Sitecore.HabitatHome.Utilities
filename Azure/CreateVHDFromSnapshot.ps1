@@ -3,7 +3,7 @@ Param(
     [string] $snapshotPrefix = "habitathome",
     [ValidateSet('xp', 'xc')]
     [string]$demoType,
-    [string[]] $regions = @("na", "emea", "ga")
+    [string[]] $regions = @("na", "emea", "ga", "ne")
     
     
 )
@@ -19,20 +19,18 @@ if ($account.Account -eq $null) {
 $demoType = $demoType.ToLower()
 $snapshotResourceGroupName = ("{0}-demo-snapshot" -f $snapshotPrefix)
 $osSnapshotName = ("{0}{1}-os-snapshot" -f $snapshotPrefix, $demoType)
-$dataSnapshotName = ("{0}{1}-data-snapshot" -f $snapshotPrefix, $demoType)
-
+Write-host ("Preparing to copy {0} from {1}" -f $osSnapshotName, $snapshotResourceGroupName)
 #Provide the name of the VHD file to which snapshot will be copied.
 $osVHDFileName = ("{0}{1}-os.vhd" -f $snapshotPrefix, $demoType)
-$dataVHDFileName = ("{0}{1}-data.vhd" -f $snapshotPrefix, $demoType)
 
 
 $sasExpiryDuration = "10800"
 
 Select-AzureRmSubscription -SubscriptionId $subscriptionId
 
-Write-Host "Generating SAS tokens for snapshot(s)..." -ForegroundColor Green
 
-if (Test-Path (Join-Path $PWD "vhdcreation.log") -PathType Leaf){
+
+if (Test-Path (Join-Path $PWD "vhdcreation.log") -PathType Leaf) {
     Remove-Item (Join-Path $PWD "vhdcreation.log") -Force
 }
 foreach ($region in $regions) {
@@ -49,9 +47,14 @@ foreach ($region in $regions) {
 
     Write-Host "Copying VHDs - this will take a while... " -ForegroundColor Green
     Write-Host "Copying OS Disk" -ForegroundColor Green
+    Write-Host "Generating SAS tokens for snapshot(s)..." -ForegroundColor Green
+    $osSAS = Grant-AzureRmSnapshotAccess -ResourceGroupName $snapshotResourceGroupName -SnapshotName $osSnapshotName -DurationInSecond $sasExpiryDuration -Access Read
+    $osSAS=$(az snapshot grant-access -g $snapshotResourceGroupName -n $osSnapshotName --duration-in-seconds $sasExpiryDuration -o tsv)
 
-    $osSAS = Grant-AzureRmSnapshotAccess -ResourceGroupName $snapshotResourceGroupName -SnapshotName $osSnapshotName  -DurationInSecond $sasExpiryDuration -Access Read     
-    $progress = Start-AzureStorageBlobCopy -AbsoluteUri $osSAS.AccessSAS -DestContainer $storageContainerName -DestContext $destinationContext -DestBlob $osVHDFileName -Force
+    #$osSAS = Grant-AzureRmSnapshotAccess -ResourceGroupName $snapshotResourceGroupName -SnapshotName $osSnapshotName  -DurationInSecond $sasExpiryDuration -Access Read -Verbose
+    #Write-Host ("SAS Token: {0}" -f $osSAS.AccessSAS)    
+    Write-Host ("SAS Token: {0}" -f $osSAS)    
+    $progress = Start-AzureStorageBlobCopy -AbsoluteUri $osSAS -DestContainer $storageContainerName -DestContext $destinationContext -DestBlob $osVHDFileName -Force
    
     while (($progress | Get-AzureStorageBlobCopyState).Status -eq "Pending") {
         Start-Sleep -s 60
@@ -65,26 +68,6 @@ foreach ($region in $regions) {
     }
     else {
         $message = ("Error copying OS disk to region {0}" -f $configRegion.location)
-        Write-Host $message -ForegroundColor Red
-        Add-Content -Path (Join-Path $PWD "vhdcreation.log") -Value $message -Force
-    }
-
-    Write-Host "Copying Data Disk" -ForegroundColor Green
-
-    $dataSAS = Grant-AzureRmSnapshotAccess -ResourceGroupName $snapshotResourceGroupName -SnapshotName $dataSnapshotName  -DurationInSecond $sasExpiryDuration -Access Read 
-    $progress = Start-AzureStorageBlobCopy -AbsoluteUri $dataSAS.AccessSAS -DestContainer $storageContainerName -DestContext $destinationContext -DestBlob $dataVHDFileName -Force
-    while (($progress | Get-AzureStorageBlobCopyState).Status -eq "Pending") {
-        Start-Sleep -s 60
-        $progress | Get-AzureStorageBlobCopyState
-    }
-    
-    $result = ($progress | Get-AzureStorageBlobCopyState)
-    
-    if ($result.Status -eq "Success") {
-        Write-Host ("Successful copy of Data Disk to {0}" -f $configRegion.location) -ForegroundColor Green
-    }
-    else {
-        $message = ("Error copying data disk to region {0}" -f $configRegion.location)
         Write-Host $message -ForegroundColor Red
         Add-Content -Path (Join-Path $PWD "vhdcreation.log") -Value $message -Force
     }
