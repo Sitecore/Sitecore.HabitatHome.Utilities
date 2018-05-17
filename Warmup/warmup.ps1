@@ -25,8 +25,10 @@ Function Get-SitecoreSession {
   )
 
   # Login - to create web session with authorisation cookies
-  $loginPage = "$site/sitecore/login"
+  $loginPage = ("https://{0}/sitecore/login" -f $site)
+  
   $login = Invoke-WebRequest $loginPage -SessionVariable webSession
+  
   $form = $login.forms[0]
   $form.fields["UserName"] = $username
   $form.fields["Password"] = $password
@@ -61,8 +63,8 @@ Function RequestPage {
 	Write-Host "Done"
 	Write-Host ""
 }
-   
-$session = Get-SitecoreSession $instanceName sitecore\admin b
+  
+$session = Get-SitecoreSession $instanceName "sitecore\admin" "b"
 
 foreach ($page in $config.urls) {
 	RequestPage "https://$instanceName$($page.url)" $session
@@ -73,13 +75,3 @@ Write-Host " "
 Write-Host "press any key to close"
 
 $x = $host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
-
-
-
-
-
-
-
-
-
-
