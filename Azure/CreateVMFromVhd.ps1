@@ -111,7 +111,7 @@ New-AzureRmResourceGroup -Name $resourceGroupName -Location $location
 
 # OS Disk
 $osDisk = New-AzureRmDisk -DiskName $osDiskName -Disk `
-(New-AzureRmDiskConfig -AccountType PremiumLRS  `
+(New-AzureRmDiskConfig -AccountType Premium_LRS  `
         -Location $location -CreateOption Import `
         -StorageAccountId $storageAccountId `
         -SourceUri $osVHDUri) `
