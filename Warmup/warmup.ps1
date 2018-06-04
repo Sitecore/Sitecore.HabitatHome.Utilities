@@ -57,7 +57,7 @@ Function RequestPage {
     try { $request = Invoke-WebRequest $url -WebSession $webSession -TimeoutSec 60000 } catch {
         $status = $_.Exception.Response.StatusCode.Value__
         if ($status -ne 200) {
-            Write-Host ("ERROR Something went wrong while requesting {0} - Error {1}" -f $url,$status) -foregroundcolor red
+            Write-Host ("ERROR Something went wrong while requesting {0} - Error {1}" -f $url,$status) -ForegroundColor Red
         }
     }
 	
@@ -68,12 +68,13 @@ Function RequestPage {
 $demoType = $demoType.ToLower()
 
 $session = Get-SitecoreSession $instanceName "sitecore\admin" "b"
-Write-Host "Warming up XP Demo" -Foreground Color Green
+Write-Host "Warming up XP Demo" -ForegroundColor Green
 foreach ($page in $config.urls.xp) {
     RequestPage "https://$instanceName$($page.url)" $session
 }
+
 if ($demoType -eq "xc") {
-Write-Host "Warming up XC Demo" -Foreground Color Green
+Write-Host "Warming up XC Demo" -ForegroundColor Green
     foreach ($page in $config.urls.xc) {
         RequestPage "https://$instanceName$($page.url)" $session
     }
