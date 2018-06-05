@@ -25,7 +25,7 @@ Function Get-SitecoreSession {
     )
 
     # Login - to create web session with authorisation cookies
-    $loginPage = ("http://{0}/sitecore/login" -f $site)
+    $loginPage = ("https://{0}/sitecore/login" -f $site)
   
     $login = Invoke-WebRequest $loginPage -SessionVariable webSession
   
@@ -81,7 +81,7 @@ $errors = 0
 
 Write-Host "Warming up XP Demo" -ForegroundColor Green
 foreach ($page in $config.urls.xp) {
-	if (!$(RequestPage "http://$instanceName$($page.url)" $session)){
+	if (!$(RequestPage "https://$instanceName$($page.url)" $session)){
 		$errors++
 	}
 }
@@ -89,7 +89,7 @@ foreach ($page in $config.urls.xp) {
 if ($demoType -eq "xc") {
 Write-Host "Warming up XC Demo" -ForegroundColor Green
     foreach ($page in $config.urls.xc) {
-		if (!$(RequestPage "http://$instanceName$($page.url)" $session)){
+		if (!$(RequestPage "https://$instanceName$($page.url)" $session)){
 			$errors++
 		}
     }
