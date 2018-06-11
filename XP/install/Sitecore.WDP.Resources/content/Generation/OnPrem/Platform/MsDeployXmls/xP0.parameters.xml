@@ -140,8 +140,11 @@
   <parameter name="Reporting Connection String" description="Connection string to enter into config" tags="SQL, Hidden,NoStore" defaultValue="Data Source={Database Server Name};Initial Catalog={Reporting DB Name};User ID={Reporting DB User Name};Password={Reporting DB User Password}">
     <parameterEntry kind="XmlFile" scope="App_Config\\ConnectionStrings\.config$" match="//connectionStrings/add[@name='reporting']/@connectionString" />
   </parameter>
-  <parameter name="SOLR Connection String" description="SOLR Connection String" tags="Hidden,NoStore">
-    <parameterEntry kind="XmlFile" scope="App_Config\\Sitecore\\ContentSearch\\Sitecore.ContentSearch.Solr.DefaultIndexConfiguration\.config$" match="//configuration/sitecore/settings/setting[@name='ContentSearch.Solr.ServiceBaseAddress']/@value" />
+    <parameter name="SOLR Connection String" description="SOLR Connection String" tags="Hidden,NoStore">
+    <parameterEntry kind="XmlFile" scope="App_Config\\ConnectionStrings\.config$" match="//connectionStrings/add[@name='solr.search']/@connectionString" />
+  </parameter>
+  <parameter name="SOLR Zookeeper Connection String" description="SOLR Zookeeper Connection String" tags="Hidden,NoStore">
+    <parameterEntry kind="XmlFile" scope="App_Config\\ConnectionStrings\.config$" match="//connectionStrings/add[@name='solr.search.zookeeper']/@connectionString" />
   </parameter>
   <parameter name="XConnect Collection" description="XConnect Collection" tags="Hidden,NoStore">
     <parameterEntry kind="XmlFile" scope="App_Config\\ConnectionStrings\.config$" match="//connectionStrings/add[@name='xconnect.collection']/@connectionString" />

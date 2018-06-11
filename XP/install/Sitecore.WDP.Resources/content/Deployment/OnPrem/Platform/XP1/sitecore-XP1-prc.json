@@ -129,11 +129,6 @@
             "DefaultValue": ".\\SQLSERVER",
             "Description": "The Sql Server where databases will be installed."
         },
-        "SolrUrl": {
-            "Type": "string",
-            "DefaultValue": "https://localhost:8983/solr",
-            "Description": "The Solr instance to use."
-        },
         "XConnectCollectionService": {
             "Type": "string",
             "DefaultValue": "https://XConnectCollection",
@@ -322,7 +317,6 @@
                         { "Name": "Processing Tasks DB User Password", "Value":  "[parameter('SqlProcessingTasksPassword')]" },
                         { "Name": "XConnect Collection", "Value": "[parameter('XConnectCollectionService')]" },
                         { "Name": "XConnect Server Certificate Validation Thumbprint", "Value": "[variable('Security.XConnect.CertificateThumbprint')]" },
-                        { "Name": "SOLR Connection String", "Value": "[parameter('SolrUrl')]" },
                         { "Name": "Solr Core Index Name", "Value": "[variable('Solr.Core.Name')]"},
                         { "Name": "Solr Master Index Name", "Value": "[variable('Solr.Master.Name')]"},
                         { "Name": "Solr Testing Index Name", "Value": "[variable('Solr.Testing.Name')]"},

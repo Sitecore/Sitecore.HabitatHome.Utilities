@@ -3,7 +3,6 @@
 //                                                                            //
 //  Run this configuration to install a single instance of Sitecore.          //
 //  This instance is configured for Reporting.                                //
-//  This instance is configured to use Solr.                                  //
 //                                                                            //
 //  NOTE: Only single line comments are accepted in configurations.           //
 // -------------------------------------------------------------------------- //

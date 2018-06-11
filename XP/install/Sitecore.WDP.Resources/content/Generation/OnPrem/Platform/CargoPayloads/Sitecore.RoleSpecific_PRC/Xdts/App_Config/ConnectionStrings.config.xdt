@@ -12,4 +12,6 @@
   <add name="exm.cryptographickey" xdt:Locator="Match(name)" xdt:Transform="Remove" />
   <add name="exm.authenticationkey" xdt:Locator="Match(name)" xdt:Transform="Remove" />
   <add name="messaging" xdt:Locator="Match(name)" xdt:Transform="Remove" />
+  <add name="solr.search" xdt:Locator="Match(name)" xdt:Transform="Remove" />
+  <add name="solr.search.zookeeper" xdt:Locator="Match(name)" xdt:Transform="Remove" />
 </connectionStrings>

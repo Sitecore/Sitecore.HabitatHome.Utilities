@@ -74,6 +74,11 @@
             "Type": "string",
             "DefaultValue": "https://localhost:8983/solr",
             "Description": "The Solr instance to use."
+        },
+		"SolrZookeeperUrl": {
+            "Type": "string",
+            "DefaultValue": "localhost:2181",
+            "Description": "The Zookeeper instance to use."
         }
     },
     "Variables": {
@@ -199,6 +204,7 @@
                         { "Name": "Experience Forms DB User Name", "Value":  "[parameter('SqlFormsUser')]"},
                         { "Name": "Experience Forms DB User Password", "Value":  "[parameter('SqlFormsPassword')]"},
                         { "Name": "SOLR Connection String", "Value": "[parameter('SolrUrl')]" },
+						{ "Name": "SOLR Zookeeper Connection String", "Value": "[parameter('SolrZookeeperUrl')]" },
                         { "Name": "Solr Web Index Name", "Value": "[variable('Solr.Web.Name')]"},
                         { "Name": "Solr Marketing Definitions Web Index Name", "Value": "[variable('Solr.MD.Web.Name')]"},
                         { "Name": "Solr Marketing Asset Web Index Name", "Value": "[variable('Solr.MA.Web.Name')]"},
