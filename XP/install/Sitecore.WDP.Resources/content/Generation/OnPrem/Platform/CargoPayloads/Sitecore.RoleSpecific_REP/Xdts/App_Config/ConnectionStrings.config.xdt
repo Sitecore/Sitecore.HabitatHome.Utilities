@@ -16,4 +16,6 @@
   <add name="xdb.processing.pools" xdt:Locator="Match(name)" xdt:Transform="Remove" />
   <add name="xdb.processing.tasks" xdt:Locator="Match(name)" xdt:Transform="Remove" />
   <add name="messaging" xdt:Locator="Match(name)" xdt:Transform="Remove" />
+  <add name="contentSearch.solr" xdt:Locator="Match(name)" xdt:Transform="Remove" />
+  <add name="contentSearch.solr.zookeeper" xdt:Locator="Match(name)" xdt:Transform="Remove" />
 </connectionStrings>
