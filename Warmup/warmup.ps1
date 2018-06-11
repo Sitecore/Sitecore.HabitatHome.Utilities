@@ -1,7 +1,8 @@
 param(
     $instance = "",
     [ValidateSet('xp', 'xc')]
-    $demoType
+    $demoType,
+	$adminPassword = "b"
 )
 
 $config = Get-Content -Raw -Path "$PSSCriptRoot\warmup-config.json" | ConvertFrom-Json
@@ -13,8 +14,6 @@ else {
 }
 Write-Host $instanceName
 
-
-
 Function Get-SitecoreSession {
     param(
         [Parameter(Mandatory = $true, Position = 0)]
@@ -23,7 +22,6 @@ Function Get-SitecoreSession {
         [string]$username,
         [Parameter(Mandatory = $true, Position = 2)]
         [string]$password
-
     )
 
     # Login - to create web session with authorisation cookies
@@ -39,10 +37,15 @@ Function Get-SitecoreSession {
     Write-Host "logging in"
   
     $request = Invoke-WebRequest -Uri $loginPage -WebSession $webSession -Method POST -Body $form | Out-Null
-
-    $webSession
-  
-    Write-Host "login done"
+	$cookies = $websession.Cookies.GetCookies($loginPage)
+	if ($cookies[".ASPXAUTH"]){
+        Write-Host "login done"
+	    Write-Host ""
+		$webSession
+    }else{
+        Write-Host "login failed" -ForegroundColor Red
+        exit 2
+    }
 }
 
 Function RequestPage {
@@ -52,33 +55,49 @@ Function RequestPage {
         [Parameter(Mandatory = $true, Position = 1)]
         [object]$webSession
     )
-    Get-Date
+    Write-Host $(Get-Date -Format HH:mm:ss.fff)
     Write-Host "requesting $url ..."
-    try { $request = Invoke-WebRequest $url -WebSession $webSession -TimeoutSec 60000 } catch {
+    try { 
+		$request = Invoke-WebRequest $url -WebSession $webSession -TimeoutSec 60000
+        Write-Host "Done" 
+        return $true
+	} 
+	catch {
         $status = $_.Exception.Response.StatusCode.Value__
         if ($status -ne 200) {
             Write-Host ("ERROR Something went wrong while requesting {0} - Error {1}" -f $url,$status) -ForegroundColor Red
         }
+		return $false
     }
-	
-    Get-Date
-    Write-Host "Done"
-    Write-Host ""
+	finally{
+		Write-Host $(Get-Date -Format HH:mm:ss.fff)
+        Write-Host ""
+	}
 }
-$demoType = $demoType.ToLower()
 
-$session = Get-SitecoreSession $instanceName "sitecore\admin" "b"
+$demoType = $demoType.ToLower()
+$session = Get-SitecoreSession $instanceName "sitecore\admin" $adminPassword
+$errors = 0
+
 Write-Host "Warming up XP Demo" -ForegroundColor Green
 foreach ($page in $config.urls.xp) {
-    RequestPage "https://$instanceName$($page.url)" $session
+	if (!$(RequestPage "https://$instanceName$($page.url)" $session)){
+		$errors++
+	}
 }
 
 if ($demoType -eq "xc") {
 Write-Host "Warming up XC Demo" -ForegroundColor Green
     foreach ($page in $config.urls.xc) {
-        RequestPage "https://$instanceName$($page.url)" $session
+		if (!$(RequestPage "https://$instanceName$($page.url)" $session)){
+			$errors++
+		}
     }
 }
 
-
-Write-Host "Warmup Complete" -ForegroundColor Green
+if ($errors -eq 0){
+	Write-Host "Warmup Complete" -ForegroundColor Green
+}else{
+	Write-Host "Warmup Complete With Errors" -ForegroundColor Red
+	exit 1
+}
