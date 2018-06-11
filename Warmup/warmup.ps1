@@ -38,7 +38,7 @@ Function Get-SitecoreSession {
   
     $request = Invoke-WebRequest -Uri $loginPage -WebSession $webSession -Method POST -Body $form | Out-Null
 	$cookies = $websession.Cookies.GetCookies($loginPage)
-	if ($cookies[".ASPXAUTH"]){
+	if ($cookies["sitecore_userticket"]){
         Write-Host "login done"
 	    Write-Host ""
 		$webSession
