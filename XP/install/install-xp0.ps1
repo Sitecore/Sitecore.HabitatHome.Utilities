@@ -294,6 +294,7 @@ function Install-Sitecore {
             -SqlAdminPassword $sql.adminPassword `
             -SqlServer $sql.server `
             -SolrUrl $solr.url `
+			-SolrZookeeperUrl $solr.url `
             -XConnectCollectionService "https://$($xConnect.siteName)" `
             -XConnectReferenceDataService "https://$($xConnect.siteName)" `
             -MarketingAutomationOperationsService "https://$($xConnect.siteName)" `

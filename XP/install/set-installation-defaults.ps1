@@ -13,8 +13,8 @@ $assets.root = "$PSScriptRoot\assets"
 $assets.psRepository = "https://sitecore.myget.org/F/sc-powershell/api/v2/"
 $assets.psRepositoryName = "SitecoreGallery"
 $assets.licenseFilePath = Join-Path $assets.root "license.xml"
-$assets.sitecoreVersion = "9.0.1 rev. 171219"
-$assets.installerVersion = "1.1.0"
+$assets.sitecoreVersion = "9.0.2 rev. 180608"
+$assets.installerVersion = "1.2.0"
 $assets.certificatesPath = Join-Path $assets.root "Certificates"
 $assets.jreRequiredVersion = "8.0.1510"
 $assets.dotnetMinimumVersionValue = "394802"
@@ -75,7 +75,7 @@ $spe.packagePath = Join-Path $assets.root "packages\Sitecore PowerShell Extensio
 $spe.install = $true
 
 $sxa = $modules | Where-Object { $_.id -eq "sxa"}
-$sxa.packagePath = Join-Path $assets.root "packages\Sitecore Experience Accelerator 1.6 rev. 180103 for 9.0.zip"
+$sxa.packagePath = Join-Path $assets.root "packages\Sitecore Experience Accelerator 1.8.658 for 9.0.zip"
 $sxa.install = $true
 
 $def = $modules | Where-Object {$_.id -eq "def"}
