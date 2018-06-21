@@ -5,6 +5,7 @@ Param(
 
 $assets = $(Get-Content $assetsFile -Raw | ConvertFrom-Json)
 $packagesFolder = (Join-Path $downloadFolder "packages")
+Set-Alias sz 'C:\Program Files\7-Zip\7z.exe'
 
 
 Function Invoke-FetchSitecoreCredentials {
@@ -117,6 +118,9 @@ foreach ($package in $assets.sitecore) {
         $destination = $([io.path]::combine((Resolve-Path $downloadFolder),  $package.fileName))
 		if (!(Test-Path $destination)){
 			Invoke-SitecoreDownload $package.url $destination $package.source
+		}
+		if ($package.extract -eq $true){
+			sz x -o"$DownloadFolder" $destination -r -y -aoa
 		}
     }
 }
