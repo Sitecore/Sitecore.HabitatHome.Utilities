@@ -6,126 +6,126 @@
 //  NOTE: Only single line comments are accepted in configurations.           //
 // -------------------------------------------------------------------------- //
 {
-  "Parameters": {
-    // Parameters are values that may be passed when Install-SitecoreConfiguration is called.
-    // Parameters must declare a Type and may declare a DefaultValue and Description.
-    // Parameters with no DefaultValue are required when Install-SitecoreConfiguration is called.
-    "Package": {
-      "Type": "string",
-      "Description": "The path to the Web Deploy package to deploy."
+    "Parameters": {
+        // Parameters are values that may be passed when Install-SitecoreConfiguration is called.
+        // Parameters must declare a Type and may declare a DefaultValue and Description.
+        // Parameters with no DefaultValue are required when Install-SitecoreConfiguration is called.
+        "Package": {
+            "Type": "string",
+            "Description": "The path to the Web Deploy package to deploy."
+        },
+        "LicenseFile": {
+            "Type": "string",
+            "Description": "The path to the Sitecore license file."
+        },
+        "SiteName": {
+            "Type": "string",
+            "DefaultValue": "XConnect",
+            "Description": "The name of the site to be deployed."
+        },
+        "XConnectCert": {
+            "Type": "string",
+            "Description": "The certificate to use for encryption. Provide the name or the thumbprint."
+        },
+        "SqlDbPrefix": {
+            "Type": "string",
+            "Description": "The prefix used for all Sql databases."
+        },
+        "SolrCorePrefix": {
+            "Type": "string",
+            "Description": "The prefix used for all Solr cores."
+        },
+        "SSLCert": {
+            "Type": "string",
+            "Description": "The certificate to use for HTTPS web bindings. Provide the name or the thumbprint. If not provided a certificate will be generated.",
+            "DefaultValue": ""
+        },
+        "SqlAdminUser": {
+            "Type": "string",
+            "DefaultValue": "sa",
+            "Description": "The Sql admin user account to use when installing databases."
+        },
+        "SqlAdminPassword": {
+            "Type": "string",
+            "DefaultValue": "12345",
+            "Description": "The Sql admin password to use when installing databases."
+        },
+        "SolrUrl": {
+            "Type": "string",
+            "DefaultValue": "https://localhost:8983/solr",
+            "Description": "The Solr instance to use."
+        },
+        "SqlCollectionUser": {
+            "Type": "string",
+            "DefaultValue": "collectionuser",
+            "Description": "The Sql admin user account to use when installing databases."
+        },
+        "SqlCollectionPassword": {
+            "Type": "string",
+            "DefaultValue": "Test12345",
+            "Description": "The Sql admin password to use when installing databases."
+        },
+        "SqlProcessingPoolsUser": {
+            "Type": "string",
+            "DefaultValue": "poolsuser",
+            "Description": "The Sql user for the Processing Pools connection string in Sitecore."
+        },
+        "SqlProcessingPoolsPassword": {
+            "Type": "string",
+            "DefaultValue": "Test12345",
+            "Description": "The Sql password for the Processing Pools connection string in Sitecore."
+        },
+        "SqlReferenceDataUser": {
+            "Type": "string",
+            "DefaultValue": "referencedatauser",
+            "Description": "The Sql user for the Reference Data connection string in Sitecore."
+        },
+        "SqlReferenceDataPassword": {
+            "Type": "string",
+            "DefaultValue": "Test12345",
+            "Description": "The Sql password for the Reference Data connection string in Sitecore."
+        },
+        "SqlMarketingAutomationUser": {
+            "Type": "string",
+            "DefaultValue": "marketingautomationuser",
+            "Description": "The Sql user for the Marketing Automation connection string in Sitecore."
+        },
+        "SqlMarketingAutomationPassword": {
+            "Type": "string",
+            "DefaultValue": "Test12345",
+            "Description": "The Sql password for the Marketing Automation connection string in Sitecore."
+        },
+        "SqlMessagingUser": {
+            "Type": "string",
+            "DefaultValue": "messaginguser",
+            "Description": "The Sql user for the Messaging connection string in Sitecore."
+        },
+        "SqlMessagingPassword": {
+            "Type": "string",
+            "DefaultValue": "Test12345",
+            "Description": "The Sql password for the Messaging connection string in Sitecore."
+        },
+        "SqlServer": {
+            "Type": "string",
+            "DefaultValue": ".\\SQLSERVER",
+            "Description": "The Sql Server where databases will be installed."
+        },
+        "XConnectEnvironment": {
+            "Type": "string",
+            "DefaultValue": "Development",
+            "Description": "The configuration environment for this instance."
+        },
+      "XConnectLogLevel": {
+        "Type": "string",
+        "DefaultValue": "Information",
+        "Description": "The level of log information to output."
+      },
+        "WebRoot": {
+          "Type": "string",
+          "DefaultValue": "c:\\inetpub\\wwwroot",
+          "Description": "The physical path of the configured Web Root for the environment"
+        }
     },
-    "LicenseFile": {
-      "Type": "string",
-      "Description": "The path to the Sitecore license file."
-    },
-    "SiteName": {
-      "Type": "string",
-      "DefaultValue": "XConnect",
-      "Description": "The name of the site to be deployed."
-    },
-    "XConnectCert": {
-      "Type": "string",
-      "Description": "The certificate to use for encryption. Provide the name or the thumbprint."
-    },
-    "SqlDbPrefix": {
-      "Type": "string",
-      "Description": "The prefix used for all Sql databases."
-    },
-    "SolrCorePrefix": {
-      "Type": "string",
-      "Description": "The prefix used for all Solr cores."
-    },
-    "SSLCert": {
-      "Type": "string",
-      "Description": "The certificate to use for HTTPS web bindings. Provide the name or the thumbprint. If not provided a certificate will be generated.",
-      "DefaultValue": ""
-    },
-    "SqlAdminUser": {
-      "Type": "string",
-      "DefaultValue": "sa",
-      "Description": "The Sql admin user account to use when installing databases."
-    },
-    "SqlAdminPassword": {
-      "Type": "string",
-      "DefaultValue": "12345",
-      "Description": "The Sql admin password to use when installing databases."
-    },
-    "SolrUrl": {
-      "Type": "string",
-      "DefaultValue": "https://localhost:8983/solr",
-      "Description": "The Solr instance to use."
-    },
-    "SqlCollectionUser": {
-      "Type": "string",
-      "DefaultValue": "collectionuser",
-      "Description": "The Sql admin user account to use when installing databases."
-    },
-    "SqlCollectionPassword": {
-      "Type": "string",
-      "DefaultValue": "Test12345",
-      "Description": "The Sql admin password to use when installing databases."
-    },
-    "SqlProcessingPoolsUser": {
-      "Type": "string",
-      "DefaultValue": "poolsuser",
-      "Description": "The Sql user for the Processing Pools connection string in Sitecore."
-    },
-    "SqlProcessingPoolsPassword": {
-      "Type": "string",
-      "DefaultValue": "Test12345",
-      "Description": "The Sql password for the Processing Pools connection string in Sitecore."
-    },
-    "SqlReferenceDataUser": {
-      "Type": "string",
-      "DefaultValue": "referencedatauser",
-      "Description": "The Sql user for the Reference Data connection string in Sitecore."
-    },
-    "SqlReferenceDataPassword": {
-      "Type": "string",
-      "DefaultValue": "Test12345",
-      "Description": "The Sql password for the Reference Data connection string in Sitecore."
-    },
-    "SqlMarketingAutomationUser": {
-      "Type": "string",
-      "DefaultValue": "marketingautomationuser",
-      "Description": "The Sql user for the Marketing Automation connection string in Sitecore."
-    },
-    "SqlMarketingAutomationPassword": {
-      "Type": "string",
-      "DefaultValue": "Test12345",
-      "Description": "The Sql password for the Marketing Automation connection string in Sitecore."
-    },
-    "SqlMessagingUser": {
-      "Type": "string",
-      "DefaultValue": "messaginguser",
-      "Description": "The Sql user for the Messaging connection string in Sitecore."
-    },
-    "SqlMessagingPassword": {
-      "Type": "string",
-      "DefaultValue": "Test12345",
-      "Description": "The Sql password for the Messaging connection string in Sitecore."
-    },
-    "SqlServer": {
-      "Type": "string",
-      "DefaultValue": ".\\SQLSERVER",
-      "Description": "The Sql Server where databases will be installed."
-    },
-    "XConnectEnvironment": {
-      "Type": "string",
-      "DefaultValue": "Development",
-      "Description": "The configuration environment for this instance."
-    },
-    "XConnectLogLevel": {
-      "Type": "string",
-      "DefaultValue": "Information",
-      "Description": "The level of log information to output."
-    },
-    "WebRoot": {
-      "Type": "string",
-      "DefaultValue": "c:\\inetpub\\wwwroot",
-      "Description": "The physical path of the configured Web Root for the environment"
-    }
-  },
   "Variables": {
     // Variables are values calculated in a configuration.
     // They can reference Parameters, other Variables, and config functions.
