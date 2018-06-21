@@ -1,9 +1,11 @@
 Param(
     [string]$assetsFile = ".\assets.json",
-    [string]$DownloadFolder = ".\downloads"
+    [string]$DownloadFolder = ".\assets"
 )
 
 $assets = $(Get-Content $assetsFile -Raw | ConvertFrom-Json)
+$packagesFolder = (Join-Path $downloadFolder "packages")
+
 
 Function Invoke-FetchSitecoreCredentials {
     #   Credit: https://jermdavis.wordpress.com/2017/11/27/downloading-stuff-from-dev-sitecore-net/
@@ -108,77 +110,37 @@ if (!(Test-Path $DownloadFolder)){
     New-Item -ItemType Directory -Force -Path $DownloadFolder
 }
 foreach ($package in $assets.sitecore) {
-    if ($package.download -eq $true) {
+    
+	if ($package.download -eq $true) {
         Write-Host ("Downloading {0}  -  if required" -f $package.fileName )
         
         $destination = $([io.path]::combine((Resolve-Path $downloadFolder),  $package.fileName))
-        Invoke-SitecoreDownload $package.url $destination $package.source
+		if (!(Test-Path $destination)){
+			Invoke-SitecoreDownload $package.url $destination $package.source
+		}
     }
 }
 foreach ($package in $assets.modules) {
+	
+if (!(Test-Path $packagesFolder)){
+    New-Item -ItemType Directory -Force -Path $packagesFolder
+}
     if ($package.download -eq $true) {
         Write-Host ("Downloading {0}  -  if required" -f $package.fileName )
-        $destination = $([io.path]::combine((Resolve-Path $downloadFolder),  $package.fileName))
-        Invoke-SitecoreDownload $package.url $destination $package.source
+        $destination = $([io.path]::combine((Resolve-Path $packagesFolder),  $package.fileName))
+		if (!(Test-Path $destination)){
+			Invoke-SitecoreDownload $package.url $destination $package.source
+		}
     }
 }
 foreach ($package in $assets.prerequisites) {
     if ($package.download -eq $true) {
         Write-Host ("Downloading {0}  -  if required" -f $package.fileName )
         $destination = $([io.path]::combine((Resolve-Path $downloadFolder),  $package.fileName))
-        Invoke-SitecoreDownload $package.url $destination $package.source
+		if (!(Test-Path $destination)){
+			Invoke-SitecoreDownload $package.url $destination $package.source
+		}
     }
 }
-Write-Host "Installing WPI, Url Rewrite and Web Deploy 3.6"
-$wpiDestination = $([io.path]::combine($downloadFolder, $webPIPackageFileName))
-if (!(Test-Path $wpiDestination)) {
-    Start-BitsTransfer -Source $webPIPackageUrl -Destination $wpiDestination
-    Start-Process -FilePath "assets\WebPlatformInstaller_amd64_en-US.msi" -Wait
-}
-set-alias wpi "$env:ProgramFiles\Microsoft\Web Platform Installer\WebpiCmd-x64.exe"
-wpi /install /Products:"UrlRewrite2"  /AcceptEULA
-wpi /install /Products:"WDeploy36NoSMO"  /AcceptEULA
 
-
-$resources = $json.resources
-$resourcesName = "Sitecore.WDP.Resources"
-$resourcesVersion = $resources.Replace($resourcesName + ".", "")
-
-if ($useLocal -eq $false) {
-    Write-Host ("Installing Resource Version '{0}'" -f $resourcesVersionJ)  -ForegroundColor Green
-    nuget install $resourcesName -Version $resourcesVersion -Source $WdpResourcesFeed -OutputDirectory . -x -prerelease
-}
-
-New-Item -ItemType Directory -Force -Path $($downloadFolder + "\packages")
-
-Write-Host "Downloading latest SPE and SXA`r`n" -ForegroundColor Green
-
-$packagesFolder = (Join-Path $downloadFolder "packages")
-
-if (!(Test-Path (Join-Path $packagesFolder $sxaPackageFileName))) {
-    Start-BitsTransfer -Source $sxaPackageUrl -Destination (Join-Path $packagesFolder $sxaPackageFileName)
-}
- 
-Write-Host "Downloading Data Exchange Framework related packages`r`n" -ForegroundColor Green
-if (!(Test-Path (Join-Path $packagesFolder $spePackageFileName))) {
-    Start-BitsTransfer -Source $spePackageUrl -Destination (Join-Path $packagesFolder $spePackageFileName)
-}
-if (!(Test-Path (Join-Path $packagesFolder $DEFPackageFileName))) {
-    Start-BitsTransfer -Source $DEFPackageUrl -Destination (Join-Path $packagesFolder $DEFPackageFileName)
-}
-if (!(Test-Path (Join-Path $packagesFolder $DEFSitecoreProviderPackageFileName))) {
-    Start-BitsTransfer -Source $DEFSitecoreProviderPackageUrl -Destination (Join-Path $packagesFolder $DEFSitecoreProviderPackageFileName)
-}
-if (!(Test-Path (Join-Path $packagesFolder $DEFxConnectProviderPackageFileName))) {
-    Start-BitsTransfer -Source $DEFxConnectProviderPackageUrl -Destination (Join-Path $packagesFolder $DEFxConnectProviderPackageFileName)
-}
-if (!(Test-Path (Join-Path $packagesFolder $DEFDynamicsProviderPackageFileName))) {
-    Start-BitsTransfer -Source $DEFDynamicsProviderPackageUrl -Destination (Join-Path $packagesFolder $DEFDynamicsProviderPackageFileName)
-}
-if (!(Test-Path (Join-Path $packagesFolder $DEFDynamicsConnectPackageFileName))) {
-    Start-BitsTransfer -Source $DEFDynamicsConnectPackageUrl -Destination (Join-Path $packagesFolder $DEFDynamicsConnectPackageFileName)
-}
-if (!(Test-Path (Join-Path $packagesFolder $DEFSqlProviderPackageFileName))) {
-    Start-BitsTransfer -Source $DEFSqlProviderPackageUrl -Destination (Join-Path $packagesFolder $DEFSqlProviderPackageFileName)
-}
 
