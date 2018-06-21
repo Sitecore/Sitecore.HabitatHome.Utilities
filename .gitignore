@@ -82,3 +82,4 @@ logs
 deploy/
 publishTemp
 Publish
+dev.creds.xml
