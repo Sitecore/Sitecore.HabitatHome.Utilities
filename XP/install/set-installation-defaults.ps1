@@ -25,12 +25,10 @@ $assets.installPackagePath = Join-Path $assets.root "installpackage.aspx"
 Write-Host "Setting default 'Site' parameters"
 # Site Settings
 $site = $json.settings.site
-$site.prefix = "habitat"
+$site.prefix = "habitathome"
 $site.suffix = "dev.local"
 $site.webroot = "C:\inetpub\wwwroot"
 $site.hostName = $json.settings.site.prefix + "." + $json.settings.site.suffix
-$site.habitatHomePrefix = $json.settings.site.prefix + "home"
-$site.habitatHomeHostName = $json.settings.habitatHomePrefix + "." + $json.settings.site.suffix
 $site.habitatHomeConfigurationPath = (Get-ChildItem $pwd -filter "habitathome-xp0.json" -Recurse).FullName
 $site.habitatHomeSslCertificateName = $site.prefix + "." + $site.suffix
 
