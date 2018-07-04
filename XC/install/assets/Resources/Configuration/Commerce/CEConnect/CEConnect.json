@@ -9,7 +9,7 @@
   "Parameters": {
     "PackageFullPath": {
       "Type": "string",
-      "Description": "The path to the Adventure Works images zip."
+      "Description": "The path to Commerce Engine Connect package zip."
     },
     "PackagesDirDst": {
       "Type": "string",

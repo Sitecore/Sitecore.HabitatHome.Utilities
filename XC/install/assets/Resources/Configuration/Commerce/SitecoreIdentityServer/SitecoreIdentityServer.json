@@ -149,11 +149,13 @@
       "Type": "SetPermissions",
       "Params": {
         "Path": "[ResolveCertificatePath(variable('Security.CertificatePath'))]",
-        "Rights": [{
-          "User": "[parameter('UserAccount'))]",
-          "FileSystemRights": ["Read"],
-          "InheritanceFlags": ["None"]
-        }]
+        "Rights": [
+          {
+            "User": "[parameter('UserAccount'))]",
+            "FileSystemRights": [ "Read" ],
+            "InheritanceFlags": [ "None" ]
+          }
+        ]
       }
     }
   }
