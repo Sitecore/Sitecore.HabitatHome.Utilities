@@ -294,7 +294,6 @@ function Install-Sitecore {
             -SqlAdminPassword $sql.adminPassword `
             -SqlServer $sql.server `
             -SolrUrl $solr.url `
-			-SolrZookeeperUrl $solr.url `
             -XConnectCollectionService "https://$($xConnect.siteName)" `
             -XConnectReferenceDataService "https://$($xConnect.siteName)" `
             -MarketingAutomationOperationsService "https://$($xConnect.siteName)" `
@@ -319,31 +318,31 @@ function Install-Sitecore {
     
 }
 
-function Add-AdditionalBindings {
-    #Add-HabitatHomeBindingDetails $site.hostName $site.habitatHomeHostName
-    try {
+# function Add-AdditionalBindings {
+#     #Add-HabitatHomeBindingDetails $site.hostName $site.habitatHomeHostName
+#     try {
         
-        Install-SitecoreConfiguration $xConnect.certificateConfigurationPath `
-            -CertificateName $site.habitatHomeSslCertificateName `
-            -CertPath $assets.certificatesPath
-    }
-    catch {
-        write-host "$site.habitatHomeHostName Certificate Creation Failed" -ForegroundColor Red
-        throw
-    }
+#         Install-SitecoreConfiguration $xConnect.certificateConfigurationPath `
+#             -CertificateName $site.habitatHomeSslCertificateName `
+#             -CertPath $assets.certificatesPath
+#     }
+#     catch {
+#         write-host "$site.habitatHomeHostName Certificate Creation Failed" -ForegroundColor Red
+#         throw
+#     }
 
-    try {
-        Install-SitecoreConfiguration $site.habitatHomeConfigurationPath `
-            -SSLCert $site.habitatHomeSslCertificateName `
-            -SiteName $site.hostName `
-            -HostHeader $site.habitatHomeHostName 
+#     try {
+#         Install-SitecoreConfiguration $site.habitatHomeConfigurationPath `
+#             -SSLCert $site.habitatHomeSslCertificateName `
+#             -SiteName $site.hostName `
+#             -HostHeader $site.habitatHomeHostName 
         
-    }
-    catch {
-        write-host "Sitecore Setup Failed" -ForegroundColor Red
-        throw
-    }
-}
+#     }
+#     catch {
+#         write-host "Sitecore Setup Failed" -ForegroundColor Red
+#         throw
+#     }
+# }
 
 function Copy-Tools {
     if (!(Test-Path $assets.installPackagePath)) {
@@ -382,7 +381,7 @@ function Install-OptionalModules {
         Copy-Package -packagePath $module.packagePath -destination "$packageDestination"
         $packageFileName = Split-Path $module.packagePath -Leaf
 
-        $packageInstallerUrl = "https://$($site.habitatHomeHostName)/InstallPackage.aspx?package=/temp/Packages/"
+        $packageInstallerUrl = "https://$($site.hostName)/InstallPackage.aspx?package=/temp/Packages/"
         $url = $packageInstallerUrl + $packageFileName 
         $request = [system.net.WebRequest]::Create($url)
         $request.Timeout = 2400000
@@ -393,10 +392,10 @@ function Install-OptionalModules {
 }
 
 
-Install-Prerequisites
-Install-Assets
-Install-XConnect
-Install-Sitecore
-Add-AdditionalBindings
+#Install-Prerequisites
+#Install-Assets
+#Install-XConnect
+#Install-Sitecore
+#Add-AdditionalBindings
 Copy-Tools
 Install-OptionalModules
