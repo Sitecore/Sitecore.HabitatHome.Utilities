@@ -1,18 +1,5 @@
-// ------------------------------------------------------------------------------------------------------ //
-//         Sitecore Install Framework - Commerce Single Server Configuration                              //
-//                                                                                                        //
-//  Run this configuration to install a single instance of Commerce Engine and Sitecore Storefront Site.  //
-//																										  //
-//                                                                                                        //
-//  NOTE: Only single line comments are accepted in configurations.                                       //
-// ------------------------------------------------------------------------------------------------------ //
-
-
 {
   "Parameters": {
-    // Parameters are values that may be passed when Install-SitecoreConfiguration is called.
-    // Parameters must declare a Type and may declare a DefaultValue and Description.
-    // Parameters with no DefaultValue are required when Install-SitecoreConfiguration is called.
     "BaseConfigurationFolder":{
       "Type":"string",
       "Description":"The base folder where configurations are stored"
@@ -233,8 +220,6 @@
     }
   },
   "Variables": {
-    // Variables are values calculated in a configuration.
-    // They can reference Parameters, other Variables, and config functions.
     "CommerceServicesPostFix": "[parameter('SitePrefix')]",
     "SiteUtilitiesDir": "[concat(parameter('InstallDir'), '\\SiteUtilityPages')]",
     "ModulesDirDst": "[concat(parameter('InstallDir'), '\\App_Data\\packages')]",
@@ -246,7 +231,6 @@
     "EngineConnectIncludeDir": "[concat(parameter('InstallDir'), '\\App_Config\\Include\\Y.Commerce.Engine')]",
     "MarketingConfigDir": "[concat(parameter('InstallDir'), '\\App_Config\\Sitecore\\Marketing.Operations.xMgmt')]",
     "ContentSearchConfig": "[concat(parameter('InstallDir'), '\\App_Config\\Sitecore\\ContentSearch\\Sitecore.ContentSearch.config')]",
-    "ContentSearchEnabledXpath": "//configuration/sitecore/settings/setting[@name='ContentSearch.Enabled']",
     "ConnectionString": "[concat('Data Source=.;Initial Catalog=', concat(parameter('SitecoreCoreDbName'), ';Integrated Security=True'))]",
     "ProjectConfigIncludeDir": "[concat(parameter('InstallDir'), '\\App_Config\\Include\\Project\\Commerce')]",
     "SiteRootUrl": "[concat('https://', concat(parameter('SiteHostHeaderName')))]",
@@ -254,10 +238,6 @@
   },
   "Modules": [ "InstallSitecoreConfiguration", "ManageCommerceService", "SitecoreUtilityTasks" ],
   "Tasks": {
-    // Tasks are separate units of work in a configuration.
-    // Each task is an action that will be completed when Install-SitecoreConfiguration is called.
-    // By default, tasks are applied in the order they are declared.
-    // Tasks may reference Parameters, Variables, and config functions.
     "CreateBinding": {
       "Type": "InstallSitecoreConfiguration",
       "Params": {
@@ -340,7 +320,6 @@
       }
     },
     "DisableIndexUpdate": {
-      // Speed up deployment
       "Type": "SetXml",
       "Params": [
         {
@@ -353,7 +332,6 @@
       ]
     },
     "DisableConfigFiles": {
-      // Speed up deployment
       "Type": "DisableConfigFiles",
       "Params": {
         "ConfigDir": "[variable('MarketingConfigDir')]",
