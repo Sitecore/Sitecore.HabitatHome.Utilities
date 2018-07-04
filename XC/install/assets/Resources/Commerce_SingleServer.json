@@ -174,6 +174,22 @@
       "Type": "string",
       "Description": "Commerce Connect module full path"
     },
+    "CommercexProfilesModuleFullPath": {
+      "Type": "string",
+      "Description": "Commerce xProfiles module full path"
+    },
+    "CommercexAnalyticsModuleFullPath": {
+      "Type": "string",
+      "Description": "Commerce xAnalytics module full path"
+    },
+    "CommerceMAModuleFullPath": {
+      "Type": "string",
+      "Description": "Commerce Marketing Automation module full path"
+    },
+    "CommerceMAForAutomationEngineModuleFullPath": {
+      "Type": "string",
+      "Description": "Commerce Marketing Automation for AutomationEngine module full path"
+    },
     "CEConnectPackageFullPath": {
       "Type": "string",
       "Description": "Commerce Engine Connect module full path"
@@ -205,13 +221,11 @@
     },
     "SitecoreUsername": {
       "Type": "string",
-      "Description": "Sitecore Admin Username",
-      "DefaultValue": "sitecore\\admin"
+      "Description": "Sitecore Admin Username"
     },
     "SitecoreUserPassword": {
       "Type": "string",
-      "Description": "Sitecore Admin Password",
-      "DefaultValue": "b"
+      "Description": "Sitecore Admin Password"
     },
     "HabitatImagesModuleFullPath": {
       "Type": "string",
@@ -355,6 +369,35 @@
         "BaseUrl": "[variable('UtilitiesBaseUrl')]"
       }
     },
+    "InstallCommercexProfilesModule": {
+      "Type": "InstallSitecoreConfiguration",
+      "Params": {
+        "Path": "[concat(parameter('BaseConfigurationFolder'), '\\Commerce\\Connect\\Connect_xProfiles.json",
+        "ModuleFullPath": "[parameter('CommercexProfilesModuleFullPath')]",
+        "ModulesDirDst": "[variable('ModulesDirDst')]",
+        "BaseUrl": "[variable('UtilitiesBaseUrl')]"
+      }
+    },
+    "InstallCommercexAnalyticsModule": {
+      "Type": "InstallSitecoreConfiguration",
+      "Params": {
+        "Path": "[concat(parameter('BaseConfigurationFolder'), '\\Commerce\\Connect\\Connect_xAnalytics.json",
+        "ModuleFullPath": "[parameter('CommercexAnalyticsModuleFullPath')]",
+        "ModulesDirDst": "[variable('ModulesDirDst')]",
+        "BaseUrl": "[variable('UtilitiesBaseUrl')]"
+      }
+    },
+    "InstallCommerceMAModule": {
+      "Type": "InstallSitecoreConfiguration",
+      "Params": {
+        "Path": "[concat(parameter('BaseConfigurationFolder'), '\\Commerce\\Connect\\Connect_MarketingAutomation.json",
+        "XConnectSitePath": "[parameter('XConnectInstallDir')]",
+        "ModuleFullPath": "[parameter('CommerceMAModuleFullPath')]",
+        "ModulesDirDst": "[variable('ModulesDirDst')]",
+        "AutomationEngineModule": "[parameter('CommerceMAForAutomationEngineModuleFullPath')]",
+        "BaseUrl": "[variable('UtilitiesBaseUrl')]"
+      }
+    },
     "InstallCommerceEngineConnectModule": {
       "Type": "InstallSitecoreConfiguration",
       "Params": {
@@ -411,7 +454,11 @@
         "Path": "[concat(parameter('BaseConfigurationFolder'), '\\Commerce\\CommerceEngine\\CommerceEngine.Initialize.json')]",
         "WebRoot":"[parameter('WebRoot')]",
         "CommerceServicesPostfix": "[variable('CommerceServicesPostfix')]",
-        "CommerceShopsServicesPort": "[parameter('CommerceShopsServicesPort')]"
+        "CommerceShopsServicesPort": "[parameter('CommerceShopsServicesPort')]",
+        "SitecoreAdminAccount": {
+          "UserName": "[parameter('SitecoreUsername')]",
+          "Password": "[parameter('SitecoreUserPassword')]"
+        }
       }
     },
     "EnableCEConnectDataProvider": {
