@@ -29,7 +29,9 @@ $assets.commerce.installationFolder = Join-Path $assets.root "Commerce"
 #Commerce Files to Extract
 $sifCommerceVersion = $assets.commerce.filesToExtract | Where-Object { $_.name -eq "SIF.Sitecore.Commerce"} 
 $sifCommerceVersion.version = "1.2.14"
+
 $assets.commerce.sifCommerceRoot = Join-Path $assets.commerce.installationFolder $($sifCommerceVersion.name + "." + $sifCommerceVersion.version)
+
 $commerceEngineVersion = $assets.commerce.filesToExtract | Where-Object { $_.name -eq "Sitecore.Commerce.Engine"} 
 $commerceEngineVersion.version = "2.2.124"
 
@@ -39,11 +41,14 @@ $commerceEngineSDKVersion.version = "2.2.72"
 $bizFxVersion = $assets.commerce.filesToExtract | Where-Object { $_.name -eq "Sitecore.BizFX"} 
 $bizFxVersion.version = "1.2.19"
 
+$identityServerVersion = $assets.commerce.filesToExtract | Where-Object { $_.name -eq "Sitecore.IdentityServer"} 
+$identityServerVersion.version = "1.2.3"
+
 # Settings
 $site = $json.settings.site
 # Commerce Settings
 $commerce = $json.settings.commerce
-$commerce.storefrontPrefix = $site.habitatHomePrefix
+$commerce.storefrontPrefix = $site.prefix
 $commerce.storefrontHostName = $commerce.storefrontPrefix + "." + $site.suffix
 
 $commerce.serviceAccountDomain = "$($Env:COMPUTERNAME)"

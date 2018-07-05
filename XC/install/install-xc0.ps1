@@ -148,8 +148,8 @@ function Install-Prerequisites {
 
     # Install Url Rewrite and Web Deploy 3.6
     set-alias wpi "$env:ProgramFiles\Microsoft\Web Platform Installer\WebpiCmd-x64.exe"
-    wpi /install /Products:UrlRewrite2
-    wpi /install /Products:WebDeploy36NoSMO
+   # wpi /install /Products:UrlRewrite2
+   # wpi /install /Products:WebDeploy36NoSMO
 
 
 
@@ -180,7 +180,7 @@ function Install-RequiredInstallationAssets {
 }
 function Install-CommerceAssets {
     Set-Location $PSScriptRoot
-    . .\get-latest-commerce.ps1 -DownloadFolder $assets.downloadFolder -CommerceAssetFolder $assets.commerce.installationFolder -CommercePackageUrl $assets.commerce.packageUrl
+#    . .\get-latest-commerce.ps1 -DownloadFolder $assets.downloadFolder -CommerceAssetFolder $assets.commerce.installationFolder -CommercePackageUrl $assets.commerce.packageUrl
 
     # This is where we expand the archives:
     $packagesToExtract = $assets.commerce.filesToExtract
@@ -206,15 +206,15 @@ function Install-CommerceAssets {
     sz x -o"$($output)" $extract -r -y -aoa
 
     #  Install ASP.NET Core 2.0 and .NET Core Windows Server Hosting 2.0.0 
-    Write-Host "Installing ASP.NET Core 2.0 and .NET Core Windows Server Hosting 2.0.0"
-    $cmd = Join-Path $assets.downloadFolder "\DotNetCore.2.0.5-WindowsHosting.exe"
+ #   Write-Host "Installing ASP.NET Core 2.0 and .NET Core Windows Server Hosting 2.0.0"
+#    $cmd = Join-Path $assets.downloadFolder "\DotNetCore.2.0.5-WindowsHosting.exe"
 
-    $params = "/install /quiet /norestart"
-    $params = $params.Split(" ")
-    & "$cmd"  $params
+#    $params = "/install /quiet /norestart"
+#    $params = $params.Split(" ")
+#    & "$cmd"  $params
 
-    $cmd = Join-Path $assets.downloadFolder "dotnet-sdk-2.0.0-win-x64.exe"
-    & "$cmd" $params
+#    $cmd = Join-Path $assets.downloadFolder "dotnet-sdk-2.0.0-win-x64.exe"
+#    & "$cmd" $params
         
     #Copy-Item $(Join-Path $sifCommerceRoot "Modules") $resourcePath -Recurse -Force
 }
@@ -255,21 +255,39 @@ Function Set-ModulesPath {
 
 Function Publish-CommerceEngine {
     Write-Host "Publishing Commerce Engine" -ForegroundColor Green
-    $SolutionName = Join-Path "..\" "Habitat.Commerce.Engine.sln"
-    $PublishLocation = Join-Path $publishPath "Habitat.Commerce.Engine"
-    dotnet publish $SolutionName -o $publishLocation
+    $SolutionName = Join-Path "..\" "HabitatHome.Commerce.Engine.sln"
+	$PublishLocation = Join-Path $publishPath $($site.prefix + ".Commerce.Engine")
+	if (Test-Path $PublishLocation) {
+        Remove-Item $PublishLocation -Force -Recurse
+    }
+	
+	if (Test-Path $SolutionName) {
+   		dotnet publish $SolutionName -o $publishLocation
+	}
+	else{
+		$commerceEngine = $assets.commerce.filesToExtract | Where-Object { $_.name -eq "Sitecore.Commerce.Engine"} 
+		$commerceEngineSource = Join-Path $commerceAssets.installationFolder $($commerceEngine.name + "." + $commerceEngine.version +"/")
+		Copy-Item -Path $commerceEngineSource -Destination $PublishLocation  -Force -Recurse
+	}
 }
 
 Function Publish-IdentityServer {
     Write-Host "Publishing IdentityServer" -ForegroundColor Green
-    $SolutionName = Join-Path "..\" "Habitat.Commerce.IdentityServer.sln"
-    $PublishLocation = Join-Path $publishPath "Habitat.Commerce.IdentityServer"
-    dotnet publish $SolutionName -o $publishLocation
+	$identityServer = $assets.commerce.filesToExtract | Where-Object { $_.name -eq "Sitecore.IdentityServer"} 
+    $identityServerSource = Join-Path $commerceAssets.installationFolder $($identityServer.name + "." + $identityServer.version +"/")
+    $PublishLocation = Join-Path $publishPath $($site.prefix + ".Commerce.IdentityServer")
+  
+  if (Test-Path $PublishLocation) {
+        Remove-Item $PublishLocation -Force -Recurse
+    }
+    Copy-Item -Path $identityServerSource -Destination $PublishLocation  -Force -Recurse
 }
 Function Publish-BizFx {
     Write-Host "Publishing BizFx" -ForegroundColor Green
-    $bizFxSource = Join-Path $commerceAssets.installationFolder "Sitecore.BizFX.1.1.9/"
-    $PublishLocation = Join-Path $publishPath "Habitat.Commerce.BizFx"
+	$bizFx = $assets.commerce.filesToExtract | Where-Object { $_.name -eq "Sitecore.BizFX"}
+    $bizFxSource = Join-Path $commerceAssets.installationFolder $($bizFx.name + "." + $bizFx.version +"/")
+	
+    $PublishLocation = Join-Path $publishPath $($site.prefix + ".Commerce.BizFx")
     if (Test-Path $PublishLocation) {
         Remove-Item $PublishLocation -Force -Recurse
     }
@@ -309,18 +327,18 @@ Function Install-Commerce {
         CommerceShopsServicesPort                   = "5005"
         CommerceAuthoringServicesPort               = "5000"
         CommerceMinionsServicesPort                 = "5010"		
-        SitecoreCommerceEnginePath                  = $(Join-Path $resourcePath "Publish\Habitat.Commerce.Engine")
-        SitecoreBizFxServicesContentPath            = $(Join-Path $resourcePath "Publish\Habitat.Commerce.BizFX")
+        SitecoreCommerceEnginePath                  = $(Join-Path $resourcePath $($publishPath + $site.prefix + ".Commerce.Engine"))
+        SitecoreBizFxServicesContentPath            = $(Join-Path $resourcePath $($publishPath + $site.prefix + ".Commerce.BizFX"))
         SitecoreBizFxPostFix                        = $site.prefix
 
-        SitecoreIdentityServerPath                  = $(Join-Path $resourcePath "Publish\Habitat.Commerce.IdentityServer")
-        CommerceEngineCertificatePath               = $(Join-Path -Path $assets.certificatesPath -ChildPath "habitat.dev.local.xConnect.Client.crt" )    
+        SitecoreIdentityServerPath                  = $(Join-Path $resourcePath $($publishPath + $site.prefix + ".Commerce.IdentityServer"))
+        CommerceEngineCertificatePath               = $(Join-Path -Path $assets.certificatesPath -ChildPath $($xConnect.CertificateName + ".crt") )    
         SiteUtilitiesSrc                            = $(Join-Path -Path $assets.commerce.sifCommerceRoot -ChildPath "SiteUtilityPages")
         CommerceConnectModuleFullPath               = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include "Sitecore Commerce Connect*.zip" -Recurse  )
-        CommercexProfilesModuleFullPath             = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include "..\Sitecore Commerce ExperienceProfile Core *.zip" -Recurse)
-        CommercexAnalyticsModuleFullPath            = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include "..\Sitecore Commerce ExperienceAnalytics Core *.zip"	-Recurse)
-        CommerceMAModuleFullPath                    = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include "..\Sitecore Commerce Marketing Automation Core *.zip"	-Recurse)
-        CommerceMAForAutomationEngineModuleFullPath = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include "..\Sitecore Commerce Marketing Automation for AutomationEngine *.zip"	-Recurse)
+        CommercexProfilesModuleFullPath             = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include "Sitecore Commerce ExperienceProfile Core *.zip" -Recurse)
+        CommercexAnalyticsModuleFullPath            = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include "Sitecore Commerce ExperienceAnalytics Core *.zip"	-Recurse)
+        CommerceMAModuleFullPath                    = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include "Sitecore Commerce Marketing Automation Core *.zip"	-Recurse)
+        CommerceMAForAutomationEngineModuleFullPath = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include "Sitecore Commerce Marketing Automation for AutomationEngine *.zip"	-Recurse)
         CEConnectPackageFullPath                    = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include  "Sitecore.Commerce.Engine.Connect*.update" -Recurse)
         SXACommerceModuleFullPath                   = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include  "Sitecore Commerce Experience Accelerator 1.*.zip" -Recurse)
         SXAStorefrontModuleFullPath                 = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include  "Sitecore Commerce Experience Accelerator Storefront 1.*.zip"-Recurse )
@@ -355,5 +373,5 @@ Publish-CommerceEngine
 Publish-IdentityServer
 Publish-BizFx
 Install-Commerce
-Start-Site
-Start-XConnect
+#Start-Site
+#Start-XConnect

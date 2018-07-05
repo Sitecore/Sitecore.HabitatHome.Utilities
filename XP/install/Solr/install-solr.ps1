@@ -5,7 +5,7 @@ Param(
     [string]$solrHost = "localhost",
     [bool]$solrSSL = $TRUE,
     [string]$nssmVersion = "2.24",
-    [string]$JREVersion = "1.8.0_151",
+    [string]$JREVersion = "1.8.0_171",
 	[string]$keystoreSecret = "secret",
 	[string]$KeystoreFile = 'solr-ssl.keystore.jks',
 	[string]$SolrDomain = 'localhost',
@@ -19,7 +19,7 @@ $solrRoot = "$installFolder\$solrName"
 $nssmRoot = "$installFolder\nssm-$nssmVersion"
 $solrPackage = "http://archive.apache.org/dist/lucene/solr/$solrVersion/$solrName.zip"
 $nssmPackage = "http://nssm.cc/release/nssm-$nssmVersion.zip"
-$downloadFolder =(Resolve-Path ".\assets")
+$downloadFolder =(Resolve-Path "..\assets")
 
 ## Verify elevated
 ## https://superuser.com/questions/749243/detect-if-powershell-is-running-as-administrator
