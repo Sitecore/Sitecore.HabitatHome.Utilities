@@ -24,7 +24,11 @@
                 {
                     "name": "Sitecore.Commerce.Engine.SDK",
                     "version": "@@Sitecore.Commerce.Engine.SDK.version@@"
-                }
+                },
+				{
+					"name": "Sitecore.IdentityServer",
+					"version":"@@Sitecore.IdentityServer.version@@"
+				}
             ]
         }
     },
