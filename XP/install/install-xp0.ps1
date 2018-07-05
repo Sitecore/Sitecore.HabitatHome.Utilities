@@ -318,31 +318,28 @@ function Install-Sitecore {
     
 }
 
-# function Add-AdditionalBindings {
-#     #Add-HabitatHomeBindingDetails $site.hostName $site.habitatHomeHostName
-#     try {
+function Enable-InstallationImprovements {
+    try {
         
-#         Install-SitecoreConfiguration $xConnect.certificateConfigurationPath `
-#             -CertificateName $site.habitatHomeSslCertificateName `
-#             -CertPath $assets.certificatesPath
-#     }
-#     catch {
-#         write-host "$site.habitatHomeHostName Certificate Creation Failed" -ForegroundColor Red
-#         throw
-#     }
-
-#     try {
-#         Install-SitecoreConfiguration $site.habitatHomeConfigurationPath `
-#             -SSLCert $site.habitatHomeSslCertificateName `
-#             -SiteName $site.hostName `
-#             -HostHeader $site.habitatHomeHostName 
+        Install-SitecoreConfiguration $site.enableInstallationImprovements `
+            -InstallDir $sitecore.siteRoot
+    }
+    catch {
+        write-host "$site.habitatHomeHostName Failed to enable installation improvements" -ForegroundColor Red
+        throw
+    }
+}
+function Disable-InstallationImprovements {
+    try {
         
-#     }
-#     catch {
-#         write-host "Sitecore Setup Failed" -ForegroundColor Red
-#         throw
-#     }
-# }
+        Install-SitecoreConfiguration $site.disableInstallationImprovements `
+            -InstallDir $sitecore.siteRoot
+    }
+    catch {
+        write-host "$site.habitatHomeHostName Failed to disable installation improvements" -ForegroundColor Red
+        throw
+    }
+}
 
 function Copy-Tools {
     if (!(Test-Path $assets.installPackagePath)) {
@@ -392,10 +389,11 @@ function Install-OptionalModules {
 }
 
 
-#Install-Prerequisites
-#Install-Assets
-#Install-XConnect
-#Install-Sitecore
-#Add-AdditionalBindings
+Install-Prerequisites
+Install-Assets
+Install-XConnect
+Install-Sitecore
+Enable-InstallationImprovements
 Copy-Tools
 Install-OptionalModules
+Disable-InstallationImprovements

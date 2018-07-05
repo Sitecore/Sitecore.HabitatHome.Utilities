@@ -29,7 +29,8 @@ $site.prefix = "habitathome"
 $site.suffix = "dev.local"
 $site.webroot = "C:\inetpub\wwwroot"
 $site.hostName = $json.settings.site.prefix + "." + $json.settings.site.suffix
-$site.habitatHomeConfigurationPath = (Get-ChildItem $pwd -filter "habitathome-xp0.json" -Recurse).FullName
+$site.enableInstallationImprovements = (Get-ChildItem $pwd -filter "enable-installation-improvements.json" -Recurse).FullName
+$site.disableInstallationImprovements = (Get-ChildItem $pwd -filter "disable-installation-improvements.json" -Recurse).FullName
 $site.habitatHomeSslCertificateName = $site.prefix + "." + $site.suffix
 
 Write-Host "Setting default 'SQL' parameters"
