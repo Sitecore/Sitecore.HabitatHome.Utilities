@@ -18,7 +18,8 @@
             "suffix": "@@site.suffix@@",
             "webRoot": "@@site.webRoot@@",
             "hostName": "@@site.hostName@@",
-            "habitatHomeConfigurationPath":"@@site.habitatHomeConfigurationPath@@",
+            "enableInstallationImprovements":"@@site.enableInstallationImprovements@@",
+            "disableInstallationImprovements":"@@site.disableInstallationImprovements@@",
             "habitatHomeSslCertificateName":"@@site.habitatHomeSslCertificateName@@"
         },
         
