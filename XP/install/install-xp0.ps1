@@ -36,7 +36,7 @@ $sitecore = $config.settings.sitecore
 $solr = $config.settings.solr
 $assets = $config.assets
 $modules = $config.modules
-
+$resourcePath = Join-Path $PSScriptRoot "Sitecore.WDP.Resources"
 Import-Module .\scripts\additional-tasks.psm1 -Force
 
 Write-Host "*******************************************************" -ForegroundColor Green
@@ -322,7 +322,8 @@ function Enable-InstallationImprovements {
     try {
         
         Install-SitecoreConfiguration $site.enableInstallationImprovements `
-            -InstallDir $sitecore.siteRoot
+            -InstallDir $sitecore.siteRoot  `
+			-ResourceDir $( $assets.root + "\\Sitecore.WDP.Resources")
     }
     catch {
         write-host "$site.habitatHomeHostName Failed to enable installation improvements" -ForegroundColor Red
@@ -333,7 +334,8 @@ function Disable-InstallationImprovements {
     try {
         
         Install-SitecoreConfiguration $site.disableInstallationImprovements `
-            -InstallDir $sitecore.siteRoot
+            -InstallDir $sitecore.siteRoot `
+			-ResourceDir $( $assets.root + "\\Sitecore.WDP.Resources")
     }
     catch {
         write-host "$site.habitatHomeHostName Failed to disable installation improvements" -ForegroundColor Red
@@ -369,6 +371,39 @@ function Copy-Package ($packagePath, $destination) {
          
     
 }
+
+Function Add-AppPool-Membership {
+
+    #Add ApplicationPoolIdentity to performance log users to avoid Sitecore log errors (https://kb.sitecore.net/articles/404548)
+    
+    try 
+    {
+        Add-LocalGroupMember "Performance Log Users" "IIS AppPool\$SitecoreSiteName"
+        Write-Host "Added IIS AppPool\$SitecoreSiteName to Performance Log Users" -ForegroundColor Green
+    }
+    catch 
+    {
+        Write-Host "Warning: Couldn't add IIS AppPool\$SitecoreSiteName to Performance Log Users -- user may already exist" -ForegroundColor Yellow
+    }
+    try 
+    {
+        Add-LocalGroupMember "Performance Monitor Users" "IIS AppPool\$SitecoreSiteName"
+        Write-Host "Added IIS AppPool\$SitecoreSiteName to Performance Monitor Users" -ForegroundColor Green
+    }
+    catch 
+    {
+        Write-Host "Warning: Couldn't add IIS AppPool\$SitecoreSiteName to Performance Monitor Users -- user may already exist" -ForegroundColor Yellow
+    }
+}
+Function Set-ModulesPath {
+    Write-Host "Setting Modules Path" -ForegroundColor Green
+    $modulesPath = ( Join-Path -Path $resourcePath -ChildPath "Modules" )
+    if ($env:PSModulePath -notlike "*$modulesPath*") {
+        $p = $env:PSModulePath + ";" + $modulesPath
+        [Environment]::SetEnvironmentVariable("PSModulePath", $p)
+    }
+}
+
 function Install-OptionalModules {
     #Copy InstallPackage.aspx to webroot
     
@@ -391,8 +426,10 @@ function Install-OptionalModules {
 
 Install-Prerequisites
 Install-Assets
+Set-ModulesPath
 Install-XConnect
 Install-Sitecore
+Add-AppPool-Membership
 Enable-InstallationImprovements
 Copy-Tools
 Install-OptionalModules
