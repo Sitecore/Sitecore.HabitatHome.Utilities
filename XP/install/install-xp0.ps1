@@ -204,11 +204,14 @@ function Install-Assets {
 function Install-XConnect {
     #Install xConnect Solr
     try {
-        Install-SitecoreConfiguration $xConnect.solrConfigurationPath `
-            -SolrUrl $solr.url `
-            -SolrRoot $solr.root `
-            -SolrService $solr.serviceName `
-            -CorePrefix $site.prefix
+        $params = @{
+            Path        =   $xConnect.solrConfigurationPath 
+            SolrUrl     =   $solr.url 
+            SolrRoot    =   $solr.root 
+            SolrService =   $solr.serviceName 
+            CorePrefix  =   $site.prefix
+        }
+        Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs")
     }
     catch {
         write-host "XConnect SOLR Failed" -ForegroundColor Red
@@ -218,9 +221,12 @@ function Install-XConnect {
     #Generate xConnect client certificate
     try {
         Write-Host $xConnect.certificateConfigurationPath
-        Install-SitecoreConfiguration $xConnect.certificateConfigurationPath `
-            -CertificateName $xConnect.certificateName `
-            -CertPath $assets.certificatesPath
+        $params = @{
+            Path            =   $xConnect.certificateConfigurationPath 
+            CertificateName =   $xConnect.certificateName 
+            CertPath        =   $assets.certificatesPath
+        }
+        Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs")
     }
     catch {
         write-host "XConnect Certificate Creation Failed" -ForegroundColor Red
@@ -229,20 +235,24 @@ function Install-XConnect {
     
     #Install xConnect
     try {
-        Install-SitecoreConfiguration $xConnect.ConfigurationPath `
-            -Package $xConnect.PackagePath `
-            -LicenseFile $assets.licenseFilePath `
-            -SiteName $xConnect.siteName `
-            -XConnectCert $xConnect.certificateName `
-            -SqlDbPrefix $site.prefix `
-            -SolrCorePrefix $site.prefix `
-            -SqlAdminUser $sql.adminUser `
-            -SqlAdminPassword $sql.adminPassword `
-            -SqlServer $sql.server `
-            -SqlCollectionUser $xConnect.sqlCollectionUser `
-            -SqlCollectionPassword $xConnect.sqlCollectionPassword `
-            -SolrUrl $solr.url `
-            -WebRoot $site.webRoot
+        $params = @{
+            Path                    =   $xConnect.ConfigurationPath 
+            Package                 =   $xConnect.PackagePath 
+            LicenseFile             =   $assets.licenseFilePath 
+            SiteName                =   $xConnect.siteName 
+            XConnectCert            =   $xConnect.certificateName 
+            SqlDbPrefix             =   $site.prefix 
+            SolrCorePrefix          =   $site.prefix 
+            SqlAdminUser            =   $sql.adminUser 
+            SqlAdminPassword        =   $sql.adminPassword 
+            SqlServer               =   $sql.server 
+            SqlCollectionUser       =   $xConnect.sqlCollectionUser 
+            SqlCollectionPassword   =   $xConnect.sqlCollectionPassword 
+            SolrUrl                 =   $solr.url 
+            WebRoot                 =   $site.webRoot
+        }
+        Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs")
+        
     }
     catch {
         write-host "XConnect Setup Failed" -ForegroundColor Red
@@ -270,11 +280,14 @@ function Install-Sitecore {
 
     try {
         #Install Sitecore Solr
-        Install-SitecoreConfiguration $sitecore.solrConfigurationPath `
-            -SolrUrl $solr.url `
-            -SolrRoot $solr.root `
-            -SolrService $solr.serviceName `
-            -CorePrefix $site.prefix
+        $params = @{
+            Path        =   $sitecore.solrConfigurationPath 
+            SolrUrl     =   $solr.url 
+            SolrRoot    =   $solr.root 
+            SolrService =   $solr.serviceName 
+            CorePrefix  =   $site.prefix
+        }
+        Install-SitecoreConfiguration  @params -WorkingDirectory $(Join-Path $PWD "logs")
     }
     catch {
         write-host "Sitecore SOLR Failed" -ForegroundColor Red
@@ -283,22 +296,26 @@ function Install-Sitecore {
 
     try {
         #Install Sitecore
-        Install-SitecoreConfiguration $sitecore.configurationPath `
-            -Package $sitecore.packagePath `
-            -LicenseFile $assets.licenseFilePath `
-            -SiteName $site.hostName `
-            -XConnectCert $xConnect.certificateName `
-            -SqlDbPrefix $site.prefix `
-            -SolrCorePrefix $site.prefix `
-            -SqlAdminUser $sql.adminUser `
-            -SqlAdminPassword $sql.adminPassword `
-            -SqlServer $sql.server `
-            -SolrUrl $solr.url `
-            -XConnectCollectionService "https://$($xConnect.siteName)" `
-            -XConnectReferenceDataService "https://$($xConnect.siteName)" `
-            -MarketingAutomationOperationsService "https://$($xConnect.siteName)" `
-            -MarketingAutomationReportingService "https://$($xConnect.siteName)"`
-            -WebRoot $site.webRoot
+        $params = @{
+            Path                                    =   $sitecore.configurationPath
+            Package                                 =   $sitecore.packagePath 
+            LicenseFile                             =   $assets.licenseFilePath 
+            SiteName                                =   $site.hostName 
+            XConnectCert                            =   $xConnect.certificateName 
+            SqlDbPrefix                             =   $site.prefix 
+            SolrCorePrefix                          =   $site.prefix 
+            SqlAdminUser                            =   $sql.adminUser 
+            SqlAdminPassword                        =   $sql.adminPassword 
+            SqlServer                               =   $sql.server 
+            SolrUrl                                 =   $solr.url
+            XConnectCollectionService               =   "https://$($xConnect.siteName)" 
+            XConnectReferenceDataService            =   "https://$($xConnect.siteName)" 
+            MarketingAutomationOperationsService    =   "https://$($xConnect.siteName)" 
+            MarketingAutomationReportingService     =   "https://$($xConnect.siteName)"
+            WebRoot                                 =   $site.webRoot
+        }
+        Install-SitecoreConfiguration  @params -WorkingDirectory $(Join-Path $PWD "logs")
+            
     }
     catch {
         write-host "Sitecore Setup Failed" -ForegroundColor Red
@@ -307,9 +324,12 @@ function Install-Sitecore {
 
     try {
         #Set web certificate on Sitecore site
-        Install-SitecoreConfiguration $sitecore.sslConfigurationPath `
-            -SiteName $site.hostName `
-            -WebRoot $site.WebRoot
+        $params = @{
+            Path        =   $sitecore.sslConfigurationPath 
+            SiteName    =   $site.hostName 
+            WebRoot     =   $site.WebRoot
+        }
+        Install-SitecoreConfiguration  @params -WorkingDirectory $(Join-Path $PWD "logs")
     }
     catch {
         write-host "Sitecore SSL Binding Failed" -ForegroundColor Red
@@ -320,10 +340,13 @@ function Install-Sitecore {
 
 function Enable-InstallationImprovements {
     try {
-        
-        Install-SitecoreConfiguration $site.enableInstallationImprovements `
-            -InstallDir $sitecore.siteRoot  `
-			-ResourceDir $( $assets.root + "\\Sitecore.WDP.Resources")
+        $params = @{
+            Path        =   $site.enableInstallationImprovements 
+            InstallDir  =   $sitecore.siteRoot  
+			ResourceDir =   $($assets.root + "\\Sitecore.WDP.Resources")
+        }
+
+        Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs")
     }
     catch {
         write-host "$site.habitatHomeHostName Failed to enable installation improvements" -ForegroundColor Red
@@ -332,10 +355,12 @@ function Enable-InstallationImprovements {
 }
 function Disable-InstallationImprovements {
     try {
-        
-        Install-SitecoreConfiguration $site.disableInstallationImprovements `
-            -InstallDir $sitecore.siteRoot `
-			-ResourceDir $( $assets.root + "\\Sitecore.WDP.Resources")
+        $params = @{
+            Path            =   $site.disableInstallationImprovements 
+            InstallDir      =   $sitecore.siteRoot 
+			ResourceDir     =   $($assets.root + "\\Sitecore.WDP.Resources")
+        }
+        Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs")
     }
     catch {
         write-host "$site.habitatHomeHostName Failed to disable installation improvements" -ForegroundColor Red
