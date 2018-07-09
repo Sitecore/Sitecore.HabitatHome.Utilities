@@ -1,75 +1,51 @@
 {
+    "assets": [{
+            "SourcePath": "https://dev.sitecore.net/~/media/F53E9734518E47EF892AD40A333B9426.ashx",
+            "Transforms": [{
+                "Type": "DownloadTransform",
+                "TargetPath": "Sitecore.Commerce.2018.07-2.2.124.zip"
+            }],
+            "assets": [{
+                "SourcePath": "Sitecore.Commerce.2018.07-2.2.124.zip",
+                "Transforms": [{
+                    "Type": "UnzipTransform",
+                    "TargetPath": "Sitecore.Commerce.2018.07-2.2.124"
+                }],
+                "assets": [{
+                        "SourcePath": "SIF.Sitecore.Commerce.1.2.14.zip",
+                        "Transforms": [{
+                            "Type": "UnzipTransform",
+                            "TargetPath": "SIF.Sitecore.Commerce.1.2.14"
+                        }]
+                    },
+                    {
+                        "SourcePath": "Sitecore.Commerce.Engine.2.2.124.zip",
+                        "Transforms": [{
+                            "Type": "UnzipTransform",
+                            "TargetPath": "Sitecore.Commerce.Engine.2.2.124"
+                        }]
+                    },
+                    {
+                        "SourcePath": "Sitecore.BizFX.1.2.19.zip",
+                        "Transforms": [{
+                            "Type": "UnzipTransform",
+                            "TargetPath": "Sitecore.BizFX.1.2.19"
+                        }]
+                    },
+                    {
+                        "SourcePath": "Sitecore.Commerce.Engine.SDK.2.2.72.zip",
+                        "Transforms": [{
+                            "Type": "UnzipTransform",
+                            "TargetPath": "Sitecore.Commerce.Engine.SDK"
+                        }]
+                    }
 
-    "sitecore": [{
-        "name": "xc",
-        "fileName": "Sitecore.Commerce.2018.07-2.2.124",
-        "url": "https://dev.sitecore.net/~/media/F53E9734518E47EF892AD40A333B9426.ashx",
-		"extract": true, 
-        "download": true,
-        "source": "sitecore"
-    }],
-    "modules": [{
-            "name": "sxa",
-            "fileName": "Sitecore Experience Accelerator 1.7.1 rev. 180604 for 9.0.zip",
-            "url": "https://dev.sitecore.net/~/media/1FF242BE683E4DE989925F74B78978FC.ashx",
-            "download": true,
-            "source": "sitecore"
+                ]
+            }]
         },
         {
-            "name": "spe",
-            "fileName": "Sitecore PowerShell Extensions-4.7.2 for Sitecore 8.zip",
-			"url": "https://marketplace.sitecore.net/services/~/media/3D2CADDAB4A34CEFB1CFD3DD86D198D5.ashx?data=Sitecore%20PowerShell%20Extensions-4.7.2%20for%20Sitecore%208&itemId=6aaea046-83af-4ef1-ab91-87f5f9c1aa57",
-            "download": true,
-            "source": "sitecore"
-        },
-        {
-            "name": "def",
-            "fileName": "Data Exchange Framework 2.0.1 rev. 180108.zip",
-            "url": "https://dev.sitecore.net/~/media/C50B044E45FE4C4DA9E675CBEED3AA09.ashx",
-            "download": true,
-            "source": "sitecore"
-        },
-        {
-            "name": "defSitecoreProvider",
-            "fileName": "Sitecore Provider for Data Exchange Framework 2.0.1 rev. 180108.zip",
-            "url": "https://dev.sitecore.net/~/media/D57A1FBB98ED4125B78D740E5B5F1772.ashx",
-            "download": true,
-            "source": "sitecore"
-        },
-        {
-            "name": "defSqlProvider",
-            "fileName": "SQL Provider for Data Exchange Framework 2.0.1 rev. 180108.zip",
-            "url": "https://dev.sitecore.net/~/media/F243222B9A95497BAB6B591D39560E95.ashx",
-            "download": true,
-            "source": "sitecore"
-        },
-        {
-            "name": "defxConnectProvider",
-            "fileName": "xConnect Provider for Data Exchange Framework 2.0.1 rev. 180108.zip",
-            "url": "https://dev.sitecore.net/~/media/C61F1265BB494CAFA4229FC9FC704AB0.ashx",
-            "download": true,
-            "source": "sitecore"
-        },
-        {
-            "name": "defDynamicsProvider",
-            "fileName": "Dynamics Provider for Data Exchange Framework 2.0.1 rev. 180108.zip",
-            "url": "https://dev.sitecore.net/~/media/819FB4C75CC74A8C984C343BEF7B53F1.ashx",
-            "download": true,
-            "source": "sitecore"
-        },
-        {
-            "name": "defDynamicsConnect",
-            "fileName": "Connect for Microsoft Dynamics 2.0.1 rev. 180108.zip",
-            "url": "https://dev.sitecore.net/~/media/ADBAF4CC6736499EBA0EBA6A9767D825.ashx",
-            "download": true,
-            "source": "sitecore"
+            "SourcePath": "License.xml",
+            "TargetPath": "ExternalAssets"
         }
-    ],
-    "prerequisites": [{
-        "name": "webPlatformInstaller",
-        "fileName": "https://download.microsoft.com/download/C/F/F/CFF3A0B8-99D4-41A2-AE1A-496C08BEB904/WebPlatformInstaller_amd64_en-US.msi",
-        "url": "WebPlatformInstaller_amd64_en-US.msi",
-        "download": true,
-        "source": "external"
-    }]
+    ]
 }
