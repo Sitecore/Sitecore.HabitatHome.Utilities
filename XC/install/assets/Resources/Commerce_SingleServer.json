@@ -350,7 +350,7 @@
     "InstallCommercexProfilesModule": {
       "Type": "InstallSitecoreConfiguration",
       "Params": {
-        "Path": "[concat(parameter('BaseConfigurationFolder'), '\\Commerce\\Connect\\Connect_xProfiles.json",
+        "Path": "[concat(parameter('BaseConfigurationFolder'), '\\Commerce\\Connect\\Connect_xProfiles.json')]",
         "ModuleFullPath": "[parameter('CommercexProfilesModuleFullPath')]",
         "ModulesDirDst": "[variable('ModulesDirDst')]",
         "BaseUrl": "[variable('UtilitiesBaseUrl')]"
@@ -359,7 +359,7 @@
     "InstallCommercexAnalyticsModule": {
       "Type": "InstallSitecoreConfiguration",
       "Params": {
-        "Path": "[concat(parameter('BaseConfigurationFolder'), '\\Commerce\\Connect\\Connect_xAnalytics.json",
+        "Path": "[concat(parameter('BaseConfigurationFolder'), '\\Commerce\\Connect\\Connect_xAnalytics.json')]",
         "ModuleFullPath": "[parameter('CommercexAnalyticsModuleFullPath')]",
         "ModulesDirDst": "[variable('ModulesDirDst')]",
         "BaseUrl": "[variable('UtilitiesBaseUrl')]"
@@ -368,7 +368,7 @@
     "InstallCommerceMAModule": {
       "Type": "InstallSitecoreConfiguration",
       "Params": {
-        "Path": "[concat(parameter('BaseConfigurationFolder'), '\\Commerce\\Connect\\Connect_MarketingAutomation.json",
+        "Path": "[concat(parameter('BaseConfigurationFolder'), '\\Commerce\\Connect\\Connect_MarketingAutomation.json')]",
         "XConnectSitePath": "[parameter('XConnectInstallDir')]",
         "ModuleFullPath": "[parameter('CommerceMAModuleFullPath')]",
         "ModulesDirDst": "[variable('ModulesDirDst')]",
