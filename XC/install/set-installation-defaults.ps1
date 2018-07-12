@@ -34,7 +34,7 @@ $sifCommerceVersion.version = "1.2.14"
 $assets.commerce.sifCommerceRoot = Join-Path $assets.commerce.installationFolder $($sifCommerceVersion.name + "." + $sifCommerceVersion.version)
 
 $commerceEngineVersion = $assets.commerce.filesToExtract | Where-Object { $_.name -eq "Sitecore.Commerce.Engine"} 
-$commerceEngineVersion.version = "2.2.124"
+$commerceEngineVersion.version = "2.2.126"
 
 $commerceEngineSDKVersion = $assets.commerce.filesToExtract | Where-Object { $_.name -eq "Sitecore.Commerce.Engine.SDK"} 
 $commerceEngineSDKVersion.version = "2.2.72"
