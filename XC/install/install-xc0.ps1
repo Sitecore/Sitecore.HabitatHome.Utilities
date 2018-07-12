@@ -201,7 +201,7 @@ function Install-CommerceAssets {
     }
     
     $commerceAssetFolder = $assets.commerce.installationFolder
-    
+
 	$habitatHomeImagePackageUrl = "https://v9assets.blob.core.windows.net/v9-onprem-assets/Habitat Home Product Images.zip?sv=2017-04-17&ss=bfqt&srt=sco&sp=rwdlacup&se=2027-11-09T20%3A11%3A50Z&st=2017-11-09T12%3A11%3A50Z&spr=https&sig=naspk%2BQflDLjyuC6gfXw4OZKvhhxzTlTvDctfw%2FByj8%3D"
     $habitatHomeImagePackageFileName = "Habitat Home Product Images.zip"
     $habitatHomeImagePackageDestination = (Join-Path $CommerceAssetFolder $habitatHomeImagePackageFileName)
@@ -277,7 +277,7 @@ Function Set-ModulesPath {
 Function Publish-CommerceEngine {
     Write-Host "Publishing Commerce Engine" -ForegroundColor Green
     $SolutionName = Join-Path "..\" "HabitatHome.Commerce.Engine.sln"
-    $PublishLocation = Join-Path $publishPath $($site.prefix + ".Commerce.Engine")
+    $PublishLocation = Join-Path $($publishPath + "\")  $($site.prefix + ".Commerce.Engine")
     if (Test-Path $PublishLocation) {
         Remove-Item $PublishLocation -Force -Recurse
     }
@@ -348,11 +348,11 @@ Function Install-Commerce {
         CommerceShopsServicesPort                   = "5005"
         CommerceAuthoringServicesPort               = "5000"
         CommerceMinionsServicesPort                 = "5010"
-        SitecoreCommerceEnginePath                  = $(Join-Path $resourcePath $($publishPath + $site.prefix + ".Commerce.Engine"))
-        SitecoreBizFxServicesContentPath            = $(Join-Path $resourcePath $($publishPath + $site.prefix + ".Commerce.BizFX"))
+        SitecoreCommerceEnginePath                  = $(Join-Path $resourcePath $($publishPath + "\" + $site.prefix + ".Commerce.Engine"))
+        SitecoreBizFxServicesContentPath            = $(Join-Path $resourcePath $($publishPath  + "\" + $site.prefix + ".Commerce.BizFX"))
         SitecoreBizFxPostFix                        = $site.prefix
 
-        SitecoreIdentityServerPath                  = $(Join-Path $resourcePath $($publishPath + $site.prefix + ".Commerce.IdentityServer"))
+        SitecoreIdentityServerPath                  = $(Join-Path $resourcePath $($publishPath  + "\" + $site.prefix + ".Commerce.IdentityServer"))
         CommerceEngineCertificatePath               = $(Join-Path -Path $assets.certificatesPath -ChildPath $($xConnect.CertificateName + ".crt") )
         SiteUtilitiesSrc                            = $(Join-Path -Path $assets.commerce.sifCommerceRoot -ChildPath "SiteUtilityPages")
         CommerceConnectModuleFullPath               = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include "Sitecore Commerce Connect*.zip" -Recurse  )
