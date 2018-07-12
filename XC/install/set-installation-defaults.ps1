@@ -21,8 +21,9 @@ $assets.downloadFolder = Join-Path $assets.root "Downloads"
 #Commerce
 $assets.commerce.nugetPackageLocation = "http://nuget1ca2/nuget/Commerce/"
 $assets.commerce.nugetPackageName = "Sitecore.Commerce.ReleasePackage.Content"
-$assets.commerce.nugetPackageVersion = "2.2.124"
-$assets.commerce.packageUrl = "https://v9assets.blob.core.windows.net/v9-onprem-assets/Sitecore.Commerce.2018.05-2.2.63.zip?sv=2017-04-17&ss=bfqt&srt=sco&sp=rwdlacup&se=2027-11-09T20%3A11%3A50Z&st=2017-11-09T12%3A11%3A50Z&spr=https&sig=naspk%2BQflDLjyuC6gfXw4OZKvhhxzTlTvDctfw%2FByj8%3D"
+$assets.commerce.nugetPackageVersion = "2.2.126"
+$assets.commerce.packageName = "Sitecore.Commerce.2018.07-2.2.126.zip"
+$assets.commerce.packageUrl = "https://dev.sitecore.net/~/media/F08E9950D0134D1DA325801057C96B35.ashx"
 $assets.commerce.installationFolder = Join-Path $assets.root "Commerce"
 
 
