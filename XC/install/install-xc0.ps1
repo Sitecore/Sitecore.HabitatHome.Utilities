@@ -172,23 +172,44 @@ function Install-RequiredInstallationAssets {
 function Install-CommerceAssets {
     Set-Location $PSScriptRoot
 
-    $credentials = Get-Credential -Message "Please provide dev.sitecore.com credentials"
+    
+    
+	$commercePackageDestination = Join-Path $assets.downloadFolder $assets.commerce.packageName
 
-    $params = @{
-        Path        = $([io.path]::combine($resourcePath, 'configuration', 'commerce', 'GetCommerceAssets.json'))
-        Credentials = $credentials
-        Source      = "https://dev.sitecore.net/~/media/F08E9950D0134D1DA325801057C96B35.ashx"
-        Destination = $(Join-Path  $assets.downloadFolder $assets.commerce.packageName)
-    }
+    if (!(Test-Path $commercePackageDestination)) {
+	
+		$credentials = Get-Credential -Message "Please provide dev.sitecore.com credentials"
 
-    if (!(Test-Path $(Join-Path $assets.downloadFolder $assets.commerce.packageName))) {
+		$params = @{
+			Path        = $([io.path]::combine($resourcePath, 'configuration', 'commerce', 'GetCommerceAssets.json'))
+			Credentials = $credentials
+			Source      = "https://dev.sitecore.net/~/media/F08E9950D0134D1DA325801057C96B35.ashx"
+			Destination = $commercePackageDestination
+		}
         Install-SitecoreConfiguration  @params  -WorkingDirectory $(Join-Path $PWD "logs") -Verbose
     }
+	
+	
+
+	$msbuildNuGetUrl = "https://v9assets.blob.core.windows.net/shared-assets/msbuild.microsoft.visualstudio.web.targets.14.0.0.3.nupkg"
+	$msbuildNuGetPackageFileName = "msbuild.microsoft.visualstudio.web.targets.14.0.0.3.nupkg"
+	$msbuildNuGetPackageDestination = $([io.path]::combine($assets.downloadFolder, $msbuildNuGetPackageFileName))
+
+	if (!(Test-Path $msbuildNuGetPackageDestination)) {
+		Write-Host "Saving $msbuildNuGetUrl to $msbuildNuGetPackageDestination" -ForegroundColor Green
+		Start-BitsTransfer -source $msbuildNuGetUrl -Destination $msbuildNuGetPackageDestination
+	}
+	
+	Write-Host "Extracting to $($CommerceAssetFolder)"
+	set-alias sz "$env:ProgramFiles\7-zip\7z.exe"
+	$commerceAssetFolder = $assets.commerce.installationFolder
+	sz x -o"$commerceAssetFolder" $commercePackageDestination -r -y -aoa
+
     # This is where we expand the archives:
     $packagesToExtract = $assets.commerce.filesToExtract
 
 
-    set-alias sz "$env:ProgramFiles\7-zip\7z.exe"
+
 
     foreach ($package in $packagesToExtract) {
 
