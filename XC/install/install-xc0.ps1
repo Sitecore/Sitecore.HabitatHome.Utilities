@@ -198,11 +198,22 @@ function Install-CommerceAssets {
 	if (!(Test-Path $msbuildNuGetPackageDestination)) {
 		Write-Host "Saving $msbuildNuGetUrl to $msbuildNuGetPackageDestination" -ForegroundColor Green
 		Start-BitsTransfer -source $msbuildNuGetUrl -Destination $msbuildNuGetPackageDestination
-	}
-	
+    }
+    
+    $commerceAssetFolder = $assets.commerce.installationFolder
+    
+	$habitatHomeImagePackageUrl = "https://v9assets.blob.core.windows.net/v9-onprem-assets/Habitat Home Product Images.zip?sv=2017-04-17&ss=bfqt&srt=sco&sp=rwdlacup&se=2027-11-09T20%3A11%3A50Z&st=2017-11-09T12%3A11%3A50Z&spr=https&sig=naspk%2BQflDLjyuC6gfXw4OZKvhhxzTlTvDctfw%2FByj8%3D"
+    $habitatHomeImagePackageFileName = "Habitat Home Product Images.zip"
+    $habitatHomeImagePackageDestination = (Join-Path $CommerceAssetFolder $habitatHomeImagePackageFileName)
+
+
+if (!(Test-Path $habitatHomeImagePackageDestination)) {
+    Write-Host ("Saving '{0}' to '{1}'" -f $habitatHomeImagePackageFileName, $CommerceAssetFolder) -ForegroundColor Green
+    Start-BitsTransfer -source $habitatHomeImagePackageUrl -Destination $habitatHomeImagePackageDestination
+}
 	Write-Host "Extracting to $($CommerceAssetFolder)"
 	set-alias sz "$env:ProgramFiles\7-zip\7z.exe"
-	$commerceAssetFolder = $assets.commerce.installationFolder
+	
 	sz x -o"$commerceAssetFolder" $commercePackageDestination -r -y -aoa
 
     # This is where we expand the archives:
