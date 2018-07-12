@@ -348,11 +348,11 @@ Function Install-Commerce {
         CommerceShopsServicesPort                   = "5005"
         CommerceAuthoringServicesPort               = "5000"
         CommerceMinionsServicesPort                 = "5010"
-        SitecoreCommerceEnginePath                  = $(Join-Path $resourcePath $($publishPath + "\" + $site.prefix + ".Commerce.Engine"))
-        SitecoreBizFxServicesContentPath            = $(Join-Path $resourcePath $($publishPath  + "\" + $site.prefix + ".Commerce.BizFX"))
+        SitecoreCommerceEnginePath                  = $($publishPath + "\" + $site.prefix + ".Commerce.Engine")
+        SitecoreBizFxServicesContentPath            = $($publishPath  + "\" + $site.prefix + ".Commerce.BizFX")
         SitecoreBizFxPostFix                        = $site.prefix
 
-        SitecoreIdentityServerPath                  = $(Join-Path $resourcePath $($publishPath  + "\" + $site.prefix + ".Commerce.IdentityServer"))
+        SitecoreIdentityServerPath                  =  $($publishPath  + "\" + $site.prefix + ".Commerce.IdentityServer")
         CommerceEngineCertificatePath               = $(Join-Path -Path $assets.certificatesPath -ChildPath $($xConnect.CertificateName + ".crt") )
         SiteUtilitiesSrc                            = $(Join-Path -Path $assets.commerce.sifCommerceRoot -ChildPath "SiteUtilityPages")
         CommerceConnectModuleFullPath               = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include "Sitecore Commerce Connect*.zip" -Recurse  )
