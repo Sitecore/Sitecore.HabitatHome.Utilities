@@ -6,6 +6,7 @@
             "nugetPackageLocation": "@@assets.commerce.nugetPackageLocation@@",
             "nugetPackageVersion": "@@assets.commerce.nugetPackageVersion@@",
             "nugetPackageName": "@@assets.commerce.nugetPackageName@@",
+            "packageName": "@@assets.commerce.packageName@@",
             "packageUrl": "@@assets.commerce.packageUrl@@",
             "installationFolder": "@@assets.commerce.installationFolder@@",
             "sifCommerceRoot": "@@assets.commerce.sifCommerceRoot@@",
