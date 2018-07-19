@@ -148,7 +148,7 @@
 
         // The path to the automation engine windows service
         "Services.MarketingAutomationEngine.InstallPath": "[joinpath(variable('Site.DataFolder'), 'jobs','continuous','AutomationEngine')]",
-        "Services.MarketingAutomationEngine.Name": "[concat(parameter('SiteName'), '-marketingautomationservice')]",
+        "Services.MarketingAutomationEngine.Name": "[concat(parameter('SiteName'), '-MarketingAutomationService')]",
 
         // The collection endpoint.
         "Endpoint.Collection": "[parameter('XConnectCollectionService')]",

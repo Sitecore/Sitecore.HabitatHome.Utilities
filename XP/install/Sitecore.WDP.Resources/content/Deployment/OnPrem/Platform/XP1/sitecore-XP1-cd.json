@@ -111,12 +111,12 @@
         },
         "MarketingAutomationOperationsService": {
             "Type": "string",
-            "DefaultValue": "https://XConnectAutomationReporting",
+            "DefaultValue": "https://XConnectMarketingAutomation",
             "Description": "The url for the XConnect Marketing Automation Service."
         },
         "MarketingAutomationReportingService": {
             "Type": "string",
-            "DefaultValue": "https://XConnectAutomationReporting",
+            "DefaultValue": "https://XConnectMarketingAutomationReporting",
             "Description": "The url for the XConnect Marketing Automation Reporting Service."
         },
         "EXMCryptographicKey": {
