@@ -1,0 +1,225 @@
+﻿// -------------------------------------------------------------------------- //
+//         Sitecore Install Framework - Sitecore IdentityServer Configuration //
+//                                                                            //
+//  Run this configuration to install a instance of Sitecore IdentityServer.  //
+//                                                                            //
+//  NOTE: Only single line comments are accepted in configurations.           //
+// -------------------------------------------------------------------------- //
+{
+    "Parameters": {
+        // Parameters are values that may be passed when Install-SitecoreConfiguration is called.
+        // Parameters must declare a Type and may declare a DefaultValue and Description.
+        // Parameters with no DefaultValue are required when Install-SitecoreConfiguration is called.
+        "Package": {
+            "Type": "string",
+            "Description": "The path to the Web Deploy package to deploy."
+        },        
+        "SqlDbPrefix": {
+            "Type": "string",
+            "Description": "The prefix used for all Sql databases."
+        },        
+        "SitecoreIdentityCert": {
+            "Type": "string",
+            "Description": "The certificate to use for encryption. Provide the name or the thumbprint."
+        },
+        "SiteName": {
+            "Type": "string",
+            "DefaultValue": "IdentityServer",
+            "Description": "The name of the site to be deployed."
+        },                
+        "SqlCoreUser": {
+            "Type": "string",
+            "DefaultValue": "coreuser",
+            "Description": "The user to create and use in Core connection string."
+        },
+        "SqlCoreDbName": {
+            "Type": "string",
+            "DefaultValue": "_Core",
+            "Description": "The database to use in Core connection string."
+        },
+        "SqlCorePassword": {
+            "Type": "string",
+            "DefaultValue": "Test12345",
+            "Description": "The Sql password for the Core connection string in Sitecore."
+        },                
+        "SqlServer": {
+            "Type": "string",
+            "DefaultValue": ".\\SQLSERVER",
+            "Description": "The Sql Server where databases will be installed."
+        },
+        "PasswordRecoveryUrl": {
+            "Type": "string",
+            "Description": "Password recovery Url (Host name of CM instance)."
+        },
+        "ClientsConfiguration": {
+            "Type": "string",
+            "DefaultValue": "",
+            "Description": "Sitecore IdentityServer clients configuration"
+        }
+    },
+    "Variables": {
+        // Variables are values calculated in a configuration.
+        // They can reference Parameters, other Variables, and config functions.
+        // Database names.
+        "Sql.Database.Core":                "[concat(parameter('SqlDbPrefix'), parameter('SqlCoreDbName'))]",
+        
+        // The security certificate details
+        "Security.CertificateStore":                "Cert:\\Localmachine\\My",
+        "Security.IdentityServer.CertificateThumbprint":  "[GetCertificateThumbprint(parameter('SitecoreIdentityCert'), variable('Security.CertificateStore'))]",
+        "Security.IdentityServer.CertificatePath":        "[joinpath(variable('Security.CertificateStore'), variable('Security.IdentityServer.CertificateThumbprint'))]",
+        
+
+        // The sites full path on disk
+        "Site.PhysicalPath": "[joinpath(environment('SystemDrive'), 'inetpub', 'wwwroot', parameter('SiteName'))]"        
+    },
+    "Tasks": {
+        // Tasks are separate units of work in a configuration.
+        // Each task is an action that will be completed when Install-SitecoreConfiguration is called.
+        // By default, tasks are applied in the order they are declared.
+        // Tasks may reference Parameters, Variables, and config functions.
+        "CreatePaths": {
+            // Ensure the destination path for the site exists.
+            "Type": "EnsurePath",
+            "Params": {
+                "Exists": [ "[variable('Site.PhysicalPath')]" ]
+            }
+        },
+        "CreateAppPool": {
+            // Creates or updates the app pool.
+            "Type": "AppPool",
+            "Params": {
+                "Name": "[parameter('SiteName')]",
+                "Properties": {
+                    "ProcessModel": {
+                        "identityType": "ApplicationPoolIdentity"
+                    },
+                "ManagedRuntimeVersion": ""
+                }
+            }
+        },
+        "SetAppPoolCertStorePermissions": {
+            // Set permissions for the App Pool User to access the client certificate.
+            "Type": "FilePermissions",
+            "Params": {
+                "Path" : "[ResolveCertificatePath(variable('Security.IdentityServer.CertificatePath'))]",
+                "Rights": [
+                    {
+                        "User": "[concat('IIS AppPool\\', parameter('SiteName'))]",
+                        "FileSystemRights": ["Read"],
+                        "InheritanceFlags": [ "None"]
+                    }
+                ]
+            }
+        },
+        "CreateWebsite": {
+            // Creates or updates the IIS website instance.
+            "Type": "Website",
+            "Params": {
+                "Name": "[parameter('SiteName')]",
+                "ApplicationPool": "[parameter('SiteName')]",
+                "PhysicalPath": "[variable('Site.PhysicalPath')]"
+            }
+        },
+        "StopWebsite": {
+            // Stops the website if it is running.
+            "Type": "ManageWebsite",
+            "Params": {
+                "Name": "[parameter('SiteName')]",
+                "Action": "Stop"
+            }
+        },
+        "StopAppPool": {
+            // Stops the app pool if it is running.
+            "Type": "ManageAppPool",
+            "Params": {
+                "Name": "[parameter('SiteName')]",
+                "Action": "Stop"
+            }
+        },
+        "RemoveDefaultBinding": {
+            // Removes the default *:80 web binding
+            "Type": "WebBinding",
+            "Params": {
+                "SiteName" : "[parameter('SiteName')]",
+                "Remove" : [ { "Port": "80", "IPAddress": "*" } ]
+            }
+        },
+        "CreateBindingsWithThumprint": {
+            // Configures the site bindings for the website.
+            "Type": "WebBinding",
+            "Params": {
+                "SiteName" : "[parameter('SiteName')]",
+                "Add": [
+                    {
+                        "HostHeader": "[parameter('SiteName')]",
+                        "Protocol": "https",
+                        "SSLFlags": 1,
+                        "Thumbprint": "[variable('Security.IdentityServer.CertificateThumbprint')]"
+                    }
+                ]
+            },
+            "Skip": "[not(parameter('SitecoreIdentityCert'))]"
+        },
+        
+        "CreateHostHeader": {
+            // Sets a hostheader for the website.
+            "Type": "HostHeader",
+            "Params": {
+                "HostName": "[parameter('SiteName')]"
+            }
+        },
+        "SetPermissions": {
+            // Sets permissions for the app pool user.
+            "Type": "FilePermissions",
+            "Params": {
+                "Path": "[variable('Site.PhysicalPath')]",
+                "Rights": [
+                    {
+                        "User": "[concat('IIS AppPool\\', parameter('SiteName'))]",
+                        "FileSystemRights": "FullControl",
+                        "InheritanceFlags": [ "ContainerInherit", "ObjectInherit" ]
+                    }
+                ]
+            }
+        },       
+        "InstallWDP": {
+            // Syncs the web deploy package with the website.
+            "Type": "WebDeploy",
+            "Params": {
+                "Verb": "Sync",
+                "Arguments": {
+                    "Source": {
+                        "Package": "[resolvepath(parameter('Package'))]"
+                    },
+                    "Dest": "Auto",
+                    "SetParam": [
+                        { "Name": "IIS Web Application Name", "Value": "[parameter('SiteName')]" },                                                
+                        { "Name": "Database Server Name", "Value": "[parameter('SqlServer')]" },                                              
+                        { "Name": "Core DB Name", "Value": "[variable('Sql.Database.Core')]" },                                                
+                        { "Name": "Core DB User Name", "Value": "[parameter('SqlCoreUser')]" },
+                        { "Name": "Core DB User Password", "Value": "[parameter('SqlCorePassword')]" },                                                                                                
+                        { "Name": "CertificateThumbprint", "Value": "[variable('Security.IdentityServer.CertificateThumbprint')]" },
+                        { "Name": "PasswordRecoveryUrl", "Value": "[parameter('PasswordRecoveryUrl')]" },
+                        { "Name": "ClientsConfiguration", "Value": "[parameter('ClientsConfiguration')]" }                                 
+                    ]
+                }
+            }
+        },       
+        "StartAppPool": {
+            // Starts the app pool.
+            "Type": "ManageAppPool",
+            "Params": {
+                "Name": "[parameter('SiteName')]",
+                "Action": "Start"
+            }
+        },
+        "StartWebsite": {
+            // Starts the website.
+            "Type": "ManageWebsite",
+            "Params": {
+                "Name": "[parameter('SiteName')]",
+                "Action": "Start"
+            }
+        }        
+    }
+}
