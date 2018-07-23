@@ -449,6 +449,22 @@ function Install-OptionalModules {
 }
 
 
+function Configure-SXA-SolrCores {
+    try {
+        $params = @{
+            Path            =   $site.configureSearchIndexes 
+            InstallDir      =   $sitecore.siteRoot 
+			ResourceDir     =   $($assets.root + "\\Sitecore.WDP.Resources")
+            SitePrefix      =   $site.prefix
+        }
+        Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs")
+    }
+    catch {
+        write-host "$site.habitatHomeHostName Failed to updated search index configuration" -ForegroundColor Red
+        throw
+    }
+}
+
 Install-Prerequisites
 Install-Assets
 Set-ModulesPath
@@ -459,3 +475,4 @@ Enable-InstallationImprovements
 Copy-Tools
 Install-OptionalModules
 Disable-InstallationImprovements
+Configure-SXA-SolrCores
