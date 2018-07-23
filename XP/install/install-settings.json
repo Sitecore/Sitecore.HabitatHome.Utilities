@@ -20,6 +20,7 @@
             "hostName": "@@site.hostName@@",
             "enableInstallationImprovements":"@@site.enableInstallationImprovements@@",
             "disableInstallationImprovements":"@@site.disableInstallationImprovements@@",
+            "configureSearchIndexes":"@@site.configureSearchIndexes@@",
             "habitatHomeSslCertificateName":"@@site.habitatHomeSslCertificateName@@"
         },
         
