@@ -99,6 +99,11 @@
             "DefaultValue": "https://localhost:8983/solr",
             "Description": "The Solr instance to use."
         },
+		"SolrZookeeperUrl": {
+            "Type": "string",
+            "DefaultValue": "localhost:2181",
+            "Description": "The Zookeeper instance to use."
+        },
         "XConnectCollectionService": {
             "Type": "string",
             "DefaultValue": "https://XConnectCollection",
@@ -111,12 +116,12 @@
         },
         "MarketingAutomationOperationsService": {
             "Type": "string",
-            "DefaultValue": "https://XConnectAutomationReporting",
+            "DefaultValue": "https://XConnectMarketingAutomation",
             "Description": "The url for the XConnect Marketing Automation Service."
         },
         "MarketingAutomationReportingService": {
             "Type": "string",
-            "DefaultValue": "https://XConnectAutomationReporting",
+            "DefaultValue": "https://XConnectMarketingAutomationReporting",
             "Description": "The url for the XConnect Marketing Automation Reporting Service."
         },
         "EXMCryptographicKey": {
@@ -285,6 +290,7 @@
                         { "Name": "XDB MA Ops Client", "Value": "[parameter('MarketingAutomationOperationsService')]" },
                         { "Name": "XConnect Server Certificate Validation Thumbprint", "Value": "[variable('Security.XConnect.CertificateThumbprint')]" },
                         { "Name": "SOLR Connection String", "Value": "[parameter('SolrUrl')]" },
+						{ "Name": "SOLR Zookeeper Connection String", "Value": "[parameter('SolrZookeeperUrl')]" },
                         { "Name": "Solr Web Index Name", "Value": "[variable('Solr.Web.Name')]"},
                         { "Name": "Solr Marketing Definitions Web Index Name", "Value": "[variable('Solr.MD.Web.Name')]"},
                         { "Name": "Solr Marketing Asset Web Index Name", "Value": "[variable('Solr.MA.Web.Name')]"},

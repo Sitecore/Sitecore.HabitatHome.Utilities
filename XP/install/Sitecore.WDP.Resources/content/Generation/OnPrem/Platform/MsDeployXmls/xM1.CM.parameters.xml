@@ -80,8 +80,12 @@
   </parameter>
   
   <parameter name="SOLR Connection String" description="SOLR Connection String" tags="Hidden,NoStore">
-    <parameterEntry kind="XmlFile" scope="App_Config\\Sitecore\\ContentSearch\\Sitecore.ContentSearch.Solr.DefaultIndexConfiguration\.config$" match="//configuration/sitecore/settings/setting[@name='ContentSearch.Solr.ServiceBaseAddress']/@value" />
-  </parameter>  
+    <parameterEntry kind="XmlFile" scope="App_Config\\ConnectionStrings\.config$" match="//connectionStrings/add[@name='solr.search']/@connectionString" />
+  </parameter>
+  
+   <parameter name="SOLR Zookeeper Connection String" description="SOLR Zookeeper Connection String" tags="Hidden,NoStore">
+    <parameterEntry kind="XmlFile" scope="App_Config\\ConnectionStrings\.config$" match="//connectionStrings/add[@name='contentSearch.solr.zookeeper']/@connectionString" />
+  </parameter>
 
   <parameter name="Data Folder" tags="Hidden,NoStore" defaultValue="/App_Data">   
      <parameterEntry type="XmlFile" scope= "App_Config\\sitecore.config" match="/sitecore/sc.variable[@name='dataFolder']/@value" />   

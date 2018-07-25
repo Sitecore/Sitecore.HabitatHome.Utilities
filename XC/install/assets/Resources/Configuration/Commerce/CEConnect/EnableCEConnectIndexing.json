@@ -10,9 +10,7 @@
         "ConfigDir": "[parameter('ConfigDir')]",
         "ConfigFileList": [
           "Sitecore.Commerce.Engine.Connectors.Index.Common.config",
-          "Sitecore.Commerce.Engine.Connectors.Index.Solr.config",
-          "Sitecore.Commerce.Engine.Connectors.Index.Solr.Master.ExcludeFields.config",
-          "Sitecore.Commerce.Engine.Connectors.Index.Solr.Web.ExcludeFields.config"
+          "Sitecore.Commerce.Engine.Connectors.Index.Solr.config"          
         ]
       }
     }

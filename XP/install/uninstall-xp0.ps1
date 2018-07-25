@@ -115,3 +115,24 @@ Remove-SitecoreCertificate $site.hostName
 
 # Drop the SQL Collectionuser login
 Remove-SitecoreDatabaseLogin -Server $database, -Name $($xConnect.sqlCollectionUser)
+
+# Remove App Pool membership 
+
+try 
+{
+    Remove-LocalGroupMember "Performance Log Users" "IIS AppPool\$($site.hostName)"
+    Write-Host "Removed IIS AppPool\$($site.hostName) from Performance Log Users" -ForegroundColor Green
+}
+catch 
+{
+    Write-Host "Could not find IIS AppPool\$($site.hostName) in Performance Log Users" -ForegroundColor Yellow
+}
+try 
+{
+    Remove-LocalGroupMember "Performance Monitor Users" "IIS AppPool\$($site.hostName)"
+    Write-Host "Removed IIS AppPool\$($site.hostName) from Performance Monitor Users" -ForegroundColor Green
+}
+catch 
+{
+    Write-Host "Could not find IIS AppPool\$($site.hostName) to Performance Monitor Users" -ForegroundColor Yellow
+}
