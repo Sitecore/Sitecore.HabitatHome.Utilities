@@ -38,6 +38,7 @@ Function Invoke-ApplyCertificateTask {
     $node = $xml.configuration.sitecore.commerceEngineConfiguration
     $node.certificateThumbprint = $cert.Thumbprint
     $xml.Save($pathToConfig)  
+
     foreach ($path in $CommerceServicesPathCollection) {
         $pathToJson = $(Join-Path -Path $path -ChildPath "wwwroot\config.json") 
         $originalJson = Get-Content $pathToJson -Raw | ConvertFrom-Json
@@ -132,6 +133,7 @@ Function Invoke-EnableCsrfValidationTask {
         [Parameter(Mandatory = $true)]
         [string[]]$CommerceServicesPathCollection
     )
+
     foreach ($path in $CommerceServicesPathCollection) {
         $pathToJson = $(Join-Path -Path $path -ChildPath "wwwroot\config.json")
         $originalJson = Get-Content $pathToJson -Raw  | ConvertFrom-Json

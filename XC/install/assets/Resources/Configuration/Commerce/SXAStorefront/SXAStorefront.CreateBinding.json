@@ -20,8 +20,7 @@
     },
     "StorefrontHostName": {
       "Type": "string",
-      "Description": "The host name of the storefront.",
-      "DefaultValue": "sxa.storefront.com"
+      "Description": "The host name of the storefront."
     }
   },
   "Variables": {
