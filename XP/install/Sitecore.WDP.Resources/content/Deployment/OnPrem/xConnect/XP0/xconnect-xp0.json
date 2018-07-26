@@ -115,79 +115,79 @@
             "DefaultValue": "Development",
             "Description": "The configuration environment for this instance."
         },
-        "XConnectLogLevel": {
-            "Type": "string",
-            "DefaultValue": "Information",
-            "Description": "The level of log information to output."
-        },
-        "WebRoot":{
-            "Type":"string",
-            "DefaultValue":"c:\\inetpub\\wwwroot",
-            "Description":"The physical path of the configured Web Root for the environment"
+      "XConnectLogLevel": {
+        "Type": "string",
+        "DefaultValue": "Information",
+        "Description": "The level of log information to output."
+      },
+        "WebRoot": {
+          "Type": "string",
+          "DefaultValue": "c:\\inetpub\\wwwroot",
+          "Description": "The physical path of the configured Web Root for the environment"
         }
     },
-    "Variables": {
-        // Variables are values calculated in a configuration.
-        // They can reference Parameters, other Variables, and config functions.
-        // The prefix for shards created by the tool
-        "Sharding.Database.Prefix": "[concat(parameter('SqlDbPrefix'), '_Xdb.Collection.Shard')]",
+  "Variables": {
+    // Variables are values calculated in a configuration.
+    // They can reference Parameters, other Variables, and config functions.
+    // The prefix for shards created by the tool
+    "Sharding.Database.Prefix": "[concat(parameter('SqlDbPrefix'), '_Xdb.Collection.Shard')]",
 
-        // The database names.
-        "Sql.Database.ShardMapManager":     "[concat(variable('Sharding.Database.Prefix'), 'MapManager')]",
-        "Sql.Database.Shard0":              "[concat(variable('Sharding.Database.Prefix'), '0')]",
-        "Sql.Database.Shard1":              "[concat(variable('Sharding.Database.Prefix'), '1')]",
-        "Sql.Database.Pools":               "[concat(parameter('SqlDbPrefix'), '_Processing.Pools')]",
-        "Sql.Database.MarketingAutomation": "[concat(parameter('SqlDbPrefix'), '_MarketingAutomation')]",
-        "Sql.Database.Messaging":           "[concat(parameter('SqlDbPrefix'), '_Messaging')]",
-        "Sql.Database.Reference":           "[concat(parameter('SqlDbPrefix'), '_ReferenceData')]",
+    // The database names.
+    "Sql.Database.ShardMapManager": "[concat(variable('Sharding.Database.Prefix'), 'MapManager')]",
+    "Sql.Database.Shard0": "[concat(variable('Sharding.Database.Prefix'), '0')]",
+    "Sql.Database.Shard1": "[concat(variable('Sharding.Database.Prefix'), '1')]",
+    "Sql.Database.Pools": "[concat(parameter('SqlDbPrefix'), '_Processing.Pools')]",
+    "Sql.Database.MarketingAutomation": "[concat(parameter('SqlDbPrefix'), '_MarketingAutomation')]",
+    "Sql.Database.Messaging": "[concat(parameter('SqlDbPrefix'), '_Messaging')]",
+    "Sql.Database.Reference": "[concat(parameter('SqlDbPrefix'), '_ReferenceData')]",
 
-        // The security certificate details
-        "Security.CertificateStore":                "Cert:\\Localmachine\\My",
-        "Security.SSL.CertificateThumbprint":       "[GetCertificateThumbprint(parameter('SSLCert'), variable('Security.CertificateStore'))]",
-        "Security.XConnect.CertificateThumbprint":  "[GetCertificateThumbprint(parameter('XConnectCert'), variable('Security.CertificateStore'))]",
-        "Security.XConnect.CertificatePath":        "[joinpath(variable('Security.CertificateStore'), variable('Security.XConnect.CertificateThumbprint'))]",
+    // The security certificate details
+    "Security.CertificateStore": "Cert:\\Localmachine\\My",
+    "Security.SSL.CertificateThumbprint": "[GetCertificateThumbprint(parameter('SSLCert'), variable('Security.CertificateStore'))]",
+    "Security.XConnect.CertificateThumbprint": "[GetCertificateThumbprint(parameter('XConnectCert'), variable('Security.CertificateStore'))]",
+    "Security.XConnect.CertificatePath": "[joinpath(variable('Security.CertificateStore'), variable('Security.XConnect.CertificateThumbprint'))]",
 
-        // The sites full path on disk
-        "Site.PhysicalPath": "[concat(parameter('WebRoot'),'\\', parameter('SiteName'))]",
-        "Site.DataFolder":  "[joinpath(variable('Site.PhysicalPath'), 'App_Data')]",
+    // The sites full path on disk
+    "Site.PhysicalPath": "[concat(parameter('WebRoot'),'\\', parameter('SiteName'))]",
+    "Site.DataFolder": "[joinpath(variable('Site.PhysicalPath'), 'App_Data')]",
 
-        // The path to the index worker windows service
-        "Services.IndexWorker.InstallPath": "[joinpath(variable('Site.DataFolder'), 'jobs','continuous','IndexWorker')]",
-        "Services.IndexWorker.Name":        "[concat(parameter('SiteName'), '-IndexWorker')]",
+    // The path to the index worker windows service
+    "Services.IndexWorker.InstallPath": "[joinpath(variable('Site.DataFolder'), 'jobs','continuous','IndexWorker')]",
+    "Services.IndexWorker.Name": "[concat(parameter('SiteName'), '-IndexWorker')]",
 
-        // The path to the automation engine windows service
-        "Services.MarketingAutomationEngine.InstallPath":   "[joinpath(variable('Site.DataFolder'), 'jobs','continuous','AutomationEngine')]",
-        "Services.MarketingAutomationEngine.Name":          "[concat(parameter('SiteName'), '-MarketingAutomationService')]",
+    // The path to the automation engine windows service
+    "Services.MarketingAutomationEngine.InstallPath": "[joinpath(variable('Site.DataFolder'), 'jobs','continuous','AutomationEngine')]",
+    "Services.MarketingAutomationEngine.Name": "[concat(parameter('SiteName'), '-MarketingAutomationService')]",
 
-        // The marketing automation endpoint.
-        "Endpoint.MarketingAutomation": "[concat('https://', parameter('SiteName'))]",
+    // The marketing automation endpoint.
+    "Endpoint.MarketingAutomation": "[concat('https://', parameter('SiteName'))]",
 
-        // The reference data endpoint.
-        "Endpoint.ReferenceData": "[concat(variable('Endpoint.MarketingAutomation'), '/refdata')]",
+    // The reference data endpoint.
+    "Endpoint.ReferenceData": "[concat(variable('Endpoint.MarketingAutomation'), '/refdata')]",
 
-        // The sharding tool details.
-        "Sharding.Root.Path":   "[joinpath(variable('Site.DataFolder'), 'collectiondeployment')]",
-        "Sharding.Tool.Path":   "[joinpath(variable('Sharding.Root.Path'), 'Sitecore.Xdb.Collection.Database.SqlShardingDeploymentTool.exe')]",
-        "Sharding.DacPac.Path": "[joinpath(variable('Sharding.Root.Path'), 'Sitecore.Xdb.Collection.Database.Sql.dacpac')]",
-        "Sharding.Map.Names": [
-            "ContactIdShardMap",
-            "DeviceProfileIdShardMap",
-            "ContactIdentifiersIndexShardMap"
-        ],
-        "Sharding.DB.Connection": "[sqlconnectionstring(parameter('SqlServer'), '', parameter('SqlAdminUser'), parameter('SqlAdminPassword'))]",
-        "Sharding.Edition": "Basic",        
-        "Sharding.SqlCmd.Path.CreateShardApplicationDatabaseServerLogin":   "[joinpath(variable('Sharding.Root.Path'), 'CreateShardApplicationDatabaseServerLogin.sql')]",
-        "Sharding.SqlCmd.Path.CreateShardManagerApplicationDatabaseUser":   "[joinpath(variable('Sharding.Root.Path'), 'CreateShardManagerApplicationDatabaseUser.sql')]",
-        "Sharding.SqlCmd.Path.CreateShardApplicationDatabaseUser":          "[joinpath(variable('Sharding.Root.Path'), 'CreateShardApplicationDatabaseUser.sql')]",
+    // The sharding tool details.
+    "Sharding.Root.Path": "[joinpath(variable('Site.DataFolder'), 'collectiondeployment')]",
+    "Sharding.Tool.Path": "[joinpath(variable('Sharding.Root.Path'), 'Sitecore.Xdb.Collection.Database.SqlShardingDeploymentTool.exe')]",
+    "Sharding.DacPac.Path": "[joinpath(variable('Sharding.Root.Path'), 'Sitecore.Xdb.Collection.Database.Sql.dacpac')]",
+    "Sharding.Map.Names": [
+      "ContactIdShardMap",
+      "DeviceProfileIdShardMap",
+      "ContactIdentifiersIndexShardMap"
+    ],
+    "Sharding.DB.Connection": "[sqlconnectionstring(parameter('SqlServer'), '', parameter('SqlAdminUser'), parameter('SqlAdminPassword'))]",
+    "Sharding.Edition": "Basic",
+    "Sharding.SqlCmd.Path.CreateShardApplicationDatabaseServerLogin": "[joinpath(variable('Sharding.Root.Path'), 'CreateShardApplicationDatabaseServerLogin.sql')]",
+    "Sharding.SqlCmd.Path.CreateShardManagerApplicationDatabaseUser": "[joinpath(variable('Sharding.Root.Path'), 'CreateShardManagerApplicationDatabaseUser.sql')]",
+    "Sharding.SqlCmd.Path.CreateShardApplicationDatabaseUser": "[joinpath(variable('Sharding.Root.Path'), 'CreateShardApplicationDatabaseUser.sql')]",
 
-        // The solr configuration details.
-        "Xdb.Name":         "[concat(parameter('SolrCorePrefix'), '_xdb')]",
-        "Xdb.Rebuild.Name": "[concat(variable('Xdb.Name'), '_rebuild')]",
-        "Solr.Url.Xdb":     "[concat(parameter('SolrUrl'), '/', variable('Xdb.Name'))]",
+    // The solr configuration details.
+    "Xdb.Name": "[concat(parameter('SolrCorePrefix'), '_xdb')]",
+    "Xdb.Rebuild.Name": "[concat(variable('Xdb.Name'), '_rebuild')]",
+    "Solr.Url.Xdb": "[concat(parameter('SolrUrl'), '/', variable('Xdb.Name'))]",
 
-        // The content at this path is installed by the wdp
-        "Solr.Config.Path": "[joinpath(variable('Site.DataFolder'), 'solrcommands', 'schema.json')]"
-    },
+    // The content at this path is installed by the wdp
+    "Solr.Config.Path": "[joinpath(variable('Site.DataFolder'), 'solrcommands', 'schema.json')]"
+  },
     "Tasks": {
         // Tasks are separate units of work in a configuration.
         // Each task is an action that will be completed when Install-SitecoreConfiguration is called.

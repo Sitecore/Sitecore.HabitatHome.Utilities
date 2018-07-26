@@ -79,10 +79,6 @@
     <parameterEntry kind="XmlFile" scope="App_Config\\ConnectionStrings\.config$" match="//connectionStrings/add[@name='xconnect.collection.certificate']/@connectionString" />
   </parameter>
 
-  <parameter name="SOLR Connection String" description="SOLR Connection String" tags="Hidden,NoStore">
-    <parameterEntry kind="XmlFile" scope="App_Config\\Sitecore\\ContentSearch\\Sitecore.ContentSearch.Solr.DefaultIndexConfiguration\.config$" match="//configuration/sitecore/settings/setting[@name='ContentSearch.Solr.ServiceBaseAddress']/@value" />
-  </parameter> 
-
    <parameter name="Solr Core Index Name" tags="Hidden,NoStore" defaultValue="$(id)">   
      <parameterEntry type="XmlFile" scope= "App_Config\\Sitecore\\ContentSearch\\Sitecore\.ContentSearch\.Solr\.Index\.Core\.config" match="//index/param[@desc='core']/text()" />   
    </parameter>

@@ -1,15 +1,8 @@
-﻿// ------------------------------------------------------------------------------ //
-//         Sitecore Install Framework - Install Commerce Engine Connect package   //
-//                                                                                //
-//  Run this configuration to install Commerce Engine Connect package.            //
-//                                                                                //
-//  NOTE: Only single line comments are accepted in configurations.               //
-// ------------------------------------------------------------------------------ //
-{
+﻿{
   "Parameters": {
     "PackageFullPath": {
       "Type": "string",
-      "Description": "The path to the Adventure Works images zip."
+      "Description": "The path to Commerce Engine Connect package zip."
     },
     "PackagesDirDst": {
       "Type": "string",

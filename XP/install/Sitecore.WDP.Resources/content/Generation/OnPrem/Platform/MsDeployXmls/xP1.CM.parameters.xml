@@ -119,7 +119,10 @@
     <parameterEntry kind="XmlFile" scope="App_Config\\ConnectionStrings\.config$" match="//connectionStrings/add[@name='reporting']/@connectionString" />
   </parameter>
   <parameter name="SOLR Connection String" description="SOLR Connection String" tags="Hidden,NoStore">
-    <parameterEntry kind="XmlFile" scope="App_Config\\Sitecore\\ContentSearch\\Sitecore.ContentSearch.Solr.DefaultIndexConfiguration\.config$" match="//configuration/sitecore/settings/setting[@name='ContentSearch.Solr.ServiceBaseAddress']/@value" />
+    <parameterEntry kind="XmlFile" scope="App_Config\\ConnectionStrings\.config$" match="//connectionStrings/add[@name='solr.search']/@connectionString" />
+  </parameter>
+  <parameter name="SOLR Zookeeper Connection String" description="SOLR Zookeeper Connection String" tags="Hidden,NoStore">
+    <parameterEntry kind="XmlFile" scope="App_Config\\ConnectionStrings\.config$" match="//connectionStrings/add[@name='solr.search.zookeeper']/@connectionString" />
   </parameter>
   <parameter name="Messaging Connection String" description="Connection string to connect to your Messaging database" tags="SQL, Hidden,NoStore" defaultValue="Data Source={Database Server Name};Initial Catalog={Messaging DB Name};User ID={Messaging DB User Name};Password={Messaging DB User Password}">
     <parameterEntry kind="XmlFile" scope="App_Config\\ConnectionStrings\.config$" match="//connectionStrings/add[@name='messaging']/@connectionString" />

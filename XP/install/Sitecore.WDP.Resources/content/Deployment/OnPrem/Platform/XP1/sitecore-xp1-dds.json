@@ -154,6 +154,11 @@
       "DefaultValue": "https://localhost:8983/solr",
       "Description": "The Solr instance to use."
     },
+	"SolrZookeeperUrl": {
+        "Type": "string",
+        "DefaultValue": "localhost:2181",
+        "Description": "The Zookeeper instance to use."
+    },
     "ProcessingService": {
       "Type": "string",
       "DefaultValue": "https://SitecoreProcessing",
@@ -181,12 +186,12 @@
     },
     "MarketingAutomationOperationsService": {
       "Type": "string",
-      "DefaultValue": "http://XConnectAutomationReporting",
+      "DefaultValue": "http://XConnectMarketingAutomation",
       "Description": "The url for the XConnect Marketing Automation Service."
     },
     "MarketingAutomationReportingService": {
       "Type": "string",
-      "DefaultValue": "http://XConnectAutomationReporting",
+      "DefaultValue": "http://XConnectMarketingAutomationReporting",
       "Description": "The url for the XConnect Marketing Automation Reporting Service."
     },
     "EXMCryptographicKey": {
@@ -405,6 +410,7 @@
                         { "Name": "Reporting Site URL", "Value": "[parameter('ReportingService')]" },
                         { "Name": "Reporting API Key", "Value": "[parameter('ReportingServiceApiKey')]" },
                         { "Name": "SOLR Connection String", "Value": "[parameter('SolrUrl')]" },
+						{ "Name": "SOLR Zookeeper Connection String", "Value": "[parameter('SolrZookeeperUrl')]" },
                         { "Name": "Solr Core Index Name", "Value": "[variable('Solr.Core.Name')]"},
                         { "Name": "Solr Master Index Name", "Value": "[variable('Solr.Master.Name')]"},
                         { "Name": "Solr Web Index Name", "Value": "[variable('Solr.Web.Name')]"},
