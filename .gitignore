@@ -72,7 +72,8 @@ configuration-x*0.json
 */**/set-installation-overrides.ps1
 XC/install/assets/Commerce
 */**/Resources/Modules
-
+*.tgz
+*.update
 InstallUtil.InstallLog
 
 /FrontEnd/**/node_modules
@@ -82,3 +83,4 @@ logs
 deploy/
 publishTemp
 Publish
+dev.creds.xml

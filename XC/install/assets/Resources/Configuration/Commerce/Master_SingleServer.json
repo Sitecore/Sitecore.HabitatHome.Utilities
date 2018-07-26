@@ -135,19 +135,15 @@
       "Type": "string",
       "Description": "SitecoreBizFx Services Content Path"
     },
-    "SitecoreBizFxPostFix": {
-      "Type": "string",
-      "Description": "String to add at the end of 'SitecoreBizFx' to make it unique to the instance"
-    },
     "SitecoreIdentityServerZipPath": {
       "Type": "string",
       "Description": "SitecoreIdentityServer Zip Path"
     },
     "UserAccount": {
       "Type": "psobject",
-      "Description": "UserAccount for Commerce Serices App Pool"
+      "Description": "UserAccount for Commerce Services App Pool"
     },
-    "BraintreeAccount": {
+	  "BraintreeAccount": {
       "Type": "psobject",
       "Description": "Braintree sandbox account for Payment plugin"
     },
@@ -170,6 +166,22 @@
     "CommerceConnectModuleFullPath": {
       "Type": "string",
       "Description": "Commerce Connect module full path"
+    },
+    "CommercexProfilesModuleFullPath": {
+      "Type": "string",
+      "Description": "Commerce xProfiles module full path"
+    },
+    "CommercexAnalyticsModuleFullPath": {
+      "Type": "string",
+      "Description": "Commerce xAnalytics module full path"
+    },
+    "CommerceMAModuleFullPath": {
+      "Type": "string",
+      "Description": "Commerce Marketing Automation module full path"
+    },
+    "CommerceMAForAutomationEngineModuleFullPath": {
+      "Type": "string",
+      "Description": "Commerce Marketing Automation for AutomationEngine module full path"
     },
     "CEConnectPackageFullPath": {
       "Type": "string",
@@ -210,13 +222,11 @@
     },
     "SitecoreUsername": {
       "Type": "string",
-      "Description": "Sitecore Admin Username",
-      "DefaultValue": "sitecore\\admin"
+      "Description": "Sitecore Admin Username"
     },
     "SitecoreUserPassword": {
       "Type": "string",
-      "Description": "Sitecore Admin Password",
-      "DefaultValue": "b"
+      "Description": "Sitecore Admin Password"
     }
   },
   "Variables": {
@@ -237,7 +247,7 @@
     "ProjectConfigIncludeDir": "[concat(parameter('InstallDir'), '\\App_Config\\Include\\Project\\Commerce')]",
     "SiteRootUrl": "[concat('http://', concat(parameter('SiteHostHeaderName')))]"
   },
-  "Modules": ["InstallSitecoreConfiguration", "ManageCommerceService", "SitecoreUtilityTasks"],
+  "Modules": [ "InstallSitecoreConfiguration", "ManageCommerceService", "SitecoreUtilityTasks" ],
   "Tasks": {
     // Tasks are separate units of work in a configuration.
     // Each task is an action that will be completed when Install-SitecoreConfiguration is called.
@@ -288,7 +298,7 @@
         "CommerceMinionsServicesPort": "[parameter('CommerceMinionsServicesPort')]",
         "SitecoreCommerceEngineZipPath": "[parameter('SitecoreCommerceEngineZipPath')]",
         "UserAccount": "[parameter('UserAccount')]",
-        "BraintreeAccount": "[parameter('BraintreeAccount')]"
+		    "BraintreeAccount": "[parameter('BraintreeAccount')]"
       }
     },
     "DeploySitecoreBizFx": {
@@ -321,20 +331,22 @@
     "DisableIndexUpdate": {
       // Speed up deployment
       "Type": "SetXml",
-      "Params": [{
-        "FilePath": "[variable('ContentSearchConfig'))]",
-        "Xpath": "[variable('ContentSearchEnabledXpath')]",
-        "Attributes": {
-          "value": "false"
+      "Params": [
+        {
+          "FilePath": "[variable('ContentSearchConfig'))]",
+          "Xpath": "[variable('ContentSearchEnabledXpath')]",
+          "Attributes": {
+            "value": "false"
+          }
         }
-      }]
+      ]
     },
     "DisableConfigFiles": {
       // Speed up deployment
       "Type": "DisableConfigFiles",
       "Params": {
         "ConfigDir": "[variable('MarketingConfigDir')]",
-        "ConfigFileList": ["Sitecore.Marketing.Search.config"]
+        "ConfigFileList": [ "Sitecore.Marketing.Search.config" ]
       }
     },
     "InstallPowershellExtensions": {
@@ -386,6 +398,35 @@
         "Path": ".\\Configuration\\Commerce\\Connect\\Connect.json",
         "ModuleFullPath": "[parameter('CommerceConnectModuleFullPath')]",
         "ModulesDirDst": "[variable('ModulesDirDst')]",
+        "BaseUrl": "[variable('UtilitiesBaseUrl')]"
+      }
+    },
+    "InstallCommercexProfilesModule": {
+      "Type": "InstallSitecoreConfiguration",
+      "Params": {
+        "Path": ".\\Configuration\\Commerce\\Connect\\Connect_xProfiles.json",
+        "ModuleFullPath": "[parameter('CommercexProfilesModuleFullPath')]",
+        "ModulesDirDst": "[variable('ModulesDirDst')]",
+        "BaseUrl": "[variable('UtilitiesBaseUrl')]"
+      }
+    },
+    "InstallCommercexAnalyticsModule": {
+      "Type": "InstallSitecoreConfiguration",
+      "Params": {
+        "Path": ".\\Configuration\\Commerce\\Connect\\Connect_xAnalytics.json",
+        "ModuleFullPath": "[parameter('CommercexAnalyticsModuleFullPath')]",
+        "ModulesDirDst": "[variable('ModulesDirDst')]",
+        "BaseUrl": "[variable('UtilitiesBaseUrl')]"
+      }
+    },
+    "InstallCommerceMAModule": {
+      "Type": "InstallSitecoreConfiguration",
+      "Params": {
+        "Path": ".\\Configuration\\Commerce\\Connect\\Connect_MarketingAutomation.json",
+        "XConnectSitePath": "[parameter('XConnectInstallDir')]",
+        "ModuleFullPath": "[parameter('CommerceMAModuleFullPath')]",
+        "ModulesDirDst": "[variable('ModulesDirDst')]",
+        "AutomationEngineModule": "[parameter('CommerceMAForAutomationEngineModuleFullPath')]",
         "BaseUrl": "[variable('UtilitiesBaseUrl')]"
       }
     },
@@ -446,9 +487,13 @@
       "Params": {
         "Path": ".\\Configuration\\Commerce\\CommerceEngine\\CommerceEngine.Initialize.json",
         "CommerceServicesPostfix": "[parameter('CommerceServicesPostfix')]",
-        "CommerceShopsServicesPort": "[parameter('CommerceShopsServicesPort')]"
+        "CommerceShopsServicesPort": "[parameter('CommerceShopsServicesPort')]",
+        "SitecoreAdminAccount": {
+          "UserName": "[parameter('SitecoreUsername')]",
+          "Password": "[parameter('SitecoreUserPassword')]"
+        }
       }
-    },
+      },
     "EnableCEConnectDataProvider": {
       "Type": "InstallSitecoreConfiguration",
       "Params": {
@@ -484,19 +529,21 @@
     },
     "EnableIndexUpdate": {
       "Type": "SetXml",
-      "Params": [{
-        "FilePath": "[variable('ContentSearchConfig'))]",
-        "Xpath": "[variable('ContentSearchEnabledXpath')]",
-        "Attributes": {
-          "value": "true"
+      "Params": [
+        {
+          "FilePath": "[variable('ContentSearchConfig'))]",
+          "Xpath": "[variable('ContentSearchEnabledXpath')]",
+          "Attributes": {
+            "value": "true"
+          }
         }
-      }]
+      ]
     },
     "EnableConfigFiles": {
       "Type": "EnableConfigFiles",
       "Params": {
         "ConfigDir": "[variable('MarketingConfigDir')]",
-        "ConfigFileList": ["Sitecore.Marketing.Search.config"]
+        "ConfigFileList": [ "Sitecore.Marketing.Search.config" ]
       }
     },
     "EnableCEConnectIndexing": {
