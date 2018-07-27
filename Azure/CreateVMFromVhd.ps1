@@ -1,6 +1,6 @@
 Param(
     [string] $subscriptionId,
-    [ValidateSet('na', 'ga', 'emea','ne')]
+    [ValidateSet('na', 'ga', 'emea','ea')]
     [string]$region = 'na',
     [ValidateSet('xp', 'xc')]
     [Parameter(Mandatory = $true)]
@@ -46,6 +46,14 @@ switch ($region) {
         $storageContainerName = "hhdemosnapshotsemea"
         $location = "ukwest"
         $timeZone = "GMT Standard Time"
+    }
+    ea
+    {
+        $storageAccountId="/subscriptions/***REMOVED***/resourceGroups/habitathome-demo-snapshot-eastasia/providers/Microsoft.Storage/storageAccounts/hhdemosnapshoteastasia"
+        $storageContainerName="hhdemosnapshoteastasia"
+        $location = "eastasia"
+        $timeZone = "China Standard Time"
+
     }
     ne {
         $storageAccountId = "/subscriptions/***REMOVED***/resourceGroups/docker-demo-snapshot/providers/Microsoft.Storage/storageAccounts/dockersnapshots"
