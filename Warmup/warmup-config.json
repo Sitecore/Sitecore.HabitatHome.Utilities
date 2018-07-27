@@ -29,19 +29,10 @@
                 "url": "/landing-pages/bing-smart-home-gym"
             },
             {
-                "url": "/habitat-health/trainer-finder"
-            },
-            {
                 "url": "/guides/intense-cycling-workouts"
             },
             {
                 "url": "/guides/best-in-wearable-fitness-technology"
-            },
-            {
-                "url": "/habitat-health?sc_camp=0292C2AA99EE401086B91B862BBA99CA"
-            },
-            {
-                "url": "/habitat-health?sc_camp=86F4B51D01D84372889A2DEAC430E01D"
             },
             {
                 "url": "/Guides/Setting-Up-the-Perfect-Home-Theater/?sc_camp=C23D8C90FCE7400F8CBD072FB537854C"
@@ -63,9 +54,6 @@
             },
             {
                 "url": "/smart-home"
-            },
-            {
-                "url": "/home-installation"
             },
             {
                 "url": "/gift-cards"
@@ -101,7 +89,16 @@
         "xc": [{
                 "url": "/shop/Health%2CBeautyandFitness%3dhabitat_master-health%20%20beauty%20and%20fitness/SydneyCummings-PlatinumPackage%3d8042103"
             },
+			{
+                "url": "/habitat-health?sc_camp=0292C2AA99EE401086B91B862BBA99CA"
+            },
             {
+                "url": "/habitat-health?sc_camp=86F4B51D01D84372889A2DEAC430E01D"
+            },
+			{
+                "url": "/habitat-health/trainer-finder"
+            },
+			{
                 "url": "/shop/fitness-activity-trackers"
             },
             {
