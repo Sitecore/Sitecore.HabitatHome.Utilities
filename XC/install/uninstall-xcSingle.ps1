@@ -1,24 +1,36 @@
-#define parameters
 Param(
-	[string]$Prefix = 'sc901com',	
-	[string]$CommerceOpsSiteName = 'CommerceOps_Sc9',
-	[string]$CommerceShopsSiteName = 'CommerceShops_Sc9',
-	[string]$CommerceAuthoringSiteName = 'CommerceAuthoring_Sc9',
-	[string]$CommerceMinionsSiteName = 'CommerceMinions_Sc9',
-	[string]$SitecoreBizFxSiteName = 'SitecoreBizFx',
-	[string]$SitecoreIdentityServerSiteName = 'SitecoreIdentityServer',
-	[string]$SolrService = 'Solr_6.6.2',
-	[string]$PathToSolr = 'E:\sc9_install\solr-6.6.2\',
-	[string]$SqlServer = 'DESKTOP-XXXXXX\MSSQLSERVER2017',
-	[string]$SqlAccount = 'sa',
-	[string]$SqlPassword = 'password'
+    [string] $ConfigurationFile = '.\configuration-xc0.json',
+    [string[]] $Environments = @("CommerceOps", "CommerceShops", "CommerceAuthoring", "CommerceMinions")
 )
-#Write-TaskHeader function modified from SIF
+
+#####################################################
+#
+#  Install Sitecore
+#
+#####################################################
+$ErrorActionPreference = 'Stop'
+#Set-Location $PSScriptRoot
+
+if (!(Test-Path $ConfigurationFile)) {
+    Write-Host 'Configuration file '$($ConfigurationFile)' not found.' -ForegroundColor Red
+    Write-Host  'Please use 'set-installation...ps1' files to generate a configuration file.' -ForegroundColor Red
+    Exit 1
+}
+
+$config = Get-Content -Raw $ConfigurationFile -Encoding Ascii |  ConvertFrom-Json
+
+if (!$config) {
+    throw "Error trying to load configuration!"
+}
+
+$site = $config.settings.site
+$sql = $config.settings.sql
+$solr = $config.settings.solr
 Function Write-TaskHeader {
     param(
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [string]$TaskName,
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [string]$TaskType
     )
 
@@ -33,15 +45,16 @@ Function Write-TaskHeader {
 
         # wraps string in spaces so we reduce length by two
         $length = $length - 2 #- $postfix.Length - $prefix.Length
-        if($value.Length -gt $length){
+        if ($value.Length -gt $length) {
             # Reduce to length - 4 for elipsis
             $value = $value.Substring(0, $length - 4) + '...'
         }
 
         $value = " $value "
-        if($padright){
+        if ($padright) {
             $value = $value.PadRight($length, '*')
-        } else {
+        }
+        else {
             $value = $value.PadLeft($length, '*')
         }
 
@@ -60,122 +73,76 @@ Function Write-TaskHeader {
     Write-Host $message -ForegroundColor 'Red'
 }
 
-Function Remove-Service{
-	[CmdletBinding()]
-	param(
-		[string]$serviceName
-	)
-	if(Get-Service "My Service" -ErrorAction SilentlyContinue){
-		sc.exe delete $serviceName
-	}
+Function Remove-Website {
+    [CmdletBinding()]
+    param(
+        [string]$siteName		
+    )
+
+    $appCmd = "C:\windows\system32\inetsrv\appcmd.exe"
+    & $appCmd delete site $siteName
 }
 
-Function Remove-Website{
-	[CmdletBinding()]
-	param(
-		[string]$siteName		
-	)
+Function Remove-AppPool {
+    [CmdletBinding()]
+    param(		
+        [string]$appPoolName
+    )
 
-	$appCmd = "C:\windows\system32\inetsrv\appcmd.exe"
-	& $appCmd delete site $siteName
-}
-
-Function Remove-AppPool{
-	[CmdletBinding()]
-	param(		
-		[string]$appPoolName
-	)
-
-	$appCmd = "C:\windows\system32\inetsrv\appcmd.exe"
-	& $appCmd delete apppool $appPoolName
+    $appCmd = "C:\windows\system32\inetsrv\appcmd.exe"
+    & $appCmd delete apppool $appPoolName
 }
 
 #Stop Solr Service
 Write-TaskHeader -TaskName "Solr Services" -TaskType "Stop"
 Write-Host "Stopping solr service"
-Stop-Service $SolrService -Force -ErrorAction stop
+Stop-Service $solr.serviceName -Force -ErrorAction SilentlyContinue
 Write-Host "Solr service stopped successfully"
 
 #Delete solr cores
 Write-TaskHeader -TaskName "Solr Services" -TaskType "Delete Cores"
 Write-Host "Deleting Solr Cores"
-$pathToCores = "$pathToSolr\server\solr\$Prefix*"
-Remove-Item $pathToCores -recurse -force -ErrorAction stop
+$pathToCores = "$($solr.root)\server\solr\$($site.prefix)*"
+Remove-Item $pathToCores -recurse -force -ErrorAction SilentlyContinue
 Write-Host "Solr Cores deleted successfully"
 
 #Remove Sites and App Pools from IIS
 Write-TaskHeader -TaskName "Internet Information Services" -TaskType "Remove Websites"
 
+foreach ($environment in $Environments) {
+    $siteName = ("{0}_{1}" -f $environment, $site.prefix)
+    Write-Host ("Deleting Website  {0}" -f $siteName)
+    Remove-Website -siteName $siteName -ErrorAction SilentlyContinue
+    Remove-AppPool -appPoolName $siteName
+    Remove-Item ("C:\inetpub\wwwroot\{0}" -f $siteName) -recurse -force -ErrorAction SilentlyContinue
+}
+$bizfxPrefix = "SitecoreBizFx"
+$bizfx = ("{0}{1}" -f $bizfxPrefix, $site.prefix)
+Write-Host ("Deleting Website {0}" -f $bizfx)
+Remove-Website -siteName $bizfx -ErrorAction SilentlyContinue
+Remove-AppPool -appPoolName $bizfxPrefix
+Remove-Item ("C:\inetpub\wwwroot\{0}" -f $siteName) -recurse -force -ErrorAction SilentlyContinue
 
-Write-Host "Deleting Website $CommerceOpsSiteName"
-Remove-Website -siteName $CommerceOpsSiteName -ErrorAction stop
-Write-Host "Websites deleted"
-
-Write-Host "Deleting Website $CommerceShopsSiteName"
-Remove-Website -siteName $CommerceShopsSiteName -ErrorAction stop
-Write-Host "Websites deleted"
-
-Write-Host "Deleting Website $CommerceAuthoringSiteName"
-Remove-Website -siteName $CommerceAuthoringSiteName -ErrorAction stop
-Write-Host "Websites deleted"
-
-Write-Host "Deleting Website $CommerceMinionsSiteName "
-Remove-Website -siteName $CommerceMinionsSiteName  -ErrorAction stop
-Write-Host "Websites deleted"
-
-Write-Host "Deleting Website $SitecoreBizFxSiteName"
-Remove-Website -siteName $SitecoreBizFxSiteName -ErrorAction stop
-Write-Host "Websites deleted"
-
-Write-Host "Deleting Website $SitecoreIdentityServerSiteName"
-Remove-Website -siteName $SitecoreIdentityServerSiteName -ErrorAction stop
-Write-Host "Websites deleted"
-
-
-
-Remove-AppPool -appPoolName $CommerceOpsSiteName -ErrorAction stop
-Write-Host "Application pools deleted"
-Remove-AppPool -appPoolName $CommerceShopsSiteName -ErrorAction stop
-Write-Host "Application pools deleted"
-Remove-AppPool -appPoolName $CommerceAuthoringSiteName -ErrorAction stop
-Write-Host "Application pools deleted"
-Remove-AppPool -appPoolName $CommerceMinionsSiteName -ErrorAction stop
-Write-Host "Application pools deleted"
-Remove-AppPool -appPoolName $SitecoreBizFxSiteName -ErrorAction stop
-Write-Host "Application pools deleted"
-Remove-AppPool -appPoolName $SitecoreIdentityServerSiteName -ErrorAction stop
-
-
-Remove-Item C:\inetpub\wwwroot\$CommerceOpsSiteName -recurse -force -ErrorAction stop
-Write-Host "Websites removed from wwwroot"
-Remove-Item C:\inetpub\wwwroot\$CommerceShopsSiteName -recurse -force -ErrorAction stop
-Write-Host "Websites removed from wwwroot"
-Remove-Item C:\inetpub\wwwroot\$CommerceAuthoringSiteName -recurse -force -ErrorAction stop
-Write-Host "Websites removed from wwwroot"
-Remove-Item C:\inetpub\wwwroot\$CommerceMinionsSiteName -recurse -force -ErrorAction stop
-Write-Host "Websites removed from wwwroot"
-Remove-Item C:\inetpub\wwwroot\$SitecoreBizFxSiteName -recurse -force -ErrorAction stop
-Write-Host "Websites removed from wwwroot"
-Remove-Item C:\inetpub\wwwroot\$SitecoreIdentityServerSiteName -recurse -force -ErrorAction stop
-Write-Host "Websites removed from wwwroot"
-
+Write-Host ("Deleting Website {0}" -f $commerce.identityServerName)
+Remove-Website -siteName $commerce.identityServerName -ErrorAction SilentlyContinue
+Remove-AppPool -appPoolName $commerce.identityServerName
+Remove-Item ("C:\inetpub\wwwroot\{0}" -f $commerce.identityServerName) -recurse -force -ErrorAction SilentlyContinue
 
 Write-TaskHeader -TaskName "SQL Server" -TaskType "Drop Databases"
 #Drop databases from SQL
 Write-Host "Dropping databases from SQL server"
 push-location
 import-module sqlps
-
-Write-Host $("Dropping database SitecoreCommerce9_Global")
-$commerceDbPrefix = $("DROP DATABASE IF EXISTS [SitecoreCommerce9_Global]")
-Write-Host $("Query: $($commerceDbPrefix)")
-invoke-sqlcmd -ServerInstance $SqlServer -U $SqlAccount -P $SqlPassword -Query $commerceDbPrefix -ErrorAction stop
-
-Write-Host $("Dropping database [SitecoreCommerce9_SharedEnvironments]")
-$sharedDbPrefix = $("DROP DATABASE IF EXISTS [SitecoreCommerce9_SharedEnvironments]")
-Write-Host $("Query: $($sharedDbPrefix)")
-invoke-sqlcmd -ServerInstance $SqlServer -U $SqlAccount -P $SqlPassword -Query $sharedDbPrefix -ErrorAction stop
+$databases = @("Global", "SharedEnvironments")
+foreach ($db in $databases) {
+    $dbName = ("{0}_{1}" -f $site.prefix, $db)
+    Write-Host $("Dropping database {0}" -f $dbName)
+    $sqlCommand = $("DROP DATABASE IF EXISTS {0}" -f $dbName)
+    Write-Host $("Query: $($sqlCommand)")
+    invoke-sqlcmd -ServerInstance $sql.server -Username $sql.adminUser -Password $sql.adminPassword -Query $sqlCommand -ErrorAction SilentlyContinue
+}
 
 
 Write-Host "Databases dropped successfully"
 pop-location
+Write-TaskHeader -TaskName "Uninstallation Complete" -TaskType "Uninstall Complete"
