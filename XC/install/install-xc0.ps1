@@ -183,7 +183,7 @@ function Install-CommerceAssets {
 		$params = @{
 			Path        = $([io.path]::combine($resourcePath, 'configuration', 'commerce', 'GetCommerceAssets.json'))
 			Credentials = $credentials
-			Source      = "https://dev.sitecore.net/~/media/F08E9950D0134D1DA325801057C96B35.ashx"
+			Source      = $assets.commerce.packageUrl
 			Destination = $commercePackageDestination
 		}
         Install-SitecoreConfiguration  @params  -WorkingDirectory $(Join-Path $PWD "logs") -Verbose
