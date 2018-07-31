@@ -1,0 +1,39 @@
+{
+    "regions" :[
+        {
+            "name":"na",
+            "location":"eastus",
+            "resourceGroupName":"habitathome-demo-snapshot",
+            "storageAccountName":"habitathomedemosnapshots",
+            "storageContainerName":"snapshots"
+        },
+        {
+            "name":"emea",
+            "location":"ukwest",
+            "resourceGroupName":"habitathome-demo-snapshot-emea",
+            "storageAccountName":"hhdemosnapshotsemea",
+            "storageContainerName":"snapshots"
+        },
+        {
+            "name":"ga",
+            "location":"australiaeast",
+            "resourceGroupName":"habitathome-demo-snapshot-ga",
+            "storageAccountName":"hhdemosnapshotsga",
+            "storageContainerName":"snapshots"
+        },
+        {
+            "name":"ea",
+            "location":"eastasia",
+            "resourceGroupName":"habitathome-demo-snapshot-eastasia",
+            "storageAccountName":"hhdemosnapshoteastasia",
+            "storageContainerName":"snapshots"
+        },
+        {
+            "name":"ne",
+            "location":"northeurope",
+            "resourceGroupName":"docker-demo-snapshot",
+            "storageAccountName":"dockersnapshots",
+            "storageContainerName":"snapshots"
+        }
+    ]
+}
