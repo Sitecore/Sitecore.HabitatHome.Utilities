@@ -20,7 +20,7 @@ $assets.downloadFolder = Join-Path $assets.root "Downloads"
 
 #Commerce
 $assets.commerce.packageName = "Sitecore.Commerce.2018.07-2.2.126.zip"
-$assets.commerce.packageUrl = "assets.commerce.packageUrl = "https://dev.sitecore.net/~/media/F374366CA5C649C99B09D35D5EF1BFCE.ashx"
+$assets.commerce.packageUrl = "https://dev.sitecore.net/~/media/F374366CA5C649C99B09D35D5EF1BFCE.ashx"
 $assets.commerce.installationFolder = Join-Path $assets.root "Commerce"
 
 
