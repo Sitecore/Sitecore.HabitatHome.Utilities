@@ -12,7 +12,6 @@ $assets = $json.assets
 $assets.root = "$PSScriptRoot\assets"
 $assets.downloadFolder = Join-Path $assets.root "Downloads"
 #Commerce
-$assets.commerce.installationFolder = Join-Path $assets.root "Commerce"
 
 # Settings
 
