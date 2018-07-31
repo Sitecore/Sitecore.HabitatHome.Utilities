@@ -19,11 +19,8 @@ $assets.root = "$PSScriptRoot\assets"
 $assets.downloadFolder = Join-Path $assets.root "Downloads"
 
 #Commerce
-$assets.commerce.nugetPackageLocation = "http://nuget1ca2/nuget/Commerce/"
-$assets.commerce.nugetPackageName = "Sitecore.Commerce.ReleasePackage.Content"
-$assets.commerce.nugetPackageVersion = "2.2.126"
 $assets.commerce.packageName = "Sitecore.Commerce.2018.07-2.2.126.zip"
-$assets.commerce.packageUrl = "https://dev.sitecore.net/~/media/F08E9950D0134D1DA325801057C96B35.ashx"
+$assets.commerce.packageUrl = "assets.commerce.packageUrl = "https://dev.sitecore.net/~/media/F374366CA5C649C99B09D35D5EF1BFCE.ashx"
 $assets.commerce.installationFolder = Join-Path $assets.root "Commerce"
 
 
