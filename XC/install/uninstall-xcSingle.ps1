@@ -105,7 +105,10 @@ Write-Host "Deleting Solr Cores"
 $pathToCores = "$($solr.root)\server\solr\$($site.prefix)*"
 Remove-Item $pathToCores -recurse -force -ErrorAction SilentlyContinue
 Write-Host "Solr Cores deleted successfully"
-
+Write-TaskHeader -TaskName "Solr Services" -TaskType "Start"
+Write-Host "Starting solr service"
+Start-Service $solr.serviceName -Force -ErrorAction SilentlyContinue
+Write-Host "Solr service started successfully"
 #Remove Sites and App Pools from IIS
 Write-TaskHeader -TaskName "Internet Information Services" -TaskType "Remove Websites"
 
@@ -141,7 +144,6 @@ foreach ($db in $databases) {
     Write-Host $("Query: $($sqlCommand)")
     invoke-sqlcmd -ServerInstance $sql.server -Username $sql.adminUser -Password $sql.adminPassword -Query $sqlCommand -ErrorAction SilentlyContinue
 }
-
 
 Write-Host "Databases dropped successfully"
 pop-location
