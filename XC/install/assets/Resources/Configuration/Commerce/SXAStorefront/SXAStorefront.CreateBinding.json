@@ -1,0 +1,113 @@
+{
+  "Parameters": {
+    "SiteName": {
+      "Type": "string",
+      "Description": "The name of the site."
+    },
+    "CertificateName": {
+      "Type": "string",
+      "Description": "The name of the certificate to be created."
+    },
+    "CertPath": {
+      "Type": "string",
+      "Description": "The physical path on disk where certificates will be stored.",
+      "DefaultValue": "c:\\certificates"
+    },
+    "RootCertFileName": {
+      "Type": "string",
+      "Description": "The file name of the root certificate to be created.",
+      "DefaultValue": "SitecoreRootCert"
+    },
+    "StorefrontHostName": {
+      "Type": "string",
+      "Description": "The host name of the storefront."
+    }
+  },
+  "Variables": {
+    "Root.Cert.DnsName": "[concat('DO_NOT_TRUST_', parameter('RootCertFileName'))]",
+    "Root.Cert.Store": "cert:\\LocalMachine\\Root",
+    "Client.Cert.Store": "cert:\\LocalMachine\\My",
+    "Security.SSL.CertificateThumbprint": "[GetCertificateThumbprint(parameter('CertificateName'), variable('Client.Cert.Store'))]"
+  },
+  "Tasks": {
+    "CreatePaths": {
+      "Type": "EnsurePath",
+      "Params": {
+        "Exists": [
+          "[parameter('CertPath')]"
+        ]
+      }
+    },
+    "CreateSignedCert": {
+      "Type": "NewSignedCertificate",
+      "Params": {
+        "Signer": "[GetCertificate(variable('Root.Cert.DnsName'), variable('Root.Cert.Store'))]",
+        "Path": "[parameter('CertPath')]",
+        "CertStoreLocation": "[variable('Client.Cert.Store')]",
+        "Name": "[parameter('CertificateName')]",
+        "DnsName": "[parameter('CertificateName')]"
+      }
+    },
+    "StopWebsite": {
+      "Type": "ManageWebsite",
+      "Params": {
+        "Name": "[parameter('SiteName')]",
+        "Action": "Stop"
+      }
+    },
+    "StopAppPool": {
+      "Type": "ManageAppPool",
+      "Params": {
+        "Name": "[parameter('SiteName')]",
+        "Action": "Stop"
+      }
+    },
+    "CreateBindingsWithThumprint": {
+      "Type": "WebBinding",
+      "Params": {
+        "SiteName": "[parameter('SiteName')]",
+        "Add": [
+          {
+            "HostHeader": "[parameter('StorefrontHostName')]",
+            "Protocol": "https",
+            "SSLFlags": 1,
+            "Thumbprint": "[variable('Security.SSL.CertificateThumbprint')]"
+          }
+        ]
+      }
+    },
+    "CreateBindings": {
+      "Type": "WebBinding",
+      "Params": {
+        "SiteName": "[parameter('SiteName')]",
+        "Add": [
+          {
+            "HostHeader": "[parameter('StorefrontHostName')]",
+            "Protocol": "http",
+            "Port": "80" 
+          } 
+        ]
+      }
+    },
+    "CreateHostHeader": {
+      "Type": "HostHeader",
+      "Params": {
+        "HostName": "[parameter('StorefrontHostName')]"
+      }
+    },
+    "StartAppPool": {
+      "Type": "ManageAppPool",
+      "Params": {
+        "Name": "[parameter('SiteName')]",
+        "Action": "Start"
+      }
+    },
+    "StartWebsite": {
+      "Type": "ManageWebsite",
+      "Params": {
+        "Name": "[parameter('SiteName')]",
+        "Action": "Start"
+      }
+    }
+  }
+}

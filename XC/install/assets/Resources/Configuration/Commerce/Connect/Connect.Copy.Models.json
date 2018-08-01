@@ -1,0 +1,33 @@
+﻿{
+  "Parameters": {
+    "InstallRootDst": {
+      "Type": "string",
+      "Description": "Destination of the web site's root folder."
+    },
+    "XConnectInstallRootDst": {
+      "Type": "string",
+      "Description": "Destination of the xConnect web site's root folder."
+    }
+  },
+  "Variables": {
+    "XConnectModelSrc": "[joinpath(parameter('InstallRootDst'), '\\XConnectModels\\Sitecore.Commerce.Connect.XConnect.Models.json')]",
+    "XConnectDst": "[joinpath(parameter('XConnectInstallRootDst'), '\\App_data\\Models')]",
+    "IndexWorkerDst": "[joinpath(parameter('XConnectInstallRootDst'), '\\App_data\\jobs\\continuous\\IndexWorker\\App_data\\Models')]"
+  },
+  "Tasks": {
+    "CopyModelsToXConnect": {
+      "Type": "Copy",
+      "Params": {
+        "Source": "[variable('XConnectModelSrc')]",
+        "Destination": "[variable('XConnectDst')]"
+      }
+    },
+    "CopyModelsToIndexWorker": {
+      "Type": "Copy",
+      "Params": {
+        "Source": "[variable('XConnectModelSrc')]",
+        "Destination": "[variable('IndexWorkerDst')]"
+      }
+    }
+  }
+}

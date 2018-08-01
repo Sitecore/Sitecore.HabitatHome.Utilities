@@ -1,0 +1,47 @@
+{
+      "Parameters": {
+        "InstallDir": {
+            "Type": "string",
+            "Description": "The sitecore site content path."
+        },
+		"ResourceDir":{
+		"Type": "string",
+		"Description":"Root directory where SIF Resources are stored"
+		}
+	},
+    "Variables": {
+        "ContentSearchConfig": "[concat(parameter('InstallDir'), '\\App_Config\\Sitecore\\ContentSearch\\Sitecore.ContentSearch.config')]",
+        "ContentSearchEnabledXpath": "//configuration/sitecore/settings/setting[@name='ContentSearch.Enabled']",
+        "MarketingConfigDir": "[concat(parameter('InstallDir'), '\\App_Config\\Sitecore\\Marketing.Operations.xMgmt')]",
+        "PreemptiveScreenshotConfigDir": "[concat(parameter('InstallDir'), '\\App_Config\\Sitecore\\ContentTesting')]",
+        "PreemptiveScreenshotConfigFile": "Sitecore.ContentTesting.PreemptiveScreenshot.config"
+    },
+	"Modules": ["SitecoreUtilityTasks"],
+    "Tasks": {
+
+        "EnableIndexUpdate": {
+            "Type": "SetXml",
+            "Params": [{
+                "FilePath": "[variable('ContentSearchConfig'))]",
+                "Xpath": "[variable('ContentSearchEnabledXpath')]",
+                "Attributes": {
+                    "value": "true"
+                }
+            }]
+        },
+        "DisableMarketingConfigFiles": {
+            "Type": "EnableConfigFiles",
+            "Params": {
+                "ConfigDir": "[variable('MarketingConfigDir')]",
+                "ConfigFileList": ["Sitecore.Marketing.Search.config"]
+            }
+        },
+        "DisableContentTestingConfigFiles": {
+            "Type": "EnableConfigFiles",
+            "Params": {
+                "ConfigDir": "[variable('PreemptiveScreenshotConfigDir')]",
+                "ConfigFileList": ["[variable('PreemptiveScreenshotConfigFile')]"]
+            }
+        }
+    }
+}

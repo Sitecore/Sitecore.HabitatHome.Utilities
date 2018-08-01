@@ -5,11 +5,9 @@ Param(
     [ValidateSet('xp', 'xc')]
     [Parameter(Mandatory = $true)]
     [string]$demoType,
-   	[Parameter(Mandatory = $true)]
-    [string] $sourceSnapshotSubscriptionId,
-	[string] $deploymentName = "habitathome",
-    [string] $sourceSnapshotPrefix = "habitathome"
-
+    [string] $deploymentName = "habitathome",
+    [string] $sourceSnapshotPrefix = "habitathome",
+    [string] $sourceSnapshotSubscriptionId 
 )
 $account = Get-AzureRMContext | Select-Object Account
 

@@ -1,0 +1,46 @@
+{
+    "assets": {
+        "root": "@@assets.root@@",
+        "downloadFolder": "@@assets.downloadFolder@@",
+        "commerce": {
+            "packageName": "@@assets.commerce.packageName@@",
+            "packageUrl": "@@assets.commerce.packageUrl@@",
+            "installationFolder": "@@assets.commerce.installationFolder@@",
+            "sifCommerceRoot": "@@assets.commerce.sifCommerceRoot@@",
+            "filesToExtract": [{
+                    "name": "SIF.Sitecore.Commerce",
+                    "version": "@@SIF.Sitecore.Commerce.version@@"
+                },
+                {
+                    "name": "Sitecore.Commerce.Engine",
+                    "version": "@@Sitecore.Commerce.Engine.version@@"
+                },
+                {
+                    "name": "Sitecore.BizFX",
+                    "version": "@@Sitecore.BizFX.version@@"
+                },
+                {
+                    "name": "Sitecore.Commerce.Engine.SDK",
+                    "version": "@@Sitecore.Commerce.Engine.SDK.version@@"
+                },
+				{
+					"name": "Sitecore.IdentityServer",
+					"version":"@@Sitecore.IdentityServer.version@@"
+				}
+            ]
+        }
+    },
+    "settings": {
+        "commerce": {
+            "storefrontHostName": "@@settings.commerce.storefrontHostName@@",
+            "storefrontPrefix": "@@settings.commerce.storefrontPrefix@@",
+            "identityServerName": "@@settings.commerce.identityServerName@@",
+            "serviceAccountDomain": "@@settings.commerce.serviceAccountDomain@@",
+            "serviceAccountUserName": "@@settings.commerce.serviceAccountUserName@@",
+            "serviceAccountPassword": "@@settings.commerce.serviceAccountPassword@@",
+            "brainTreeAccountMerchandId": "@@@@",
+            "brainTreeAccountPublicKey": "@@@@",
+            "brainTreeAccountPrivateKey": "@@@@"
+        }
+    }
+}
