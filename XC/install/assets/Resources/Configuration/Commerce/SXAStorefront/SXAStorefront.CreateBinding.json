@@ -24,17 +24,13 @@
     }
   },
   "Variables": {
-    // The name dns name of the root certificate.
     "Root.Cert.DnsName": "[concat('DO_NOT_TRUST_', parameter('RootCertFileName'))]",
-    // The certificate store for the root certificate.
     "Root.Cert.Store": "cert:\\LocalMachine\\Root",
-    // The certificate store for the client certificate.
     "Client.Cert.Store": "cert:\\LocalMachine\\My",
     "Security.SSL.CertificateThumbprint": "[GetCertificateThumbprint(parameter('CertificateName'), variable('Client.Cert.Store'))]"
   },
   "Tasks": {
     "CreatePaths": {
-      // Create the physical disk path.
       "Type": "EnsurePath",
       "Params": {
         "Exists": [
@@ -43,7 +39,6 @@
       }
     },
     "CreateSignedCert": {
-      // Create a certificate signed by the root authority.
       "Type": "NewSignedCertificate",
       "Params": {
         "Signer": "[GetCertificate(variable('Root.Cert.DnsName'), variable('Root.Cert.Store'))]",
@@ -54,7 +49,6 @@
       }
     },
     "StopWebsite": {
-      // Stops the website if it is running.
       "Type": "ManageWebsite",
       "Params": {
         "Name": "[parameter('SiteName')]",
@@ -62,7 +56,6 @@
       }
     },
     "StopAppPool": {
-      // Stops the app pool if it is running.
       "Type": "ManageAppPool",
       "Params": {
         "Name": "[parameter('SiteName')]",
@@ -70,7 +63,6 @@
       }
     },
     "CreateBindingsWithThumprint": {
-      // Configures the site bindings for the website.
       "Type": "WebBinding",
       "Params": {
         "SiteName": "[parameter('SiteName')]",
@@ -85,7 +77,6 @@
       }
     },
     "CreateBindings": {
-      // Configures the site bindings for the website.
       "Type": "WebBinding",
       "Params": {
         "SiteName": "[parameter('SiteName')]",
@@ -99,14 +90,12 @@
       }
     },
     "CreateHostHeader": {
-      // Sets a hostheader for the website.
       "Type": "HostHeader",
       "Params": {
         "HostName": "[parameter('StorefrontHostName')]"
       }
     },
     "StartAppPool": {
-      // Starts the app pool.
       "Type": "ManageAppPool",
       "Params": {
         "Name": "[parameter('SiteName')]",
@@ -114,7 +103,6 @@
       }
     },
     "StartWebsite": {
-      // Starts the website.
       "Type": "ManageWebsite",
       "Params": {
         "Name": "[parameter('SiteName')]",
