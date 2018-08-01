@@ -1,0 +1,27 @@
+{
+    "Parameters": {
+        "Credentials": {
+            "Type": "PSCredential",
+            "Description": "Credentials for downloading Commerce Packages."
+          },
+          "Source":{
+              "Type":"String",
+              "Description":"Source Uri for file to be downloaded"
+          },
+          "Destination":{
+              "Type":"String",
+              "Description":"Destination Full Path (including file name) where the file will be stored"
+          }
+    },
+    "Modules":["DownloadFileWithCredentials"],
+    "Tasks":{
+        "DownloadCommerce":{
+            "Type":"DownloadFileWithCredentials",
+            "Params":{
+                "SourceUri":"[parameter('Source')]",
+                "DestinationPath":"[parameter('Destination')]",
+                "Credentials": "[parameter('Credentials')]"
+            }
+        }
+    }
+}

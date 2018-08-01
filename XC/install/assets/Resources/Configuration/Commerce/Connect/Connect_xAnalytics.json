@@ -1,10 +1,3 @@
-// ------------------------------------------------------------------------------ //
-//         Sitecore Install Framework - Install Commerce xAnalytics module         //
-//                                                                                //
-//  Run this configuration to install Commerce xAnalytics module.                  //
-//                                                                                //
-//  NOTE: Only single line comments are accepted in configurations.               //
-// ------------------------------------------------------------------------------ //
 {
     "Parameters": {
       "ModuleFullPath": {

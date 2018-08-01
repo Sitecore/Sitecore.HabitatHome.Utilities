@@ -16,16 +16,12 @@
         }
     },
     "Variables": {
-        // The name dns name of the root certificate.
         "Root.Cert.DnsName": "[concat('DO_NOT_TRUST_', parameter('RootCertFileName'))]",
-        // The certificate store for the root certificate.
         "Root.Cert.Store": "cert:\\LocalMachine\\Root",
-        // The certificate store for the client certificate.
         "Client.Cert.Store": "cert:\\LocalMachine\\My"
     },
     "Tasks": {
         "CreatePaths": {
-            // Create the physical disk path.
             "Type": "EnsurePath",
             "Params": {
                 "Exists": [
@@ -34,7 +30,6 @@
             }
         },
         "CreateRootCert": {
-            // Create the root certificate.
             "Type": "NewRootCertificate",
             "Params": {
                 "Path": "[parameter('CertPath')]",
@@ -44,7 +39,6 @@
             }
         },
         "ImportRootCertificate": {
-            // Import the root certificate.
             "Type": "ImportCertificate",
             "Params": {
                 "CertStoreLocation": "[variable('Root.Cert.Store')]",
@@ -52,7 +46,6 @@
             }
         },
         "CreateSignedCert": {
-            // Create a certificate signed by the root authority.
             "Type": "NewSignedCertificate",
             "Params": {
                 "Signer": "[GetCertificate(variable('Root.Cert.DnsName'), variable('Root.Cert.Store'))]",
