@@ -1,0 +1,123 @@
+{
+  "Parameters": {
+    "SolrUrl": {
+      "Type": "string",
+      "DefaultValue": "https://localhost:8983/solr",
+      "Description": "The Solr instance url."
+    },
+    "SolrRoot": {
+      "Type": "string",
+      "DefaultValue": "c:\\solr-6.6.2",
+      "Description": "The file path to the Solr instance."
+    },
+    "SolrService": {
+      "Type": "string",
+      "DefaultValue": "Solr-6.6.2",
+      "Description": "The name of the Solr service."
+    },
+    "SolrSchemas": {
+      "Type": "string",
+      "Description": "The path to solr schema files."
+    },
+    "BaseConfig": {
+      "Type": "string",
+      "DefaultValue": "basic_configs",
+      "Description": "The configset to copy as a base for each core."
+    },
+    "CorePrefix": {
+      "Type": "string",
+      "DefaultValue": "",
+      "Description": "The prefix for each of the created indexes."
+    }
+  },
+  "Variables": {
+    "Solr.FullRoot": "[resolvepath(parameter('SolrRoot'))]",
+    "Solr.Server": "[joinpath(variable('Solr.FullRoot'), 'server', 'solr')]",
+    "Solr.BaseConfigs": "[joinpath(variable('Solr.Server'), 'configsets', parameter('BaseConfig'))]",
+    "Solr.CustomersSchema": "[concat(parameter('SolrSchemas'), '\\Customers')]",
+    "Solr.OrdersSchema": "[concat(parameter('SolrSchemas'), '\\Orders')]",
+    "Solr.CatalogItemsSchema": "[concat(parameter('SolrSchemas'), '\\CatalogItems')]",
+    "Customers.Name": "[concat(parameter('CorePrefix'), 'CustomersScope')]",
+    "Orders.Name": "[concat(parameter('CorePrefix'), 'OrdersScope')]",
+    "CatalogItems.Name": "[concat(parameter('CorePrefix'), 'CatalogItemsScope')]",
+    "Customers.Root": "[joinpath(variable('Solr.Server'), variable('Customers.Name'))]",
+    "Orders.Root": "[joinpath(variable('Solr.Server'), variable('Orders.Name'))]",
+    "CatalogItems.Root": "[joinpath(variable('Solr.Server'), variable('CatalogItems.Name'))]",
+    "Customers.Conf": "[joinpath(variable('Customers.Root'), 'conf')]",
+    "Orders.Conf": "[joinpath(variable('Orders.Root'), 'conf')]",
+    "CatalogItems.Conf": "[joinpath(variable('CatalogItems.Root'), 'conf')]"
+  },
+  "Tasks": {
+    "StopSolr": {
+      "Type": "ManageService",
+      "Params": {
+        "Name": "[parameter('SolrService')]",
+        "Status": "Stopped",
+        "PostDelay": 1000
+      }
+    },
+    "CleanCores": {
+      "Type": "EnsurePath",
+      "Params": {
+        "Clean": [
+          "[variable('Customers.Root')]",
+          "[variable('Orders.Root')]",
+          "[variable('CatalogItems.Root')]"
+        ]
+      }
+    },
+    "PrepareCores": {
+      "Type": "Copy",
+      "Params": [
+        { "Source": "[joinpath(variable('Solr.BaseConfigs'), '*')]", "Destination": "[variable('Customers.Root')]" },
+        { "Source": "[joinpath(variable('Solr.BaseConfigs'), '*')]", "Destination": "[variable('Orders.Root')]" },
+        { "Source": "[joinpath(variable('Solr.BaseConfigs'), '*')]", "Destination": "[variable('CatalogItems.Root')]" }
+      ]
+    },
+    "CopySchemaFiles": {
+      "Type": "Copy",
+      "Params": [
+        { "Source": "[joinpath(variable('Solr.CustomersSchema'), '*')]", "Destination": "[variable('Customers.Conf')]" },
+        { "Source": "[joinpath(variable('Solr.OrdersSchema'), '*')]", "Destination": "[variable('Orders.Conf')]" },
+        { "Source": "[joinpath(variable('Solr.CatalogItemsSchema'), '*')]", "Destination": "[variable('CatalogItems.Conf')]" }
+      ]
+    },
+    "StartSolr": {
+      "Type": "ManageService",
+      "Params": {
+        "Name": "[parameter('SolrService')]",
+        "Status": "Running",
+        "PostDelay": 8000
+      }
+    },
+    "CreateCores": {
+      "Type": "ManageSolrCore",
+      "Params": [
+        {
+          "Action": "Create",
+          "Address": "[parameter('SolrUrl')]",
+          "Arguments": {
+            "Name": "[variable('Customers.Name')]",
+            "Configset": "[parameter('BaseConfig')]"
+          }
+        },
+        {
+          "Action": "Create",
+          "Address": "[parameter('SolrUrl')]",
+          "Arguments": {
+            "Name": "[variable('Orders.Name')]",
+            "Configset": "[parameter('BaseConfig')]"
+          }
+        },
+        {
+          "Action": "Create",
+          "Address": "[parameter('SolrUrl')]",
+          "Arguments": {
+            "Name": "[variable('CatalogItems.Name')]",
+            "Configset": "[parameter('BaseConfig')]"
+          }
+        }
+      ]
+    }
+  }
+}

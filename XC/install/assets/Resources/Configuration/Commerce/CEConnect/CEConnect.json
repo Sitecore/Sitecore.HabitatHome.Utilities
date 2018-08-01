@@ -1,0 +1,56 @@
+﻿{
+  "Parameters": {
+    "PackageFullPath": {
+      "Type": "string",
+      "Description": "The path to Commerce Engine Connect package zip."
+    },
+    "PackagesDirDst": {
+      "Type": "string",
+      "Description": "The path to packages directory."
+    },
+    "BaseUrl": {
+      "Type": "string",
+      "Description": "The utility pages base url."
+    },
+    "MergeTool": {
+      "Type": "string",
+      "Description": "The path to the Merge Tool."
+    },
+    "InputFile": {
+      "Type": "string",
+      "Description": "The path to input file to merge."
+    },
+    "WebConfig": {
+      "Type": "string",
+      "Description": "The path to the web config file."
+    }
+  },
+  "Modules": [ "SitecoreUtilityTasks", "MergeWebConfig" ],
+  "Tasks": {
+    "CheckPaths": {
+      "Type": "EnsurePath",
+      "Params": {
+        "Exists": [
+          "[parameter('PackageFullPath')]",
+          "[parameter('PackagesDirDst')]"
+        ]
+      }
+    },
+    "InstallPackage": {
+      "Type": "InstallPackage",
+      "Params": {
+        "PackageFullPath": "[parameter('PackageFullPath')]",
+        "PackagesDirDst": "[parameter('PackagesDirDst')]",
+        "BaseUrl": "[parameter('BaseUrl')]"
+      }
+    },
+    "MergeWebConfig": {
+      "Type": "MergeWebConfig",
+      "Params": {
+        "MergeTool": "[parameter('MergeTool')]",
+        "InputFile": "[parameter('InputFile')]",
+        "WebConfig": "[parameter('WebConfig')]"
+      }
+    }
+  }
+}

@@ -1,0 +1,119 @@
+﻿{
+  "Parameters": {
+    "SXACommerceModuleFullPath": {
+      "Type": "string",
+      "Description": "The path to the SXA Commerce module zip."
+    },
+    "SXAStorefrontModuleFullPath": {
+      "Type": "string",
+      "Description": "The path to the SXA Commerce Storefront module zip."
+    },
+	"SXAStorefrontThemeModuleFullPath": {
+      "Type": "string",
+      "Description": "The path to the SXA Commerce Storefront Theme module zip."
+    },
+    "SXAStorefrontCatalogModuleFullPath": {
+      "Type": "string",
+      "Description": "The path to the SXA Commerce Storefront Catalog module zip."
+    },
+    "ModulesDirDst": {
+      "Type": "string",
+      "Description": "The path to modules directory."
+    },
+    "BaseUrl": {
+      "Type": "string",
+      "Description": "The utility pages base url."
+    },
+    "MergeTool": {
+      "Type": "string",
+      "Description": "The path to the Merge Tool."
+    },
+    "InputFile": {
+      "Type": "string",
+      "Description": "The path to input file to merge."
+    },
+    "WebConfig": {
+      "Type": "string",
+      "Description": "The path to the web config file."
+    }
+  },
+  "Modules": [ "SitecoreUtilityTasks", "MergeWebConfig" ],
+  "Tasks": {
+    "CheckSXAPaths": {
+      "Type": "EnsurePath",
+      "Params": {
+        "Exists": [
+          "[parameter('SXACommerceModuleFullPath')]",
+          "[parameter('ModulesDirDst')]"
+        ]
+      }
+    },
+    "InstallSXAModule": {
+      "Type": "InstallModule",
+      "Params": {
+        "ModuleFullPath": "[parameter('SXACommerceModuleFullPath')]",
+        "ModulesDirDst": "[parameter('ModulesDirDst')]",
+        "BaseUrl": "[parameter('BaseUrl')]"
+      }
+    },
+    "CheckStorefrontPaths": {
+      "Type": "EnsurePath",
+      "Params": {
+        "Exists": [
+          "[parameter('SXAStorefrontModuleFullPath')]",
+          "[parameter('ModulesDirDst')]"
+        ]
+      }
+    },
+    "InstallStorefrontModule": {
+      "Type": "InstallModule",
+      "Params": {
+        "ModuleFullPath": "[parameter('SXAStorefrontModuleFullPath')]",
+        "ModulesDirDst": "[parameter('ModulesDirDst')]",
+        "BaseUrl": "[parameter('BaseUrl')]"
+      }
+    },
+    "CheckThemesPaths": {
+      "Type": "EnsurePath",
+      "Params": {
+        "Exists": [
+          "[parameter('SXAStorefrontThemeModuleFullPath')]",
+          "[parameter('ModulesDirDst')]"
+        ]
+      }
+    },
+    "InstallThemesModule": {
+      "Type": "InstallModule",
+      "Params": {
+        "ModuleFullPath": "[parameter('SXAStorefrontThemeModuleFullPath')]",
+        "ModulesDirDst": "[parameter('ModulesDirDst')]",
+        "BaseUrl": "[parameter('BaseUrl')]"
+      }
+    },
+    "CheckCatalogPaths": {
+      "Type": "EnsurePath",
+      "Params": {
+        "Exists": [
+          "[parameter('SXAStorefrontCatalogModuleFullPath')]",
+          "[parameter('ModulesDirDst')]"
+        ]
+      }
+    },
+    "InstallCatalogModule": {
+      "Type": "InstallModule",
+      "Params": {
+        "ModuleFullPath": "[parameter('SXAStorefrontCatalogModuleFullPath')]",
+        "ModulesDirDst": "[parameter('ModulesDirDst')]",
+        "BaseUrl": "[parameter('BaseUrl')]"
+      }
+    },
+    "MergeWebConfig": {
+      "Type": "MergeWebConfig",
+      "Params": {
+        "MergeTool": "[parameter('MergeTool')]",
+        "InputFile": "[parameter('InputFile')]",
+        "WebConfig": "[parameter('WebConfig')]"
+      }
+    }
+  }
+}

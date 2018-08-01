@@ -1,0 +1,18 @@
+{
+  "Parameters": {
+    "ConfigDir": { "Type": "string" }
+  },
+  "Modules": [ "SitecoreUtilityTasks" ],
+  "Tasks": {
+    "EnableConfigFiles": {
+      "Type": "EnableConfigFiles",
+      "Params": {
+        "ConfigDir": "[parameter('ConfigDir')]",
+        "ConfigFileList": [
+          "Sitecore.Commerce.Engine.Connectors.Index.Common.config",
+          "Sitecore.Commerce.Engine.Connectors.Index.Solr.config"          
+        ]
+      }
+    }
+  }
+}

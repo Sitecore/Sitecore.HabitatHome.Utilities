@@ -1,0 +1,25 @@
+	{
+	    "Parameters": {
+	        "SiteName": {
+	            "Type": "string",
+	            "DefaultValue": "Sitecore",
+	            "Description": "The name of the site to be deployed."
+	        }
+	    },
+	    "Tasks": {
+	        "StopWebsite": {
+	            "Type": "ManageWebsite",
+	            "Params": {
+	                "Name": "[parameter('SiteName')]",
+	                "Action": "Stop"
+	            }
+	        },
+	        "StopAppPool": {
+	            "Type": "ManageAppPool",
+	            "Params": {
+	                "Name": "[parameter('SiteName')]",
+	                "Action": "Stop"
+	            }
+	        }
+	    }
+	}
