@@ -174,53 +174,60 @@ function Install-CommerceAssets {
 
     
     
-	$commercePackageDestination = Join-Path $assets.downloadFolder $assets.commerce.packageName
+    $commercePackageDestination = Join-Path $assets.downloadFolder $assets.commerce.packageName
 
     if (!(Test-Path $commercePackageDestination)) {
 	
-		$credentials = Get-Credential -Message "Please provide dev.sitecore.com credentials"
+        $credentials = Get-Credential -Message "Please provide dev.sitecore.com credentials"
 
-		$params = @{
-			Path        = $([io.path]::combine($resourcePath, 'configuration', 'commerce', 'GetCommerceAssets.json'))
-			Credentials = $credentials
-			Source      = $assets.commerce.packageUrl
-			Destination = $commercePackageDestination
-		}
-        Install-SitecoreConfiguration  @params  -WorkingDirectory $(Join-Path $PWD "logs") -Verbose
+        $params = @{
+            Path        = $([io.path]::combine($resourcePath, 'configuration', 'commerce', 'HabitatHome', 'download-assets.json'))
+            Credentials = $credentials
+            Source      = $assets.commerce.packageUrl
+            Destination = $commercePackageDestination
+        }
+            Install-SitecoreConfiguration  @params  -WorkingDirectory $(Join-Path $PWD "logs") -Verbose 
     }
 	
 	
 
-	$msbuildNuGetUrl = "https://v9assets.blob.core.windows.net/shared-assets/msbuild.microsoft.visualstudio.web.targets.14.0.0.3.nupkg"
-	$msbuildNuGetPackageFileName = "msbuild.microsoft.visualstudio.web.targets.14.0.0.3.nupkg"
-	$msbuildNuGetPackageDestination = $([io.path]::combine($assets.downloadFolder, $msbuildNuGetPackageFileName))
+    $msbuildNuGetUrl = "https://www.nuget.org/api/v2/package/MSBuild.Microsoft.VisualStudio.Web.targets/14.0.0.3"
+    $msbuildNuGetPackageFileName = "msbuild.microsoft.visualstudio.web.targets.14.0.0.3.nupkg"
+    $msbuildNuGetPackageDestination = $([io.path]::combine($assets.downloadFolder, $msbuildNuGetPackageFileName))
 
-	if (!(Test-Path $msbuildNuGetPackageDestination)) {
-		Write-Host "Saving $msbuildNuGetUrl to $msbuildNuGetPackageDestination" -ForegroundColor Green
-		Start-BitsTransfer -source $msbuildNuGetUrl -Destination $msbuildNuGetPackageDestination
+    if (!(Test-Path $msbuildNuGetPackageDestination)) {
+        Write-Host "Saving $msbuildNuGetUrl to $msbuildNuGetPackageDestination" -ForegroundColor Green
+        $params = @{
+            Path        = $([io.path]::combine($resourcePath, 'configuration', 'commerce', 'HabitatHome', 'download-assets.json'))
+            Source      = $msbuildNuGetUrl
+            Destination = $msbuildNuGetPackageDestination
+        }
+        Install-SitecoreConfiguration  @params  -WorkingDirectory $(Join-Path $PWD "logs") -Verbose 
     }
     
     $commerceAssetFolder = $assets.commerce.installationFolder
 
-	$habitatHomeImagePackageUrl = "https://v9assets.blob.core.windows.net/v9-onprem-assets/Habitat Home Product Images.zip?sv=2017-04-17&ss=bfqt&srt=sco&sp=rwdlacup&se=2027-11-09T20%3A11%3A50Z&st=2017-11-09T12%3A11%3A50Z&spr=https&sig=naspk%2BQflDLjyuC6gfXw4OZKvhhxzTlTvDctfw%2FByj8%3D"
+    $habitatHomeImagePackageUrl = "https://sitecore.box.com/shared/static/bjvge68eqge87su5vg258366rve6bg5d.zip"
     $habitatHomeImagePackageFileName = "Habitat Home Product Images.zip"
     $habitatHomeImagePackageDestination = (Join-Path $CommerceAssetFolder $habitatHomeImagePackageFileName)
 
 
-if (!(Test-Path $habitatHomeImagePackageDestination)) {
-    Write-Host ("Saving '{0}' to '{1}'" -f $habitatHomeImagePackageFileName, $CommerceAssetFolder) -ForegroundColor Green
-    Start-BitsTransfer -source $habitatHomeImagePackageUrl -Destination $habitatHomeImagePackageDestination
-}
-	Write-Host "Extracting to $($CommerceAssetFolder)"
-	set-alias sz "$env:ProgramFiles\7-zip\7z.exe"
+    if (!(Test-Path $habitatHomeImagePackageDestination)) {
+        Write-Host ("Saving '{0}' to '{1}'" -f $habitatHomeImagePackageFileName, $habitatHomeImagePackageDestination) -ForegroundColor Green
+        $params = @{
+            Path        = $([io.path]::combine($resourcePath, 'configuration', 'commerce', 'HabitatHome', 'download-assets.json'))
+            Source      = $habitatHomeImagePackageUrl
+            Destination = $habitatHomeImagePackageDestination
+        }
+        Install-SitecoreConfiguration  @params  -WorkingDirectory $(Join-Path $PWD "logs") -Verbose 
+    }
+    Write-Host "Extracting to $($CommerceAssetFolder)"
+    set-alias sz "$env:ProgramFiles\7-zip\7z.exe"
 	
-	sz x -o"$commerceAssetFolder" $commercePackageDestination -r -y -aoa
+    sz x -o"$commerceAssetFolder" $commercePackageDestination -r -y -aoa
 
     # This is where we expand the archives:
     $packagesToExtract = $assets.commerce.filesToExtract
-
-
-
 
     foreach ($package in $packagesToExtract) {
 
@@ -349,10 +356,10 @@ Function Install-Commerce {
         CommerceAuthoringServicesPort               = "5000"
         CommerceMinionsServicesPort                 = "5010"
         SitecoreCommerceEnginePath                  = $($publishPath + "\" + $site.prefix + ".Commerce.Engine")
-        SitecoreBizFxServicesContentPath            = $($publishPath  + "\" + $site.prefix + ".Commerce.BizFX")
+        SitecoreBizFxServicesContentPath            = $($publishPath + "\" + $site.prefix + ".Commerce.BizFX")
         SitecoreBizFxPostFix                        = $site.prefix
 
-        SitecoreIdentityServerPath                  =  $($publishPath  + "\" + $site.prefix + ".Commerce.IdentityServer")
+        SitecoreIdentityServerPath                  = $($publishPath + "\" + $site.prefix + ".Commerce.IdentityServer")
         CommerceEngineCertificatePath               = $(Join-Path -Path $assets.certificatesPath -ChildPath $($xConnect.CertificateName + ".crt") )
         SiteUtilitiesSrc                            = $(Join-Path -Path $assets.commerce.sifCommerceRoot -ChildPath "SiteUtilityPages")
         CommerceConnectModuleFullPath               = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include "Sitecore Commerce Connect*.zip" -Recurse  )
@@ -387,9 +394,9 @@ Function Install-Commerce {
 
 Install-Prerequisites
 Install-RequiredInstallationAssets
+Set-ModulesPath
 Install-CommerceAssets
 Stop-XConnect
-Set-ModulesPath
 Publish-CommerceEngine
 Publish-IdentityServer
 Publish-BizFx

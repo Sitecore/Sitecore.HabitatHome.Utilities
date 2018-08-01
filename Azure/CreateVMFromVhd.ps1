@@ -6,7 +6,8 @@ Param(
     [Parameter(Mandatory = $true)]
     [string]$demoType,
     [string] $deploymentName = "habitathome",
-    [string] $sourceSnapshotPrefix = "habitathome"
+    [string] $sourceSnapshotPrefix = "habitathome",
+    [string] $sourceSnapshotSubscriptionId = "***REMOVED***"
 )
 $account = Get-AzureRMContext | Select-Object Account
 
@@ -30,36 +31,30 @@ $demoType = $demoType.ToLower()
 
 switch ($region) {
     na {
-        $storageAccountId = "/subscriptions/***REMOVED***/resourceGroups/habitathome-demo-snapshot/providers/Microsoft.Storage/storageAccounts/habitathomedemosnapshots"
+        $storageAccountId = ("/subscriptions/{0}/resourceGroups/habitathome-demo-snapshot/providers/Microsoft.Storage/storageAccounts/habitathomedemosnapshots" -f $sourceSnapshotSubscriptionId)
         $storageContainerName = "habitathomedemosnapshots"
         $location = "eastus"
         $timeZone = "Eastern Standard Time"
     }
     ga {
-        $storageAccountId = "/subscriptions/***REMOVED***/resourceGroups/habitathome-demo-snapshot-ga/providers/Microsoft.Storage/storageAccounts/hhdemosnapshotsga"
+        $storageAccountId = ("/subscriptions/{0}/resourceGroups/habitathome-demo-snapshot-ga/providers/Microsoft.Storage/storageAccounts/hhdemosnapshotsga" -f $sourceSnapshotSubscriptionId)
         $storageContainerName = "hhdemosnapshotsga"
         $location = "australiaeast"
         $timeZone = "E. Australia Standard Time"
     }
     emea {
-        $storageAccountId = "/subscriptions/***REMOVED***/resourceGroups/habitathome-demo-snapshot-emea/providers/Microsoft.Storage/storageAccounts/hhdemosnapshotsemea"
+        $storageAccountId = ("/subscriptions/{0}/resourceGroups/habitathome-demo-snapshot-emea/providers/Microsoft.Storage/storageAccounts/hhdemosnapshotsemea" -f $sourceSnapshotSubscriptionId)
         $storageContainerName = "hhdemosnapshotsemea"
         $location = "ukwest"
         $timeZone = "GMT Standard Time"
     }
     ea
     {
-        $storageAccountId="/subscriptions/***REMOVED***/resourceGroups/habitathome-demo-snapshot-eastasia/providers/Microsoft.Storage/storageAccounts/hhdemosnapshoteastasia"
+        $storageAccountId=("/subscriptions/{0}/resourceGroups/habitathome-demo-snapshot-eastasia/providers/Microsoft.Storage/storageAccounts/hhdemosnapshoteastasia" -f $sourceSnapshotSubscriptionId)
         $storageContainerName="hhdemosnapshoteastasia"
         $location = "eastasia"
         $timeZone = "China Standard Time"
 
-    }
-    ne {
-        $storageAccountId = "/subscriptions/***REMOVED***/resourceGroups/docker-demo-snapshot/providers/Microsoft.Storage/storageAccounts/dockersnapshots"
-        $storageContainerName = "dockersnapshots"
-        $location = "northeurope"
-        $timeZone = "GMT Standard Time"
     }
 }
 $snapshotPrefix = ("{0}{1}" -f $sourceSnapshotPrefix, $demoType)
