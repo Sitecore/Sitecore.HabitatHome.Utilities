@@ -1,5 +1,6 @@
 Param(
-    [string] $ConfigurationFile = "configuration-xp0.json"
+    [string] $ConfigurationFile = "configuration-xp0.json",
+    [string] $AssetsFile = "assets.json"
 )
 
 #####################################################
@@ -45,7 +46,7 @@ Write-Host " Sitecore: $($site.hostName)" -ForegroundColor Green
 Write-Host " xConnect: $($xConnect.siteName)" -ForegroundColor Green
 Write-Host "*******************************************************" -ForegroundColor Green
 
-function Install-Prerequisites {
+function Confirm-Prerequisites {
     #Verify SQL version
     
     [reflection.assembly]::LoadWithPartialName("Microsoft.SqlServer.Smo") | out-null
@@ -162,26 +163,9 @@ function Install-Prerequisites {
     if (-not $versionExists) {
         throw "Please install .NET Framework $($assets.dotnetMinimumVersion) or newer"
     }
-}
-function Install-Assets {
-    #Register Assets PowerShell Repository
-    if ((Get-PSRepository | Where-Object {$_.Name -eq $assets.psRepositoryName}).count -eq 0) {
-        Register-PSRepository -Name $assets.psRepositoryName -SourceLocation $assets.psRepository -InstallationPolicy Trusted 
-    }
 
-    #Sitecore Install Framework dependencies
-    Import-Module WebAdministration
-
-    #Install SIF
-    $module = Get-Module -FullyQualifiedName @{ModuleName = "SitecoreInstallFramework"; ModuleVersion = $($assets.installerVersion -replace "-beta[0-9]*$")}
-    if (-not $module) {
-        write-host "Installing the Sitecore Install Framework, version $($assets.installerVersion)" -ForegroundColor Green
-        Install-Module SitecoreInstallFramework -RequiredVersion $assets.installerVersion -Repository $assets.psRepositoryName -Scope CurrentUser -Force
-        Import-Module SitecoreInstallFramework -RequiredVersion $($assets.installerVersion -replace "-beta[0-9]*$")
-    }
-
-    #Verify that manual assets are present
-    if (!(Test-Path $assets.root)) {
+      #Verify that assets are present
+      if (!(Test-Path $assets.root)) {
         throw "$($assets.root) not found"
     }
 
@@ -200,16 +184,110 @@ function Install-Assets {
         throw "XConnect package $($xConnect.packagePath) not found"
     }
 }
+function Install-Assets {
+    #Register Assets PowerShell Repository
+    if ((Get-PSRepository | Where-Object {$_.Name -eq $assets.psRepositoryName}).count -eq 0) {
+        Register-PSRepository -Name $assets.psRepositoryName -SourceLocation $assets.psRepository -InstallationPolicy Trusted 
+    }
+
+    #Sitecore Install Framework dependencies
+    Import-Module WebAdministration
+
+    #Install SIF
+    $module = Get-Module -FullyQualifiedName @{ModuleName = "SitecoreInstallFramework"; ModuleVersion = $($assets.installerVersion -replace "-beta[0-9]*$")}
+    if (-not $module) {
+        write-host "Installing the Sitecore Install Framework, version $($assets.installerVersion)" -ForegroundColor Green
+        Install-Module SitecoreInstallFramework -RequiredVersion $assets.installerVersion -Repository $assets.psRepositoryName -Scope CurrentUser -Force
+        Import-Module SitecoreInstallFramework -RequiredVersion $($assets.installerVersion -replace "-beta[0-9]*$")
+    }
+}
+function Get-CommerceAssets {
+
+    $downloadAssets = Get-Content $AssetsFile -Raw | ConvertFrom-Json
+    $downloadFolder = $assets.root
+    $packagesFolder = (Join-Path $downloadFolder "packages")
+    
+   
+    # Download Sitecore
+    if (!(Test-Path $downloadFolder)) {
+        New-Item -ItemType Directory -Force -Path $downloadFolder
+    }
+    $credentials = Get-Credential -Message "Please provide dev.sitecore.com credentials"
+
+
+    $downloadJsonPath = $([io.path]::combine($resourcePath, 'content', 'Deployment','OnPrem','HabitatHome', 'download-assets.json'))
+    Set-Alias sz 'C:\Program Files\7-Zip\7z.exe'
+
+    foreach ($package in $downloadAssets.sitecore) {
+    
+        if ($package.download -eq $true) {
+            Write-Host ("Downloading {0}  -  if required" -f $package.fileName )
+        
+            $destination = $([io.path]::combine((Resolve-Path $downloadFolder), $package.fileName))
+            
+            if (!(Test-Path $destination)) {
+                $params = @{
+                    Path        = $downloadJsonPath
+                    Credentials = $credentials
+                    Source      = $package.url
+                    Destination = $destination
+                }
+                Install-SitecoreConfiguration  @params  -WorkingDirectory $(Join-Path $PWD "logs") -Verbose 
+            }
+            if ($package.extract -eq $true) {
+                sz x -o"$DownloadFolder" $destination -r -y -aoa
+            }
+        }
+    }
+    # Download modules
+    foreach ($package in $downloadAssets.modules) {
+	
+        if (!(Test-Path $packagesFolder)) {
+            New-Item -ItemType Directory -Force -Path $packagesFolder
+        }
+        if ($package.download -eq $true) {
+            Write-Host ("Downloading {0}  -  if required" -f $package.fileName )
+            $destination = $([io.path]::combine((Resolve-Path $packagesFolder), $package.fileName))
+            if (!(Test-Path $destination)) {
+                $params = @{
+                    Path        = $downloadJsonPath
+                    Credentials = $credentials
+                    Source      = $package.url
+                    Destination = $destination
+                }
+                Install-SitecoreConfiguration  @params  -WorkingDirectory $(Join-Path $PWD "logs") -Verbose 
+            }
+        }
+    }
+
+    # Download other packages
+    foreach ($package in $downloadAssets.prerequisites) {
+        if ($package.download -eq $true) {
+            Write-Host ("Downloading {0}  -  if required" -f $package.fileName )
+            $destination = $([io.path]::combine((Resolve-Path $downloadFolder), $package.fileName))
+            if (!(Test-Path $destination)) {
+                $params = @{
+                    Path        = $downloadJsonPath
+                    Credentials = $credentials
+                    Source      = $package.url
+                    Destination = $destination
+                }
+                Install-SitecoreConfiguration  @params  -WorkingDirectory $(Join-Path $PWD "logs") -Verbose 
+            }
+        }
+    }
+}
+
 
 function Install-XConnect {
     #Install xConnect Solr
     try {
         $params = @{
-            Path        =   $xConnect.solrConfigurationPath 
-            SolrUrl     =   $solr.url 
-            SolrRoot    =   $solr.root 
-            SolrService =   $solr.serviceName 
-            CorePrefix  =   $site.prefix
+            Path        = $xConnect.solrConfigurationPath 
+            SolrUrl     = $solr.url 
+            SolrRoot    = $solr.root 
+            SolrService = $solr.serviceName 
+            CorePrefix  = $site.prefix
         }
         Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs")
     }
@@ -222,9 +300,9 @@ function Install-XConnect {
     try {
         Write-Host $xConnect.certificateConfigurationPath
         $params = @{
-            Path            =   $xConnect.certificateConfigurationPath 
-            CertificateName =   $xConnect.certificateName 
-            CertPath        =   $assets.certificatesPath
+            Path            = $xConnect.certificateConfigurationPath 
+            CertificateName = $xConnect.certificateName 
+            CertPath        = $assets.certificatesPath
         }
         Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs")
     }
@@ -236,20 +314,20 @@ function Install-XConnect {
     #Install xConnect
     try {
         $params = @{
-            Path                    =   $xConnect.ConfigurationPath 
-            Package                 =   $xConnect.PackagePath 
-            LicenseFile             =   $assets.licenseFilePath 
-            SiteName                =   $xConnect.siteName 
-            XConnectCert            =   $xConnect.certificateName 
-            SqlDbPrefix             =   $site.prefix 
-            SolrCorePrefix          =   $site.prefix 
-            SqlAdminUser            =   $sql.adminUser 
-            SqlAdminPassword        =   $sql.adminPassword 
-            SqlServer               =   $sql.server 
-            SqlCollectionUser       =   $xConnect.sqlCollectionUser 
-            SqlCollectionPassword   =   $xConnect.sqlCollectionPassword 
-            SolrUrl                 =   $solr.url 
-            WebRoot                 =   $site.webRoot
+            Path                  = $xConnect.ConfigurationPath 
+            Package               = $xConnect.PackagePath 
+            LicenseFile           = $assets.licenseFilePath 
+            SiteName              = $xConnect.siteName 
+            XConnectCert          = $xConnect.certificateName 
+            SqlDbPrefix           = $site.prefix 
+            SolrCorePrefix        = $site.prefix 
+            SqlAdminUser          = $sql.adminUser 
+            SqlAdminPassword      = $sql.adminPassword 
+            SqlServer             = $sql.server 
+            SqlCollectionUser     = $xConnect.sqlCollectionUser 
+            SqlCollectionPassword = $xConnect.sqlCollectionPassword 
+            SolrUrl               = $solr.url 
+            WebRoot               = $site.webRoot
         }
         Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs")
         
@@ -281,11 +359,11 @@ function Install-Sitecore {
     try {
         #Install Sitecore Solr
         $params = @{
-            Path        =   $sitecore.solrConfigurationPath 
-            SolrUrl     =   $solr.url 
-            SolrRoot    =   $solr.root 
-            SolrService =   $solr.serviceName 
-            CorePrefix  =   $site.prefix
+            Path        = $sitecore.solrConfigurationPath 
+            SolrUrl     = $solr.url 
+            SolrRoot    = $solr.root 
+            SolrService = $solr.serviceName 
+            CorePrefix  = $site.prefix
         }
         Install-SitecoreConfiguration  @params -WorkingDirectory $(Join-Path $PWD "logs")
     }
@@ -297,22 +375,22 @@ function Install-Sitecore {
     try {
         #Install Sitecore
         $params = @{
-            Path                                    =   $sitecore.configurationPath
-            Package                                 =   $sitecore.packagePath 
-            LicenseFile                             =   $assets.licenseFilePath 
-            SiteName                                =   $site.hostName 
-            XConnectCert                            =   $xConnect.certificateName 
-            SqlDbPrefix                             =   $site.prefix 
-            SolrCorePrefix                          =   $site.prefix 
-            SqlAdminUser                            =   $sql.adminUser 
-            SqlAdminPassword                        =   $sql.adminPassword 
-            SqlServer                               =   $sql.server 
-            SolrUrl                                 =   $solr.url
-            XConnectCollectionService               =   "https://$($xConnect.siteName)" 
-            XConnectReferenceDataService            =   "https://$($xConnect.siteName)" 
-            MarketingAutomationOperationsService    =   "https://$($xConnect.siteName)" 
-            MarketingAutomationReportingService     =   "https://$($xConnect.siteName)"
-            WebRoot                                 =   $site.webRoot
+            Path                                 = $sitecore.configurationPath
+            Package                              = $sitecore.packagePath 
+            LicenseFile                          = $assets.licenseFilePath 
+            SiteName                             = $site.hostName 
+            XConnectCert                         = $xConnect.certificateName 
+            SqlDbPrefix                          = $site.prefix 
+            SolrCorePrefix                       = $site.prefix 
+            SqlAdminUser                         = $sql.adminUser 
+            SqlAdminPassword                     = $sql.adminPassword 
+            SqlServer                            = $sql.server 
+            SolrUrl                              = $solr.url
+            XConnectCollectionService            = "https://$($xConnect.siteName)" 
+            XConnectReferenceDataService         = "https://$($xConnect.siteName)" 
+            MarketingAutomationOperationsService = "https://$($xConnect.siteName)" 
+            MarketingAutomationReportingService  = "https://$($xConnect.siteName)"
+            WebRoot                              = $site.webRoot
         }
         Install-SitecoreConfiguration  @params -WorkingDirectory $(Join-Path $PWD "logs")
             
@@ -325,9 +403,9 @@ function Install-Sitecore {
     try {
         #Set web certificate on Sitecore site
         $params = @{
-            Path        =   $sitecore.sslConfigurationPath 
-            SiteName    =   $site.hostName 
-            WebRoot     =   $site.WebRoot
+            Path     = $sitecore.sslConfigurationPath 
+            SiteName = $site.hostName 
+            WebRoot  = $site.WebRoot
         }
         Install-SitecoreConfiguration  @params -WorkingDirectory $(Join-Path $PWD "logs")
     }
@@ -341,9 +419,9 @@ function Install-Sitecore {
 function Enable-InstallationImprovements {
     try {
         $params = @{
-            Path        =   $site.enableInstallationImprovements 
-            InstallDir  =   $sitecore.siteRoot  
-			ResourceDir =   $($assets.root + "\\Sitecore.WDP.Resources")
+            Path        = $site.enableInstallationImprovements 
+            InstallDir  = $sitecore.siteRoot  
+            ResourceDir = $($assets.root + "\\Sitecore.WDP.Resources")
         }
 
         Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs")
@@ -356,9 +434,9 @@ function Enable-InstallationImprovements {
 function Disable-InstallationImprovements {
     try {
         $params = @{
-            Path            =   $site.disableInstallationImprovements 
-            InstallDir      =   $sitecore.siteRoot 
-			ResourceDir     =   $($assets.root + "\\Sitecore.WDP.Resources")
+            Path        = $site.disableInstallationImprovements 
+            InstallDir  = $sitecore.siteRoot 
+            ResourceDir = $($assets.root + "\\Sitecore.WDP.Resources")
         }
         Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs")
     }
@@ -397,26 +475,22 @@ function Copy-Package ($packagePath, $destination) {
     
 }
 
-Function Add-AppPool-Membership {
+Function Add-AppPoolMembership {
 
     #Add ApplicationPoolIdentity to performance log users to avoid Sitecore log errors (https://kb.sitecore.net/articles/404548)
     
-    try 
-    {
+    try {
         Add-LocalGroupMember "Performance Log Users" "IIS AppPool\$($site.hostName)"
         Write-Host "Added IIS AppPool\$($site.hostName) to Performance Log Users" -ForegroundColor Green
     }
-    catch 
-    {
+    catch {
         Write-Host "Warning: Couldn't add IIS AppPool\$($site.hostName) to Performance Log Users -- user may already exist" -ForegroundColor Yellow
     }
-    try 
-    {
+    try {
         Add-LocalGroupMember "Performance Monitor Users" "IIS AppPool\$($site.hostName)"
         Write-Host "Added IIS AppPool\$($site.hostName) to Performance Monitor Users" -ForegroundColor Green
     }
-    catch 
-    {
+    catch {
         Write-Host "Warning: Couldn't add IIS AppPool\$($site.hostName) to Performance Monitor Users -- user may already exist" -ForegroundColor Yellow
     }
 }
@@ -449,13 +523,13 @@ function Install-OptionalModules {
 }
 
 
-function Configure-SXA-SolrCores {
+function Update-SXASolrCores {
     try {
         $params = @{
-            Path            =   $site.configureSearchIndexes 
-            InstallDir      =   $sitecore.siteRoot 
-			ResourceDir     =   $($assets.root + "\\Sitecore.WDP.Resources")
-            SitePrefix      =   $site.prefix
+            Path        = $site.configureSearchIndexes 
+            InstallDir  = $sitecore.siteRoot 
+            ResourceDir = $($assets.root + "\\Sitecore.WDP.Resources")
+            SitePrefix  = $site.prefix
         }
         Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs")
     }
@@ -465,14 +539,15 @@ function Configure-SXA-SolrCores {
     }
 }
 
-Install-Prerequisites
-Install-Assets
 Set-ModulesPath
+Install-Assets
+Get-CommerceAssets
+Confirm-Prerequisites
 Install-XConnect
 Install-Sitecore
-Add-AppPool-Membership
+Add-AppPoolMembership
 Enable-InstallationImprovements
 Copy-Tools
 Install-OptionalModules
 Disable-InstallationImprovements
-Configure-SXA-SolrCores
+Update-SXASolrCores

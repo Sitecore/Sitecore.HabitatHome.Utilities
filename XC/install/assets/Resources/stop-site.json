@@ -1,16 +1,5 @@
-	// -------------------------------------------------------------------------- //
-	//         Sitecore Install Framework - Sitecore XP0 Configuration            //
-	//                                                                            //
-	//  Run this configuration to install a single instance of Sitecore.          //
-	//  This instance is configured to use Solr.                                  //
-	//                                                                            //
-	//  NOTE: Only single line comments are accepted in configurations.           //
-	// -------------------------------------------------------------------------- //
 	{
 	    "Parameters": {
-	        // Parameters are values that may be passed when Install-SitecoreConfiguration is called.
-	        // Parameters must declare a Type and may declare a DefaultValue and Description.
-	        // Parameters with no DefaultValue are required when Install-SitecoreConfiguration is called.
 	        "SiteName": {
 	            "Type": "string",
 	            "DefaultValue": "Sitecore",
@@ -18,12 +7,7 @@
 	        }
 	    },
 	    "Tasks": {
-	        // Tasks are separate units of work in a configuration.
-	        // Each task is an action that will be completed when Install-SitecoreConfiguration is called.
-	        // By default, tasks are applied in the order they are declared.
-	        // Tasks may reference Parameters, Variables, and config functions.
 	        "StopWebsite": {
-	            // Stops the website if it is running.
 	            "Type": "ManageWebsite",
 	            "Params": {
 	                "Name": "[parameter('SiteName')]",
@@ -31,7 +15,6 @@
 	            }
 	        },
 	        "StopAppPool": {
-	            // Stops the app pool if it is running.
 	            "Type": "ManageAppPool",
 	            "Params": {
 	                "Name": "[parameter('SiteName')]",

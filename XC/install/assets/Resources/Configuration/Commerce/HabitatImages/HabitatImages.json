@@ -1,11 +1,4 @@
-﻿// -------------------------------------------------------------------------- //
-//         Sitecore Install Framework - Install Habitat Images module         //
-//                                                                            //
-//  Run this configuration to install Habitat Images module.                  //
-//                                                                            //
-//  NOTE: Only single line comments are accepted in configurations.           //
-// -------------------------------------------------------------------------- //
-{
+﻿{
   "Parameters": {
     "ModuleFullPath": {
       "Type": "string",

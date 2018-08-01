@@ -13,13 +13,14 @@
               "Description":"Destination Full Path (including file name) where the file will be stored"
           }
     },
+    "Modules":["DownloadFileWithCredentials"],
     "Tasks":{
         "DownloadCommerce":{
-            "Type":"DownloadFile",
+            "Type":"DownloadFileWithCredentials",
             "Params":{
                 "SourceUri":"[parameter('Source')]",
                 "DestinationPath":"[parameter('Destination')]",
-                "Credential": "[parameter('Credentials')]"
+                "Credentials": "[parameter('Credentials')]"
             }
         }
     }
