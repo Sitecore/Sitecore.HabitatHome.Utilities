@@ -1,10 +1,3 @@
-// ----------------------------------------------------------------------------------------- //
-//         Sitecore Install Framework - Install Commerce Marketing Automation module         //
-//                                                                                           //
-//  Run this configuration to install Commerce Marketing Automation module.                  //
-//                                                                                           //
-//  NOTE: Only single line comments are accepted in configurations.                          //
-// ----------------------------------------------------------------------------------------- //
 {
     "Parameters": {
       "XConnectSitePath": {
