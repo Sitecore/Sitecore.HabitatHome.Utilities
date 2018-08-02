@@ -107,7 +107,7 @@ Remove-Item $pathToCores -recurse -force -ErrorAction SilentlyContinue
 Write-Host "Solr Cores deleted successfully"
 Write-TaskHeader -TaskName "Solr Services" -TaskType "Start"
 Write-Host "Starting solr service"
-Start-Service $solr.serviceName -Force -ErrorAction SilentlyContinue
+Start-Service $solr.serviceName  -ErrorAction SilentlyContinue
 Write-Host "Solr service started successfully"
 #Remove Sites and App Pools from IIS
 Write-TaskHeader -TaskName "Internet Information Services" -TaskType "Remove Websites"
