@@ -26,6 +26,7 @@ if (!$config) {
 $site = $config.settings.site
 $sql = $config.settings.sql
 $solr = $config.settings.solr
+$commerce = $config.settings.commerce
 Function Write-TaskHeader {
     param(
         [Parameter(Mandatory = $true)]
@@ -102,8 +103,11 @@ Write-Host "Solr service stopped successfully"
 #Delete solr cores
 Write-TaskHeader -TaskName "Solr Services" -TaskType "Delete Cores"
 Write-Host "Deleting Solr Cores"
-$pathToCores = "$($solr.root)\server\solr\$($site.prefix)*"
-Remove-Item $pathToCores -recurse -force -ErrorAction SilentlyContinue
+$pathToCores = "$($solr.root)\server\solr"
+$cores = @("CatalogItemsScope", "CustomersScope", "OrdersScope")
+foreach ($core in $cores) {
+    Remove-Item (Join-Path $pathToCores $core) -recurse -force -ErrorAction SilentlyContinue
+}
 Write-Host "Solr Cores deleted successfully"
 Write-TaskHeader -TaskName "Solr Services" -TaskType "Start"
 Write-Host "Starting solr service"
@@ -118,13 +122,14 @@ foreach ($environment in $Environments) {
     Remove-Website -siteName $siteName -ErrorAction SilentlyContinue
     Remove-AppPool -appPoolName $siteName
     Remove-Item ("C:\inetpub\wwwroot\{0}" -f $siteName) -recurse -force -ErrorAction SilentlyContinue
+    Remove-Item ("C:\inetpub\wwwroot\{0}_backup" -f $siteName) -recurse -force -ErrorAction SilentlyContinue
 }
 $bizfxPrefix = "SitecoreBizFx"
 $bizfx = ("{0}{1}" -f $bizfxPrefix, $site.prefix)
 Write-Host ("Deleting Website {0}" -f $bizfx)
-Remove-Website -siteName $bizfx -ErrorAction SilentlyContinue
+Remove-Website -siteName $bizfxPrefix -ErrorAction SilentlyContinue
 Remove-AppPool -appPoolName $bizfxPrefix
-Remove-Item ("C:\inetpub\wwwroot\{0}" -f $siteName) -recurse -force -ErrorAction SilentlyContinue
+Remove-Item ("C:\inetpub\wwwroot\{0}" -f $bizfx) -recurse -force -ErrorAction SilentlyContinue
 
 Write-Host ("Deleting Website {0}" -f $commerce.identityServerName)
 Remove-Website -siteName $commerce.identityServerName -ErrorAction SilentlyContinue

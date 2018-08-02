@@ -21,7 +21,8 @@
             "enableInstallationImprovements":"@@site.enableInstallationImprovements@@",
             "disableInstallationImprovements":"@@site.disableInstallationImprovements@@",
             "configureSearchIndexes":"@@site.configureSearchIndexes@@",
-            "habitatHomeSslCertificateName":"@@site.habitatHomeSslCertificateName@@"
+            "habitatHomeSslCertificateName":"@@site.habitatHomeSslCertificateName@@",
+            "addSiteBindingWithSSLPath":"@@site.addSiteBindingWithSSLPath@@"
         },
         
         "sql": {
