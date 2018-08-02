@@ -4,3 +4,9 @@
 
 /XP/install/Packaging
 /XP/install/Enable-EngineHostname.ps1
+/XP/install/assets/Certificates/SitecoreRootCert.crt
+*.crt
+*.zip
+*.log
+/XP/install/assets/license.xml
+*.msi
