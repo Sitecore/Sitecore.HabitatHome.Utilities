@@ -10,3 +10,8 @@
 *.log
 /XP/install/assets/license.xml
 *.msi
+/XC/install/configuration-xc0.json
+/XC/install/set-installation-overrides.ps1
+/XP/install/configuration-xp0.json
+/XP/install/set-installation-overrides.ps1
+/.vs

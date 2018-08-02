@@ -46,6 +46,7 @@ $identityServerVersion.version = "1.2.3"
 $site = $json.settings.site
 # Commerce Settings
 $commerce = $json.settings.commerce
+$commerce.engineConfigurationPath = ([IO.Path]::Combine($assets.root, "Resources","Configuration","Commerce","HabitatHome","set-engine-hostname.json"))
 $commerce.storefrontPrefix = $site.prefix
 $commerce.storefrontHostName = $commerce.storefrontPrefix + "." + $site.suffix
 
