@@ -396,10 +396,10 @@ Install-Prerequisites
 Install-RequiredInstallationAssets
 Set-ModulesPath
 Install-CommerceAssets
-Stop-XConnect
+#Stop-XConnect - Should no longer do this as of 9.0.2
 Publish-CommerceEngine
 Publish-IdentityServer
 Publish-BizFx
 Install-Commerce
 Start-Site
-Start-XConnect
+# Start-XConnect No longer required as of 9.0.2
