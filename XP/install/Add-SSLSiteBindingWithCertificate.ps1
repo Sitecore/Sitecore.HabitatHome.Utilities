@@ -1,7 +1,10 @@
 Param(
     [string] $ConfigurationFile = "configuration-xp0.json",
     [string] $SiteName,
-    [string] $HostName
+    [string] $HostName,
+    [string] $CertificateName,
+    [int] $Port = 443,
+    [switch] $SkipCreateCert
 )
 
 #####################################################
@@ -51,18 +54,32 @@ function Install-Assets {
         throw "$($assets.root) not found"
     }
 }
-function Add-SiteBindingWithNewCertificate {
+function Add-SSLSiteBindingWithCertificate {
     try {
-           
-        $params = @{
-            Path       = $site.addSiteBindingWithSSLPath 
-            SiteName   = $siteName 
-            WebRoot    = $site.webRoot 
-            HostHeader = $HostName 
-            CertPath   = $assets.certificatesPath
+        if ($SkipCreateCert) {
+            $params = @{
+                Path            = $site.addSiteBindingWithSSLPath 
+                SiteName        = $siteName 
+                WebRoot         = $site.webRoot 
+                HostHeader      = $HostName 
+                Port            = $Port
+                CertPath        = $assets.certificatesPath
+                CertificateName = $CertificateName
+                Skip            = "CreatePaths", "CreateRootCert", "ImportRootCertificate", "CreateSignedCert"
+            }
         }
-        Install-SitecoreConfiguration  @params  -WorkingDirectory $(Join-Path $PWD "logs") -Verbose
-            
+        else {
+            $params = @{
+                Path       = $site.addSiteBindingWithSSLPath 
+                SiteName   = $siteName 
+                WebRoot    = $site.webRoot 
+                HostHeader = $HostName 
+                Port       = $Port
+                CertPath   = $assets.certificatesPath
+            }
+        }
+
+        Install-SitecoreConfiguration  @params   -WorkingDirectory $(Join-Path $PWD "logs") -Verbose
     }
     catch {
         write-host "Sitecore Setup Failed" -ForegroundColor Red
@@ -81,4 +98,4 @@ Function Set-ModulesPath {
 
 Set-ModulesPath
 Install-Assets
-Add-SiteBindingWithNewCertificate
+Add-SSLSiteBindingWithCertificate
