@@ -27,11 +27,14 @@
             "Type": "string",
             "Description": "The file name of the root certificate to be created.",
             "DefaultValue": "SitecoreRootCert"
+        },
+        "CertificateName":{
+            "Type": "string",
+            "Description": "The  name of certificate to be used or created.",
+            "DefaultValue": "[parameter('HostHeader')]"
         }
     },
     "Variables": {
-
-        "CertificateName": "[parameter('HostHeader')]",
         "Client.Cert.Store": "cert:\\LocalMachine\\My",
         "Root.Cert.DnsName": "[concat('DO_NOT_TRUST_', parameter('RootCertFileName'))]",
         "Root.Cert.Store": "cert:\\LocalMachine\\Root",
@@ -70,8 +73,8 @@
                 "Signer": "[GetCertificate(variable('Root.Cert.DnsName'), variable('Root.Cert.Store'))]",
                 "Path": "[parameter('CertPath')]",
                 "CertStoreLocation": "[variable('Client.Cert.Store')]",
-                "Name": "[variable('CertificateName')]",
-                "DnsName": "[variable('CertificateName')]"
+                "Name": "[parameter('CertificateName')]",
+                "DnsName": "[parameter('HostHeader')]"
             }
         },
         "CreateBindingsWithThumprint": {
@@ -83,14 +86,14 @@
                     "Protocol": "https",
                     "SSLFlags": 1,
                     "Port":"[parameter('Port')]",
-                    "Thumbprint": "[GetCertificateThumbprint(variable('CertificateName'), variable('Client.Cert.Store'))]"
+                    "Thumbprint": "[GetCertificateThumbprint(parameter('CertificateName'), variable('Client.Cert.Store'))]"
                 }]
             }
         },
         "CreateHostHeader": {
             "Type": "HostHeader",
             "Params": {
-                "HostName": "[parameter('HostHeader')]"
+                "HostName": "[parameter('CertificateName')]"
             }
         }
     }
