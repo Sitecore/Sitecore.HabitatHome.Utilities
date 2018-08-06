@@ -74,10 +74,8 @@ function Add-CommerceAdditionalBindings {
                 HostHeader = $HostName 
                 Port       = $port
             }
-            Install-SitecoreConfiguration  @params  -WorkingDirectory $(Join-Path $PWD "logs") -Verbose
 
-            
-        
+            Install-SitecoreConfiguration  @params  -WorkingDirectory $(Join-Path $PWD "logs") -Verbose         
         }
         catch {
             write-host "Sitecore Setup Failed" -ForegroundColor Red

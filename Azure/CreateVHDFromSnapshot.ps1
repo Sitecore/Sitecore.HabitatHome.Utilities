@@ -102,6 +102,8 @@ while (1 -eq 1){
             Write-Host "Success!" -ForegroundColor Green
             break
         }
+
+        return
     }
     foreach ($job in $jobs){
         Write-Host ("... Copy of VHD to {0} in progress" -f $job.Name)
