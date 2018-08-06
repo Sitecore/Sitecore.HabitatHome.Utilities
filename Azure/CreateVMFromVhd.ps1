@@ -7,7 +7,8 @@ Param(
     [string]$demoType,
     [string] $deploymentName = "habitathome",
     [string] $sourceSnapshotPrefix = "habitathome",
-    [string] $sourceSnapshotSubscriptionId 
+    [string] $sourceSnapshotSubscriptionId ,
+    [string] $virtualMachineSize = "Standard_D8_v3"
 )
 $account = Get-AzureRMContext | Select-Object Account
 
@@ -18,9 +19,9 @@ if ($account.Account -eq $null) {
 #Provide the size of the virtual machine
 #Get all the vm sizes in a region using below script:
 #e.g. Get-AzureRmVMSize -Location eastus 
-# available regions are "eastus", "australiaeast" and "ukwest"
+# available regions are "eastus", "australiaeast", "ukwest" and "eastasia"
 
-$virtualMachineSize = 'Standard_DS12_V2_Promo'
+
 
 
 #########       SHOULD not need to modify the following     #############
