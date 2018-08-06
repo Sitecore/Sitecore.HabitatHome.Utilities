@@ -1,5 +1,6 @@
 Param(
     [string] $subscriptionId,
+
     [ValidateSet('na', 'ga', 'emea', 'ea')]
     [string]$region = 'na',
     [ValidateSet('xp', 'xc')]
@@ -20,8 +21,6 @@ if ($account.Account -eq $null) {
 #Get all the vm sizes in a region using below script:
 #e.g. Get-AzureRmVMSize -Location eastus 
 # available regions are "eastus", "australiaeast", "ukwest" and "eastasia"
-
-
 
 
 #########       SHOULD not need to modify the following     #############
@@ -49,6 +48,7 @@ switch ($region) {
         $location = "ukwest"
         $timeZone = "GMT Standard Time"
     }
+
     ea {
         $storageAccountId = ("/subscriptions/{0}/resourceGroups/habitathome-demo-snapshot-eastasia/providers/Microsoft.Storage/storageAccounts/hhdemosnapshoteastasia" -f $sourceSnapshotSubscriptionId)
         $storageContainerName = "hhdemosnapshoteastasia"
@@ -106,6 +106,7 @@ Function Enable-AzureRMVmAutoShutdown {
 
 }
 
+
 Write-Host "Selecting Azure Subscription" -ForegroundColor Green
 Write-Host ("Creating new deployment '{0}' in '{1}' location" -f $deploymentName, $location) -ForegroundColor Green
 #Set the context to the subscription Id where Managed Disks and VM will be created
@@ -127,6 +128,7 @@ Add-AzureRmVirtualNetworkSubnetConfig -Name sNet -VirtualNetwork $vnet -AddressP
 $vnet | Set-AzureRmVirtualNetwork
 
 Write-Host "Setting up Network Security Rules" -ForegroundColor Green
+
 # set up network security rules and group
 $http = New-AzureRmNetworkSecurityRuleConfig  -Name "HTTP" -Description "Allow inbound HTTP" -Protocol Tcp -SourcePortRange * -DestinationPortRange 80 -SourceAddressPrefix * -DestinationAddressPrefix * -Access Allow -Priority 101 -Direction Inbound 
 $https = New-AzureRmNetworkSecurityRuleConfig -Name "HTTPS" -Description "Allow inbound HTTPS" -Protocol Tcp -SourcePortRange * -DestinationPortRange 443 -SourceAddressPrefix * -DestinationAddressPrefix * -Access Allow -Priority 105 -Direction Inbound 
@@ -149,6 +151,7 @@ else {
 }
 
 $vnet = Get-AzureRmVirtualNetwork -Name $virtualNetworkName -ResourceGroupName $resourceGroupName
+
 
 Write-Host "Creating NIC" -ForegroundColor Green
 # Create NIC in the first subnet of the virtual network

@@ -102,6 +102,7 @@ while (1 -eq 1){
             Write-Host "Success!" -ForegroundColor Green
             break
         }
+
         return
     }
     foreach ($job in $jobs){

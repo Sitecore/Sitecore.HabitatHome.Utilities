@@ -74,6 +74,7 @@ function Add-CommerceAdditionalBindings {
                 HostHeader = $HostName 
                 Port       = $port
             }
+
             Install-SitecoreConfiguration  @params  -WorkingDirectory $(Join-Path $PWD "logs") -Verbose         
         }
         catch {
