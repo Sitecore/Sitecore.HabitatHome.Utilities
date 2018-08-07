@@ -101,7 +101,7 @@ try {
 	$keytool = (Get-Command 'keytool.exe').Source
 } catch {
 	try {
-		$path = $Env:JAVA_HOME + '\bin\keytool.exe'
+		$path = $jreVal + '\bin\keytool.exe'
 		Write-Host $path
 		if (Test-Path $path) {
 			$keytool = (Get-Command $path).Source
