@@ -8,8 +8,10 @@ Param(
     [string]$demoType,
     [string] $deploymentName = "habitathome",
     [string] $sourceSnapshotPrefix = "habitathome",
+    [Parameter(Mandatory = $true)]
     [string] $sourceSnapshotSubscriptionId ,
-    [string] $virtualMachineSize = "Standard_DS13_v2_Promo"
+    [string] $virtualMachineSize = "Standard_DS13_v2_Promo",
+    [string] $version = "9.0.2.1"
 )
 
 Import-Module -Name AzureRM -MaximumVersion 6.3.0 -Force
@@ -63,7 +65,7 @@ switch ($region) {
 $snapshotPrefix = ("{0}{1}" -f $sourceSnapshotPrefix, $demoType)
 
 #Provide the name of the snapshot that will be used to create OS disk
-$osVHDUri = ("https://{0}.blob.core.windows.net/snapshots/{1}-os.vhd" -f $storageContainerName, $snapshotPrefix)
+$osVHDUri = ("https://{0}.blob.core.windows.net/snapshots/{1}-{2}-os.vhd" -f $storageContainerName, $snapshotPrefix, $version)
 
 $resourceGroupName = $deploymentName
 
