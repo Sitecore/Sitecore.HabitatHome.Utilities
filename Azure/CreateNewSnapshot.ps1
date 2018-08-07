@@ -5,8 +5,10 @@ Param(
     [string] $location = "eastus",
     [string] $snapshotDestinationResourceGroup = "habitathome-demo-snapshot",
     [ValidateSet('xp', 'xc')]
-    [string]$demoType,
-    [string]$suffix="master"
+    [string] $demoType,
+    [string] $suffix = "master",
+	[Parameter(Mandatory = $true)]
+    [string] $version
 )
 $account = Get-AzureRMContext | Select-Object Account
 
@@ -15,10 +17,10 @@ if ($account.Account -eq $null) {
 }
 $demoType = $demoType.ToLower()
 $location = $location.ToLower()
-$sourceResourceGroupName = ("{0}{1}{2}" -f $sourceResourceGroupNamePrefix, $demoType,$suffix)
+$sourceResourceGroupName = ("{0}{1}{2}" -f $sourceResourceGroupNamePrefix, $demoType, $suffix)
 $vmName = ("{0}-vm" -f $sourceResourceGroupName)
 
-$osSnapshotName = ("{0}{1}-os-snapshot" -f $snapshotPrefix, $demoType)
+$osSnapshotName = ("{0}{1}-{2}-os-snapshot" -f $snapshotPrefix, $demoType, $version)
 
 Select-AzureRmSubscription -SubscriptionId $subscriptionId
 
