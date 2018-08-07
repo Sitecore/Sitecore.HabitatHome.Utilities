@@ -12,6 +12,9 @@
 
 	`Invoke-WebRequest -Uri https://raw.githubusercontent.com/Sitecore/Sitecore.HabitatHome.Utilities/master/Prerequisites/packages.config | set-content packages.config` 
 
+- Install Chocolatey
+
+    `Set-ExecutionPolicy Bypass -Scope Process -Force; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))`
 - Review packages.config to ensure it matches what you'd like to install
 - Install prerequisites and tools using chocolatey
     `choco install packages.config -y`
@@ -20,9 +23,14 @@
 > You may need to specify the instance name using the -S .\<InstanceName> if you aren't using a default SQL Server instance or if you're using SQLExpress
 > Ensure you've installed SQL Server with Mixed Mode authentication (or enable it)
 
-	`$saPassword = "SUPERS3CR3T!!"`
-	`sqlcmd -q "ALTER LOGIN [sa] WITH PASSWORD=N'" + $saPassword + "'"`
-	`sqlcmd -q "ALTER LOGIN [sa] ENABLE"`
+	Install-Module -Name SqlServer
+	$saPassword = "SUPERS3CR3T!!"
+	$instanceName = "your-instance-name"
+	Invoke-sqlcmd -Query $("ALTER LOGIN [sa] WITH PASSWORD=N'" + $saPassword + "'") -ServerInstance $instanceName
+	Invoke-sqlcmd -Query "ALTER LOGIN [sa] ENABLE" -ServerInstance $instanceName
+
+
+### RESTART COMPUTER
 
 - Clone the [Sitecore.HabitatHome.Utilities](https://github.com/Sitecore/Sitecore.HabitatHome.Utilities/) repository
 

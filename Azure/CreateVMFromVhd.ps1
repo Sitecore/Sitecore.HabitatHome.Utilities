@@ -9,8 +9,11 @@ Param(
     [string] $deploymentName = "habitathome",
     [string] $sourceSnapshotPrefix = "habitathome",
     [string] $sourceSnapshotSubscriptionId ,
-    [string] $virtualMachineSize = "Standard_D8_v3"
+    [string] $virtualMachineSize = "Standard_DS13_v2_Promo"
 )
+
+Import-Module -Name AzureRM -MaximumVersion 6.3.0 -Force
+
 $account = Get-AzureRMContext | Select-Object Account
 
 if ($account.Account -eq $null) {
