@@ -96,10 +96,14 @@ while (1 -eq 1){
         if (Test-Path $(Join-Path $PWD "vhdcreation.log")){
             # this means we've encountered an error
             Write-Host "Error copying VHD"
+            break
         }
         else {
             Write-Host "Success!" -ForegroundColor Green
+            break
         }
+
+        return
     }
     foreach ($job in $jobs){
         Write-Host ("... Copy of VHD to {0} in progress" -f $job.Name)
