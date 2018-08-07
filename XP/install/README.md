@@ -11,12 +11,12 @@ Still in an elevated PowerShell sessions
 
 - Install Solr 
 	
-	`.\install-solr.ps1`
+	`.\install-solr.ps1 -JREVersion <version of JRE you have installed ie: 1.8.0_181>`
 > Once setup is complete, the installer should load the solr 'home' page
 
 #### Prepare to install XP
 	
-	`Set-Location ..`
+	Set-Location ..
 
 ##### A bit about the process
 
@@ -31,11 +31,14 @@ The set-installation-overrides.ps1.example script needs to be renamed and modifi
 ----------
 
 #### Installation
-   
+
+- Set some predefined defaults   
 `.\set-installation-defaults.ps1`
+- Create a copy of the overrides file
 `copy set-installation-overrides.ps1.example set-installation-overrides.ps1`
-- Automatically set the sql "sa" password into the overrides file (assumes you've set the $saPassword variable - if not just replace $saPassword with the value you would like (in single quotes of course)
-`(Get-Content set-installation-overrides.ps1).replace('###saPassword###', $saPassword) | Set-Content set-installation-overrides.ps1`
+
+- Edit ***set-installation-overrides.ps1*** to set the SQL instance name and sa password 
+
 - Copy your license file to the .\assets folder
 `copy ~\Downloads\license.xml .\assets`
 
