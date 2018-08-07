@@ -15,7 +15,7 @@
     },
     "Modules":["DownloadFileWithCredentials"],
     "Tasks":{
-        "DownloadCommerce":{
+        "DownloadSitecore":{
             "Type":"DownloadFileWithCredentials",
             "Params":{
                 "SourceUri":"[parameter('Source')]",
