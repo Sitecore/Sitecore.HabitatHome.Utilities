@@ -13,7 +13,7 @@ $config = Get-Content .\config.json | ConvertFrom-Json
 
 $account = Get-AzureRMContext | Select-Object Account
 
-if ($account.Account -eq $null) {
+if ($null -eq $account.Account) {
     Login-AzureRmAccount
 }
 

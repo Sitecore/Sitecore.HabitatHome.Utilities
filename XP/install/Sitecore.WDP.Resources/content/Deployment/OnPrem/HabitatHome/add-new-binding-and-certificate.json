@@ -23,12 +23,12 @@
             "Description": "The physical path on disk where certificates will be stored.",
             "DefaultValue": "c:\\certificates"
         },
-		  "RootCertFileName": {
+        "RootCertFileName": {
             "Type": "string",
             "Description": "The file name of the root certificate to be created.",
             "DefaultValue": "SitecoreRootCert"
         },
-        "CertificateName":{
+        "CertificateName": {
             "Type": "string",
             "Description": "The  name of certificate to be used or created.",
             "DefaultValue": "[parameter('HostHeader')]"
@@ -40,7 +40,7 @@
         "Root.Cert.Store": "cert:\\LocalMachine\\Root",
         "Site.PhysicalPath": "[concat(parameter('WebRoot'),'\\', parameter('SiteName'))]",
         "Site.DataFolder": "[joinpath(variable('Site.PhysicalPath'), 'App_Data')]",
-		"Security.CertificateStore": "Cert:\\Localmachine\\My"
+        "Security.CertificateStore": "Cert:\\Localmachine\\My"
     },
     "Tasks": {
         "CreatePaths": {
@@ -85,15 +85,26 @@
                     "HostHeader": "[parameter('HostHeader')]",
                     "Protocol": "https",
                     "SSLFlags": 1,
-                    "Port":"[parameter('Port')]",
+                    "Port": "[parameter('Port')]",
                     "Thumbprint": "[GetCertificateThumbprint(parameter('CertificateName'), variable('Client.Cert.Store'))]"
+                }]
+            }
+        },
+        "CreateBindings": {
+            "Type": "WebBinding",
+            "Params": {
+                "SiteName": "[parameter('SiteName')]",
+                "Add": [{
+                    "HostHeader": "[parameter('HostHeader')]",
+                    "Protocol": "http",
+                    "Port": "80"
                 }]
             }
         },
         "CreateHostHeader": {
             "Type": "HostHeader",
             "Params": {
-                "HostName": "[parameter('CertificateName')]"
+                "HostName": "[parameter('HostHeader')]"
             }
         }
     }

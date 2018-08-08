@@ -10,7 +10,7 @@ Param(
     [string] $sourceSnapshotPrefix = "habitathome",
     [Parameter(Mandatory = $true)]
     [string] $sourceSnapshotSubscriptionId ,
-    [string] $virtualMachineSize = "Standard_DS13_v2_Promo",
+    [string] $virtualMachineSize = "Standard_D4s_v3",
     [string] $version = "9.0.2.1"
 )
 
@@ -18,7 +18,7 @@ Import-Module -Name AzureRM -MaximumVersion 6.3.0 -Force
 
 $account = Get-AzureRMContext | Select-Object Account
 
-if ($account.Account -eq $null) {
+if ($null -eq $account.Account) {
     Login-AzureRmAccount
 }
 
