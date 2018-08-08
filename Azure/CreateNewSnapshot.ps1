@@ -12,7 +12,7 @@ Param(
 )
 $account = Get-AzureRMContext | Select-Object Account
 
-if ($account.Account -eq $null) {
+if ($null -eq $account.Account) {
     Login-AzureRmAccount
 }
 $demoType = $demoType.ToLower()
