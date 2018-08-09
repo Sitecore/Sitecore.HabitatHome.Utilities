@@ -1,11 +1,11 @@
 Param(
     [string] $subscriptionId,
-    [string] $snapshotPrefix = "habitathome",
     [ValidateSet('xp', 'xc')]
     [string]$demoType,
-    [string[]] $regions = @("na", "emea", "ga", "ea"),
 	[Parameter(Mandatory = $true)]
-    [string] $version
+    [string] $version,
+    [string[]] $regions = @("na", "emea", "ga", "ea"),
+    [string] $snapshotPrefix = "habitathome"
 
 
 )
