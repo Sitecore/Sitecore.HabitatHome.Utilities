@@ -1,14 +1,15 @@
 Param(
     [string] $subscriptionId,
+    [ValidateSet('xp', 'xc')]
+    [string] $demoType,
+	[Parameter(Mandatory = $true)]
+    [string] $version,
+    [string] $suffix = "master",
     [string] $sourceResourceGroupNamePrefix = "habitathome",
     [string] $snapshotPrefix = "habitathome",
     [string] $location = "eastus",
-    [string] $snapshotDestinationResourceGroup = "habitathome-demo-snapshot",
-    [ValidateSet('xp', 'xc')]
-    [string] $demoType,
-    [string] $suffix = "master",
-	[Parameter(Mandatory = $true)]
-    [string] $version
+    [string] $snapshotDestinationResourceGroup = "habitathome-demo-snapshot"
+
 )
 $account = Get-AzureRMContext | Select-Object Account
 

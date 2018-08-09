@@ -4,7 +4,8 @@ Param(
     [string] $HostName,
     [string] $CertificateName,
     [int] $Port = 443,
-    [switch] $SkipCreateCert
+    [switch] $SkipCreateCert,
+    [switch] $SslOnly
 )
 
 #####################################################
@@ -56,29 +57,22 @@ function Install-Assets {
 }
 function Add-SSLSiteBindingWithCertificate {
     try {
+        $params = @{
+            Path            = $site.addSiteBindingWithSSLPath 
+            SiteName        = $siteName 
+            WebRoot         = $site.webRoot 
+            HostHeader      = $HostName 
+            Port            = $Port
+            CertPath        = $assets.certificatesPath
+            CertificateName = $CertificateName
+            Skip            = @("")
+        }
         if ($SkipCreateCert) {
-            $params = @{
-                Path            = $site.addSiteBindingWithSSLPath 
-                SiteName        = $siteName 
-                WebRoot         = $site.webRoot 
-                HostHeader      = $HostName 
-                Port            = $Port
-                CertPath        = $assets.certificatesPath
-                CertificateName = $CertificateName
-                Skip            = "CreatePaths", "CreateRootCert", "ImportRootCertificate", "CreateSignedCert"
-            }
+            $params.Skip += "CreatePaths", "CreateRootCert", "ImportRootCertificate", "CreateSignedCert"
         }
-        else {
-            $params = @{
-                Path       = $site.addSiteBindingWithSSLPath 
-                SiteName   = $siteName 
-                WebRoot    = $site.webRoot 
-                HostHeader = $HostName 
-                Port       = $Port
-                CertPath   = $assets.certificatesPath
-            }
+        if ($SslOnly) {
+            $params.Skip += "CreateBindings"
         }
-
         Install-SitecoreConfiguration  @params   -WorkingDirectory $(Join-Path $PWD "logs") -Verbose
     }
     catch {

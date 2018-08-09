@@ -1,17 +1,17 @@
 Param(
     [string] $subscriptionId,
-
     [ValidateSet('na', 'ga', 'emea', 'ea')]
     [string]$region = 'na',
     [ValidateSet('xp', 'xc')]
     [Parameter(Mandatory = $true)]
     [string]$demoType,
-    [string] $deploymentName = "habitathome",
-    [string] $sourceSnapshotPrefix = "habitathome",
     [Parameter(Mandatory = $true)]
-    [string] $sourceSnapshotSubscriptionId ,
+    [string] $version,
     [string] $virtualMachineSize = "Standard_D4s_v3",
-    [string] $version = "9.0.2.1"
+    [Parameter(Mandatory = $true)]
+    [string] $sourceSnapshotSubscriptionId ,    
+    [string] $deploymentName = "habitathome",
+    [string] $sourceSnapshotPrefix = "habitathome"
 )
 
 Import-Module -Name AzureRM -MaximumVersion 6.3.0 -Force
