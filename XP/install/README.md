@@ -1,7 +1,7 @@
-### Installation helpers for Sitecore XP
+### Installation helpers for Sitecore Experience Platform (XP)
 > These steps assume you have all of the prerequisites installed and have followed the instructions at [README.md](../../Prerequisits/README.md)
 
-Still in an elevated PowerShell sessions
+Still in an elevated PowerShell session
 
 - Browse to the solr folder
 	
@@ -12,6 +12,7 @@ Still in an elevated PowerShell sessions
 - Install Solr 
 	
 	`.\install-solr.ps1 -JREVersion <version of JRE you have installed ie: 1.8.0_181>`
+> **Known Issue**: error finding keytool. For now, exit and re-open Powershell and run the script again
 > Once setup is complete, the installer should load the solr 'home' page
 
 #### Prepare to install XP
@@ -45,4 +46,12 @@ The set-installation-overrides.ps1.example script needs to be renamed and modifi
 > Let's GO!
 
 `.\install-xp0.ps1`
+
+> You will be prompted for your dev.sitecore.com credentials - the required assets will be downloaded automatically.
+
+**KNOWN ISSUE**
+Downloading large files take time and are causing connection issues. 
+ After the download of larger files, you may get an error `Unable to read data from the transport connection: An existing connection was forcibly closed by the remote host.` The download was NOT completed successfully. 
+**WORKAROUND: manually download the larger Sitecore WDP Package required and place it into the XP/install/assets folder.**
+
 
