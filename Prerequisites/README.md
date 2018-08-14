@@ -1,8 +1,6 @@
 ### Suggested Steps for semi-automated install of prerequisites
 #### Boxstarter - install Windows features
 - Open PowerShell session as Administrator
-- Run Boxstarter bootstrapper (thanks @chiragp) which will install mandatory Windows Features
-	`wget -Uri 'https://raw.githubusercontent.com/chiragp/Sitecore-Dev-Machine/master/bootstrap.ps1' -OutFile "$($env:temp)\bootstrap.ps1";&Invoke-Command -ScriptBlock { &"$($env:temp)\bootstrap.ps1" -SkipInstallRecommendedApps}`
 #### Install other prerequisites and tools 
 - Create a working directory
 	`md c:\projects`

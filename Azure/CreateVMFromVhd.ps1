@@ -14,8 +14,6 @@ Param(
     [string] $sourceSnapshotPrefix = "habitathome"
 )
 
-Import-Module -Name AzureRM -MaximumVersion 6.3.0 -Force
-
 $account = Get-AzureRMContext | Select-Object Account
 
 if ($null -eq $account.Account) {
@@ -171,13 +169,13 @@ New-AzureRmDisk -DiskName $osDiskName -Disk `
         -Location $location -CreateOption Import `
         -StorageAccountId $storageAccountId `
         -SourceUri $osVHDUri) `
-    -ResourceGroupName $resourceGroupName
+        -ResourceGroupName $resourceGroupName
 $osDisk = Get-AzureRMDisk -DiskName $osDiskName -ResourceGroupName $resourceGroupName
 
 Write-Host "Setting VM Configuration" -ForegroundColor Green
 #Initialize virtual machine configuration
 $VirtualMachine = New-AzureRmVMConfig -VMName $virtualMachineName -VMSize $virtualMachineSize
-$VirtualMachine = Set-AzureRmVMOSDisk -VM $VirtualMachine -ManagedDiskId $osDisk.Id -CreateOption Attach -Windows
+$VirtualMachine = Set-AzureRmVMOSDisk -VM $VirtualMachine -ManagedDiskId $osDisk.Id -CreateOption Attach -Windows -StorageAccountType Premium_LRS
 $VirtualMachine = Add-AzureRmVMNetworkInterface -VM $VirtualMachine -Id $nic.Id
 
 #Create the virtual machine with Managed Disk
