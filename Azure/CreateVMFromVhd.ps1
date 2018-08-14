@@ -1,22 +1,22 @@
 Param(
     [string] $subscriptionId,
-
     [ValidateSet('na', 'ga', 'emea', 'ea')]
     [string]$region = 'na',
     [ValidateSet('xp', 'xc')]
     [Parameter(Mandatory = $true)]
     [string]$demoType,
+    [Parameter(Mandatory = $true)]
+    [string] $version,
+    [string] $virtualMachineSize = "Standard_D4s_v3",
+    [Parameter(Mandatory = $true)]
+    [string] $sourceSnapshotSubscriptionId = "8ae723fd-8e32-44bd-bd0e-f3f71631e11e",    
     [string] $deploymentName = "habitathome",
-    [string] $sourceSnapshotPrefix = "habitathome",
-    [string] $sourceSnapshotSubscriptionId = "8ae723fd-8e32-44bd-bd0e-f3f71631e11e" ,
-    [string] $virtualMachineSize = "Standard_DS13_v2_Promo"
+    [string] $sourceSnapshotPrefix = "habitathome"
 )
-
-Import-Module -Name AzureRM -MaximumVersion 6.3.0 -Force
 
 $account = Get-AzureRMContext | Select-Object Account
 
-if ($account.Account -eq $null) {
+if ($null -eq $account.Account) {
     Login-AzureRmAccount
 }
 
@@ -63,7 +63,7 @@ switch ($region) {
 $snapshotPrefix = ("{0}{1}" -f $sourceSnapshotPrefix, $demoType)
 
 #Provide the name of the snapshot that will be used to create OS disk
-$osVHDUri = ("https://{0}.blob.core.windows.net/snapshots/{1}-os.vhd" -f $storageContainerName, $snapshotPrefix)
+$osVHDUri = ("https://{0}.blob.core.windows.net/snapshots/{1}-{2}-os.vhd" -f $storageContainerName, $snapshotPrefix, $version)
 
 $resourceGroupName = $deploymentName
 
@@ -123,7 +123,6 @@ New-AzureRmResourceGroup -Name $resourceGroupName -Location $location
 Write-Host "Creating Public IP Address" -ForegroundColor Green
 New-AzureRmPublicIpAddress -Name ("{0}_ip" -f $deploymentName) -ResourceGroupName $resourceGroupName -Location $location -AllocationMethod Static
 $publicIp = Get-AzureRmPublicIpAddress -Name ("{0}_ip" -f $deploymentName) -ResourceGroupName $resourceGroupName
-
 #Get the virtual network where virtual machine will be hosted
 Write-Host "Creating Virtual Network" -ForegroundColor Green
 New-AzureRmVirtualNetwork -Name $virtualNetworkName -ResourceGroupName $resourceGroupName -Location $location -AddressPrefix 10.0.0.0/24
@@ -170,13 +169,13 @@ New-AzureRmDisk -DiskName $osDiskName -Disk `
         -Location $location -CreateOption Import `
         -StorageAccountId $storageAccountId `
         -SourceUri $osVHDUri) `
-    -ResourceGroupName $resourceGroupName
+        -ResourceGroupName $resourceGroupName
 $osDisk = Get-AzureRMDisk -DiskName $osDiskName -ResourceGroupName $resourceGroupName
 
 Write-Host "Setting VM Configuration" -ForegroundColor Green
 #Initialize virtual machine configuration
 $VirtualMachine = New-AzureRmVMConfig -VMName $virtualMachineName -VMSize $virtualMachineSize
-$VirtualMachine = Set-AzureRmVMOSDisk -VM $VirtualMachine -ManagedDiskId $osDisk.Id -CreateOption Attach -Windows
+$VirtualMachine = Set-AzureRmVMOSDisk -VM $VirtualMachine -ManagedDiskId $osDisk.Id -CreateOption Attach -Windows -StorageAccountType Premium_LRS
 $VirtualMachine = Add-AzureRmVMNetworkInterface -VM $VirtualMachine -Id $nic.Id
 
 #Create the virtual machine with Managed Disk
