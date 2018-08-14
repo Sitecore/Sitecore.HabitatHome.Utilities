@@ -65,7 +65,7 @@ function Add-SSLSiteBindingWithCertificate {
             Port            = $Port
             CertPath        = $assets.certificatesPath
             CertificateName = $CertificateName
-            Skip            = @("")
+            Skip            = @()
         }
         if ($SkipCreateCert) {
             $params.Skip += "CreatePaths", "CreateRootCert", "ImportRootCertificate", "CreateSignedCert"
