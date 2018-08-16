@@ -298,13 +298,6 @@
                 "HostName": "[parameter('SiteName')]"
             }
         },
-        "CreateBindingsWithDevelopmentThumprint": {
-            "Type": "AddWebFeatureSSL",
-            "Params": {
-                "HostName": "[parameter('SiteName')]",
-                "OutputDirectory": "[variable('Site.DataFolder')]"
-            }
-        },
         "SetPermissions": {
             "Type": "FilePermissions",
             "Params": {
@@ -410,6 +403,13 @@
             "Params": {
                 "Source": "[resolvepath(parameter('LicenseFile'))]",
                 "Destination": "[variable('Site.DataFolder')]"
+            }
+        },
+        "CreateBindingsWithDevelopmentThumprint": {
+            "Type": "AddWebFeatureSSL",
+            "Params": {
+                "HostName": "[parameter('SiteName')]",
+                "OutputDirectory": "[variable('Site.DataFolder')]"
             }
         },
         "StartAppPool": {
