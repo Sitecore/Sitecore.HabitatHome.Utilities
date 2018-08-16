@@ -298,6 +298,13 @@
                 "HostName": "[parameter('SiteName')]"
             }
         },
+        "CreateBindingsWithDevelopmentThumprint": {
+            "Type": "AddWebFeatureSSL",
+            "Params": {
+                "HostName": "[parameter('SiteName')]",
+                "OutputDirectory": "[variable('Site.DataFolder')]"
+            }
+        },
         "SetPermissions": {
             "Type": "FilePermissions",
             "Params": {
