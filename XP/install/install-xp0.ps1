@@ -399,22 +399,7 @@ function Install-Sitecore {
         write-host "Sitecore Setup Failed" -ForegroundColor Red
         throw
     }
-
-    try {
-        #Set web certificate on Sitecore site
-        $params = @{
-            Path     = $sitecore.sslConfigurationPath 
-            SiteName = $site.hostName 
-            WebRoot  = $site.WebRoot
-        }
-        Install-SitecoreConfiguration  @params -WorkingDirectory $(Join-Path $PWD "logs")
     }
-    catch {
-        write-host "Sitecore SSL Binding Failed" -ForegroundColor Red
-        throw
-    }
-    
-}
 
 function Enable-InstallationImprovements {
     try {

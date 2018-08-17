@@ -2,7 +2,8 @@ param(
     $instance = "",
     [ValidateSet('xp', 'xc')]
     $demoType,
-	$adminPassword = "b"
+    $adminUser = "admin",
+    $adminPassword = "b"
 )
 
 $config = Get-Content -Raw -Path "$PSSCriptRoot\warmup-config.json" | ConvertFrom-Json
@@ -76,7 +77,7 @@ Function RequestPage {
 }
 
 $demoType = $demoType.ToLower()
-$session = Get-SitecoreSession $instanceName "sitecore\admin" $adminPassword
+$session = Get-SitecoreSession $instanceName ("sitecore\{0}" -f $adminUser) $adminPassword
 $errors = 0
 
 Write-Host "Warming up XP Demo" -ForegroundColor Green
