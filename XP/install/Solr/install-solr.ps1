@@ -1,3 +1,5 @@
+# Credit primarily to jermdavis for the original script
+
 Param(
     [string]$solrVersion = "6.6.2",
     [string]$installFolder = "c:\solr",
