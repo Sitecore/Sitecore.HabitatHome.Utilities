@@ -1,10 +1,10 @@
 Param(
     [string] $hostName = "my.hostname",
     [string]$CertificateName = "my.hostname",
-    [string[]]$sites = @("habitathome.dev.local:443", "CommerceAuthoring_habitathome:5000", "CommerceMinions_habitathome:5010", "CommerceOps_habitathome:5015", "CommerceShops_habitathome:5020", "SitecoreBizFx:4200", "SitecoreIdentityServer:5050")
+    [string[]]$sites = @("CommerceAuthoring_habitathome:5000", "CommerceMinions_habitathome:5010", "CommerceOps_habitathome:5015", "CommerceShops_habitathome:5020", "SitecoreBizFx:4200", "SitecoreIdentityServer:5050")
 )
 
-Set-Location Resolve-Path "..\..\XP\Install"
+Set-Location (Resolve-Path "..\..\XP\Install")
 
 foreach ($site in $sites) {
     $siteName = $site.split(":")[0]
