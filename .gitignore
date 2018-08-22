@@ -36,7 +36,6 @@ settings.user.ps1
 *.user.config
 *.user.js
 *.user.targets
-# Hedgehog Team Development for Sitecore
 *.scproj.user
 IconCache/
 T4RenderCache/
@@ -51,20 +50,7 @@ configuration-xp0.json
 set-installation-overrides.ps1
 *.crt
 *.msi
-settings.user.ps1
-*.log
-*.zip
-
-# Hedgehog Team Development for Sitecore
-*.scproj.user
 *.config.user
-IconCache/
-T4RenderCache/
-BuiltFiles_*.txt
-/src/**/tds/*/Report/*
-
-
-
 Deploy-*
 */**/Downloads
 configuration-x*0.json
@@ -72,14 +58,12 @@ configuration-x*0.json
 */**/set-installation-overrides.ps1
 XC/install/assets/Commerce
 */**/Resources/Modules
-
+*.tgz
+*.update
 InstallUtil.InstallLog
-
 /FrontEnd/**/node_modules
-
 logs
 *.dll
-deploy/
 publishTemp
 Publish
-/XP/install/dev.creds.xml
+dev.creds.xml

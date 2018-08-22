@@ -1,18 +1,5 @@
-// -------------------------------------------------------------------------- //
-//         Sitecore Install Framework - Sitecore Solr Configuration           //
-//                                                                            //
-//  Run this configuration on your Solr instance to configure the cores for   //
-//  an Sitecore deployment. If the cores exist, they will be overwritten.     //
-//                                                                            //
-//  NOTE: Only single line comments are accepted in configurations.           //
-// -------------------------------------------------------------------------- //
-
 {
     "Parameters": {
-        // Parameters are values that may be passed when Install-SitecoreConfiguration is called.
-        // Parameters must declare a Type and may declare a DefaultValue and Description.
-        // Parameters with no DefaultValue are required when Install-SitecoreConfiguration is called.
-
         "SolrUrl": {
             "Type": "string",
             "DefaultValue": "https://localhost:8983/solr",
@@ -40,26 +27,12 @@
         }
     },
     "Variables": {
-        // Variables are values calculated in a configuration.
-        // They can reference Parameters, other Variables, and config functions.
-
-        // Resolves the full path to Solr on disk in case a relative path was passed.
         "Solr.FullRoot":    "[resolvepath(parameter('SolrRoot'))]",
-
-        // Resolves the full solr folder path on disk.
         "Solr.Server":      "[joinpath(variable('Solr.FullRoot'), 'server', 'solr')]",
-
-        // Resolves the full path for the base configset to use for each core.
         "Solr.BaseConfigs": "[joinpath(variable('Solr.Server'), 'configsets', parameter('BaseConfig'))]",
-
-        // Solr schema file to be modified.
         "Solr.SchemaFileName": "managed-schema",
-
-        // Solr schema xpaths to be modified.
         "Solr.Xpath.SchemaRoot": "//schema",
         "Solr.Xpath.UniqueKey": "[concat(variable('Solr.Xpath.SchemaRoot'), '/uniqueKey')]",
-
-        // The solr unique field info.
         "Solr.UniqueField" : "_uniqueid",
         "Solr.UniqueField.Attributes": {
             "name" : "[variable('Solr.UniqueField')]",
@@ -68,8 +41,6 @@
             "required": "true",
             "stored": "true"
         },
-
-        // The names of the cores to create.
         "Core.Name":        "[concat(parameter('CorePrefix'), '_core_index')]",
         "Master.Name":      "[concat(parameter('CorePrefix'), '_master_index')]",
         "Web.Name":         "[concat(parameter('CorePrefix'), '_web_index')]",
@@ -81,8 +52,6 @@
         "Suggested.Name":   "[concat(parameter('CorePrefix'), '_suggested_test_index')]",
         "FXM.Master.Name":  "[concat(parameter('CorePrefix'), '_fxm_master_index')]",
         "FXM.Web.Name":     "[concat(parameter('CorePrefix'), '_fxm_web_index')]",
-
-        // The destination paths of the cores to create.
         "Core.Root":        "[joinpath(variable('Solr.Server'), variable('Core.Name'))]",
         "Master.Root":      "[joinpath(variable('Solr.Server'), variable('Master.Name'))]",
         "Web.Root":         "[joinpath(variable('Solr.Server'), variable('Web.Name'))]",
@@ -94,8 +63,6 @@
         "Suggested.Root":   "[joinpath(variable('Solr.Server'), variable('Suggested.Name'))]",
         "FXM.Master.Root":  "[joinpath(variable('Solr.Server'), variable('FXM.Master.Name'))]",
         "FXM.Web.Root":     "[joinpath(variable('Solr.Server'), variable('FXM.Web.Name'))]",
-
-        // The destination paths for the base configurations of each core.
         "Core.Conf":        "[joinpath(variable('Core.Root'), 'conf')]",
         "Master.Conf":      "[joinpath(variable('Master.Root'), 'conf')]",
         "Web.Conf":         "[joinpath(variable('Web.Root'), 'conf')]",
@@ -109,13 +76,7 @@
         "FXM.Web.Conf":     "[joinpath(variable('FXM.Web.Root'), 'conf')]"
     },
     "Tasks": {
-        // Tasks are separate units of work in a configuration.
-        // Each task is an action that will be completed when Install-SitecoreConfiguration is called.
-        // By default, tasks are applied in the order they are declared.
-        // Tasks may reference Parameters, Variables, and config functions.
-
         "StopSolr": {
-            // Stops the Solr service if it is running.
             "Type": "ManageService",
             "Params":{
                 "Name": "[parameter('SolrService')]",
@@ -124,7 +85,6 @@
             }
         },
         "CleanCores": {
-            // Creates/clears core paths.
             "Type": "EnsurePath",
             "Params":{
                 "Clean": [
@@ -143,7 +103,6 @@
             }
         },
         "PrepareCores": {
-            // Copies base configs into the core paths.
             "Type": "Copy",
             "Params":[
                 { "Source": "[joinpath(variable('Solr.BaseConfigs'), '*')]", "Destination": "[variable('Core.Root')]" },
@@ -160,7 +119,6 @@
             ]
         },
         "AddSchemaUniqueKeyField": {
-            // Amends the core managed schema uniqueKey element
             "Type": "SetXml",
             "Params": [
                 { "FilePath": "[joinpath(variable('Core.Conf'), variable('Solr.SchemaFileName'))]", "Xpath":"[variable('Solr.Xpath.SchemaRoot')]", "Element": "field", "Attributes": "[variable('Solr.UniqueField.Attributes')]" },
@@ -177,7 +135,6 @@
             ]
         },
         "UpdateSchemaUniqueKey": {
-            // Amends the core managed schema uniqueKey element
             "Type": "SetXml",
             "Params": [
                 { "FilePath": "[joinpath(variable('Core.Conf'), 'managed-schema')]", "Xpath":"[variable('Solr.Xpath.UniqueKey')]", "Value": "[variable('Solr.UniqueField')]" },
@@ -194,7 +151,6 @@
             ]
         },
         "StartSolr": {
-            // Starts the Solr service.
             "Type": "ManageService",
             "Params":{
                 "Name": "[parameter('SolrService')]",
@@ -203,7 +159,6 @@
             }
         },
         "CreateCores":{
-            // Tells Solr to create the new cores.
             "Type": "ManageSolrCore",
             "Params": [
                 { "Action": "Create", "Address": "[parameter('SolrUrl')]", "Arguments": { "name": "[variable('Core.Name')]", "property.update.autoCreateFields": "false" } },

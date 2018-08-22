@@ -19,31 +19,35 @@ $assets.root = "$PSScriptRoot\assets"
 $assets.downloadFolder = Join-Path $assets.root "Downloads"
 
 #Commerce
-$assets.commerce.nugetPackageLocation = "http://nuget1ca2/nuget/Commerce/"
-$assets.commerce.nugetPackageName = "Sitecore.Commerce.ReleasePackage.Content"
-$assets.commerce.nugetPackageVersion = "2.1.55"
-$assets.commerce.packageUrl = "https://v9assets.blob.core.windows.net/v9-onprem-assets/Sitecore.Commerce.2018.03-2.1.55.zip?sv=2017-04-17&ss=bfqt&srt=sco&sp=rwdlacup&se=2027-11-09T20%3A11%3A50Z&st=2017-11-09T12%3A11%3A50Z&spr=https&sig=naspk%2BQflDLjyuC6gfXw4OZKvhhxzTlTvDctfw%2FByj8%3D"
+$assets.commerce.packageName = "Sitecore.Commerce.2018.07-2.2.126.zip"
+$assets.commerce.packageUrl = "https://dev.sitecore.net/~/media/F374366CA5C649C99B09D35D5EF1BFCE.ashx"
 $assets.commerce.installationFolder = Join-Path $assets.root "Commerce"
 
 
 #Commerce Files to Extract
 $sifCommerceVersion = $assets.commerce.filesToExtract | Where-Object { $_.name -eq "SIF.Sitecore.Commerce"} 
-$sifCommerceVersion.version = "1.1.4"
+$sifCommerceVersion.version = "1.2.14"
+
 $assets.commerce.sifCommerceRoot = Join-Path $assets.commerce.installationFolder $($sifCommerceVersion.name + "." + $sifCommerceVersion.version)
+
 $commerceEngineVersion = $assets.commerce.filesToExtract | Where-Object { $_.name -eq "Sitecore.Commerce.Engine"} 
-$commerceEngineVersion.version = "2.1.55"
+$commerceEngineVersion.version = "2.2.126"
 
 $commerceEngineSDKVersion = $assets.commerce.filesToExtract | Where-Object { $_.name -eq "Sitecore.Commerce.Engine.SDK"} 
-$commerceEngineSDKVersion.version = "2.1.10"
+$commerceEngineSDKVersion.version = "2.2.72"
 
 $bizFxVersion = $assets.commerce.filesToExtract | Where-Object { $_.name -eq "Sitecore.BizFX"} 
-$bizFxVersion.version = "1.1.9"
+$bizFxVersion.version = "1.2.19"
+
+$identityServerVersion = $assets.commerce.filesToExtract | Where-Object { $_.name -eq "Sitecore.IdentityServer"} 
+$identityServerVersion.version = "1.2.3"
 
 # Settings
 $site = $json.settings.site
 # Commerce Settings
 $commerce = $json.settings.commerce
-$commerce.storefrontPrefix = $site.habitatHomePrefix
+$commerce.engineConfigurationPath = ([IO.Path]::Combine($assets.root, "Resources","Configuration","Commerce","HabitatHome","set-engine-hostname.json"))
+$commerce.storefrontPrefix = $site.prefix
 $commerce.storefrontHostName = $commerce.storefrontPrefix + "." + $site.suffix
 
 $commerce.serviceAccountDomain = "$($Env:COMPUTERNAME)"
