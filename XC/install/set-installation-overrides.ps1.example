@@ -12,7 +12,6 @@ $assets = $json.assets
 $assets.root = "$PSScriptRoot\assets"
 $assets.downloadFolder = Join-Path $assets.root "Downloads"
 #Commerce
-$assets.commerce.installationFolder = Join-Path $assets.root "Commerce"
 
 # Settings
 
@@ -20,7 +19,7 @@ $assets.commerce.installationFolder = Join-Path $assets.root "Commerce"
 $site = $json.settings.site
 
 $commerce = $json.settings.commerce
-$commerce.storefrontPrefix = $site.habitatHomePrefix
+$commerce.storefrontPrefix = $site.prefix
 $commerce.storefrontHostName = $commerce.storefrontPrefix + "." + $site.suffix
 
 $commerce.serviceAccountDomain = "$($Env:COMPUTERNAME)"

@@ -1,12 +1,4 @@
-﻿// -------------------------------------------------------------------------- //
-//         Sitecore Install Framework - Initialize Commerce Services          //
-//                                                                            //
-//  Run this configuration to initialize Commerce Services.                   //
-//                                                                            //
-//  NOTE: Only single line comments are accepted in configurations.           //
-// -------------------------------------------------------------------------- //
-
-{
+﻿{
   "Parameters": {
     "WebRoot": {
       "Type": "string",
@@ -23,10 +15,6 @@
     },
     "SitecoreAdminAccount": {
       "Type": "psobject",
-      "DefaultValue": {
-        "UserName": "sitecore\\admin",
-        "Password": "b"
-      },
       "Description": "Sitecore Admin account."
     },
     "CommerceServicesPostfix": {
@@ -44,7 +32,6 @@
     "CommerceShopsPhysicalPath": "[joinpath(parameter('WebRoot'),  variable('CommerceShops'))]",
     "CommerceAuthoringPhysicalPath": "[joinpath(parameter('WebRoot'),  variable('CommerceAuthoring'))]",
     "CommerceMinionsPhysicalPath": "[joinpath(parameter('WebRoot'),  variable('CommerceMinions'))]",
-
     "UrlCommerceShopsServicesBootstrap": "[concat('https://localhost:', concat(parameter('CommerceShopsServicesPort'), '/commerceops/Bootstrap()'))]",
     "InitializeParam": "/commerceops/InitializeEnvironment(environment='envNameValue')",
     "UrlInitializeEnvironment": "[concat('https://localhost:', concat(parameter('CommerceShopsServicesPort'), variable('InitializeParam')))]",

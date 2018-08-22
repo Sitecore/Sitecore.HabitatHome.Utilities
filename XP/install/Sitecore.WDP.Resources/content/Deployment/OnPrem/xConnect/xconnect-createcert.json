@@ -23,35 +23,12 @@
         }
     },
     "Variables": {
-        // The DNS name of the root certificate.
         "Root.Cert.DnsName": "[concat('DO_NOT_TRUST_', parameter('RootCertFileName'))]",
-        // The certificate store for the root certificate.
-        "Root.Cert.Store": "Cert:\\LocalMachine\\Root",
-        // The certificate store for the client certificate.
-        "Client.Cert.Store": "Cert:\\LocalMachine\\My",
-        // Variable to detect user supplied string and generate a secure password as required.
-        "Export.Password" : "[if(variable('User.Supplied.Password'),variable('Secure.Password'),variable('Convert.User.Password'))]",
-        // Check for user supplied password.
-        "User.Supplied.Password" : "[equal(parameter('ExportPassword'),'SIF-Default')]",
-        // Conversion of password to a secure string.
-        "Secure.Password" : "[ConvertToSecureString(String:variable('Password.String'),AsPlainText:true,Force:true)]",
-        // Password generated from the internal config function.
-        "Password.String" : "[RandomString(Length:20,EnforceComplexity:True)]",
-        // Convert User password to Secure String
-        "Convert.User.Password" : "[ConvertToSecureString(String:parameter('ExportPassword'),AsPlainText:true,Force:true)]"
-    },
-    // Extra registrations.
-    "Register":{
-        "Tasks" :{
-            "WriteOutput" : "Write-Output"
-        },
-        "ConfigFunction": {
-            "ConvertToSecureString" :"ConvertTo-SecureString"
-        }
+        "Root.Cert.Store": "cert:\\LocalMachine\\Root",
+        "Client.Cert.Store": "cert:\\LocalMachine\\My"
     },
     "Tasks": {
         "CreatePaths": {
-            // Create the physical disk path.
             "Type": "EnsurePath",
             "Params": {
                 "Exists": [
@@ -68,21 +45,22 @@
             "Skip" : "[not(variable('User.Supplied.Password'))]"
         },
         "CreateRootCert": {
-            // Create the root certificate.
             "Type": "NewRootCertificate",
             "Params": {
                 "Path": "[parameter('CertPath')]",
                 "Name": "[parameter('RootCertFileName')]",
-                "DnsName": [
-                    "[variable('Root.Cert.DnsName')]",
-                    "127.0.0.1"
-                ],
-                "IncludePrivateKey" : true,
-                "Password" : "[variable('Export.Password')]"
+                "StoreLocation": "CurrentUser",
+                "DnsName": "[variable('Root.Cert.DnsName')]"
+            }
+        },
+        "ImportRootCertificate": {
+            "Type": "ImportCertificate",
+            "Params": {
+                "CertStoreLocation": "[variable('Root.Cert.Store')]",
+                "FilePath": "[concat(joinpath(parameter('CertPath'), parameter('RootCertFileName')), '.crt')]"
             }
         },
         "CreateSignedCert": {
-            // Create a certificate signed by the root authority.
             "Type": "NewSignedCertificate",
             "Params": {
                 "Signer": "[GetCertificate(variable('Root.Cert.DnsName'), variable('Root.Cert.Store'))]",
