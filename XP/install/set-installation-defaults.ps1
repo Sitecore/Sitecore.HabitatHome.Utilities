@@ -41,32 +41,55 @@ $sql = $json.settings.sql
 $sql.server = "."
 $sql.adminUser = "sa"
 $sql.adminPassword = "12345"
+$sql.coreUser = $site.prefix + "coreuser"
+$sql.corePassword = "Test12345"
+$sql.masterUser = $site.prefix + "masteruser"
+$sql.masterPassword = "Test12345"
+$sql.webUser = $site.prefix + "webuser"
+$sql.webPassword = "Test12345"
+$sql.collectionUser = $site.prefix + "collectionuser"
+$sql.collectionPassword = "Test12345"
+$sql.reportingUser = $site.prefix + "reportinguser"
+$sql.reportingPassword = "Test12345"
+$sql.processingPoolsUser = $site.prefix + "poolsuser"
+$sql.processingPoolsPassword = "Test12345"
+$sql.processingTasksUser = $site.prefix + "tasksuser"
+$sql.processingTasksPassword = "Test12345"
+$sql.referenceDataUser = $site.prefix + "referencedatauser"
+$sql.referenceDataPassword = "Test12345"
+$sql.marketingAutomationUser = $site.prefix + "marketingautomationuser"
+$sql.marketingAutomationPassword = "Test12345"
+$sql.formsUser = $site.prefix + "formsuser"
+$sql.formsPassword = "Test12345"
+$sql.exmMasterUser = $site.prefix + "exmmasteruser"
+$sql.exmMasterPassword = "Test12345"
+$sql.messagingUser = $site.prefix + "messaginguser"
+$sql.messagingPassword = "Test12345"
 $sql.minimumVersion="13.0.4001"
 
 Write-Host "Setting default 'xConnect' parameters"
 # XConnect Parameters
 $xConnect = $json.settings.xConnect
-
-$xConnect.ConfigurationPath = (Get-ChildItem $pwd -filter "xconnect-xp0.json" -Recurse).FullName 
+$xConnect.ConfigurationPath = (Get-ChildItem $pwd -filter "xconnect-xp0.json" -Recurse).FullName
 $xConnect.certificateConfigurationPath = (Get-ChildItem $pwd -filter "xconnect-createcert.json" -Recurse).FullName
-$xConnect.solrConfigurationPath = (Get-ChildItem $pwd -filter "xconnect-solr.json" -Recurse).FullName 
+$xConnect.solrConfigurationPath = (Get-ChildItem $pwd -filter "xconnect-solr.json" -Recurse).FullName
 $xConnect.packagePath = Join-Path $assets.root $("Sitecore " + $assets.sitecoreVersion + " (OnPrem)_xp0xconnect.scwdp.zip")
 $xConnect.siteName = $site.prefix + "_xconnect." + $site.suffix
 $xConnect.certificateName = [string]::Join(".", @($site.prefix, $site.suffix, "xConnect.Client"))
 $xConnect.siteRoot = Join-Path $site.webRoot -ChildPath $xConnect.siteName
-$xConnect.sqlCollectionUser = $site.prefix + "collectionuser"
-$xConnect.sqlCollectionPassword = "Test12345"
 
 Write-Host "Setting default 'Sitecore' parameters"
-
 # Sitecore Parameters
 $sitecore = $json.settings.sitecore
-
-$sitecore.solrConfigurationPath =  (Get-ChildItem $pwd -filter "sitecore-solr.json" -Recurse).FullName 
-$sitecore.configurationPath = (Get-ChildItem $pwd -filter "sitecore-xp0.json" -Recurse).FullName 
+$sitecore.solrConfigurationPath =  (Get-ChildItem $pwd -filter "sitecore-solr.json" -Recurse).FullName
+$sitecore.configurationPath = (Get-ChildItem $pwd -filter "sitecore-xp0.json" -Recurse).FullName
 $sitecore.sslConfigurationPath = "$PSScriptRoot\certificates\sitecore-ssl.json"
 $sitecore.packagePath = Join-Path $assets.root $("Sitecore " + $assets.sitecoreVersion +" (OnPrem)_single.scwdp.zip")
 $sitecore.siteRoot = Join-Path $site.webRoot -ChildPath $site.hostName
+$sitecore.adminPassword = "b"
+$sitecore.exmCryptographicKey = "0x0000000000000000000000000000000000000000000000000000000000000000"
+$sitecore.exmAuthenticationKey = "0x0000000000000000000000000000000000000000000000000000000000000000"
+$sitecore.telerikEncryptionKey = "PutYourCustomEncryptionKeyHereFrom32To256CharactersLong"
 
 Write-Host "Setting default 'Solr' parameters"
 # Solr Parameters
@@ -76,6 +99,7 @@ $solr.root = "c:\solr"
 $solr.serviceName = "Solr"
 
 Write-Host "Setting default 'modules' parameters"
+# Modules
 $modules = $json.modules
 
 $spe = $modules | Where-Object { $_.id -eq "spe"}

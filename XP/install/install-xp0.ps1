@@ -116,6 +116,7 @@ function Confirm-Prerequisites {
     #Enable Contained Databases
     Write-Host "Enable contained databases" -ForegroundColor Green
     try {
+        # This command can set the location to SQLSERVER:\
         Invoke-Sqlcmd -ServerInstance $sql.server `
             -Username $sql.adminUser `
             -Password $sql.adminPassword `
@@ -125,6 +126,9 @@ function Confirm-Prerequisites {
         write-host "Set Enable contained databases failed" -ForegroundColor Red
         throw
     }
+
+    # Reset location to script root
+    Set-Location $PSScriptRoot
 
     # Verify Solr
     Write-Host "Verifying Solr connection" -ForegroundColor Green
@@ -310,38 +314,44 @@ function Install-XConnect {
         write-host "XConnect Certificate Creation Failed" -ForegroundColor Red
         throw
     }
-    
+
     #Install xConnect
     try {
         $params = @{
-            Path                  = $xConnect.ConfigurationPath 
-            Package               = $xConnect.PackagePath 
-            LicenseFile           = $assets.licenseFilePath 
-            SiteName              = $xConnect.siteName 
-            XConnectCert          = $xConnect.certificateName 
-            SqlDbPrefix           = $site.prefix 
-            SolrCorePrefix        = $site.prefix 
-            SqlAdminUser          = $sql.adminUser 
-            SqlAdminPassword      = $sql.adminPassword 
-            SqlServer             = $sql.server 
-            SqlCollectionUser     = $xConnect.sqlCollectionUser 
-            SqlCollectionPassword = $xConnect.sqlCollectionPassword 
-            SolrUrl               = $solr.url 
-            WebRoot               = $site.webRoot
+            Path                           = $xConnect.ConfigurationPath
+            Package                        = $xConnect.PackagePath
+            LicenseFile                    = $assets.licenseFilePath
+            SiteName                       = $xConnect.siteName
+            XConnectCert                   = $xConnect.certificateName
+            SqlDbPrefix                    = $site.prefix
+            SolrCorePrefix                 = $site.prefix
+            SqlAdminUser                   = $sql.adminUser
+            SqlAdminPassword               = $sql.adminPassword
+            SqlServer                      = $sql.server
+            SqlCollectionUser              = $sql.collectionUser
+            SqlCollectionPassword          = $sql.collectionPassword
+            SqlProcessingPoolsUser         = $sql.processingPoolsUser
+            SqlProcessingPoolsPassword     = $sql.processingPoolsPassword
+            SqlReferenceDataUser           = $sql.referenceDataUser
+            SqlReferenceDataPassword       = $sql.referenceDataPassword
+            SqlMarketingAutomationUser     = $sql.marketingAutomationUser
+            SqlMarketingAutomationPassword = $sql.marketingAutomationPassword
+            SqlMessagingUser               = $sql.messagingUser
+            SqlMessagingPassword           = $sql.messagingPassword
+            SolrUrl                        = $solr.url
+            WebRoot                        = $site.webRoot
         }
         Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs")
-        
     }
     catch {
         write-host "XConnect Setup Failed" -ForegroundColor Red
         throw
     }
-                             
 
     #Set rights on the xDB connection database
     Write-Host "Setting Collection User rights" -ForegroundColor Green
     try {
-        $sqlVariables = "DatabasePrefix = $($site.prefix)", "UserName = $($xConnect.sqlCollectionUser)", "Password = $($xConnect.sqlCollectionPassword)"
+        $sqlVariables = "DatabasePrefix = $($site.prefix)", "UserName = $($sql.collectionUser)", "Password = $($sql.collectionPassword)"
         Invoke-Sqlcmd -ServerInstance $sql.server `
             -Username $sql.adminUser `
             -Password $sql.adminPassword `
@@ -359,10 +369,10 @@ function Install-Sitecore {
     try {
         #Install Sitecore Solr
         $params = @{
-            Path        = $sitecore.solrConfigurationPath 
-            SolrUrl     = $solr.url 
-            SolrRoot    = $solr.root 
-            SolrService = $solr.serviceName 
+            Path        = $sitecore.solrConfigurationPath
+            SolrUrl     = $solr.url
+            SolrRoot    = $solr.root
+            SolrService = $solr.serviceName
             CorePrefix  = $site.prefix
         }
         Install-SitecoreConfiguration  @params -WorkingDirectory $(Join-Path $PWD "logs")
@@ -376,30 +386,55 @@ function Install-Sitecore {
         #Install Sitecore
         $params = @{
             Path                                 = $sitecore.configurationPath
-            Package                              = $sitecore.packagePath 
-            LicenseFile                          = $assets.licenseFilePath 
-            SiteName                             = $site.hostName 
-            XConnectCert                         = $xConnect.certificateName 
-            SqlDbPrefix                          = $site.prefix 
-            SolrCorePrefix                       = $site.prefix 
-            SqlAdminUser                         = $sql.adminUser 
-            SqlAdminPassword                     = $sql.adminPassword 
-            SqlServer                            = $sql.server 
+            Package                              = $sitecore.packagePath
+            LicenseFile                          = $assets.licenseFilePath
+            SiteName                             = $site.hostName
+            XConnectCert                         = $xConnect.certificateName
+            SqlDbPrefix                          = $site.prefix
+            SolrCorePrefix                       = $site.prefix
+            SitecoreAdminPassword                = $sitecore.adminPassword
+            SqlAdminUser                         = $sql.adminUser
+            SqlAdminPassword                     = $sql.adminPassword
+            SqlCoreUser                          = $sql.coreUser
+            SqlCorePassword                      = $sql.corePassword
+            SqlMasterUser                        = $sql.masterUser
+            SqlMasterPassword                    = $sql.masterPassword
+            SqlWebUser                           = $sql.webUser
+            SqlWebPassword                       = $sql.webPassword
+            SqlReportingUser                     = $sql.reportingUser
+            SqlReportingPassword                 = $sql.reportingPassword
+            SqlProcessingPoolsUser               = $sql.processingPoolsUser
+            SqlProcessingPoolsPassword           = $sql.processingPoolsPassword
+            SqlProcessingTasksUser               = $sql.processingTasksUser
+            SqlProcessingTasksPassword           = $sql.processingTasksPassword
+            SqlReferenceDataUser                 = $sql.referenceDataUser
+            SqlReferenceDataPassword             = $sql.referenceDataPassword
+            SqlMarketingAutomationUser           = $sql.marketingAutomationUser
+            SqlMarketingAutomationPassword       = $sql.marketingAutomationPassword
+            SqlFormsUser                         = $sql.formsUser
+            SqlFormsPassword                     = $sql.formsPassword
+            SqlExmMasterUser                     = $sql.exmMasterUser
+            SqlExmMasterPassword                 = $sql.exmMasterPassword
+            SqlMessagingUser                     = $sql.messagingUser
+            SqlMessagingPassword                 = $sql.messagingPassword
+            SqlServer                            = $sql.server
+            EXMCryptographicKey                  = $sitecore.exmCryptographicKey
+            EXMAuthenticationKey                 = $sitecore.exmAuthenticationKey
             SolrUrl                              = $solr.url
-            XConnectCollectionService            = "https://$($xConnect.siteName)" 
-            XConnectReferenceDataService         = "https://$($xConnect.siteName)" 
-            MarketingAutomationOperationsService = "https://$($xConnect.siteName)" 
+            XConnectCollectionService            = "https://$($xConnect.siteName)"
+            XConnectReferenceDataService         = "https://$($xConnect.siteName)"
+            MarketingAutomationOperationsService = "https://$($xConnect.siteName)"
             MarketingAutomationReportingService  = "https://$($xConnect.siteName)"
+            TelerikEncryptionKey                 = $sitecore.telerikEncryptionKey
             WebRoot                              = $site.webRoot
         }
         Install-SitecoreConfiguration  @params -WorkingDirectory $(Join-Path $PWD "logs")
-            
     }
     catch {
         write-host "Sitecore Setup Failed" -ForegroundColor Red
         throw
     }
-    }
+}
 
 function Enable-InstallationImprovements {
     try {
@@ -432,6 +467,8 @@ function Disable-InstallationImprovements {
 }
 
 function Copy-Tools {
+    #Copy InstallPackage.aspx to webroot
+
     if (!(Test-Path $assets.installPackagePath)) {
         throw "$($assets.installPackagePath) not found"
     }
@@ -489,8 +526,6 @@ Function Set-ModulesPath {
 }
 
 function Install-OptionalModules {
-    #Copy InstallPackage.aspx to webroot
-    
     $packageDestination = Join-Path $sitecore.siteRoot "\temp\Packages"
     foreach ($module in $modules | Where-Object {$_.install -eq $true}) {
         Write-Host "Copying $($module.name) to the $packageDestination"
