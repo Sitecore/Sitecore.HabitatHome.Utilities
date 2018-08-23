@@ -24,13 +24,35 @@
             "habitatHomeSslCertificateName":"@@site.habitatHomeSslCertificateName@@",
             "addSiteBindingWithSSLPath":"@@site.addSiteBindingWithSSLPath@@"
         },
-        
         "sql": {
             "server": "@@sql.server@@",
             "adminUser": "@@sql.adminUser@@",
             "adminPassword": "@@sql.adminPassword@@",
+            "coreUser": "@@sql.coreUser@@",
+            "corePassword": "@@sql.corePassword@@",
+            "masterUser": "@@sql.masterUser@@",
+            "masterPassword": "@@sql.masterPassword@@",
+            "webUser": "@@sql.webUser@@",
+            "webPassword": "@@sql.webPassword@@",
+            "collectionUser": "@@sql.collectionUser@@",
+            "collectionPassword": "@@sql.collectionPassword@@",
+            "reportingUser": "@@sql.reportingUser@@",
+            "reportingPassword": "@@sql.reportingPassword@@",
+            "processingPoolsUser": "@@sql.processingPoolsUser@@",
+            "processingPoolsPassword": "@@sql.processingPoolsPassword@@",
+            "processingTasksUser": "@@sql.processingTasksUser@@",
+            "processingTasksPassword": "@@sql.processingTasksPassword@@",
+            "referenceDataUser": "@@sql.referenceDataUser@@",
+            "referenceDataPassword": "@@sql.referenceDataPassword@@",
+            "marketingAutomationUser": "@@sql.marketingAutomationUser@@",
+            "marketingAutomationPassword": "@@sql.marketingAutomationPassword@@",
+            "formsUser": "@@sql.formsUser@@",
+            "formsPassword": "@@sql.formsPassword@@",
+            "exmMasterUser": "@@sql.exmMasterUser@@",
+            "exmMasterPassword": "@@sql.exmMasterPassword@@",
+            "messagingUser": "@@sql.messagingUser@@",
+            "messagingPassword": "@@sql.messagingPassword@@",
             "minimumVersion":"@@sql.minimumVersion@@"
-
         },
         "xConnect": {
             "configurationPath": "@@xConnect.configurationPath@@",
@@ -39,23 +61,23 @@
             "packagePath": "@@xConnect.packagePath@@",
             "siteName": "@@xConnect.siteName@@",
             "certificateName": "@@xConnect.certificate@@",
-            "siteRoot": "@@xConnect.siteRoot@@",
-            "sqlCollectionUser": "@@xConnect.sqlCollectionUser@@",
-            "sqlCollectionPassword": "@@xConnect.sqlConnectionPassword@@"
+            "siteRoot": "@@xConnect.siteRoot@@"
         },
         "sitecore": {
             "solrConfigurationPath": "@@sitecore.solrConfigurationPath@@",
             "configurationPath": "@@sitecore.configurationPath@@",
             "sslConfigurationPath": "@@sitecore.sslConfigurationPath@@",
             "packagePath": "@@sitecore.packagePath@@",
-            "siteRoot": "@@sitecore.siteRoot@@"
-
+            "siteRoot": "@@sitecore.siteRoot@@",
+            "adminPassword": "@@sitecore.adminPassword@@",
+            "exmCryptographicKey": "@@sitecore.exmCryptographicKey@@",
+            "exmAuthenticationKey": "@@sitecore.exmAuthenticationKey@@",
+            "telerikEncryptionKey": "@@sitecore.telerikEncryptionKey@@"
         },
         "solr": {
             "url": "@@solr.url@@",
             "root": "@@solr.root@@",
             "serviceName": "@@solr.serviceName@@"
-
         }
     },
     "modules":[
@@ -108,7 +130,4 @@
             "install":"@@modules.defDynamicsConnectInstall@@"
         }
     ]
-
-
-
 }
