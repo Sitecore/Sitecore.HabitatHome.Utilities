@@ -41,6 +41,7 @@ $solr.root = "c:\solr\solr-6.6.2"
 $solr.serviceName = "Solr-6.6.2"
 
 # SQL Settings
+$sql = $json.settings.sql
 $sql.server = "."
 $sql.adminUser = "sa"
 $sql.adminPassword = "12345"
