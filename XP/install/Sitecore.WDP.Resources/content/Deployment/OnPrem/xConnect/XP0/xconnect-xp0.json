@@ -1,124 +1,148 @@
 ﻿{
-    "Parameters": {
-        "Package": {
-            "Type": "string",
-            "Description": "The path to the Web Deploy package to deploy."
-        },
-        "LicenseFile": {
-            "Type": "string",
-            "Description": "The path to the Sitecore license file."
-        },
-        "SiteName": {
-            "Type": "string",
-            "DefaultValue": "XConnect",
-            "Description": "The name of the site to be deployed."
-        },
-        "XConnectCert": {
-            "Type": "string",
-            "Description": "The certificate to use for encryption. Provide the name or the thumbprint."
-        },
-        "SqlDbPrefix": {
-            "Type": "string",
-            "Description": "The prefix used for all Sql databases."
-        },
-        "SolrCorePrefix": {
-            "Type": "string",
-            "Description": "The prefix used for all Solr cores."
-        },
-        "SSLCert": {
-            "Type": "string",
-            "Description": "The certificate to use for HTTPS web bindings. Provide the name or the thumbprint. If not provided a certificate will be generated.",
-            "DefaultValue": ""
-        },
-        "SqlAdminUser": {
-            "Type": "string",
-            "DefaultValue": "sa",
-            "Description": "The Sql admin user account to use when installing databases."
-        },
-        "SqlAdminPassword": {
-            "Type": "string",
-            "DefaultValue": "12345",
-            "Description": "The Sql admin password to use when installing databases."
-        },
-        "SolrUrl": {
-            "Type": "string",
-            "DefaultValue": "https://localhost:8983/solr",
-            "Description": "The Solr instance to use."
-        },
-        "SqlCollectionUser": {
-            "Type": "string",
-            "DefaultValue": "collectionuser",
-            "Description": "The Sql admin user account to use when installing databases."
-        },
-        "SqlCollectionPassword": {
-            "Type": "string",
-            "DefaultValue": "Test12345",
-            "Description": "The Sql admin password to use when installing databases."
-        },
-        "SqlProcessingPoolsUser": {
-            "Type": "string",
-            "DefaultValue": "poolsuser",
-            "Description": "The Sql user for the Processing Pools connection string in Sitecore."
-        },
-        "SqlProcessingPoolsPassword": {
-            "Type": "string",
-            "DefaultValue": "Test12345",
-            "Description": "The Sql password for the Processing Pools connection string in Sitecore."
-        },
-        "SqlReferenceDataUser": {
-            "Type": "string",
-            "DefaultValue": "referencedatauser",
-            "Description": "The Sql user for the Reference Data connection string in Sitecore."
-        },
-        "SqlReferenceDataPassword": {
-            "Type": "string",
-            "DefaultValue": "Test12345",
-            "Description": "The Sql password for the Reference Data connection string in Sitecore."
-        },
-        "SqlMarketingAutomationUser": {
-            "Type": "string",
-            "DefaultValue": "marketingautomationuser",
-            "Description": "The Sql user for the Marketing Automation connection string in Sitecore."
-        },
-        "SqlMarketingAutomationPassword": {
-            "Type": "string",
-            "DefaultValue": "Test12345",
-            "Description": "The Sql password for the Marketing Automation connection string in Sitecore."
-        },
-        "SqlMessagingUser": {
-            "Type": "string",
-            "DefaultValue": "messaginguser",
-            "Description": "The Sql user for the Messaging connection string in Sitecore."
-        },
-        "SqlMessagingPassword": {
-            "Type": "string",
-            "DefaultValue": "Test12345",
-            "Description": "The Sql password for the Messaging connection string in Sitecore."
-        },
-        "SqlServer": {
-            "Type": "string",
-            "DefaultValue": ".\\SQLSERVER",
-            "Description": "The Sql Server where databases will be installed."
-        },
-        "XConnectEnvironment": {
-            "Type": "string",
-            "DefaultValue": "Development",
-            "Description": "The configuration environment for this instance."
-        },
-      "XConnectLogLevel": {
-        "Type": "string",
-        "DefaultValue": "Information",
-        "Description": "The level of log information to output."
-      },
-        "WebRoot": {
-          "Type": "string",
-          "DefaultValue": "c:\\inetpub\\wwwroot",
-          "Description": "The physical path of the configured Web Root for the environment"
-        }
+  "Parameters": {
+    "Package": {
+      "Type": "string",
+      "Description": "The path to the Web Deploy package to deploy."
     },
+    "LicenseFile": {
+      "Type": "string",
+      "Description": "The path to the Sitecore license file."
+    },
+    "SiteName": {
+      "Type": "string",
+      "DefaultValue": "XConnect",
+      "Description": "The name of the site to be deployed."
+    },
+    "XConnectCert": {
+      "Type": "string",
+      "Description": "The certificate to use for encryption. Provide the name or the thumbprint."
+    },
+    "SqlDbPrefix": {
+      "Type": "string",
+      "Description": "The prefix used for all Sql databases."
+    },
+    "SolrCorePrefix": {
+      "Type": "string",
+      "Description": "The prefix used for all Solr cores."
+    },
+    "SSLCert": {
+      "Type": "string",
+      "Description": "The certificate to use for HTTPS web bindings. Provide the name or the thumbprint. If not provided a certificate will be generated.",
+      "DefaultValue": ""
+    },
+    "SqlAdminUser": {
+      "Type": "string",
+      "DefaultValue": "sa",
+      "Description": "The Sql admin user account to use when installing databases."
+    },
+    "SqlAdminPassword": {
+      "Type": "string",
+      "DefaultValue": "12345",
+      "Description": "The Sql admin password to use when installing databases."
+    },
+    "SolrUrl": {
+      "Type": "string",
+      "DefaultValue": "https://localhost:8983/solr",
+      "Description": "The Solr instance to use."
+    },
+    "SqlCollectionUser": {
+      "Type": "string",
+      "DefaultValue": "collectionuser",
+      "Description": "The Sql admin user account to use when installing databases."
+    },
+    "SqlCollectionPassword": {
+      "Type": "string",
+      "DefaultValue": "Test12345",
+      "Description": "The Sql admin password to use when installing databases."
+    },
+    "SqlProcessingPoolsUser": {
+      "Type": "string",
+      "DefaultValue": "poolsuser",
+      "Description": "The Sql user for the Processing Pools connection string in Sitecore."
+    },
+    "SqlProcessingPoolsPassword": {
+      "Type": "string",
+      "DefaultValue": "Test12345",
+      "Description": "The Sql password for the Processing Pools connection string in Sitecore."
+    },
+    "SqlReferenceDataUser": {
+      "Type": "string",
+      "DefaultValue": "referencedatauser",
+      "Description": "The Sql user for the Reference Data connection string in Sitecore."
+    },
+    "SqlReferenceDataPassword": {
+      "Type": "string",
+      "DefaultValue": "Test12345",
+      "Description": "The Sql password for the Reference Data connection string in Sitecore."
+    },
+    "SqlMarketingAutomationUser": {
+      "Type": "string",
+      "DefaultValue": "marketingautomationuser",
+      "Description": "The Sql user for the Marketing Automation connection string in Sitecore."
+    },
+    "SqlMarketingAutomationPassword": {
+      "Type": "string",
+      "DefaultValue": "Test12345",
+      "Description": "The Sql password for the Marketing Automation connection string in Sitecore."
+    },
+    "SqlMessagingUser": {
+      "Type": "string",
+      "DefaultValue": "messaginguser",
+      "Description": "The Sql user for the Messaging connection string in Sitecore."
+    },
+    "SqlMessagingPassword": {
+      "Type": "string",
+      "DefaultValue": "Test12345",
+      "Description": "The Sql password for the Messaging connection string in Sitecore."
+    },
+    "SqlProcessingEngineUser": {
+      "Type": "string",
+      "DefaultValue": "processingengineuser",
+      "Description": "The Sql user for the Processing Engine Tasks and Storage database connection strings in Sitecore."
+    },
+    "SqlProcessingEnginePassword": {
+      "Type": "string",
+      "DefaultValue": "Test12345",
+      "Description": "The Sql password for the Processing Engine Tasks and Storage database connection strings in Sitecore."
+    },
+    "SqlReportingUser": {
+      "Type": "string",
+      "DefaultValue": "reportinguser",
+      "Description": "The Sql user for the Reporting connection string in Sitecore."
+    },
+    "SqlReportingPassword": {
+      "Type": "string",
+      "DefaultValue": "Test12345",
+      "Description": "The Sql password for the Reporting connection string in Sitecore."
+    },
+    "SqlServer": {
+      "Type": "string",
+      "DefaultValue": ".\\SQLSERVER",
+      "Description": "The Sql Server where databases will be installed."
+    },
+    "XConnectEnvironment": {
+      "Type": "string",
+      "DefaultValue": "Development",
+      "Description": "The configuration environment for this instance."
+    },
+    "XConnectLogLevel": {
+      "Type": "string",
+      "DefaultValue": "Information",
+      "Description": "The level of log information to output."
+    },
+    "MachineLearningServerUrl": {
+      "Type": "string",
+      "DefaultValue": "",
+      "Description": "The Microsoft Machine Learning Server instance to use."
+    },
+    "WebRoot": {
+      "Type": "string",
+      "DefaultValue": "c:\\inetpub\\wwwroot",
+      "Description": "The physical path of the configured Web Root for the environment"
+    }
+  },
   "Variables": {
     "Sharding.Database.Prefix": "[concat(parameter('SqlDbPrefix'), '_Xdb.Collection.Shard')]",
-
     "Sql.Database.ShardMapManager": "[concat(variable('Sharding.Database.Prefix'), 'MapManager')]",
     "Sql.Database.Shard0": "[concat(variable('Sharding.Database.Prefix'), '0')]",
     "Sql.Database.Shard1": "[concat(variable('Sharding.Database.Prefix'), '1')]",
@@ -126,6 +150,9 @@
     "Sql.Database.MarketingAutomation": "[concat(parameter('SqlDbPrefix'), '_MarketingAutomation')]",
     "Sql.Database.Messaging": "[concat(parameter('SqlDbPrefix'), '_Messaging')]",
     "Sql.Database.Reference": "[concat(parameter('SqlDbPrefix'), '_ReferenceData')]",
+    "Sql.Database.Reporting": "[concat(parameter('SqlDbPrefix'), '_Reporting')]",
+    "Sql.Database.ProcessingEngineTasks": "[concat(parameter('SqlDbPrefix'), '_ProcessingEngineTasks')]",
+    "Sql.Database.ProcessingEngineStorage": "[concat(parameter('SqlDbPrefix'), '_ProcessingEngineStorage')]",
 
     "Security.CertificateStore": "Cert:\\Localmachine\\My",
     "Security.SSL.CertificateThumbprint": "[GetCertificateThumbprint(parameter('SSLCert'), variable('Security.CertificateStore'))]",
@@ -141,9 +168,17 @@
     "Services.MarketingAutomationEngine.InstallPath": "[joinpath(variable('Site.DataFolder'), 'jobs','continuous','AutomationEngine')]",
     "Services.MarketingAutomationEngine.Name": "[concat(parameter('SiteName'), '-MarketingAutomationService')]",
 
+    "Services.ProcessingEngine.InstallPath": "[joinpath(variable('Site.DataFolder'), 'jobs','continuous','ProcessingEngine')]",
+    "Services.ProcessingEngine.Name": "[concat(parameter('SiteName'), '-ProcessingEngineService')]",
+
     "Endpoint.MarketingAutomation": "[concat('https://', parameter('SiteName'))]",
 
     "Endpoint.ReferenceData": "[concat(variable('Endpoint.MarketingAutomation'), '/refdata')]",
+
+    "Endpoint.Collection": "[concat('https://', parameter('SiteName'))]",
+
+    "Endpoint.Processing.BlobStorage": "[concat('https://', parameter('SiteName'))]",
+    "Endpoint.Processing.TableStorage": "[concat('https://', parameter('SiteName'))]",
 
     "Sharding.Root.Path": "[joinpath(variable('Site.DataFolder'), 'collectiondeployment')]",
     "Sharding.Tool.Path": "[joinpath(variable('Sharding.Root.Path'), 'Sitecore.Xdb.Collection.Database.SqlShardingDeploymentTool.exe')]",
@@ -232,6 +267,11 @@
                     "Name": "[variable('Services.MarketingAutomationEngine.Name')]",
                     "Status": "Stopped",
                     "PostDelay": 3000
+                },
+                {
+                    "Name": "[variable('Services.ProcessingEngine.Name')]",
+                    "Status": "Stopped",
+                    "PostDelay": 3000
                 }
             ]
         },
@@ -239,7 +279,8 @@
             "Type": "RemoveService",
             "Params": [
                 { "Name": "[variable('Services.IndexWorker.Name')]" },
-                { "Name": "[variable('Services.MarketingAutomationEngine.Name')]" }
+                { "Name": "[variable('Services.MarketingAutomationEngine.Name')]" },
+                { "Name": "[variable('Services.ProcessingEngine.Name')]" }
             ]
         },
         "RemoveDefaultBinding": {
@@ -321,6 +362,9 @@
                         { "Name": "Marketing Automation Database Name", "Value": "[variable('Sql.Database.MarketingAutomation')]" },
                         { "Name": "Messaging Database Name", "Value": "[variable('Sql.Database.Messaging')]" },
                         { "Name": "Reference Data Database Name", "Value": "[variable('Sql.Database.Reference')]" },
+                        { "Name": "Reporting Database Name", "Value": "[variable('Sql.Database.Reporting')]" },
+                        { "Name": "Processing Engine Tasks Database Name", "Value":  "[variable('Sql.Database.ProcessingEngineTasks')]" },
+                        { "Name": "Processing Engine Storage Database Name", "Value":  "[variable('Sql.Database.ProcessingEngineStorage')]" },
                         { "Name": "Search SOLR Core Application Connection String", "Value": "[variable('Solr.Url.Xdb')]" },
                         { "Name": "XConnect Server Configuration Environment", "Value": "[parameter('XConnectEnvironment')]" },
                         { "Name": "XConnect Server Certificate Validation Thumbprint", "Value": "[variable('Security.XConnect.CertificateThumbprint')]" },
@@ -329,16 +373,27 @@
                         { "Name": "Marketing Automation Engine Xconnect Collection Client Certificate Thumbprint", "Value": "[variable('Security.XConnect.CertificateThumbprint')]" },
                         { "Name": "Marketing Automation Engine Xdb Reference Data Endpoint", "Value": "[variable('Endpoint.ReferenceData')]" },
                         { "Name": "Marketing Automation Engine Xdb Reference Data Client Certificate Thumbprint", "Value": "[variable('Security.XConnect.CertificateThumbprint')]" },
+                        { "Name": "Processing Engine Xconnect Collection Client Endpoint", "Value": "[variable('Endpoint.Collection')]" },
+                        { "Name": "Processing Engine Xconnect Collection Client Certificate Thumbprint", "Value": "[variable('Security.XConnect.CertificateThumbprint')]" },
+                        { "Name": "Processing Engine Xconnect Search Client Endpoint", "Value": "[variable('Endpoint.Collection')]" },
+                        { "Name": "Processing Engine Xconnect Search Client Certificate Thumbprint", "Value": "[variable('Security.XConnect.CertificateThumbprint')]" },
+                        { "Name": "Processing Engine Blob Storage WebApi Endpoint", "Value": "[variable('Endpoint.Processing.BlobStorage')]" },
+                        { "Name": "Processing Engine Table Storage WebApi Endpoint", "Value": "[variable('Endpoint.Processing.TableStorage')]" },
+                        { "Name": "Processing Engine Machine Learning Server Endpoint", "Value": "[parameter('MachineLearningServerUrl')]" },
                         { "Name": "Collection Database Application User Name", "Value": "[parameter('SqlCollectionUser')]" },
                         { "Name": "Collection Database Application User Password", "Value": "[parameter('SqlCollectionPassword')]" },
                         { "Name": "Processing Pool Database Application User Name", "Value": "[parameter('SqlProcessingPoolsUser')]" },
                         { "Name": "Processing Pool Database Application User Password", "Value": "[parameter('SqlProcessingPoolsPassword')]" },
                         { "Name": "Reference Data Database Application User Name", "Value": "[parameter('SqlReferenceDataUser')]" },
                         { "Name": "Reference Data Database Application User Password", "Value": "[parameter('SqlReferenceDataPassword')]" },
+                        { "Name": "Reporting Database Application User Name", "Value": "[parameter('SqlReportingUser')]" },
+                        { "Name": "Reporting Database Application User Password", "Value": "[parameter('SqlReportingPassword')]" },
                         { "Name": "Marketing Automation Database Application User Name", "Value": "[parameter('SqlMarketingAutomationUser')]" },
                         { "Name": "Marketing Automation Database Application User Password", "Value": "[parameter('SqlMarketingAutomationPassword')]" },
                         { "Name": "Messaging Database Application User Name", "Value": "[parameter('SqlMessagingUser')]" },
-                        { "Name": "Messaging Database Application User Password", "Value": "[parameter('SqlMessagingPassword')]" }
+                        { "Name": "Messaging Database Application User Password", "Value": "[parameter('SqlMessagingPassword')]" },
+                        { "Name": "Processing Engine Database Application User Name", "Value": "[parameter('SqlProcessingEngineUser')]" },
+                        { "Name": "Processing Engine Database Application User Password", "Value": "[parameter('SqlProcessingEnginePassword')]" }
                     ]
                 }
             }
@@ -488,7 +543,8 @@
             "Params": {
                 "Exists": [
                     "[joinpath(variable('Services.IndexWorker.InstallPath'), 'App_Data', 'Logs')]",
-                    "[joinpath(variable('Services.MarketingAutomationEngine.InstallPath'), 'App_Data', 'Logs')]"
+                    "[joinpath(variable('Services.MarketingAutomationEngine.InstallPath'), 'App_Data', 'Logs')]",
+                    "[joinpath(variable('Services.ProcessingEngine.InstallPath'), 'App_Data', 'Logs')]"
                 ]
             }
         },
@@ -504,6 +560,13 @@
             "Params": {
                 "Source": "[resolvepath(parameter('LicenseFile'))]",
                 "Destination": "[joinpath(variable('Services.MarketingAutomationEngine.InstallPath'), 'App_Data')]"
+            }
+        },
+        "SetProcessingEngineServiceLicense": {
+            "Type": "Copy",
+            "Params": {
+                "Source": "[resolvepath(parameter('LicenseFile'))]",
+                "Destination": "[joinpath(variable('Services.ProcessingEngine.InstallPath'), 'App_Data')]"
             }
         },
         "SetIndexWorkerServicePermissions": {
@@ -532,6 +595,19 @@
                 ]
             }
         },
+        "SetProcessingEngineServicePermissions": {
+            "Type": "FilePermissions",
+            "Params": {
+                "Path": "[joinpath(variable('Services.ProcessingEngine.InstallPath'), 'App_Data', 'Logs')]",
+                "Rights": [
+                    {
+                        "User": "NT AUTHORITY\\LocalService",
+                        "FileSystemRights": [ "FullControl" ],
+                        "InheritanceFlags": [ "ContainerInherit", "ObjectInherit" ]
+                    }
+                ]
+            }
+        },
         "InstallServices": {
             "Type": "Command",
             "Params": [
@@ -542,6 +618,10 @@
                 {
                     "Path": "[joinpath(variable('Services.MarketingAutomationEngine.InstallPath'), 'maengine.exe')]",
                     "Arguments": [ "-i", "[variable('Services.MarketingAutomationEngine.Name')]" ]
+                },
+                {
+                    "Path": "[joinpath(variable('Services.ProcessingEngine.InstallPath'), 'Sitecore.ProcessingEngine.exe')]",
+                    "Arguments": [ "-i", "[variable('Services.ProcessingEngine.Name')]" ]
                 }
             ]
         },
@@ -554,6 +634,10 @@
                 },
                 {
                     "Name": "[variable('Services.MarketingAutomationEngine.Name')]",
+                    "Status": "Running"
+                },
+                {
+                    "Name": "[variable('Services.ProcessingEngine.Name')]",
                     "Status": "Running"
                 }
             ]

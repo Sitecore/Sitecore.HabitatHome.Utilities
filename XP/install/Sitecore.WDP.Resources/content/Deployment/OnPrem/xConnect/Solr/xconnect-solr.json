@@ -20,17 +20,17 @@
         },
         "SolrRoot": {
             "Type": "string",
-            "DefaultValue": "c:\\solr-6.6.1",
+            "DefaultValue": "c:\\solr-7.2.1",
             "Description": "The file path to the Solr instance." 
         },
         "SolrService": {
             "Type": "string",
-            "DefaultValue": "Solr-6.6.1",
+            "DefaultValue": "Solr-7.2.1",
             "Description": "The name of the Solr service."
         },
         "BaseConfig": {
             "Type": "string",
-            "DefaultValue": "basic_configs",
+            "DefaultValue": "_default",
             "Description": "The configset to copy as a base for each core."
         },
         "CorePrefix": {
@@ -106,8 +106,8 @@
             // Tells Solr to create the new cores.
             "Type": "ManageSolrCore",
             "Params": [
-                { "Action": "Create", "Address": "[parameter('SolrUrl')]", "Arguments": { "Name": "[variable('Xdb.Name')]" } },
-                { "Action": "Create", "Address": "[parameter('SolrUrl')]", "Arguments": { "Name": "[variable('Xdb.Rebuild.Name')]" } }
+                { "Action": "Create", "Address": "[parameter('SolrUrl')]", "Arguments": { "name": "[variable('Xdb.Name')]", "property.update.autoCreateFields": "false" } },
+                { "Action": "Create", "Address": "[parameter('SolrUrl')]", "Arguments": { "name": "[variable('Xdb.Rebuild.Name')]", "property.update.autoCreateFields": "false" } }
             ]
         }
     }
