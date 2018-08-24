@@ -58,6 +58,12 @@ $xConnect.siteRoot = Join-Path $site.webRoot -ChildPath $xConnect.siteName
 $xConnect.sqlCollectionUser = $site.prefix + "collectionuser"
 $xConnect.sqlCollectionPassword = "Test12345"
 
+
+$identityServer = $json.settings.identityServer
+$identityServer.name = "IdentityServer." + $site.hostname
+$identityServer.url = ("https://{0}" -f $identityServer.name)
+$identityServer.clientSecrect = "ClientSecret"
+
 $json.settings.xConnect = $xConnect
 
 Set-Content $configurationFile  (ConvertTo-Json -InputObject $json -Depth 3)

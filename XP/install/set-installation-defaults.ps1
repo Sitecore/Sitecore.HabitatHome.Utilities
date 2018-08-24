@@ -13,12 +13,13 @@ $assets.root = "$PSScriptRoot\assets"
 $assets.psRepository = "https://sitecore.myget.org/F/sc-powershell/api/v2/"
 $assets.psRepositoryName = "SitecoreGallery"
 $assets.licenseFilePath = Join-Path $assets.root "license.xml"
-$assets.sitecoreVersion = "9.0.2 rev. 180604"
 $assets.installerVersion = "1.2.0"
+$assets.sitecoreVersion = "9.1.0 rev. 001256"
+$assets.identityServerVersion = "2.0.0 rev. 00128"
 $assets.certificatesPath = Join-Path $assets.root "Certificates"
-$assets.jreRequiredVersion = "8.0.1510"
+$assets.jreRequiredVersion = "8.0.1710"
 $assets.dotnetMinimumVersionValue = "394802"
-$assets.dotnetMinimumVersion = "4.6.2"
+$assets.dotnetMinimumVersion = "4.7.1"
 $assets.installPackagePath = Join-Path $assets.root "installpackage.aspx"
 
 # Settings
@@ -68,6 +69,13 @@ $sitecore.sslConfigurationPath = "$PSScriptRoot\certificates\sitecore-ssl.json"
 $sitecore.packagePath = Join-Path $assets.root $("Sitecore " + $assets.sitecoreVersion +" (OnPrem)_single.scwdp.zip")
 $sitecore.siteRoot = Join-Path $site.webRoot -ChildPath $site.hostName
 
+Write-Host "Setting default 'IdentityServer' parameters"
+$identityServer = $json.settings.identityServer
+$identityServer.packagePath = Join-Path $assets.root $("Sitecore.IdentityServer " + $assets.identityServerVersion + " (OnPrem)_identityserver.scwdp.zip")
+$identityServer.configurationPath = (Get-ChildItem $pwd -filter "IdentityServer.json" -Recurse).FullName 
+$identityServer.name = "IdentityServer." + $site.hostname
+$identityServer.url = ("https://{0}" -f $identityServer.name)
+$identityServer.clientSecret = "ClientSecret"
 Write-Host "Setting default 'Solr' parameters"
 # Solr Parameters
 $solr = $json.settings.solr
@@ -83,7 +91,7 @@ $spe.packagePath = Join-Path $assets.root "packages\Sitecore PowerShell Extensio
 $spe.install = $true
 
 $sxa = $modules | Where-Object { $_.id -eq "sxa"}
-$sxa.packagePath = Join-Path $assets.root "packages\Sitecore Experience Accelerator 1.7.1 rev. 180604 for 9.0.zip"
+$sxa.packagePath = Join-Path $assets.root "packages\Sitecore Experience Accelerator 1.8 .878 for 9.1.zip"
 $sxa.install = $true
 
 $def = $modules | Where-Object {$_.id -eq "def"}
