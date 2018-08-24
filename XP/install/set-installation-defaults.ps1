@@ -96,27 +96,27 @@ $sxa.install = $true
 
 $def = $modules | Where-Object {$_.id -eq "def"}
 $def.packagePath = Join-Path $assets.root "packages\Data Exchange Framework 2.0.1 rev. 180108.zip"
-$def.install = $true
+$def.install = $false
 
 $defSql = $modules | Where-Object {$_.id -eq "defSql"}
 $defSql.packagePath = Join-Path $assets.root "packages\SQL Provider for Data Exchange Framework 2.0.1 rev. 180108.zip"
-$defSql.install = $true
+$defSql.install = $false
 
 $defSitecore = $modules | Where-Object {$_.id -eq "defSitecore"}
 $defSitecore.packagePath = Join-Path $assets.root "packages\Sitecore Provider for Data Exchange Framework 2.0.1 rev. 180108.zip"
-$defSitecore.install = $true
+$defSitecore.install = $false
 
 $defxConnect = $modules | Where-Object {$_.id -eq "defxConnect"}
 $defxConnect.packagePath = Join-Path $assets.root "packages\xConnect Provider for Data Exchange Framework 2.0.1 rev. 180108.zip"
-$defxConnect.install = $true
+$defxConnect.install = $false
 
 $defDynamicsProvider = $modules | Where-Object {$_.id -eq "defDynamicsProvider"}
 $defDynamicsProvider.packagePath = Join-Path $assets.root "packages\Dynamics Provider for Data Exchange Framework 2.0.1 rev. 180108.zip"
-$defDynamicsProvider.install = $true
+$defDynamicsProvider.install = $false
 
 $defDynamicsConnect = $modules | Where-Object {$_.id -eq "defDynamicsConnect"}
 $defDynamicsConnect.packagePath = Join-Path $assets.root "packages\Connect for Microsoft Dynamics 2.0.1 rev. 180108.zip"
-$defDynamicsConnect.install = $true
+$defDynamicsConnect.install = $false
 
 Write-Host ("Saving Configuration file to {0}" -f $ConfigurationFile)
 
