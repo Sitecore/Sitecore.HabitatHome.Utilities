@@ -22,6 +22,10 @@
             "Type": "string",
             "Description": "The certificate to use for encryption. Provide the name or the thumbprint."
         },
+        "LicenseFile": {
+            "Type": "string",
+            "Description": "The path to the Sitecore license file."
+        },
         "SiteName": {
             "Type": "string",
             "DefaultValue": "IdentityServer",
@@ -70,7 +74,9 @@
         
 
         // The sites full path on disk
-        "Site.PhysicalPath": "[joinpath(environment('SystemDrive'), 'inetpub', 'wwwroot', parameter('SiteName'))]"        
+        "Site.PhysicalPath": "[joinpath(environment('SystemDrive'), 'inetpub', 'wwwroot', parameter('SiteName'))]",
+        // The sites license folder
+        "Site.LicenseFolder": "[joinpath(variable('Site.PhysicalPath'), 'sitecoreruntime')]"
     },
     "Tasks": {
         // Tasks are separate units of work in a configuration.
@@ -204,7 +210,23 @@
                     ]
                 }
             }
-        },       
+        },
+        "CreateLicenseFolder": {
+            // Ensure the destination path for the license exists.
+            "Type": "EnsurePath",
+            "Params": {
+                "Exists": [ "[variable('Site.LicenseFolder')]" ]
+            }
+        },
+        "SetLicense" : {
+            // Copies the license file to the instance license folder.
+            "Type": "Copy",
+            "Params": {
+                "Source": "[resolvepath(parameter('LicenseFile'))]",
+                "Destination": "[variable('Site.LicenseFolder')]"
+            },
+            "Skip": "[not(parameter('LicenseFile'))]"
+        },
         "StartAppPool": {
             // Starts the app pool.
             "Type": "ManageAppPool",

@@ -14,8 +14,6 @@
             "Description": "The file name of the root certificate to be created.",
             "DefaultValue": "SitecoreRootCert"
         },
-        // A password may be passed on the command line to export the certificates. If this isn't
-        // supplied then one will be generated on your behalf. Check the logs for the password.
         "ExportPassword" : {
             "Type" :"String",
             "Description" :"Password to export certificates with.",
@@ -24,8 +22,21 @@
     },
     "Variables": {
         "Root.Cert.DnsName": "[concat('DO_NOT_TRUST_', parameter('RootCertFileName'))]",
-        "Root.Cert.Store": "cert:\\LocalMachine\\Root",
-        "Client.Cert.Store": "cert:\\LocalMachine\\My"
+        "Root.Cert.Store": "Cert:\\LocalMachine\\Root",
+        "Client.Cert.Store": "Cert:\\LocalMachine\\My",
+        "Export.Password" : "[if(variable('User.Supplied.Password'),variable('Secure.Password'),variable('Convert.User.Password'))]",
+        "User.Supplied.Password" : "[equal(parameter('ExportPassword'),'SIF-Default')]",
+        "Secure.Password" : "[ConvertToSecureString(String:variable('Password.String'),AsPlainText:true,Force:true)]",
+        "Password.String" : "[RandomString(Length:20,EnforceComplexity:True)]",
+        "Convert.User.Password" : "[ConvertToSecureString(String:parameter('ExportPassword'),AsPlainText:true,Force:true)]"
+    },
+    "Register":{
+        "Tasks" :{
+            "WriteOutput" : "Write-Output"
+        },
+        "ConfigFunction": {
+            "ConvertToSecureString" :"ConvertTo-SecureString"
+        }
     },
     "Tasks": {
         "CreatePaths": {
@@ -49,15 +60,12 @@
             "Params": {
                 "Path": "[parameter('CertPath')]",
                 "Name": "[parameter('RootCertFileName')]",
-                "StoreLocation": "CurrentUser",
-                "DnsName": "[variable('Root.Cert.DnsName')]"
-            }
-        },
-        "ImportRootCertificate": {
-            "Type": "ImportCertificate",
-            "Params": {
-                "CertStoreLocation": "[variable('Root.Cert.Store')]",
-                "FilePath": "[concat(joinpath(parameter('CertPath'), parameter('RootCertFileName')), '.crt')]"
+                "DnsName": [
+                    "[variable('Root.Cert.DnsName')]",
+                    "127.0.0.1"
+                ],
+                "IncludePrivateKey" : true,
+                "Password" : "[variable('Export.Password')]"
             }
         },
         "CreateSignedCert": {
