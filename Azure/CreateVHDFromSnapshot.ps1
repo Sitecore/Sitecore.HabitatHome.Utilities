@@ -1,9 +1,11 @@
 Param(
     [string] $subscriptionId,
-    [string] $snapshotPrefix = "habitathome",
     [ValidateSet('xp', 'xc')]
     [string]$demoType,
-    [string[]] $regions = @("na", "emea", "ga", "ea")
+	[Parameter(Mandatory = $true)]
+    [string] $version,
+    [string[]] $regions = @("na", "emea", "ga", "ea"),
+    [string] $snapshotPrefix = "habitathome"
 
 
 )
@@ -11,17 +13,17 @@ $config = Get-Content .\config.json | ConvertFrom-Json
 
 $account = Get-AzureRMContext | Select-Object Account
 
-if ($account.Account -eq $null) {
+if ($null -eq $account.Account) {
     Login-AzureRmAccount
 }
 
 ### DO NOT CHANGE
 $demoType = $demoType.ToLower()
 $snapshotResourceGroupName = ("{0}-demo-snapshot" -f $snapshotPrefix)
-$osSnapshotName = ("{0}{1}-os-snapshot" -f $snapshotPrefix, $demoType)
+$osSnapshotName = ("{0}{1}-{2}-os-snapshot" -f $snapshotPrefix, $demoType, $version)
 Write-host ("Preparing to copy {0} from {1}" -f $osSnapshotName, $snapshotResourceGroupName)
 #Provide the name of the VHD file to which snapshot will be copied.
-$osVHDFileName = ("{0}{1}-os.vhd" -f $snapshotPrefix, $demoType)
+$osVHDFileName = ("{0}{1}-{2}-os.vhd" -f $snapshotPrefix, $demoType, $version)
 
 
 $sasExpiryDuration = "10800"
@@ -81,27 +83,31 @@ $Block = {
 
 }
 
-foreach ($region in $regions){
+foreach ($region in $regions) {
     $jobName = $region
 
     Start-Job -Name $jobName -ScriptBlock $Block -ArgumentList $region, $sasUri, $config, $osVHDFileName
 
 }
 
-while (1 -eq 1){
+while (1 -eq 1) {
 
 
     $jobs = Get-Job | Where-Object {$_.State -eq "Running"}
     if ($jobs.Count -eq 0) {
-        if (Test-Path $(Join-Path $PWD "vhdcreation.log")){
+        if (Test-Path $(Join-Path $PWD "vhdcreation.log")) {
             # this means we've encountered an error
             Write-Host "Error copying VHD"
+            break
         }
         else {
             Write-Host "Success!" -ForegroundColor Green
+            break
         }
+
+        return
     }
-    foreach ($job in $jobs){
+    foreach ($job in $jobs) {
         Write-Host ("... Copy of VHD to {0} in progress" -f $job.Name)
         $jobs | Receive-Job
     }

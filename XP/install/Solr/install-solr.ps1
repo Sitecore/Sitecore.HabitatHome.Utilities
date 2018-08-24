@@ -1,3 +1,5 @@
+# Credit primarily to jermdavis for the original script
+
 Param(
     [string]$solrVersion = "6.6.2",
     [string]$installFolder = "c:\solr",
@@ -101,7 +103,7 @@ try {
 	$keytool = (Get-Command 'keytool.exe').Source
 } catch {
 	try {
-		$path = $Env:JAVA_HOME + '\bin\keytool.exe'
+		$path = $jreVal + '\bin\keytool.exe'
 		Write-Host $path
 		if (Test-Path $path) {
 			$keytool = (Get-Command $path).Source
