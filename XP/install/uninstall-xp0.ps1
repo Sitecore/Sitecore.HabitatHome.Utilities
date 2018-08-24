@@ -43,6 +43,7 @@ if (-not $carbon) {
     Import-Module Carbon
 }
 
+IISRESET /STOP
 Import-Module "$PSScriptRoot\uninstall\uninstall.psm1"
 
 $database = Get-SitecoreDatabase -SqlServer $sql.server -SqlAdminUser $sql.adminUser -SqlAdminPassword $sql.adminPassword
@@ -50,6 +51,7 @@ $database = Get-SitecoreDatabase -SqlServer $sql.server -SqlAdminUser $sql.admin
 # Unregister xconnect services
 Remove-SitecoreWindowsService "$($xConnect.siteName)-MarketingAutomationService"
 Remove-SitecoreWindowsService "$($xConnect.siteName)-IndexWorker"
+Remove-SitecoreWindowsService "$($xConnect.siteName)-ProcessingEngineService"
 
 # Delete xconnect site
 Remove-SitecoreIisSite $xConnect.siteName
@@ -84,6 +86,9 @@ Remove-SitecoreCertificate $site.habitatHomeSslCertificateName
 # Delete sitecore site
 Remove-SitecoreIisSite $site.hostName
 
+# Delete Identity Server site
+Remove-SitecoreIisSite ("IdentityServer.{0}" -f $site.hostName)
+
 # Drop sitecore databases
 Remove-SitecoreDatabase -Name "$($site.prefix)_Core" -Server $database
 Remove-SitecoreDatabase -Name "$($site.prefix)_ExperienceForms" -Server $database
@@ -91,6 +96,9 @@ Remove-SitecoreDatabase -Name "$($site.prefix)_Master" -Server $database
 Remove-SitecoreDatabase -Name "$($site.prefix)_Web" -Server $database
 Remove-SitecoreDatabase -Name "$($site.prefix)_EXM.Master" -Server $database
 Remove-SitecoreDatabase -Name "$($site.prefix)_Messaging" -Server $database
+Remove-SitecoreDatabase -Name "$($site.prefix)_ProcessingEngineStorage" -Server $database
+Remove-SitecoreDatabase -Name "$($site.prefix)_ProcessingEngineTasks" -Server $database
+
 
 # Delete sitecore files
 Remove-SitecoreFiles $sitecore.siteRoot
@@ -136,3 +144,5 @@ catch
 {
     Write-Host "Could not find IIS AppPool\$($site.hostName) to Performance Monitor Users" -ForegroundColor Yellow
 }
+
+IISRESET /START

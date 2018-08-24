@@ -198,9 +198,13 @@ function Install-Assets {
     Write-Host ("Loading Sitecore Installer Framework {0}" -f $SIFVersion) -ForegroundColor Green
 
     $module = Get-Module -FullyQualifiedName @{ModuleName = "SitecoreInstallFramework"; ModuleVersion = $SIFVersion}
+    Write-Host $module
+
+    Write-host "module"
     if (-not $module) {
         write-host "Installing the Sitecore Install Framework, version $($assets.installerVersion)" -ForegroundColor Green
         if ($assets.installerversion -like "*beta*") {
+            Write-Host "Installing Beta"
             Install-Module SitecoreInstallFramework -RequiredVersion $assets.installerVersion -Repository $assets.psRepositoryName -Scope CurrentUser -Force -AllowPrerelease
         }
         else {
@@ -437,20 +441,20 @@ function Install-IdentityServer {
     # Deploy Identity Server
     #################################################################
 
-    $allowedCorsOrigins = "<AllowedCorsOrigin1>$sitecoreSiteUrl</AllowedCorsOrigin1>"
+    $allowedCorsOrigins = "<AllowedCorsOrigin1>$(('https://{0}' -f $site.hostname))</AllowedCorsOrigin1>"
     $clientConfiguration = @"
         <Clients>
         <DefaultClient>
         <AllowedCorsOrigins>
-        $allowedCorsOrigins
+        $($allowedCorsOrigins)
         </AllowedCorsOrigins>
         </DefaultClient>
         <PasswordClient>
         <AllowedCorsOrigins>
-        $allowedCorsOrigins
+        $($allowedCorsOrigins)
         </AllowedCorsOrigins>
         <ClientSecrets>
-        <ClientSecret1>$clientSecret</ClientSecret1>
+        <ClientSecret1>$($identityServer.clientSecret)</ClientSecret1>
         </ClientSecrets>
         </PasswordClient>
         </Clients>
@@ -599,15 +603,15 @@ function Update-SXASolrCores {
 }
 
 Set-ModulesPath
-#Install-Assets
-#Get-Assets
-#Confirm-Prerequisites
-#Install-XConnect
-#Install-Sitecore
-#Install-IdentityServer
-#Add-AppPoolMembership
-#Enable-InstallationImprovements
-#Copy-Tools
+Install-Assets
+Get-Assets
+Confirm-Prerequisites
+Install-XConnect
+Install-Sitecore
+Install-IdentityServer
+Add-AppPoolMembership
+Enable-InstallationImprovements
+Copy-Tools
 Install-OptionalModules
 Disable-InstallationImprovements
 Update-SXASolrCores
