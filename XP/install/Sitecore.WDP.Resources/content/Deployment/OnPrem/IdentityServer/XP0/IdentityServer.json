@@ -1,15 +1,5 @@
-﻿// -------------------------------------------------------------------------- //
-//         Sitecore Install Framework - Sitecore IdentityServer Configuration //
-//                                                                            //
-//  Run this configuration to install a instance of Sitecore IdentityServer.  //
-//                                                                            //
-//  NOTE: Only single line comments are accepted in configurations.           //
-// -------------------------------------------------------------------------- //
-{
+﻿{
     "Parameters": {
-        // Parameters are values that may be passed when Install-SitecoreConfiguration is called.
-        // Parameters must declare a Type and may declare a DefaultValue and Description.
-        // Parameters with no DefaultValue are required when Install-SitecoreConfiguration is called.
         "Package": {
             "Type": "string",
             "Description": "The path to the Web Deploy package to deploy."
@@ -59,39 +49,32 @@
             "Type": "string",
             "DefaultValue": "",
             "Description": "Sitecore IdentityServer clients configuration"
+        },
+        "WebRoot": {
+            "Type": "string",
+            "DefaultValue": "c:\\inetpub\\wwwroot",
+            "Description": "The physical path of the configured Web Root for the environment"
         }
     },
     "Variables": {
-        // Variables are values calculated in a configuration.
-        // They can reference Parameters, other Variables, and config functions.
-        // Database names.
         "Sql.Database.Core":                "[concat(parameter('SqlDbPrefix'), parameter('SqlCoreDbName'))]",
         
-        // The security certificate details
         "Security.CertificateStore":                "Cert:\\Localmachine\\My",
         "Security.IdentityServer.CertificateThumbprint":  "[GetCertificateThumbprint(parameter('SitecoreIdentityCert'), variable('Security.CertificateStore'))]",
         "Security.IdentityServer.CertificatePath":        "[joinpath(variable('Security.CertificateStore'), variable('Security.IdentityServer.CertificateThumbprint'))]",
         
 
-        // The sites full path on disk
-        "Site.PhysicalPath": "[joinpath(environment('SystemDrive'), 'inetpub', 'wwwroot', parameter('SiteName'))]",
-        // The sites license folder
+        "Site.PhysicalPath": "[concat(parameter('WebRoot'),'\\', parameter('SiteName'))]",
         "Site.LicenseFolder": "[joinpath(variable('Site.PhysicalPath'), 'sitecoreruntime')]"
     },
     "Tasks": {
-        // Tasks are separate units of work in a configuration.
-        // Each task is an action that will be completed when Install-SitecoreConfiguration is called.
-        // By default, tasks are applied in the order they are declared.
-        // Tasks may reference Parameters, Variables, and config functions.
         "CreatePaths": {
-            // Ensure the destination path for the site exists.
             "Type": "EnsurePath",
             "Params": {
                 "Exists": [ "[variable('Site.PhysicalPath')]" ]
             }
         },
         "CreateAppPool": {
-            // Creates or updates the app pool.
             "Type": "AppPool",
             "Params": {
                 "Name": "[parameter('SiteName')]",
@@ -104,7 +87,6 @@
             }
         },
         "SetAppPoolCertStorePermissions": {
-            // Set permissions for the App Pool User to access the client certificate.
             "Type": "FilePermissions",
             "Params": {
                 "Path" : "[ResolveCertificatePath(variable('Security.IdentityServer.CertificatePath'))]",
@@ -118,7 +100,6 @@
             }
         },
         "CreateWebsite": {
-            // Creates or updates the IIS website instance.
             "Type": "Website",
             "Params": {
                 "Name": "[parameter('SiteName')]",
@@ -127,7 +108,6 @@
             }
         },
         "StopWebsite": {
-            // Stops the website if it is running.
             "Type": "ManageWebsite",
             "Params": {
                 "Name": "[parameter('SiteName')]",
@@ -135,7 +115,6 @@
             }
         },
         "StopAppPool": {
-            // Stops the app pool if it is running.
             "Type": "ManageAppPool",
             "Params": {
                 "Name": "[parameter('SiteName')]",
@@ -143,7 +122,6 @@
             }
         },
         "RemoveDefaultBinding": {
-            // Removes the default *:80 web binding
             "Type": "WebBinding",
             "Params": {
                 "SiteName" : "[parameter('SiteName')]",
@@ -151,7 +129,6 @@
             }
         },
         "CreateBindingsWithThumprint": {
-            // Configures the site bindings for the website.
             "Type": "WebBinding",
             "Params": {
                 "SiteName" : "[parameter('SiteName')]",
@@ -168,14 +145,12 @@
         },
         
         "CreateHostHeader": {
-            // Sets a hostheader for the website.
             "Type": "HostHeader",
             "Params": {
                 "HostName": "[parameter('SiteName')]"
             }
         },
         "SetPermissions": {
-            // Sets permissions for the app pool user.
             "Type": "FilePermissions",
             "Params": {
                 "Path": "[variable('Site.PhysicalPath')]",
@@ -189,7 +164,6 @@
             }
         },       
         "InstallWDP": {
-            // Syncs the web deploy package with the website.
             "Type": "WebDeploy",
             "Params": {
                 "Verb": "Sync",
@@ -212,14 +186,12 @@
             }
         },
         "CreateLicenseFolder": {
-            // Ensure the destination path for the license exists.
             "Type": "EnsurePath",
             "Params": {
                 "Exists": [ "[variable('Site.LicenseFolder')]" ]
             }
         },
         "SetLicense" : {
-            // Copies the license file to the instance license folder.
             "Type": "Copy",
             "Params": {
                 "Source": "[resolvepath(parameter('LicenseFile'))]",
@@ -228,7 +200,6 @@
             "Skip": "[not(parameter('LicenseFile'))]"
         },
         "StartAppPool": {
-            // Starts the app pool.
             "Type": "ManageAppPool",
             "Params": {
                 "Name": "[parameter('SiteName')]",
@@ -236,7 +207,6 @@
             }
         },
         "StartWebsite": {
-            // Starts the website.
             "Type": "ManageWebsite",
             "Params": {
                 "Name": "[parameter('SiteName')]",

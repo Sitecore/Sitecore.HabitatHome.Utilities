@@ -624,7 +624,6 @@
       }
     },
     "StartAppPool": {
-      // Starts the app pool.
       "Type": "ManageAppPool",
       "Params": {
         "Name": "[parameter('SiteName')]",
@@ -632,7 +631,6 @@
       }
     },
     "StartWebsite": {
-      // Starts the website.
       "Type": "ManageWebsite",
       "Params": {
         "Name": "[parameter('SiteName')]",
@@ -640,7 +638,6 @@
       }
     },
     "UpdateSolrSchema": {
-      // Update the solr schemas.
       "Type": "SitecoreUrl",
       "Params": {
         "SitecoreInstanceRoot": "[concat('https://', parameter('SiteName'))]",

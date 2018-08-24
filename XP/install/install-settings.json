@@ -6,6 +6,7 @@
         "licenseFilePath": "@@assets.licenseFilePath@@",
         "certificatesPath": "@@assets.certificatePath@@",
         "sitecoreVersion": "@@assets.sitecoreVersion@@",
+        "identityServerVersion":"@@assets.identityServerVersion@@",
         "installerVersion": "@@assets.installerVersion@@",
         "jreRequiredVersion":"@@assets.jreRequiredVersion@@",
         "dotnetMinimumVersion":"@@assets.netMinimumVersion@@",
@@ -50,6 +51,13 @@
             "packagePath": "@@sitecore.packagePath@@",
             "siteRoot": "@@sitecore.siteRoot@@"
 
+        },
+        "identityServer":{
+            "configurationPath":"@@identityServer.ConfigurationPath@@",
+            "packagePath":"@@identityServer.packagePath@@",
+            "name":"@@identityServer.name@@",
+            "url":"@@identityServer.url@@",
+            "clientSecret":"@@identityServer.clientSecret@@"
         },
         "solr": {
             "url": "@@solr.url@@",

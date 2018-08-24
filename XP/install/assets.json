@@ -2,15 +2,15 @@
 
     "sitecore": [{
         "name": "xc",
-        "fileName": "Sitecore 9.0.2 rev. 180604 (WDP XP0 packages).zip",
-        "url": "https://dev.sitecore.net/~/media/F53E9734518E47EF892AD40A333B9426.ashx",
+        "fileName": "Sitecore 9.1.0 rev. 001256 (WDP XP0 packages).zip",
+        "url": "",
 		"extract": true, 
         "download": true,
         "source": "sitecore"
     }],
     "modules": [{
             "name": "sxa",
-            "fileName": "Sitecore Experience Accelerator 1.7.1 rev. 180604 for 9.0.zip",
+            "fileName": "Sitecore Experience Accelerator 1.8 .878 for 9.1.zip",
             "url": "https://dev.sitecore.net/~/media/1FF242BE683E4DE989925F74B78978FC.ashx",
             "download": true,
             "source": "sitecore"
