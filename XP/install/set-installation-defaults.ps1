@@ -13,12 +13,13 @@ $assets.root = "$PSScriptRoot\assets"
 $assets.psRepository = "https://sitecore.myget.org/F/sc-powershell/api/v2/"
 $assets.psRepositoryName = "SitecoreGallery"
 $assets.licenseFilePath = Join-Path $assets.root "license.xml"
-$assets.sitecoreVersion = "9.0.2 rev. 180604"
 $assets.installerVersion = "1.2.0"
+$assets.sitecoreVersion = "9.1.0 rev. 001256"
+$assets.identityServerVersion = "2.0.0 rev. 00128"
 $assets.certificatesPath = Join-Path $assets.root "Certificates"
-$assets.jreRequiredVersion = "8.0.1510"
+$assets.jreRequiredVersion = "8.0.1710"
 $assets.dotnetMinimumVersionValue = "394802"
-$assets.dotnetMinimumVersion = "4.6.2"
+$assets.dotnetMinimumVersion = "4.7.1"
 $assets.installPackagePath = Join-Path $assets.root "installpackage.aspx"
 
 # Settings
@@ -68,6 +69,13 @@ $sitecore.sslConfigurationPath = "$PSScriptRoot\certificates\sitecore-ssl.json"
 $sitecore.packagePath = Join-Path $assets.root $("Sitecore " + $assets.sitecoreVersion +" (OnPrem)_single.scwdp.zip")
 $sitecore.siteRoot = Join-Path $site.webRoot -ChildPath $site.hostName
 
+Write-Host "Setting default 'IdentityServer' parameters"
+$identityServer = $json.settings.identityServer
+$identityServer.packagePath = Join-Path $assets.root $("Sitecore.IdentityServer " + $assets.identityServerVersion + " (OnPrem)_identityserver.scwdp.zip")
+$identityServer.configurationPath = (Get-ChildItem $pwd -filter "IdentityServer.json" -Recurse).FullName 
+$identityServer.name = "IdentityServer." + $site.hostname
+$identityServer.url = ("https://{0}" -f $identityServer.name)
+$identityServer.clientSecret = "ClientSecret"
 Write-Host "Setting default 'Solr' parameters"
 # Solr Parameters
 $solr = $json.settings.solr
@@ -83,32 +91,32 @@ $spe.packagePath = Join-Path $assets.root "packages\Sitecore PowerShell Extensio
 $spe.install = $true
 
 $sxa = $modules | Where-Object { $_.id -eq "sxa"}
-$sxa.packagePath = Join-Path $assets.root "packages\Sitecore Experience Accelerator 1.7.1 rev. 180604 for 9.0.zip"
+$sxa.packagePath = Join-Path $assets.root "packages\Sitecore Experience Accelerator 1.8 .878 for 9.1.zip"
 $sxa.install = $true
 
 $def = $modules | Where-Object {$_.id -eq "def"}
 $def.packagePath = Join-Path $assets.root "packages\Data Exchange Framework 2.0.1 rev. 180108.zip"
-$def.install = $true
+$def.install = $false
 
 $defSql = $modules | Where-Object {$_.id -eq "defSql"}
 $defSql.packagePath = Join-Path $assets.root "packages\SQL Provider for Data Exchange Framework 2.0.1 rev. 180108.zip"
-$defSql.install = $true
+$defSql.install = $false
 
 $defSitecore = $modules | Where-Object {$_.id -eq "defSitecore"}
 $defSitecore.packagePath = Join-Path $assets.root "packages\Sitecore Provider for Data Exchange Framework 2.0.1 rev. 180108.zip"
-$defSitecore.install = $true
+$defSitecore.install = $false
 
 $defxConnect = $modules | Where-Object {$_.id -eq "defxConnect"}
 $defxConnect.packagePath = Join-Path $assets.root "packages\xConnect Provider for Data Exchange Framework 2.0.1 rev. 180108.zip"
-$defxConnect.install = $true
+$defxConnect.install = $false
 
 $defDynamicsProvider = $modules | Where-Object {$_.id -eq "defDynamicsProvider"}
 $defDynamicsProvider.packagePath = Join-Path $assets.root "packages\Dynamics Provider for Data Exchange Framework 2.0.1 rev. 180108.zip"
-$defDynamicsProvider.install = $true
+$defDynamicsProvider.install = $false
 
 $defDynamicsConnect = $modules | Where-Object {$_.id -eq "defDynamicsConnect"}
 $defDynamicsConnect.packagePath = Join-Path $assets.root "packages\Connect for Microsoft Dynamics 2.0.1 rev. 180108.zip"
-$defDynamicsConnect.install = $true
+$defDynamicsConnect.install = $false
 
 Write-Host ("Saving Configuration file to {0}" -f $ConfigurationFile)
 

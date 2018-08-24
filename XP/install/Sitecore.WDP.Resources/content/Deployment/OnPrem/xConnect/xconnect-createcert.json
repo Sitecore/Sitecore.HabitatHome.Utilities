@@ -7,18 +7,36 @@
         "CertPath": {
             "Type": "string",
             "Description": "The physical path on disk where certificates will be stored.",
-            "DefaultValue": "c:\\certificates"
+            "DefaultValue": "C:\\certificates"
         },
         "RootCertFileName": {
             "Type": "string",
             "Description": "The file name of the root certificate to be created.",
             "DefaultValue": "SitecoreRootCert"
+        },
+        "ExportPassword" : {
+            "Type" :"String",
+            "Description" :"Password to export certificates with.",
+            "DefaultValue" : "SIF-Default"
         }
     },
     "Variables": {
         "Root.Cert.DnsName": "[concat('DO_NOT_TRUST_', parameter('RootCertFileName'))]",
-        "Root.Cert.Store": "cert:\\LocalMachine\\Root",
-        "Client.Cert.Store": "cert:\\LocalMachine\\My"
+        "Root.Cert.Store": "Cert:\\LocalMachine\\Root",
+        "Client.Cert.Store": "Cert:\\LocalMachine\\My",
+        "Export.Password" : "[if(variable('User.Supplied.Password'),variable('Secure.Password'),variable('Convert.User.Password'))]",
+        "User.Supplied.Password" : "[equal(parameter('ExportPassword'),'SIF-Default')]",
+        "Secure.Password" : "[ConvertToSecureString(String:variable('Password.String'),AsPlainText:true,Force:true)]",
+        "Password.String" : "[RandomString(Length:20,EnforceComplexity:True)]",
+        "Convert.User.Password" : "[ConvertToSecureString(String:parameter('ExportPassword'),AsPlainText:true,Force:true)]"
+    },
+    "Register":{
+        "Tasks" :{
+            "WriteOutput" : "Write-Output"
+        },
+        "ConfigFunction": {
+            "ConvertToSecureString" :"ConvertTo-SecureString"
+        }
     },
     "Tasks": {
         "CreatePaths": {
@@ -29,20 +47,25 @@
                 ]
             }
         },
+        "DisplayPassword" :{
+            // Print password if the user hasn't supplied their own.
+            "Type" : "WriteOutput",
+            "Params" : {
+                "InputObject" :"[concat('Certificate Password: ',variable('Password.String'))]"
+            },
+            "Skip" : "[not(variable('User.Supplied.Password'))]"
+        },
         "CreateRootCert": {
             "Type": "NewRootCertificate",
             "Params": {
                 "Path": "[parameter('CertPath')]",
                 "Name": "[parameter('RootCertFileName')]",
-                "StoreLocation": "CurrentUser",
-                "DnsName": "[variable('Root.Cert.DnsName')]"
-            }
-        },
-        "ImportRootCertificate": {
-            "Type": "ImportCertificate",
-            "Params": {
-                "CertStoreLocation": "[variable('Root.Cert.Store')]",
-                "FilePath": "[concat(joinpath(parameter('CertPath'), parameter('RootCertFileName')), '.crt')]"
+                "DnsName": [
+                    "[variable('Root.Cert.DnsName')]",
+                    "127.0.0.1"
+                ],
+                "IncludePrivateKey" : true,
+                "Password" : "[variable('Export.Password')]"
             }
         },
         "CreateSignedCert": {
@@ -52,7 +75,12 @@
                 "Path": "[parameter('CertPath')]",
                 "CertStoreLocation": "[variable('Client.Cert.Store')]",
                 "Name": "[parameter('CertificateName')]",
-                "DnsName": "[parameter('CertificateName')]"
+                "DnsName": [
+                    "[parameter('CertificateName')]",
+                    "127.0.0.1"
+                ],
+                "IncludePrivateKey": true,
+                "Password" : "[variable('Export.Password')]"
             }
         }
     }

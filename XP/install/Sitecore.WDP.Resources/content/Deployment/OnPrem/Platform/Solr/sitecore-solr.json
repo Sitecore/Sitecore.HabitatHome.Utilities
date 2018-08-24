@@ -7,17 +7,17 @@
         },
         "SolrRoot": {
             "Type": "string",
-            "DefaultValue": "c:\\solr-6.6.1",
+            "DefaultValue": "c:\\solr-7.2.1",
             "Description": "The file path to the Solr instance."
         },
         "SolrService": {
             "Type": "string",
-            "DefaultValue": "Solr-6.6.1",
+            "DefaultValue": "Solr-7.2.1",
             "Description": "The name of the Solr service."
         },
         "BaseConfig": {
             "Type": "string",
-            "DefaultValue": "basic_configs",
+            "DefaultValue": "_default",
             "Description": "The configset to copy as a base for each core."
         },
         "CorePrefix": {
@@ -161,17 +161,17 @@
         "CreateCores":{
             "Type": "ManageSolrCore",
             "Params": [
-                { "Action": "Create", "Address": "[parameter('SolrUrl')]", "Arguments": { "Name": "[variable('Core.Name')]" } },
-                { "Action": "Create", "Address": "[parameter('SolrUrl')]", "Arguments": { "Name": "[variable('Master.Name')]" } },
-                { "Action": "Create", "Address": "[parameter('SolrUrl')]", "Arguments": { "Name": "[variable('Web.Name')]" } },
-                { "Action": "Create", "Address": "[parameter('SolrUrl')]", "Arguments": { "Name": "[variable('MD.Master.Name')]" } },
-                { "Action": "Create", "Address": "[parameter('SolrUrl')]", "Arguments": { "Name": "[variable('MD.Web.Name')]" } },
-                { "Action": "Create", "Address": "[parameter('SolrUrl')]", "Arguments": { "Name": "[variable('MA.Master.Name')]" } },
-                { "Action": "Create", "Address": "[parameter('SolrUrl')]", "Arguments": { "Name": "[variable('MA.Web.Name')]" } },
-                { "Action": "Create", "Address": "[parameter('SolrUrl')]", "Arguments": { "Name": "[variable('Testing.Name')]" } },
-                { "Action": "Create", "Address": "[parameter('SolrUrl')]", "Arguments": { "Name": "[variable('Suggested.Name')]" } },
-                { "Action": "Create", "Address": "[parameter('SolrUrl')]", "Arguments": { "Name": "[variable('FXM.Master.Name')]" } },
-                { "Action": "Create", "Address": "[parameter('SolrUrl')]", "Arguments": { "Name": "[variable('FXM.Web.Name')]" } }
+                { "Action": "Create", "Address": "[parameter('SolrUrl')]", "Arguments": { "name": "[variable('Core.Name')]", "property.update.autoCreateFields": "false" } },
+                { "Action": "Create", "Address": "[parameter('SolrUrl')]", "Arguments": { "name": "[variable('Master.Name')]", "property.update.autoCreateFields": "false" } },
+                { "Action": "Create", "Address": "[parameter('SolrUrl')]", "Arguments": { "name": "[variable('Web.Name')]", "property.update.autoCreateFields": "false" } },
+                { "Action": "Create", "Address": "[parameter('SolrUrl')]", "Arguments": { "name": "[variable('MD.Master.Name')]", "property.update.autoCreateFields": "false" } },
+                { "Action": "Create", "Address": "[parameter('SolrUrl')]", "Arguments": { "name": "[variable('MD.Web.Name')]", "property.update.autoCreateFields": "false" } },
+                { "Action": "Create", "Address": "[parameter('SolrUrl')]", "Arguments": { "name": "[variable('MA.Master.Name')]", "property.update.autoCreateFields": "false" } },
+                { "Action": "Create", "Address": "[parameter('SolrUrl')]", "Arguments": { "name": "[variable('MA.Web.Name')]", "property.update.autoCreateFields": "false" } },
+                { "Action": "Create", "Address": "[parameter('SolrUrl')]", "Arguments": { "name": "[variable('Testing.Name')]", "property.update.autoCreateFields": "false" } },
+                { "Action": "Create", "Address": "[parameter('SolrUrl')]", "Arguments": { "name": "[variable('Suggested.Name')]", "property.update.autoCreateFields": "false" } },
+                { "Action": "Create", "Address": "[parameter('SolrUrl')]", "Arguments": { "name": "[variable('FXM.Master.Name')]", "property.update.autoCreateFields": "false" } },
+                { "Action": "Create", "Address": "[parameter('SolrUrl')]", "Arguments": { "name": "[variable('FXM.Web.Name')]", "property.update.autoCreateFields": "false" } }
             ]
         }
     }
