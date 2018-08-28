@@ -16,17 +16,13 @@ Function Invoke-DownloadFileWithCredentialsTask {
             Write-Verbose "Downloading $SourceUri to $DestinationPath"
 
             if ($Credentials) {
-                Write-Verbose "Test"
                 $user = $Credentials.GetNetworkCredential().username
-                
-                Write-Output $user
                 $password = $Credentials.GetNetworkCredential().password
                 $loginRequest = Invoke-RestMethod -Uri https://dev.sitecore.net/api/authorization -Method Post -ContentType "application/json" -Body "{username: '$user', password: '$password'}" -SessionVariable session -UseBasicParsing
                 Invoke-WebRequest -Uri $SourceUri -OutFile $DestinationPath -WebSession $session -UseBasicParsing
             }
 			else
 			{
-                Write-Verbose "here"
                 Invoke-WebRequest -Uri $SourceUri -OutFile $DestinationPath -UseBasicParsing
             }
         } catch {

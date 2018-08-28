@@ -62,7 +62,7 @@
           ],
           "Skip": [
             {
-              "ObjectName": "dbFullSql"
+              "ObjectName": "dbDacFx"
             }
           ]
         }
