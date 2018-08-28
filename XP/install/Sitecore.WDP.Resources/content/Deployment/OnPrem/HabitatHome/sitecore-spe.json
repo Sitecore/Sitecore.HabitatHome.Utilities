@@ -1,0 +1,72 @@
+﻿{
+  "Parameters": {
+    "Package": {
+      "Type": "string",
+      "Description": "The path to the Web Deploy package to deploy."
+    },
+    "SiteName": {
+      "Type": "string",
+      "DefaultValue": "Sitecore",
+      "Description": "The name of the site to be deployed."
+    },
+    "SqlDbPrefix": {
+      "Type": "string",
+      "Description": "SQL DB Prefix"
+    },
+    "SqlAdminUser": {
+      "Type": "string",
+      "DefaultValue": "sa",
+      "Description": "The Sql admin user account to use when installing databases."
+    },
+    "SqlAdminPassword": {
+      "Type": "string",
+      "DefaultValue": "12345",
+      "Description": "The Sql admin password to use when installing databases."
+    },
+    "SqlServer": {
+      "Type": "string",
+      "DefaultValue": ".\\SQLSERVER",
+      "Description": "The Sql Server where databases will be installed."
+    }
+  },
+  "Variables": {
+    "Sql.Database.Core": "[concat(parameter('SqlDbPrefix'), '_Core')]",
+    "Sql.Database.Master": "[concat(parameter('SqlDbPrefix'), '_Master')]",
+    "Sql.Core.ConnectionString": "[SqlConnectionString(parameter('SqlServer'),variable('Sql.Database.Core'), parameter('SqlAdminUser'), parameter('SqlAdminPassword'))]",
+    "Sql.Master.ConnectionString": "[SqlConnectionString(parameter('SqlServer'),variable('Sql.Database.Master'), parameter('SqlAdminUser'), parameter('SqlAdminPassword'))]"
+  },
+  "Tasks": {
+    "InstallWDP": {
+      "Type": "WebDeploy",
+      "Params": {
+        "Verb": "Sync",
+        "Arguments": {
+          "Source": {
+            "Package": "[resolvepath(parameter('Package'))]"
+          },
+          "Dest": "Auto",
+          "EnableRule":"DoNotDeleteRule",
+          "SetParam": [
+            {
+              "Name": "Application Path",
+              "Value": "[parameter('SiteName')]"
+            },
+            {
+              "Name": "Core Admin Connection String",
+              "Value": "[variable('Sql.Core.ConnectionString')]"
+            },
+            {
+              "Name": "Master Admin Connection String",
+              "Value": "[variable('Sql.Master.ConnectionString')]"
+            }
+          ],
+          "Skip": [
+            {
+              "ObjectName": "dbDacFx"
+            }
+          ]
+        }
+      }
+    }
+  }
+}

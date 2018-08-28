@@ -198,13 +198,9 @@ function Install-Assets {
     Write-Host ("Loading Sitecore Installer Framework {0}" -f $SIFVersion) -ForegroundColor Green
 
     $module = Get-Module -FullyQualifiedName @{ModuleName = "SitecoreInstallFramework"; ModuleVersion = $SIFVersion}
-    Write-Host $module
-
-    Write-host "module"
     if (-not $module) {
         write-host "Installing the Sitecore Install Framework, version $($assets.installerVersion)" -ForegroundColor Green
         if ($assets.installerversion -like "*beta*") {
-            Write-Host "Installing Beta"
             Install-Module SitecoreInstallFramework -RequiredVersion $assets.installerVersion -Repository $assets.psRepositoryName -Scope CurrentUser -Force -AllowPrerelease
         }
         else {
@@ -610,8 +606,8 @@ Install-XConnect
 Install-Sitecore
 Install-IdentityServer
 Add-AppPoolMembership
-Enable-InstallationImprovements
-Copy-Tools
-Install-OptionalModules
+#Enable-InstallationImprovements
+#Copy-Tools
+#Install-OptionalModules
 Disable-InstallationImprovements
-Update-SXASolrCores
+#Update-SXASolrCores
