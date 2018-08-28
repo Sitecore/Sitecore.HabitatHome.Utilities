@@ -201,10 +201,10 @@ function Install-Assets {
     if (-not $module) {
         write-host "Installing the Sitecore Install Framework, version $($assets.installerVersion)" -ForegroundColor Green
         if ($assets.installerversion -like "*beta*") {
-            Install-Module SitecoreInstallFramework -RequiredVersion $assets.installerVersion -Repository $assets.psRepositoryName -Scope CurrentUser -Force -AllowPrerelease
+            Install-Module SitecoreInstallFramework -RequiredVersion $assets.installerVersion -Repository $assets.psRepositoryName  -Force -AllowPrerelease
         }
         else {
-            Install-Module SitecoreInstallFramework -RequiredVersion $assets.installerVersion -Repository $assets.psRepositoryName -Scope CurrentUser -Force 
+            Install-Module SitecoreInstallFramework -RequiredVersion $assets.installerVersion -Repository $assets.psRepositoryName  -Force 
 
         }
         
