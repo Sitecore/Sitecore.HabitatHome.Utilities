@@ -114,7 +114,7 @@ Get-WmiObject win32_service  -Filter "name like '$($solr.serviceName)'" | Start-
 Remove-SitecoreCertificate $site.hostName
 
 # Drop the SQL Collectionuser login
-Remove-SitecoreDatabaseLogin -Server $database, -Name $($xConnect.sqlCollectionUser)
+Remove-SitecoreDatabaseLogin -Server $database -Name $($sql.collectionUser)
 
 # Remove App Pool membership 
 
