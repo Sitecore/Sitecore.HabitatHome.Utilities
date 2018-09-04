@@ -9,6 +9,7 @@
 - Download packages.config and install.ps1 from repository
 
 	`Invoke-WebRequest -Uri https://raw.githubusercontent.com/Sitecore/Sitecore.HabitatHome.Utilities/master/Prerequisites/packages.config | set-content packages.config` 
+	
 	`Invoke-WebRequest -Uri https://raw.githubusercontent.com/Sitecore/Sitecore.HabitatHome.Utilities/master/Prerequisites/install.ps1 | set-content install.ps1` 
 
 - **Review packages.config** to ensure it matches what you'd like to install
