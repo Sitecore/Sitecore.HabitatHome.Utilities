@@ -24,9 +24,9 @@ Enable-WindowsOptionalFeature -Online -FeatureName IIS-HttpCompressionStatic
 Enable-WindowsOptionalFeature -Online -FeatureName IIS-HttpCompressionDynamic
 Enable-WindowsOptionalFeature -Online -FeatureName IIS-WebServerManagementTools
 Enable-WindowsOptionalFeature -Online -FeatureName IIS-ManagementConsole
-Enable-WindowsOptionalFeature -Online -FeatureName IIS-LegacySnapIn
 Enable-WindowsOptionalFeature -Online -FeatureName IIS-IIS6ManagementCompatibility
 Enable-WindowsOptionalFeature -Online -FeatureName IIS-Metabase
+Enable-WindowsOptionalFeature -Online -FeatureName IIS-LegacySnapIn
 
 Set-ExecutionPolicy Bypass -Scope Process -Force; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
 
