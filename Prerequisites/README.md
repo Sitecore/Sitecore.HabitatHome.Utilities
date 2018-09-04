@@ -6,26 +6,16 @@
 	`md c:\projects`
 	`Set-Location c:\projects`
 
-- Download packages.config from repository
+- Download packages.config and install.ps1 from repository
 
 	`Invoke-WebRequest -Uri https://raw.githubusercontent.com/Sitecore/Sitecore.HabitatHome.Utilities/master/Prerequisites/packages.config | set-content packages.config` 
+	`Invoke-WebRequest -Uri https://raw.githubusercontent.com/Sitecore/Sitecore.HabitatHome.Utilities/master/Prerequisites/install.ps1 | set-content install.ps1` 
 
-- Install Chocolatey
+- **Review packages.config** to ensure it matches what you'd like to install
+- Install prerequisites and tools
+    `.\install.ps1`
 
-    `Set-ExecutionPolicy Bypass -Scope Process -Force; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))`
-- Review packages.config to ensure it matches what you'd like to install
-- Install prerequisites and tools using chocolatey
-    `choco install packages.config -y`
-
-- Set the password and enable the SA user (assumes current user has admin privileges)
-> You may need to specify the instance name using the -S .\<InstanceName> if you aren't using a default SQL Server instance or if you're using SQLExpress
-> Ensure you've installed SQL Server with Mixed Mode authentication (or enable it)
-
-	Install-Module -Name SqlServer
-	$saPassword = "SUPERS3CR3T!!"
-	$instanceName = "your-instance-name"
-	Invoke-sqlcmd -Query $("ALTER LOGIN [sa] WITH PASSWORD=N'" + $saPassword + "'") -ServerInstance $instanceName
-	Invoke-sqlcmd -Query "ALTER LOGIN [sa] ENABLE" -ServerInstance $instanceName
+- Manually install and configure SQL Server
 
 
 ### RESTART COMPUTER
