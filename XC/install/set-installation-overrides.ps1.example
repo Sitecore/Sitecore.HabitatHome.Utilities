@@ -11,13 +11,13 @@ $json = Get-Content -Raw $configurationFile |  ConvertFrom-Json
 $assets = $json.assets
 $assets.root = "$PSScriptRoot\assets"
 $assets.downloadFolder = Join-Path $assets.root "Downloads"
-#Commerce
 
 # Settings
 
 # Site Settings
 $site = $json.settings.site
 
+#Commerce
 $commerce = $json.settings.commerce
 $commerce.storefrontPrefix = $site.prefix
 $commerce.storefrontHostName = $commerce.storefrontPrefix + "." + $site.suffix
