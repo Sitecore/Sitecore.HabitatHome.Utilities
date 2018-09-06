@@ -81,53 +81,5 @@
         }
     },
     "modules":[
-        {
-            "id":"spe",
-            "name":"Sitecore PowerShell Extensions",
-            "packagePath":"@@modules.spePackagePath@@",
-            "install":"@@modules.speInstall@@"
-        },
-        {
-            "id":"sxa",
-            "name":"Sitecore Experience Accelerator",
-            "packagePath":"@@modules.sxaPackagePath@@",
-            "install":"@@modules.sxaInstall@@"
-        },
-        {
-            "id":"def",
-            "name":"Data Exchange Framework",
-            "packagePath":"@@modules.defPackagePath@@",
-            "install":"@@modules.defInstall@@"
-        },
-        {
-            "id":"defSitecore",
-            "name":"Sitecore Provider Data Exchange Framework",
-            "packagePath":"@@modules.defSitecorePackagePath@@",
-            "install":"@@modules.defSitecoreInstall@@"
-        },
-        {
-            "id":"defSql",
-            "name":"SQL Provider Data Exchange Framework",
-            "packagePath":"@@modules.defSqlPackagePath@@",
-            "install":"@@modules.defSqlInstall@@"
-        },
-        {
-            "id":"defxConnect",
-            "name":"xConnect Provider Data Exchange Framework",
-            "packagePath":"@@modules.defxConnectPackagePath@@",
-            "install":"@@modules.defxConnectInstall@@"
-        },
-        {
-            "id":"defDynamicsProvider",
-            "name":"Dynamics Provider Data Exchange Framework",
-            "packagePath":"@@modules.defDynamicsProviderPackagePath@@",
-            "install":"@@modules.defDynamicsProviderInstall@@"
-        },
-        {
-            "id":"defDynamicsConnect",
-            "name":"Dynamics Connect Data Exchange Framework",
-            "packagePath":"@@modules.defDynamicsConnectPackagePath@@",
-            "install":"@@modules.defDynamicsConnectInstall@@"
-        }
     ]
 }

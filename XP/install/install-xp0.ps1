@@ -1,6 +1,5 @@
 Param(
-    [string] $ConfigurationFile = "configuration-xp0.json",
-    [string] $AssetsFile = "assets.json"
+    [string] $ConfigurationFile = "configuration-xp0.json"
 )
 
 #####################################################
@@ -20,15 +19,6 @@ $config = Get-Content -Raw $ConfigurationFile |  ConvertFrom-Json
 if (!$config) {
     throw "Error trying to load configuration!"
 }
-
-$carbon = Get-Module Carbon
-if (-not $carbon) {
-    Write-Host "Installing latest version of Carbon" -ForegroundColor Green
-    Install-Module -Name Carbon -Repository PSGallery -AllowClobber -Verbose
-    Import-Module Carbon
-}
-
-
 
 $site = $config.settings.site
 $sql = $config.settings.sql
@@ -168,8 +158,8 @@ function Confirm-Prerequisites {
         throw "Please install .NET Framework $($assets.dotnetMinimumVersion) or newer"
     }
 
-      #Verify that assets are present
-      if (!(Test-Path $assets.root)) {
+    #Verify that assets are present
+    if (!(Test-Path $assets.root)) {
         throw "$($assets.root) not found"
     }
 
@@ -205,9 +195,9 @@ function Install-Assets {
         Import-Module SitecoreInstallFramework -RequiredVersion $($assets.installerVersion -replace "-beta[0-9]*$")
     }
 }
-function Get-CommerceAssets {
+function Get-Assets {
 
-    $downloadAssets = Get-Content $AssetsFile -Raw | ConvertFrom-Json
+    $downloadAssets = $modules
     $downloadFolder = $assets.root
     $packagesFolder = (Join-Path $downloadFolder "packages")
     
@@ -219,33 +209,35 @@ function Get-CommerceAssets {
     $credentials = Get-Credential -Message "Please provide dev.sitecore.com credentials"
 
 
-    $downloadJsonPath = $([io.path]::combine($resourcePath, 'content', 'Deployment','OnPrem','HabitatHome', 'download-assets.json'))
+    $downloadJsonPath = $([io.path]::combine($resourcePath, 'content', 'Deployment', 'OnPrem', 'HabitatHome', 'download-assets.json'))
     Set-Alias sz 'C:\Program Files\7-Zip\7z.exe'
-
-    foreach ($package in $downloadAssets.sitecore) {
+    $package = $modules | Where-Object {$_.id -eq "xp"}
     
-        if ($package.download -eq $true) {
-            Write-Host ("Downloading {0}  -  if required" -f $package.fileName )
+    if ($package.download -eq $true) {
+        Write-Host ("Downloading {0}  -  if required" -f $package.fileName )
         
-            $destination = $([io.path]::combine((Resolve-Path $downloadFolder), $package.fileName))
+        $destination = $([io.path]::combine((Resolve-Path $downloadFolder), $package.fileName))
             
-            if (!(Test-Path $destination)) {
-                $params = @{
-                    Path        = $downloadJsonPath
-                    Credentials = $credentials
-                    Source      = $package.url
-                    Destination = $destination
-                }
-                Install-SitecoreConfiguration  @params  -WorkingDirectory $(Join-Path $PWD "logs") -Verbose 
+        if (!(Test-Path $destination)) {
+            $params = @{
+                Path        = $downloadJsonPath
+                Credentials = $credentials
+                Source      = $package.url
+                Destination = $destination
             }
-            if ($package.extract -eq $true) {
-                sz x -o"$DownloadFolder" $destination -r -y -aoa
-            }
+            Install-SitecoreConfiguration  @params  -WorkingDirectory $(Join-Path $PWD "logs") -Verbose 
+        }
+        if ((Test-Path $destination) -and ( $package.extract -eq $true)) {
+            sz x -o"$DownloadFolder" $destination -r -y -aoa
         }
     }
+   
+    
     # Download modules
     foreach ($package in $downloadAssets.modules) {
-	
+        if ($package.id -eq "xp") {
+            continue;
+        }
         if (!(Test-Path $packagesFolder)) {
             New-Item -ItemType Directory -Force -Path $packagesFolder
         }
@@ -561,7 +553,7 @@ function Update-SXASolrCores {
 
 Set-ModulesPath
 Install-Assets
-Get-CommerceAssets
+Get-Assets
 Confirm-Prerequisites
 Install-XConnect
 Install-Sitecore
