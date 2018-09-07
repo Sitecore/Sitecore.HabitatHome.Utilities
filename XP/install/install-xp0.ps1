@@ -214,9 +214,9 @@ function Get-Assets {
     $package = $modules | Where-Object {$_.id -eq "xp"}
     
     if ($package.download -eq $true) {
-        Write-Host ("Downloading {0}  -  if required" -f $package.fileName )
+        Write-Host ("Downloading {0}  -  if required" -f $package.name )
         
-        $destination = $([io.path]::combine((Resolve-Path $downloadFolder), $package.fileName))
+        $destination =  $package.packagePath
             
         if (!(Test-Path $destination)) {
             $params = @{
@@ -228,13 +228,13 @@ function Get-Assets {
             Install-SitecoreConfiguration  @params  -WorkingDirectory $(Join-Path $PWD "logs") -Verbose 
         }
         if ((Test-Path $destination) -and ( $package.extract -eq $true)) {
-            sz x -o"$DownloadFolder" $destination -r -y -aoa
+            sz x -o"$DownloadFolder" $destination  -y -aoa
         }
     }
    
     
     # Download modules
-    foreach ($package in $downloadAssets.modules) {
+    foreach ($package in $downloadAssets) {
         if ($package.id -eq "xp") {
             continue;
         }
@@ -242,25 +242,8 @@ function Get-Assets {
             New-Item -ItemType Directory -Force -Path $packagesFolder
         }
         if ($package.download -eq $true) {
-            Write-Host ("Downloading {0}  -  if required" -f $package.fileName )
-            $destination = $([io.path]::combine((Resolve-Path $packagesFolder), $package.fileName))
-            if (!(Test-Path $destination)) {
-                $params = @{
-                    Path        = $downloadJsonPath
-                    Credentials = $credentials
-                    Source      = $package.url
-                    Destination = $destination
-                }
-                Install-SitecoreConfiguration  @params  -WorkingDirectory $(Join-Path $PWD "logs") -Verbose 
-            }
-        }
-    }
-
-    # Download other packages
-    foreach ($package in $downloadAssets.prerequisites) {
-        if ($package.download -eq $true) {
-            Write-Host ("Downloading {0}  -  if required" -f $package.fileName )
-            $destination = $([io.path]::combine((Resolve-Path $downloadFolder), $package.fileName))
+            Write-Host ("Downloading {0}  -  if required" -f $package.name )
+            $destination = $package.packagePath
             if (!(Test-Path $destination)) {
                 $params = @{
                     Path        = $downloadJsonPath

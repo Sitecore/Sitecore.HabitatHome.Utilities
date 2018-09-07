@@ -97,7 +97,7 @@ $sitecore.telerikEncryptionKey = "PutYourCustomEncryptionKeyHereFrom32To256Chara
 Write-Host "Setting default 'Solr' parameters"
 # Solr Parameters
 $solr = $json.settings.solr
-$solr.url = "https://localhost:8983/solr"
+$solr.url = "https://localhost:8662/solr"
 $solr.root = "c:\solr"
 $solr.serviceName = "Solr"
 
