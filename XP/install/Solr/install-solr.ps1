@@ -3,7 +3,7 @@
 Param(
     [string]$solrVersion = "6.6.2",
     [string]$installFolder = "c:\solr",
-    [string]$solrPort = "8983",
+    [string]$solrPort = "8662",
     [string]$solrHost = "localhost",
     [bool]$solrSSL = $TRUE,
     [string]$nssmVersion = "2.24",

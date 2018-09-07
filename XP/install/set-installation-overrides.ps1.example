@@ -36,39 +36,42 @@ $sitecore.telerikEncryptionKey = "PutYourCustomEncryptionKeyHereFrom32To256Chara
 
 # Solr Parameters
 $solr = $json.settings.solr
-$solr.url = "https://localhost:8983/solr"
+$solr.url = "https://localhost:8662/solr"
 $solr.root = "c:\solr\solr-6.6.2"
 $solr.serviceName = "Solr-6.6.2"
 
 # SQL Settings
 $sql = $json.settings.sql
+
+$SqlStrongPassword = "Str0NgPA33w0rd!!" # Used for all other services
+
 $sql.server = "."
 $sql.adminUser = "sa"
 $sql.adminPassword = "12345"
 $sql.coreUser = $site.prefix + "coreuser"
-$sql.corePassword = "Test12345"
+$sql.corePassword = $SqlStrongPassword
 $sql.masterUser = $site.prefix + "masteruser"
-$sql.masterPassword = "Test12345"
+$sql.masterPassword = $SqlStrongPassword
 $sql.webUser = $site.prefix + "webuser"
-$sql.webPassword = "Test12345"
+$sql.webPassword = $SqlStrongPassword
 $sql.collectionUser = $site.prefix + "collectionuser"
-$sql.collectionPassword = "Test12345"
+$sql.collectionPassword = $SqlStrongPassword
 $sql.reportingUser = $site.prefix + "reportinguser"
-$sql.reportingPassword = "Test12345"
+$sql.reportingPassword = $SqlStrongPassword
 $sql.processingPoolsUser = $site.prefix + "poolsuser"
-$sql.processingPoolsPassword = "Test12345"
+$sql.processingPoolsPassword = $SqlStrongPassword
 $sql.processingTasksUser = $site.prefix + "tasksuser"
-$sql.processingTasksPassword = "Test12345"
+$sql.processingTasksPassword = $SqlStrongPassword
 $sql.referenceDataUser = $site.prefix + "referencedatauser"
-$sql.referenceDataPassword = "Test12345"
+$sql.referenceDataPassword = $SqlStrongPassword
 $sql.marketingAutomationUser = $site.prefix + "marketingautomationuser"
-$sql.marketingAutomationPassword = "Test12345"
+$sql.marketingAutomationPassword = $SqlStrongPassword
 $sql.formsUser = $site.prefix + "formsuser"
-$sql.formsPassword = "Test12345"
+$sql.formsPassword = $SqlStrongPassword
 $sql.exmMasterUser = $site.prefix + "exmmasteruser"
-$sql.exmMasterPassword = "Test12345"
+$sql.exmMasterPassword = $SqlStrongPassword
 $sql.messagingUser = $site.prefix + "messaginguser"
-$sql.messagingPassword = "Test12345"
+$sql.messagingPassword = $SqlStrongPassword
 
 # XConnect Parameters
 $xConnect = $json.settings.xConnect

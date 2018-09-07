@@ -8,6 +8,8 @@
 *.crt
 *.zip
 *.log
+*.p12
+*.jks
 /XP/install/assets/license.xml
 *.msi
 /XC/install/configuration-xc0.json
@@ -15,3 +17,4 @@
 /XP/install/configuration-xp0.json
 /XP/install/set-installation-overrides.ps1
 /.vs
+/XP/install/.vscode
