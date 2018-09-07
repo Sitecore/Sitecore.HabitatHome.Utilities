@@ -340,13 +340,13 @@ Function Install-Commerce {
         SitecoreDbServer                            = $sql.server
         SitecoreCoreDbName                          = $($site.prefix + "_Core")
         SitecoreUsername                            = "sitecore\admin"
-        SitecoreUserPassword                        = "b"
+        SitecoreUserPassword                        = $sitecore.adminPassword
         CommerceSearchProvider                      = "solr"
         SolrUrl                                     = $solr.url
         SolrRoot                                    = $solr.root
         SolrService                                 = $solr.serviceName
         SolrSchemas                                 = (Join-Path -Path $assets.commerce.sifCommerceRoot -ChildPath "SolrSchemas" )
-        SearchIndexPrefix                           = ""
+        SearchIndexPrefix                           = $site.prefix
         AzureSearchServiceName                      = ""
         AzureSearchAdminKey                         = ""
         AzureSearchQueryKey                         = ""
