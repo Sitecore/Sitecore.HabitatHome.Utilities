@@ -40,6 +40,7 @@
     },
     "Tasks": {
         "CreatePaths": {
+			"Description" : "Create the physical disk path.",
             "Type": "EnsurePath",
             "Params": {
                 "Exists": [
@@ -48,7 +49,7 @@
             }
         },
         "DisplayPassword" :{
-            // Print password if the user hasn't supplied their own.
+			"Description" : "Print password if the user hasn't supplied their own.",
             "Type" : "WriteOutput",
             "Params" : {
                 "InputObject" :"[concat('Certificate Password: ',variable('Password.String'))]"
@@ -56,6 +57,7 @@
             "Skip" : "[not(variable('User.Supplied.Password'))]"
         },
         "CreateRootCert": {
+			"Description" : "Create the root certificate.",
             "Type": "NewRootCertificate",
             "Params": {
                 "Path": "[parameter('CertPath')]",
@@ -69,6 +71,7 @@
             }
         },
         "CreateSignedCert": {
+			"Description" : "Create a certificate signed by the root authority.",
             "Type": "NewSignedCertificate",
             "Params": {
                 "Signer": "[GetCertificate(variable('Root.Cert.DnsName'), variable('Root.Cert.Store'))]",

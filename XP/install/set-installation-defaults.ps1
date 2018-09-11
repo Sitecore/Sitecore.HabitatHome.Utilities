@@ -14,7 +14,7 @@ $assets.psRepository = "https://sitecore.myget.org/F/sc-powershell/api/v2/"
 $assets.psRepositoryName = "SitecoreGallery"
 $assets.licenseFilePath = Join-Path $assets.root "license.xml"
 $assets.installerVersion = "2.0.0-beta0229"
-$assets.sitecoreVersion = "9.1.0 rev. 001256"
+$assets.sitecoreVersion = "9.1.0 rev. 001320"
 $assets.identityServerVersion = "2.0.0 rev. 00128"
 $assets.certificatesPath = Join-Path $assets.root "Certificates"
 $assets.jreRequiredVersion = "8.0.1710"
@@ -39,36 +39,64 @@ $site.habitatHomeSslCertificateName = $site.prefix + "." + $site.suffix
 Write-Host "Setting default 'SQL' parameters"
 $sql = $json.settings.sql
 # SQL Settings
+
+$SqlStrongPassword = "Str0NgPA33w0rd!!" # Used for all other services
+
 $sql.server = "."
 $sql.adminUser = "sa"
 $sql.adminPassword = "12345"
-$sql.minimumVersion="13.0.4001"
+$sql.coreUser = $site.prefix + "coreuser"
+$sql.corePassword = $SqlStrongPassword
+$sql.masterUser = $site.prefix + "masteruser"
+$sql.masterPassword = $SqlStrongPassword
+$sql.webUser = $site.prefix + "webuser"
+$sql.webPassword = $SqlStrongPassword
+$sql.collectionUser = $site.prefix + "collectionuser"
+$sql.collectionPassword = $SqlStrongPassword
+$sql.reportingUser = $site.prefix + "reportinguser"
+$sql.reportingPassword = $SqlStrongPassword
+$sql.processingPoolsUser = $site.prefix + "poolsuser"
+$sql.processingPoolsPassword = $SqlStrongPassword
+$sql.processingEngineUser = $site.prefix + "processingengineuser"
+$sql.processingEnginePassword = $SqlStrongPassword
+$sql.processingTasksUser = $site.prefix + "tasksuser"
+$sql.processingTasksPassword = $SqlStrongPassword
+$sql.referenceDataUser = $site.prefix + "referencedatauser"
+$sql.referenceDataPassword = $SqlStrongPassword
+$sql.marketingAutomationUser = $site.prefix + "marketingautomationuser"
+$sql.marketingAutomationPassword = $SqlStrongPassword
+$sql.formsUser = $site.prefix + "formsuser"
+$sql.formsPassword = $SqlStrongPassword
+$sql.exmMasterUser = $site.prefix + "exmmasteruser"
+$sql.exmMasterPassword = $SqlStrongPassword
+$sql.messagingUser = $site.prefix + "messaginguser"
+$sql.messagingPassword = $SqlStrongPassword
+$sql.minimumVersion = "13.0.4001"
 
 Write-Host "Setting default 'xConnect' parameters"
 # XConnect Parameters
 $xConnect = $json.settings.xConnect
-
-$xConnect.ConfigurationPath = (Get-ChildItem $pwd -filter "xconnect-xp0.json" -Recurse).FullName 
+$xConnect.ConfigurationPath = (Get-ChildItem $pwd -filter "xconnect-xp0.json" -Recurse).FullName
 $xConnect.certificateConfigurationPath = (Get-ChildItem $pwd -filter "xconnect-createcert.json" -Recurse).FullName
-$xConnect.solrConfigurationPath = (Get-ChildItem $pwd -filter "xconnect-solr.json" -Recurse).FullName 
+$xConnect.solrConfigurationPath = (Get-ChildItem $pwd -filter "xconnect-solr.json" -Recurse).FullName
 $xConnect.packagePath = Join-Path $assets.root $("Sitecore " + $assets.sitecoreVersion + " (OnPrem)_xp0xconnect.scwdp.zip")
 $xConnect.siteName = $site.prefix + "_xconnect." + $site.suffix
 $xConnect.certificateName = [string]::Join(".", @($site.prefix, $site.suffix, "xConnect.Client"))
 $xConnect.siteRoot = Join-Path $site.webRoot -ChildPath $xConnect.siteName
-$xConnect.sqlCollectionUser = $site.prefix + "collectionuser"
-$xConnect.sqlCollectionPassword = "Test12345"
+
 
 Write-Host "Setting default 'Sitecore' parameters"
-
 # Sitecore Parameters
 $sitecore = $json.settings.sitecore
-
-$sitecore.solrConfigurationPath =  (Get-ChildItem $pwd -filter "sitecore-solr.json" -Recurse).FullName 
-$sitecore.configurationPath = (Get-ChildItem $pwd -filter "sitecore-xp0.json" -Recurse).FullName 
+$sitecore.solrConfigurationPath = (Get-ChildItem $pwd -filter "sitecore-solr.json" -Recurse).FullName
+$sitecore.configurationPath = (Get-ChildItem $pwd -filter "sitecore-xp0.json" -Recurse).FullName
 $sitecore.sslConfigurationPath = "$PSScriptRoot\certificates\sitecore-ssl.json"
-$sitecore.packagePath = Join-Path $assets.root $("Sitecore " + $assets.sitecoreVersion +" (OnPrem)_single.scwdp.zip")
+$sitecore.packagePath = Join-Path $assets.root $("Sitecore " + $assets.sitecoreVersion + " (OnPrem)_single.scwdp.zip")
 $sitecore.siteRoot = Join-Path $site.webRoot -ChildPath $site.hostName
-
+$sitecore.adminPassword = "b"
+$sitecore.exmCryptographicKey = "0x0000000000000000000000000000000000000000000000000000000000000000"
+$sitecore.exmAuthenticationKey = "0x0000000000000000000000000000000000000000000000000000000000000000"
+$sitecore.telerikEncryptionKey = "PutYourCustomEncryptionKeyHereFrom32To256CharactersLong"
 Write-Host "Setting default 'IdentityServer' parameters"
 $identityServer = $json.settings.identityServer
 $identityServer.packagePath = Join-Path $assets.root $("Sitecore.IdentityServer " + $assets.identityServerVersion + " (OnPrem)_identityserver.scwdp.zip")
@@ -79,44 +107,48 @@ $identityServer.clientSecret = "ClientSecret"
 Write-Host "Setting default 'Solr' parameters"
 # Solr Parameters
 $solr = $json.settings.solr
-$solr.url = "https://localhost:8983/solr"
+$solr.url = "https://localhost:8721	/solr"
 $solr.root = "c:\solr"
 $solr.serviceName = "Solr"
 
 Write-Host "Setting default 'modules' parameters"
+# Modules
+$modulesConfig = Get-Content -Raw .\assets.json -Encoding Ascii |  ConvertFrom-Json
+
 $modules = $json.modules
 
-$spe = $modules | Where-Object { $_.id -eq "spe"}
-$spe.packagePath = Join-Path $assets.root "packages\Sitecore PowerShell Extensions-4.7.2 for Sitecore 8.zip"
-$spe.install = $true
+$sitecore = $modulesConfig.sitecore
 
-$sxa = $modules | Where-Object { $_.id -eq "sxa"}
-$sxa.packagePath = Join-Path $assets.root "packages\Sitecore Experience Accelerator 1.8 .878 for 9.1.zip"
-$sxa.install = $true
+$config = @{
+    id          = $sitecore.id
+    name        = $sitecore.name
+    packagePath = Join-Path $assets.root ("\{0}" -f $sitecore.fileName) 
+    url         = $sitecore.url
+    extract     = $sitecore.extract
+    download    = $sitecore.download
+    source      = $sitecore.source
+}
 
-$def = $modules | Where-Object {$_.id -eq "def"}
-$def.packagePath = Join-Path $assets.root "packages\Data Exchange Framework 2.0.1 rev. 180108.zip"
-$def.install = $false
+$config = $config| ConvertTo-Json
 
-$defSql = $modules | Where-Object {$_.id -eq "defSql"}
-$defSql.packagePath = Join-Path $assets.root "packages\SQL Provider for Data Exchange Framework 2.0.1 rev. 180108.zip"
-$defSql.install = $false
+$modules += (ConvertFrom-Json -InputObject $config) 
+$config = @{}
+foreach ($module in $modulesConfig.modules) {
+    $config = @{
+        id          = $module.id
+        name        = $module.name
+        packagePath = Join-Path $assets.root ("packages\{0}" -f $module.fileName) 
+        url         = $module.url
+        install     = $module.install
+        download    = $module.download
+        source      = $module.source
+    } 
+    $config = $config| ConvertTo-Json
 
-$defSitecore = $modules | Where-Object {$_.id -eq "defSitecore"}
-$defSitecore.packagePath = Join-Path $assets.root "packages\Sitecore Provider for Data Exchange Framework 2.0.1 rev. 180108.zip"
-$defSitecore.install = $false
-
-$defxConnect = $modules | Where-Object {$_.id -eq "defxConnect"}
-$defxConnect.packagePath = Join-Path $assets.root "packages\xConnect Provider for Data Exchange Framework 2.0.1 rev. 180108.zip"
-$defxConnect.install = $false
-
-$defDynamicsProvider = $modules | Where-Object {$_.id -eq "defDynamicsProvider"}
-$defDynamicsProvider.packagePath = Join-Path $assets.root "packages\Dynamics Provider for Data Exchange Framework 2.0.1 rev. 180108.zip"
-$defDynamicsProvider.install = $false
-
-$defDynamicsConnect = $modules | Where-Object {$_.id -eq "defDynamicsConnect"}
-$defDynamicsConnect.packagePath = Join-Path $assets.root "packages\Connect for Microsoft Dynamics 2.0.1 rev. 180108.zip"
-$defDynamicsConnect.install = $false
+    $modules += (ConvertFrom-Json -InputObject $config) 
+    $config=@{}
+}
+$json.modules = $modules
 
 Write-Host ("Saving Configuration file to {0}" -f $ConfigurationFile)
 

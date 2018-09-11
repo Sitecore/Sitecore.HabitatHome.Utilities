@@ -67,3 +67,4 @@ logs
 publishTemp
 Publish
 dev.creds.xml
+*.pfx

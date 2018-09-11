@@ -7,7 +7,7 @@ Param(
     [string]$solrHost = "localhost",
     [bool]$solrSSL = $TRUE,
     [string]$nssmVersion = "2.24",
-    [string]$JREVersion = "1.8.0_171",
+    [string]$JREVersion = "1.8.0_181",
 	[string]$keystoreSecret = "secret",
 	[string]$KeystoreFile = 'solr-ssl.keystore.jks',
 	[string]$SolrDomain = 'localhost',
