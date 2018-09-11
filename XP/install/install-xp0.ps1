@@ -1,6 +1,5 @@
 Param(
-    [string] $ConfigurationFile = "configuration-xp0.json",
-    [string] $AssetsFile = "assets.json"
+    [string] $ConfigurationFile = "configuration-xp0.json"
 )
 
 #####################################################
@@ -20,15 +19,6 @@ $config = Get-Content -Raw $ConfigurationFile |  ConvertFrom-Json
 if (!$config) {
     throw "Error trying to load configuration!"
 }
-
-#$carbon = Get-Module Carbon
-#if (-not $carbon) {
-#    Write-Host "Installing latest version of Carbon" -ForegroundColor Green
-#    Install-Module -Name Carbon -Repository PSGallery -AllowClobber -Verbose
-#    Import-Module Carbon
-#}
-
-
 
 $site = $config.settings.site
 $sql = $config.settings.sql
@@ -101,30 +91,23 @@ function Confirm-Prerequisites {
         throw "Could not find WebDeploy in $webDeployPath"
     }   
 
-    # Verify DAC Fx
-    # Verify Microsoft.SqlServer.TransactSql.ScriptDom.dll
-    # try {
-    #     $assembly = [reflection.assembly]::LoadWithPartialName("Microsoft.SqlServer.TransactSql.ScriptDom")
-    #     if (-not $assembly) {
-    #         throw "error"
-    #     }
-    # }
-    # catch {
-    #     throw "Could load the Microsoft.SqlServer.TransactSql.ScriptDom assembly. Please make sure it is installed and registered in the GAC"
-    # }
-    
+   
     #Enable Contained Databases
-    # Write-Host "Enable contained databases" -ForegroundColor Green
-    # try {
-    #     Invoke-Sqlcmd -ServerInstance $sql.server `
-    #         -Username $sql.adminUser `
-    #         -Password $sql.adminPassword `
-    #         -InputFile "$PSScriptRoot\database\containedauthentication.sql"
-    # }
-    # catch {
-    #     write-host "Set Enable contained databases failed" -ForegroundColor Red
-    #     throw
-    # }
+    Write-Host "Enable contained databases" -ForegroundColor Green
+    try {
+        # This command can set the location to SQLSERVER:\
+        Invoke-Sqlcmd -ServerInstance $sql.server `
+            -Username $sql.adminUser `
+            -Password $sql.adminPassword `
+            -InputFile "$PSScriptRoot\database\containedauthentication.sql"
+    }
+    catch {
+        write-host "Set Enable contained databases failed" -ForegroundColor Red
+        throw
+    }
+
+    # Reset location to script root
+    Set-Location $PSScriptRoot
 
     # Verify Solr
     Write-Host "Verifying Solr connection" -ForegroundColor Green
@@ -189,7 +172,6 @@ function Install-Assets {
     if ((Get-PSRepository | Where-Object {$_.Name -eq $assets.psRepositoryName}).count -eq 0) {
         Register-PSRepository -Name $assets.psRepositoryName -SourceLocation $assets.psRepository -InstallationPolicy Trusted 
     }
-
     #Sitecore Install Framework dependencies
     Import-Module WebAdministration
 
@@ -213,7 +195,7 @@ function Install-Assets {
 }
 function Get-Assets {
 
-    $downloadAssets = Get-Content $AssetsFile -Raw | ConvertFrom-Json
+    $downloadAssets = $modules
     $downloadFolder = $assets.root
     $packagesFolder = (Join-Path $downloadFolder "packages")
     
@@ -227,54 +209,39 @@ function Get-Assets {
 
     $downloadJsonPath = $([io.path]::combine($resourcePath, 'content', 'Deployment', 'OnPrem', 'HabitatHome', 'download-assets.json'))
     Set-Alias sz 'C:\Program Files\7-Zip\7z.exe'
-
-    foreach ($package in $downloadAssets.sitecore) {
+    $package = $modules | Where-Object {$_.id -eq "xp"}
     
-        if ($package.download -eq $true) {
-            Write-Host ("Downloading {0}  -  if required" -f $package.fileName )
+    if ($package.download -eq $true) {
+        Write-Host ("Downloading {0}  -  if required" -f $package.name )
         
-            $destination = $([io.path]::combine((Resolve-Path $downloadFolder), $package.fileName))
+        $destination =  $package.packagePath
             
-            if (!(Test-Path $destination)) {
-                $params = @{
-                    Path        = $downloadJsonPath
-                    Credentials = $credentials
-                    Source      = $package.url
-                    Destination = $destination
-                }
-                Install-SitecoreConfiguration  @params  -WorkingDirectory $(Join-Path $PWD "logs") -Verbose 
+        if (!(Test-Path $destination)) {
+            $params = @{
+                Path        = $downloadJsonPath
+                Credentials = $credentials
+                Source      = $package.url
+                Destination = $destination
             }
-            if ($package.extract -eq $true) {
-                sz x -o"$DownloadFolder" $destination -r -y -aoa
-            }
+            Install-SitecoreConfiguration  @params  -WorkingDirectory $(Join-Path $PWD "logs") -Verbose 
+        }
+        if ((Test-Path $destination) -and ( $package.extract -eq $true)) {
+            sz x -o"$DownloadFolder" $destination  -y -aoa
         }
     }
+   
+    
     # Download modules
-    foreach ($package in $downloadAssets.modules) {
-	
+    foreach ($package in $downloadAssets) {
+        if ($package.id -eq "xp") {
+            continue;
+        }
         if (!(Test-Path $packagesFolder)) {
             New-Item -ItemType Directory -Force -Path $packagesFolder
         }
         if ($package.download -eq $true) {
-            Write-Host ("Downloading {0}  -  if required" -f $package.fileName )
-            $destination = $([io.path]::combine((Resolve-Path $packagesFolder), $package.fileName))
-            if (!(Test-Path $destination)) {
-                $params = @{
-                    Path        = $downloadJsonPath
-                    Credentials = $credentials
-                    Source      = $package.url
-                    Destination = $destination
-                }
-                Install-SitecoreConfiguration  @params  -WorkingDirectory $(Join-Path $PWD "logs") -Verbose 
-            }
-        }
-    }
-
-    # Download other packages
-    foreach ($package in $downloadAssets.prerequisites) {
-        if ($package.download -eq $true) {
-            Write-Host ("Downloading {0}  -  if required" -f $package.fileName )
-            $destination = $([io.path]::combine((Resolve-Path $downloadFolder), $package.fileName))
+            Write-Host ("Downloading {0}  -  if required" -f $package.name )
+            $destination = $package.packagePath
             if (!(Test-Path $destination)) {
                 $params = @{
                     Path        = $downloadJsonPath
@@ -290,21 +257,6 @@ function Get-Assets {
 
 
 function Install-XConnect {
-    #Generate xConnect client certificate
-    try {
-        Write-Host $xConnect.certificateConfigurationPath
-        $params = @{
-            Path            = $xConnect.certificateConfigurationPath 
-            CertificateName = $xConnect.certificateName 
-            CertPath        = $assets.certificatesPath
-        }
-        Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs")
-    }
-    catch {
-        write-host "XConnect Certificate Creation Failed" -ForegroundColor Red
-        throw
-    }
-    
     #Install xConnect Solr
     try {
         $params = @{
@@ -321,52 +273,79 @@ function Install-XConnect {
         throw
     }
 
-  
-    
+    #Generate xConnect client certificate
+    try {
+        Write-Host $xConnect.certificateConfigurationPath
+        $params = @{
+            Path            = $xConnect.certificateConfigurationPath 
+            CertificateName = $xConnect.certificateName 
+            CertPath        = $assets.certificatesPath
+        }
+        Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs")
+    }
+    catch {
+        write-host "XConnect Certificate Creation Failed" -ForegroundColor Red
+        throw
+    }
+
     #Install xConnect
     try {
-      
-         
-        $xconnectParams = @{
-            Path                     = $xConnect.ConfigurationPath 
-            Package                  = $xConnect.PackagePath 
-            LicenseFile              = $assets.licenseFilePath 
-            SiteName                 = $xConnect.siteName 
-            XConnectCert             = $xConnect.certificateName 
-            SqlDbPrefix              = $site.prefix 
-            SolrCorePrefix           = $site.prefix 
-            SqlAdminUser             = $sql.adminUser 
-            SqlAdminPassword         = $sql.adminPassword 
-            SqlServer                = $sql.server 
-            SqlCollectionUser        = $xConnect.sqlCollectionUser 
-            SqlCollectionPassword    = $xConnect.sqlCollectionPassword 
-            SolrUrl                  = $solr.url 
-            WebRoot                  = $site.webRoot
-            MachineLearningServerUrl = "XXX"
+        $params = @{
+            Path                           = $xConnect.ConfigurationPath
+            Package                        = $xConnect.PackagePath
+            LicenseFile                    = $assets.licenseFilePath
+            SiteName                       = $xConnect.siteName
+            XConnectCert                   = $xConnect.certificateName
+            SqlDbPrefix                    = $site.prefix
+            SolrCorePrefix                 = $site.prefix
+            SqlAdminUser                   = $sql.adminUser
+            SqlAdminPassword               = $sql.adminPassword
+            SolrUrl                        = $solr.url
+            SqlCollectionUser               = $sql.collectionUser
+            SqlCollectionPassword           = $sql.collectionPassword
+            SqlProcessingPoolsUser         = $sql.processingPoolsUser
+            SqlProcessingPoolsPassword     = $sql.processingPoolsPassword
+            SqlReferenceDataUser           = $sql.referenceDataUser
+            SqlReferenceDataPassword       = $sql.referenceDataPassword
+            SqlMarketingAutomationUser     = $sql.marketingAutomationUser
+            SqlMarketingAutomationPassword = $sql.marketingAutomationPassword
+            SqlMessagingUser                = $sql.messagingUser
+            SqlMessagingPassword            = $sql.messagingPassword
+            SqlProcessingEngineUser         = $sql.processingEngineUser
+            SqlProcessingEnginePassword     = $sql.processingEnginePassword
+            SqlReportingUser               = $sql.reportingUser
+            SqlReportingPassword           = $sql.reportingPassword
+            SqlServer                      = $sql.server
+            MachineLearningServerUrl        = "XXX"
+            MachineLearningServerBlobEndpointCertificatePath    = ""
+            MachineLearningServerBlobEndpointCertificatePassword = ""
+            MachineLearningServerTableEndpointCertificatePath   = ""
+            MachineLearningServerTableEndpointCertificatePassword = ""
+            MachineLearningServerEndpointCertificationAuthorityCertificatePath = ""
+            WebRoot                         = $site.webRoot
+
         }
-        Install-SitecoreConfiguration @xconnectParams -WorkingDirectory $(Join-Path $PWD "logs")
-        
+        Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs")
     }
     catch {
         write-host "XConnect Setup Failed" -ForegroundColor Red
         throw
     }
-                             
 
     #Set rights on the xDB connection database
-    #     Write-Host "Setting Collection User rights" -ForegroundColor Green
-    #     try {
-    #         $sqlVariables = "DatabasePrefix = $($site.prefix)", "UserName = $($xConnect.sqlCollectionUser)", "Password = $($xConnect.sqlCollectionPassword)"
-    #         Invoke-Sqlcmd -ServerInstance $sql.server `
-    #             -Username $sql.adminUser `
-    #             -Password $sql.adminPassword `
-    #             -InputFile "$PSScriptRoot\database\collectionusergrant.sql" `
-    #             -Variable $sqlVariables
-    #     }
-    #     catch {
-    #         write-host "Set Collection User rights failed" -ForegroundColor Red
-    #         throw
-    #     }
+    Write-Host "Setting Collection User rights" -ForegroundColor Green
+    try {
+        $sqlVariables = "DatabasePrefix = $($site.prefix)", "UserName = $($sql.collectionUser)", "Password = $($sql.collectionPassword)"
+        Invoke-Sqlcmd -ServerInstance $sql.server `
+            -Username $sql.adminUser `
+            -Password $sql.adminPassword `
+            -InputFile "$PSScriptRoot\database\collectionusergrant.sql" `
+            -Variable $sqlVariables
+    }
+    catch {
+        write-host "Set Collection User rights failed" -ForegroundColor Red
+        throw
+    }
 }
 
 function Install-Sitecore {
@@ -374,10 +353,10 @@ function Install-Sitecore {
     try {
         #Install Sitecore Solr
         $params = @{
-            Path        = $sitecore.solrConfigurationPath 
-            SolrUrl     = $solr.url 
-            SolrRoot    = $solr.root 
-            SolrService = $solr.serviceName 
+            Path        = $sitecore.solrConfigurationPath
+            SolrUrl     = $solr.url
+            SolrRoot    = $solr.root
+            SolrService = $solr.serviceName
             CorePrefix  = $site.prefix
         }
         Install-SitecoreConfiguration  @params -WorkingDirectory $(Join-Path $PWD "logs")
@@ -389,30 +368,54 @@ function Install-Sitecore {
 
     try {
         #Install Sitecore
-        
         $sitecoreParams = @{
             Path                                 = $sitecore.configurationPath
-            Package                              = $sitecore.packagePath 
-            LicenseFile                          = $assets.licenseFilePath 
-            SiteName                             = $site.hostName 
-            XConnectCert                         = $xConnect.certificateName 
-            SqlDbPrefix                          = $site.prefix 
-            SolrCorePrefix                       = $site.prefix 
-            SqlAdminUser                         = $sql.adminUser 
-            SqlAdminPassword                     = $sql.adminPassword 
-            SqlServer                            = $sql.server 
+            Package                              = $sitecore.packagePath
+            LicenseFile                          = $assets.licenseFilePath
+            SiteName                             = $site.hostName
+            XConnectCert                         = $xConnect.certificateName
+            SqlDbPrefix                          = $site.prefix
+            SolrCorePrefix                       = $site.prefix
+            SitecoreAdminPassword                = $sitecore.adminPassword
+            SqlAdminUser                         = $sql.adminUser
+            SqlAdminPassword                     = $sql.adminPassword
+            SqlCoreUser                          = $sql.coreUser
+            SqlCorePassword                      = $sql.corePassword
+            SqlMasterUser                        = $sql.masterUser
+            SqlMasterPassword                    = $sql.masterPassword
+            SqlWebUser                           = $sql.webUser
+            SqlWebPassword                       = $sql.webPassword
+            SqlReportingUser                     = $sql.reportingUser
+            SqlReportingPassword                 = $sql.reportingPassword
+            SqlProcessingPoolsUser               = $sql.processingPoolsUser
+            SqlProcessingPoolsPassword           = $sql.processingPoolsPassword
+            SqlProcessingTasksUser               = $sql.processingTasksUser
+            SqlProcessingTasksPassword           = $sql.processingTasksPassword
+            SqlReferenceDataUser                 = $sql.referenceDataUser
+            SqlReferenceDataPassword             = $sql.referenceDataPassword
+            SqlMarketingAutomationUser           = $sql.marketingAutomationUser
+            SqlMarketingAutomationPassword       = $sql.marketingAutomationPassword
+            SqlFormsUser                         = $sql.formsUser
+            SqlFormsPassword                     = $sql.formsPassword
+            SqlExmMasterUser                     = $sql.exmMasterUser
+            SqlExmMasterPassword                 = $sql.exmMasterPassword
+            SqlMessagingUser                     = $sql.messagingUser
+            SqlMessagingPassword                 = $sql.messagingPassword
+            SqlServer                            = $sql.server
+            EXMCryptographicKey                  = $sitecore.exmCryptographicKey
+            EXMAuthenticationKey                 = $sitecore.exmAuthenticationKey
             SolrUrl                              = $solr.url
             XConnectReportingService             = "https://$($xConnect.siteName)" 
-            XConnectCollectionService            = "https://$($xConnect.siteName)" 
-            XConnectReferenceDataService         = "https://$($xConnect.siteName)" 
-            MarketingAutomationOperationsService = "https://$($xConnect.siteName)" 
+			XConnectCollectionService            = "https://$($xConnect.siteName)"
+            XConnectReferenceDataService         = "https://$($xConnect.siteName)"
+            MarketingAutomationOperationsService = "https://$($xConnect.siteName)"
             MarketingAutomationReportingService  = "https://$($xConnect.siteName)"
-            SitecoreIdentityAuthority            = $identityServer.url   
+            TelerikEncryptionKey                 = $sitecore.telerikEncryptionKey
+			SitecoreIdentityAuthority            = $identityServer.url   
             SitecoreIdentitySecret               = $identityServer.clientSecret
             WebRoot                              = $site.webRoot
         }
         Install-SitecoreConfiguration  @sitecoreParams -WorkingDirectory $(Join-Path $PWD "logs")
-            
     }
     catch {
         write-host "Sitecore Setup Failed" -ForegroundColor Red
@@ -489,7 +492,6 @@ function Enable-InstallationImprovements {
         throw
     }
 }
-
 function Disable-InstallationImprovements {
     try {
         $params = @{
@@ -506,6 +508,8 @@ function Disable-InstallationImprovements {
 }
 
 function Copy-Tools {
+    #Copy InstallPackage.aspx to webroot
+
     if (!(Test-Path $assets.installPackagePath)) {
         throw "$($assets.installPackagePath) not found"
     }
@@ -552,19 +556,31 @@ Function Add-AppPoolMembership {
     catch {
         Write-Host "Warning: Couldn't add IIS AppPool\$($site.hostName) to Performance Monitor Users -- user may already exist" -ForegroundColor Yellow
     }
+	  try {
+        Add-LocalGroupMember "Performance Monitor Users" "IIS AppPool\$($xConnect.siteName)"
+        Write-Host "Added IIS AppPool\$($xConnect.siteName) to Performance Monitor Users" -ForegroundColor Green
+    }
+    catch {
+        Write-Host "Warning: Couldn't add IIS AppPool\$($site.hostName) to Performance Monitor Users -- user may already exist" -ForegroundColor Yellow
+    }
+    try {
+        Add-LocalGroupMember "Performance Log Users" "IIS AppPool\$($xConnect.siteName)"
+        Write-Host "Added IIS AppPool\$($xConnect.siteName) to Performance Log Users" -ForegroundColor Green
+    }
+    catch {
+        Write-Host "Warning: Couldn't add IIS AppPool\$($xConnect.siteName) to Performance Log Users -- user may already exist" -ForegroundColor Yellow
+    }
 }
 Function Set-ModulesPath {
     Write-Host "Setting Modules Path" -ForegroundColor Green
     $modulesPath = ( Join-Path -Path $resourcePath -ChildPath "Modules" )
     if ($env:PSModulePath -notlike "*$modulesPath*") {
-        $p = $env:PSModulePath + "; " + $modulesPath
+        $p = $env:PSModulePath + ";" + $modulesPath
         [Environment]::SetEnvironmentVariable("PSModulePath", $p)
     }
 }
 
 function Install-OptionalModules {
-    #Copy InstallPackage.aspx to webroot
-    
     $packageDestination = Join-Path $sitecore.siteRoot "\temp\Packages"
     foreach ($module in $modules | Where-Object {$_.install -eq $true}) {
         Write-Host "Copying $($module.name) to the $packageDestination"
@@ -606,8 +622,8 @@ Install-XConnect
 Install-Sitecore
 Install-IdentityServer
 Add-AppPoolMembership
-#Enable-InstallationImprovements
-#Copy-Tools
-#Install-OptionalModules
+Enable-InstallationImprovements
+Copy-Tools
+Install-OptionalModules
 Disable-InstallationImprovements
-#Update-SXASolrCores
+Update-SXASolrCores

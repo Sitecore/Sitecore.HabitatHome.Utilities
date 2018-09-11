@@ -36,12 +36,12 @@ Write-Host "*******************************************************" -Foreground
 #    Remove-Module "uninstall"
 #}
 
-$carbon = Get-Module Carbon
-if (-not $carbon) {
-    Write-Host "Installing latest version of Carbon" -ForegroundColor Green
-    Install-Module -Name Carbon -Repository PSGallery -AllowClobber -Verbose
-    Import-Module Carbon
-}
+# $carbon = Get-Module Carbon
+# if (-not $carbon) {
+#     Write-Host "Installing latest version of Carbon" -ForegroundColor Green
+#     Install-Module -Name Carbon -Repository PSGallery -AllowClobber -Verbose
+#     Import-Module Carbon
+# }
 
 IISRESET /STOP
 Import-Module "$PSScriptRoot\uninstall\uninstall.psm1"
@@ -102,7 +102,7 @@ Remove-SitecoreDatabase -Name "$($site.prefix)_ProcessingEngineTasks" -Server $d
 
 # Delete sitecore files
 Remove-SitecoreFiles $sitecore.siteRoot
-
+Remove-SitecoreFiles  (Join-Path $site.webroot ("IdentityServer.{0}" -f $site.hostName))
 # Delete sitecore cores
 Get-WmiObject win32_service  -Filter "name like '$($solr.serviceName)'" | Stop-Service 
 Remove-SitecoreSolrCore "$($site.prefix)_core_index" -Root $solr.root
@@ -126,23 +126,33 @@ Remove-SitecoreDatabaseLogin -Server $database, -Name $($xConnect.sqlCollectionU
 
 # Remove App Pool membership 
 
-try 
-{
+try {
     Remove-LocalGroupMember "Performance Log Users" "IIS AppPool\$($site.hostName)"
-    Write-Host "Removed IIS AppPool\$($site.hostName) from Performance Log Users" -ForegroundColor Green
+    Write-Host "Removed IIS AppPool\$($site.hostName) to Performance Log Users" -ForegroundColor Green
+  
 }
-catch 
-{
-    Write-Host "Could not find IIS AppPool\$($site.hostName) in Performance Log Users" -ForegroundColor Yellow
+catch {
+    Write-Host "Warning: Couldn't remove IIS AppPool\$($site.hostName) to Performance Log Users -- user may already exist" -ForegroundColor Yellow
 }
-try 
-{
+try {
     Remove-LocalGroupMember "Performance Monitor Users" "IIS AppPool\$($site.hostName)"
-    Write-Host "Removed IIS AppPool\$($site.hostName) from Performance Monitor Users" -ForegroundColor Green
+    Write-Host "Removed IIS AppPool\$($site.hostName) to Performance Monitor Users" -ForegroundColor Green
 }
-catch 
-{
-    Write-Host "Could not find IIS AppPool\$($site.hostName) to Performance Monitor Users" -ForegroundColor Yellow
+catch {
+    Write-Host "Warning: Couldn't remove IIS AppPool\$($site.hostName) to Performance Monitor Users -- user may already exist" -ForegroundColor Yellow
 }
-
+try {
+    Remove-LocalGroupMember "Performance Monitor Users" "IIS AppPool\$($xConnect.siteName)"
+    Write-Host "Removed IIS AppPool\$($xConnect.siteName) to Performance Monitor Users" -ForegroundColor Green
+}
+catch {
+    Write-Host "Warning: Couldn't remove IIS AppPool\$($site.hostName) to Performance Monitor Users -- user may already exist" -ForegroundColor Yellow
+}
+try {
+    Remove-LocalGroupMember "Performance Log Users" "IIS AppPool\$($xConnect.siteName)"
+    Write-Host "Removed IIS AppPool\$($xConnect.siteName) to Performance Log Users" -ForegroundColor Green
+}
+catch {
+    Write-Host "Warning: Couldn't remove IIS AppPool\$($xConnect.siteName) to Performance Log Users -- user may already exist" -ForegroundColor Yellow
+}
 IISRESET /START
