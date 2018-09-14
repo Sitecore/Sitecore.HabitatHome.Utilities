@@ -61,7 +61,7 @@
             "packagePath": "@@xConnect.packagePath@@",
             "siteName": "@@xConnect.siteName@@",
             "certificateName": "@@xConnect.certificate@@",
-            "siteRoot": "@@xConnect.siteRoot@@"
+            "siteRoot": "@@xConnect.siteRoot@@"            
         },
         "sitecore": {
             "solrConfigurationPath": "@@sitecore.solrConfigurationPath@@",
@@ -72,7 +72,8 @@
             "adminPassword": "@@sitecore.adminPassword@@",
             "exmCryptographicKey": "@@sitecore.exmCryptographicKey@@",
             "exmAuthenticationKey": "@@sitecore.exmAuthenticationKey@@",
-            "telerikEncryptionKey": "@@sitecore.telerikEncryptionKey@@"
+            "telerikEncryptionKey": "@@sitecore.telerikEncryptionKey@@",
+            "rootCertificateName": "@@sitecore.rootCertificateName@@"
         },
         "solr": {
             "url": "@@solr.url@@",

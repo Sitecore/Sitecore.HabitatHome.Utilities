@@ -282,6 +282,7 @@ function Install-XConnect {
             Path            = $xConnect.certificateConfigurationPath 
             CertificateName = $xConnect.certificateName 
             CertPath        = $assets.certificatesPath
+            RootCertFileName = $sitecore.rootCertificateName
         }
         Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs")
     }
@@ -541,8 +542,8 @@ Confirm-Prerequisites
 Install-XConnect
 Install-Sitecore
 Add-AppPoolMembership
-Enable-InstallationImprovements
-Copy-Tools
-Install-OptionalModules
-Disable-InstallationImprovements
-Update-SXASolrCores
+#Enable-InstallationImprovements
+#Copy-Tools
+#Install-OptionalModules
+#Disable-InstallationImprovements
+#Update-SXASolrCores

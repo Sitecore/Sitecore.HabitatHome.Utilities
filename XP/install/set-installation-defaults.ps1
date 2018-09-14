@@ -93,6 +93,7 @@ $sitecore.adminPassword = "b"
 $sitecore.exmCryptographicKey = "0x0000000000000000000000000000000000000000000000000000000000000000"
 $sitecore.exmAuthenticationKey = "0x0000000000000000000000000000000000000000000000000000000000000000"
 $sitecore.telerikEncryptionKey = "PutYourCustomEncryptionKeyHereFrom32To256CharactersLong"
+$sitecore.rootCertificateName = "SitecoreRoot90"
 
 Write-Host "Setting default 'Solr' parameters"
 # Solr Parameters
@@ -131,6 +132,7 @@ foreach ($module in $modulesConfig.modules) {
         url         = $module.url
         install     = $module.install
         download    = $module.download
+        convert     = $module.convertToWdp
         source      = $module.source
     } 
     $config = $config| ConvertTo-Json

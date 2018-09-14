@@ -39,7 +39,7 @@ Write-Host "*******************************************************" -Foreground
 $carbon = Get-Module Carbon
 if (-not $carbon) {
     Write-Host "Installing latest version of Carbon" -ForegroundColor Green
-    Install-Module -Name Carbon -Repository PSGallery -AllowClobber -Verbose
+    Install-Module -Name Carbon -Repository PSGallery -AllowClobber  -Force
     Import-Module Carbon
 }
 
