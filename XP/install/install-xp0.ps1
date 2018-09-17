@@ -519,21 +519,7 @@ function Install-OptionalModules {
 }
 
 
-function Update-SXASolrCores {
-    try {
-        $params = @{
-            Path        = $site.configureSearchIndexes 
-            InstallDir  = $sitecore.siteRoot 
-            ResourceDir = $($assets.root + "\\Sitecore.WDP.Resources")
-            SitePrefix  = $site.prefix
-        }
-        Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs")
-    }
-    catch {
-        write-host "$site.habitatHomeHostName Failed to updated search index configuration" -ForegroundColor Red
-        throw
-    }
-}
+
 
 Set-ModulesPath
 Install-Assets
@@ -542,8 +528,3 @@ Confirm-Prerequisites
 Install-XConnect
 Install-Sitecore
 Add-AppPoolMembership
-#Enable-InstallationImprovements
-#Copy-Tools
-#Install-OptionalModules
-#Disable-InstallationImprovements
-#Update-SXASolrCores

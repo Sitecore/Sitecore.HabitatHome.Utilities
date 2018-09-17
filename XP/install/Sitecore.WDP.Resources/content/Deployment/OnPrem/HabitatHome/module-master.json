@@ -30,9 +30,7 @@
       }
     },
     "Variables": {
-      "Sql.Database.Core": "[concat(parameter('SqlDbPrefix'), '_Core')]",
       "Sql.Database.Master": "[concat(parameter('SqlDbPrefix'), '_Master')]",
-      "Sql.Core.ConnectionString": "[SqlConnectionString(parameter('SqlServer'),variable('Sql.Database.Core'), parameter('SqlAdminUser'), parameter('SqlAdminPassword'))]",
       "Sql.Master.ConnectionString": "[SqlConnectionString(parameter('SqlServer'),variable('Sql.Database.Master'), parameter('SqlAdminUser'), parameter('SqlAdminPassword'))]"
     },
     "Tasks": {
@@ -50,10 +48,6 @@
               {
                 "Name": "Application Path",
                 "Value": "[parameter('SiteName')]"
-              },
-              {
-                "Name": "Core Admin Connection String",
-                "Value": "[variable('Sql.Core.ConnectionString')]"
               },
               {
                 "Name": "Master Admin Connection String",

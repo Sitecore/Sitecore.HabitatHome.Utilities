@@ -2,6 +2,8 @@ Param(
     [string] $ConfigurationFile = ".\configuration-xp0.json"
 )
 
+$StopWatch = New-Object -TypeName System.Diagnostics.Stopwatch 
+$StopWatch.Start()
 #####################################################
 # 
 #  Install Modules
@@ -22,7 +24,7 @@ if (!$config) {
 $assets = $config.assets
 $modules = $config.modules
 $site = $config.settings.site
-#$sitecore = $config.settings.sitecore
+$sitecore = $config.settings.sitecore
 $sql = $config.settings.sql
 $xConnect = $config.settings.xConnect
 $resourcePath = Join-Path $PSScriptRoot "Sitecore.WDP.Resources"
@@ -96,7 +98,7 @@ Function Remove-DatabaseUsers {
     }
 }
 
-Function Stop-Services{
+Function Stop-Services {
     IISRESET /STOP
     Stop-Service "$($xConnect.siteName)-MarketingAutomationService"
     Stop-Service "$($xConnect.siteName)-IndexWorker"
@@ -112,11 +114,10 @@ Function Stop-Services{
 }
 Function Install-SitecorePowerShellExtensions {
    
-
     $spe = $modules | Where-Object { $_.id -eq "spe"}
     $spe.packagePath = $spe.packagePath.replace(".zip", ".scwdp.zip")
     $params = @{
-        Path             = (Join-path $resourcePath 'content\Deployment\OnPrem\HabitatHome\module-spe.json')
+        Path             = (Join-path $resourcePath 'content\Deployment\OnPrem\HabitatHome\module-mastercore.json')
         Package          = $spe.packagePath
         SiteName         = $site.hostName
         SqlDbPrefix      = $site.prefix 
@@ -132,7 +133,7 @@ Function Install-SitecoreExperienceAccelerator {
     $spe = $modules | Where-Object { $_.id -eq "sxa"}
     $spe.packagePath = $spe.packagePath.replace(".zip", ".scwdp.zip")
     $params = @{
-        Path             = (Join-path $resourcePath 'content\Deployment\OnPrem\HabitatHome\module-sxa.json')
+        Path             = (Join-path $resourcePath 'content\Deployment\OnPrem\HabitatHome\module-mastercore.json')
         Package          = $spe.packagePath
         SiteName         = $site.hostName
         SqlDbPrefix      = $site.prefix 
@@ -144,20 +145,119 @@ Function Install-SitecoreExperienceAccelerator {
     
     Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs") -Verbose
 }
-Function Enable-ContainedDatabases{
-     #Enable Contained Databases
-     Write-Host "Enable contained databases" -ForegroundColor Green
-     try {
-         # This command can set the location to SQLSERVER:\
-         Invoke-Sqlcmd -ServerInstance $sql.server `
-             -Username $sql.adminUser `
-             -Password $sql.adminPassword `
-             -InputFile "$PSScriptRoot\database\containedauthentication.sql"
-     }
-     catch {
-         write-host "Set Enable contained databases failed" -ForegroundColor Red
-         throw
-     }
+
+Function Install-DataExchangeFrameworkModules {
+    $def = $modules | Where-Object { $_.id -eq "def"}
+    Write-Host ("Installing {0}" -f $def.name)
+    $def.packagePath = $def.packagePath.replace(".zip", ".scwdp.zip")
+    $params = @{
+        Path             = (Join-path $resourcePath 'content\Deployment\OnPrem\HabitatHome\module-mastercore.json')
+        Package          = $def.packagePath
+        SiteName         = $site.hostName
+        SqlDbPrefix      = $site.prefix 
+        SqlAdminUser     = $sql.adminUser 
+        SqlAdminPassword = $sql.adminPassword 
+        SqlServer        = $sql.server 
+
+    }
+    
+    Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs") -Verbose
+
+    $defSitecore = $modules | Where-Object { $_.id -eq "defSitecore"}
+    Write-Host ("Installing {0}" -f $defSitecore.name)
+    $defSitecore.packagePath = $defSitecore.packagePath.replace(".zip", ".scwdp.zip")
+    $params = @{
+        Path             = (Join-path $resourcePath 'content\Deployment\OnPrem\HabitatHome\module-master.json')
+        Package          = $defSitecore.packagePath
+        SiteName         = $site.hostName
+        SqlDbPrefix      = $site.prefix 
+        SqlAdminUser     = $sql.adminUser 
+        SqlAdminPassword = $sql.adminPassword 
+        SqlServer        = $sql.server 
+
+    }
+    
+    Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs") -Verbose
+
+    $defSql = $modules | Where-Object { $_.id -eq "defSql"}
+    Write-Host ("Installing {0}" -f $defSql.name)
+    $defSql.packagePath = $defSql.packagePath.replace(".zip", ".scwdp.zip")
+    $params = @{
+        Path             = (Join-path $resourcePath 'content\Deployment\OnPrem\HabitatHome\module-master.json')
+        Package          = $defSql.packagePath
+        SiteName         = $site.hostName
+        SqlDbPrefix      = $site.prefix 
+        SqlAdminUser     = $sql.adminUser 
+        SqlAdminPassword = $sql.adminPassword 
+        SqlServer        = $sql.server 
+
+    }
+    
+    Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs") -Verbose
+
+    $defxConnect = $modules | Where-Object { $_.id -eq "defxConnect"}
+    Write-Host ("Installing {0}" -f $defxConnect.name)
+    $defxConnect.packagePath = $defxConnect.packagePath.replace(".zip", ".scwdp.zip")
+    $params = @{
+        Path             = (Join-path $resourcePath 'content\Deployment\OnPrem\HabitatHome\module-mastercore.json')
+        Package          = $defxConnect.packagePath
+        SiteName         = $site.hostName
+        SqlDbPrefix      = $site.prefix 
+        SqlAdminUser     = $sql.adminUser 
+        SqlAdminPassword = $sql.adminPassword 
+        SqlServer        = $sql.server 
+
+    }
+    
+    Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs") -Verbose
+
+    $defDynamics = $modules | Where-Object { $_.id -eq "defDynamics"}
+    Write-Host ("Installing {0}" -f $defDynamics.name)
+    $defDynamics.packagePath = $defDynamics.packagePath.replace(".zip", ".scwdp.zip")
+    $params = @{
+        Path             = (Join-path $resourcePath 'content\Deployment\OnPrem\HabitatHome\module-master.json')
+        Package          = $defDynamics.packagePath
+        SiteName         = $site.hostName
+        SqlDbPrefix      = $site.prefix 
+        SqlAdminUser     = $sql.adminUser 
+        SqlAdminPassword = $sql.adminPassword 
+        SqlServer        = $sql.server 
+
+    }
+    
+    Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs") -Verbose
+    
+    $defDynamicsConnect = $modules | Where-Object { $_.id -eq "defDynamicsConnect"}
+    Write-Host ("Installing {0}" -f $defDynamicsConnect.name)
+    $defDynamicsConnect.packagePath = $defDynamicsConnect.packagePath.replace(".zip", ".scwdp.zip")
+    $params = @{
+        Path             = (Join-path $resourcePath 'content\Deployment\OnPrem\HabitatHome\module-master.json')
+        Package          = $defDynamicsConnect.packagePath
+        SiteName         = $site.hostName
+        SqlDbPrefix      = $site.prefix 
+        SqlAdminUser     = $sql.adminUser 
+        SqlAdminPassword = $sql.adminPassword 
+        SqlServer        = $sql.server 
+
+    }
+    
+    Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs") -Verbose
+
+}
+Function Enable-ContainedDatabases {
+    #Enable Contained Databases
+    Write-Host "Enable contained databases" -ForegroundColor Green
+    try {
+        # This command can set the location to SQLSERVER:\
+        Invoke-Sqlcmd -ServerInstance $sql.server `
+            -Username $sql.adminUser `
+            -Password $sql.adminPassword `
+            -InputFile "$PSScriptRoot\database\containedauthentication.sql"
+    }
+    catch {
+        write-host "Set Enable contained databases failed" -ForegroundColor Red
+        throw
+    }
 }
 Function Add-DatabaseUsers {
     Write-Host ("Adding {0}" -f $sql.coreUser) -ForegroundColor Green
@@ -173,7 +273,7 @@ Function Add-DatabaseUsers {
         write-host "Set Collection User rights failed" -ForegroundColor Red
         throw
     }
-     Write-Host ("Adding {0}" -f $sql.masterUser) -ForegroundColor Green
+    Write-Host ("Adding {0}" -f $sql.masterUser) -ForegroundColor Green
     try {
         $sqlVariables = "DatabasePrefix = $($site.prefix)", "DatabaseSuffix = Master", "UserName = $($sql.masterUser)", "Password = $($sql.masterPassword)"
         Invoke-Sqlcmd -ServerInstance $sql.server `
@@ -187,7 +287,23 @@ Function Add-DatabaseUsers {
         throw
     }
 }
-Function Start-Services{
+function Update-SXASolrCores {
+    try {
+        $params = @{
+            Path        = $site.configureSearchIndexes 
+            InstallDir  = $sitecore.siteRoot 
+            ResourceDir = $($assets.root + "\\Sitecore.WDP.Resources")
+            SitePrefix  = $site.prefix
+        }
+        Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs")
+    }
+    catch {
+        write-host "$site.habitatHomeHostName Failed to updated search index configuration" -ForegroundColor Red
+        throw
+    }
+}
+
+Function Start-Services {
     IISRESET /START
     Start-Service "$($xConnect.siteName)-MarketingAutomationService"
     Start-Service "$($xConnect.siteName)-IndexWorker"
@@ -200,6 +316,12 @@ Remove-DatabaseUsers
 Stop-Services
 Install-SitecorePowerShellExtensions
 Install-SitecoreExperienceAccelerator
+Install-DataExchangeFrameworkModules
 Enable-ContainedDatabases
 Add-DatabaseUsers
+Update-SXASolrCores
 Start-Services
+
+
+$StopWatch.Stop()
+$StopWatch
