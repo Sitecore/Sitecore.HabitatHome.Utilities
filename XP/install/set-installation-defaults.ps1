@@ -123,25 +123,69 @@ $config = @{
 $config = $config| ConvertTo-Json
 
 $modules += (ConvertFrom-Json -InputObject $config) 
-$config = @{}
-foreach ($module in $modulesConfig.modules) {
-    $config = @{
-        id          = $module.id
-        name        = $module.name
-        packagePath = Join-Path $assets.root ("packages\{0}" -f $module.fileName) 
-        url         = $module.url
-        install     = $module.install
-        download    = $module.download
-        convert     = $module.convertToWdp
-        source      = $module.source
-    } 
-    $config = $config| ConvertTo-Json
-
-    $modules += (ConvertFrom-Json -InputObject $config) 
-    $config=@{}
-}
 $json.modules = $modules
+
+Function Add-ModuleToConfig{
+    param(
+        $module,
+        $modulesConfig,
+        $submodule = $false,
+        $parentModuleId
+    )
+    $config={}
+    $modulesPlaceholder=@()
+    if ($module.isGroup){
+        $config = [ordered]@{
+            id          = $module.id
+            name        = $module.name
+            isGroup     = $module.isGroup
+            download    = $module.download
+            modules     = $modulesPlaceholder
+        } 
+        $config = $config| ConvertTo-Json
+        $modulesConfig += (ConvertFrom-Json -InputObject $config) 
+
+        foreach ($submodule in $module.modules){
+          $modulesConfig =  Add-ModuleToConfig -module $submodule -modulesConfig $modulesConfig -submodule $true -parentModuleId $module.id
+        }
+        return $modulesConfig
+    }
+    else {
+        $config = [ordered]@{
+            id          = $module.id
+            name        = $module.name
+            packagePath = Join-Path $assets.root ("packages\{0}" -f $module.fileName) 
+            url         = $module.url
+            install     = $module.install
+            download    = $module.download
+            convert     = $module.convertToWdp
+            source      = $module.source
+        } 
+        $config =  ConvertTo-Json -InputObject $config 
+    }
+
+    if ($submodule)
+    {
+        $parentModule = $modulesConfig |Where-Object {$_.id -eq $parentModuleId}
+        $parentModule.modules+= $config | ConvertFrom-Json
+    }
+    else
+    {
+        $modulesConfig+= (ConvertFrom-Json -InputObject $config) 
+    }
+   return $modulesConfig
+    
+
+    
+}
+
+foreach ($module in $modulesConfig.modules) {
+   
+   $modules =  Add-ModuleToConfig -module $module -modulesConfig $modules
+   $json.modules = $modules 
+}
+
 
 Write-Host ("Saving Configuration file to {0}" -f $ConfigurationFile)
 
-Set-Content $ConfigurationFile  (ConvertTo-Json -InputObject $json -Depth 3 )
+Set-Content $ConfigurationFile  (ConvertTo-Json -InputObject $json -Depth 6 )

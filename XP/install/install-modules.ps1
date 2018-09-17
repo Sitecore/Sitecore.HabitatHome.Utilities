@@ -74,7 +74,7 @@ Function Get-OptionalModules {
     $downloadFolder = $assets.root
     $packagesFolder = (Join-Path $downloadFolder "packages")
     
-    Import-Module Join-Path $assets.root "SAT\tools\Sitecore.Cloud.CmdLets.dll" -Force
+    Import-Module (Join-Path $assets.root "SAT\tools\Sitecore.Cloud.CmdLets.dll") -Force
 
     if (!(Test-Path $downloadFolder)) {
         New-Item -ItemType Directory -Force -Path $downloadFolder
@@ -83,7 +83,22 @@ Function Get-OptionalModules {
 
     $downloadJsonPath = $([io.path]::combine($resourcePath, 'content', 'Deployment', 'OnPrem', 'HabitatHome', 'download-assets.json'))
     # Download modules
-    foreach ($package in $downloadAssets) {
+    $args = @{
+        Packages = $downloadAssets
+        PackagesFolder = $packagesFolder
+        Credentials = $credentials
+        DownloadJsonPath = $downloadJsonPath
+    }
+   Process-Packages @args
+}
+
+Function Process-Packages{
+param(   [PSCustomObject] $Packages,
+    $PackagesFolder,
+    $Credentials,
+    $DownloadJsonPath
+    )
+    foreach ($package in $Packages) {
         if ($package.id -eq "xp" -or $package.id -eq "sat") {
             # Skip Sitecore Azure Toolkit and XP package - previously downloaded
             continue;
@@ -92,9 +107,20 @@ Function Get-OptionalModules {
         if (!(Test-Path $packagesFolder)) {
             New-Item -ItemType Directory -Force -Path $packagesFolder
         }
-        if ($package.download -eq $true) {
+       
+        if ($package.isGroup -and $package.download -eq $true){
+            $submodules = $package.modules
+            $args = @{
+                Packages = $submodules
+                PackagesFolder = $PackagesFolder
+                Credentials = $Credentials
+                DownloadJsonPath = $DownloadJsonPath
+            }
+            Process-Packages @args
+        }
+        elseif ($true -eq $package.download  -and (!($package.PSObject.Properties.name -match "isGroup") ) ) {
             Write-Host ("Downloading {0}  -  if required" -f $package.name )
-            $destination = Join-Path $packagesFolder $package.name
+            $destination = $package.packagePath
             if (!(Test-Path $destination)) {
                 $params = @{
                     Path        = $downloadJsonPath
@@ -104,13 +130,14 @@ Function Get-OptionalModules {
                 }
                 Install-SitecoreConfiguration  @params  -WorkingDirectory $(Join-Path $PWD "logs") -Verbose 
             }
-            if ($package.convertToWdp){
-                ConvertTo-SCModuleWebDeployPackage -Path  $destination -Destination $destination.Replace(".zip",".scwdp.zip")
+            if ($package.convert){
+                Write-Host ("Converting {0} to SCWDP" -f $package.name) -ForegroundColor Green
+               ConvertTo-SCModuleWebDeployPackage  -Path $destination -Destination $PackagesFolder -Force
             }
         }
     }
-}
 
+}
 
 Function Remove-DatabaseUsers {
     # Delete master and core database users
