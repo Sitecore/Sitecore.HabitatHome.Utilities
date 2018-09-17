@@ -68,6 +68,50 @@ Function Set-ModulesPath {
     }
 }
 
+Function Get-OptionalModules {
+
+    $downloadAssets = $modules
+    $downloadFolder = $assets.root
+    $packagesFolder = (Join-Path $downloadFolder "packages")
+    
+    Import-Module Join-Path $assets.root "SAT\tools\Sitecore.Cloud.CmdLets.dll" -Force
+
+    if (!(Test-Path $downloadFolder)) {
+        New-Item -ItemType Directory -Force -Path $downloadFolder
+    }
+    $credentials = Get-Credential -Message "Please provide dev.sitecore.com credentials"
+
+    $downloadJsonPath = $([io.path]::combine($resourcePath, 'content', 'Deployment', 'OnPrem', 'HabitatHome', 'download-assets.json'))
+    # Download modules
+    foreach ($package in $downloadAssets) {
+        if ($package.id -eq "xp" -or $package.id -eq "sat") {
+            # Skip Sitecore Azure Toolkit and XP package - previously downloaded
+            continue;
+        }
+
+        if (!(Test-Path $packagesFolder)) {
+            New-Item -ItemType Directory -Force -Path $packagesFolder
+        }
+        if ($package.download -eq $true) {
+            Write-Host ("Downloading {0}  -  if required" -f $package.name )
+            $destination = Join-Path $packagesFolder $package.name
+            if (!(Test-Path $destination)) {
+                $params = @{
+                    Path        = $downloadJsonPath
+                    Credentials = $credentials
+                    Source      = $package.url
+                    Destination = $destination
+                }
+                Install-SitecoreConfiguration  @params  -WorkingDirectory $(Join-Path $PWD "logs") -Verbose 
+            }
+            if ($package.convertToWdp){
+                ConvertTo-SCModuleWebDeployPackage -Path  $destination -Destination $destination.Replace(".zip",".scwdp.zip")
+            }
+        }
+    }
+}
+
+
 Function Remove-DatabaseUsers {
     # Delete master and core database users
     Write-Host ("Removing {0}" -f $sql.coreUser) -ForegroundColor Green
@@ -312,6 +356,7 @@ Function Start-Services {
 
 Install-SitecoreInstallFramework
 Set-ModulesPath
+Get-OptionalModules
 Remove-DatabaseUsers
 Stop-Services
 Install-SitecorePowerShellExtensions
