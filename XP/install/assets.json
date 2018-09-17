@@ -44,6 +44,7 @@
             "name": "Data Exchange Framework",
             "isGroup": true,
             "download": true,
+            "install": true,
             "modules": [{
                     "id": "def",
                     "name": "Data Exchange Framework",

@@ -84,19 +84,19 @@ Function Get-OptionalModules {
     $downloadJsonPath = $([io.path]::combine($resourcePath, 'content', 'Deployment', 'OnPrem', 'HabitatHome', 'download-assets.json'))
     # Download modules
     $args = @{
-        Packages = $downloadAssets
-        PackagesFolder = $packagesFolder
-        Credentials = $credentials
+        Packages         = $downloadAssets
+        PackagesFolder   = $packagesFolder
+        Credentials      = $credentials
         DownloadJsonPath = $downloadJsonPath
     }
-   Process-Packages @args
+    Process-Packages @args
 }
 
-Function Process-Packages{
-param(   [PSCustomObject] $Packages,
-    $PackagesFolder,
-    $Credentials,
-    $DownloadJsonPath
+Function Process-Packages {
+    param(   [PSCustomObject] $Packages,
+        $PackagesFolder,
+        $Credentials,
+        $DownloadJsonPath
     )
     foreach ($package in $Packages) {
         if ($package.id -eq "xp" -or $package.id -eq "sat") {
@@ -108,17 +108,17 @@ param(   [PSCustomObject] $Packages,
             New-Item -ItemType Directory -Force -Path $packagesFolder
         }
        
-        if ($package.isGroup -and $package.download -eq $true){
+        if ($package.isGroup -and $package.download -eq $true) {
             $submodules = $package.modules
             $args = @{
-                Packages = $submodules
-                PackagesFolder = $PackagesFolder
-                Credentials = $Credentials
+                Packages         = $submodules
+                PackagesFolder   = $PackagesFolder
+                Credentials      = $Credentials
                 DownloadJsonPath = $DownloadJsonPath
             }
             Process-Packages @args
         }
-        elseif ($true -eq $package.download  -and (!($package.PSObject.Properties.name -match "isGroup") ) ) {
+        elseif ($true -eq $package.download -and (!($package.PSObject.Properties.name -match "isGroup") ) ) {
             Write-Host ("Downloading {0}  -  if required" -f $package.name )
             $destination = $package.packagePath
             if (!(Test-Path $destination)) {
@@ -130,9 +130,9 @@ param(   [PSCustomObject] $Packages,
                 }
                 Install-SitecoreConfiguration  @params  -WorkingDirectory $(Join-Path $PWD "logs") -Verbose 
             }
-            if ($package.convert){
+            if ($package.convert) {
                 Write-Host ("Converting {0} to SCWDP" -f $package.name) -ForegroundColor Green
-               ConvertTo-SCModuleWebDeployPackage  -Path $destination -Destination $PackagesFolder -Force
+                ConvertTo-SCModuleWebDeployPackage  -Path $destination -Destination $PackagesFolder -Force
             }
         }
     }
@@ -218,7 +218,12 @@ Function Install-SitecoreExperienceAccelerator {
 }
 
 Function Install-DataExchangeFrameworkModules {
-    $def = $modules | Where-Object { $_.id -eq "def"}
+    $defGroup = $modules | Where-Object { $_.id -eq "def"}
+    if ($false -eq $defGroup.install) {
+        return;
+    }
+    $defModules = ($modules | Where-Object { $_.id -eq "def"}).modules
+    $def = $defModules | Where-Object { $_.id -eq "def"}
     Write-Host ("Installing {0}" -f $def.name)
     $def.packagePath = $def.packagePath.replace(".zip", ".scwdp.zip")
     $params = @{
@@ -234,7 +239,7 @@ Function Install-DataExchangeFrameworkModules {
     
     Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs") -Verbose
 
-    $defSitecore = $modules | Where-Object { $_.id -eq "defSitecore"}
+    $defSitecore = $defModules | Where-Object { $_.id -eq "defSitecore"}
     Write-Host ("Installing {0}" -f $defSitecore.name)
     $defSitecore.packagePath = $defSitecore.packagePath.replace(".zip", ".scwdp.zip")
     $params = @{
@@ -250,7 +255,7 @@ Function Install-DataExchangeFrameworkModules {
     
     Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs") -Verbose
 
-    $defSql = $modules | Where-Object { $_.id -eq "defSql"}
+    $defSql = $defModules | Where-Object { $_.id -eq "defSql"}
     Write-Host ("Installing {0}" -f $defSql.name)
     $defSql.packagePath = $defSql.packagePath.replace(".zip", ".scwdp.zip")
     $params = @{
@@ -266,7 +271,7 @@ Function Install-DataExchangeFrameworkModules {
     
     Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs") -Verbose
 
-    $defxConnect = $modules | Where-Object { $_.id -eq "defxConnect"}
+    $defxConnect = $defModules | Where-Object { $_.id -eq "defxConnect"}
     Write-Host ("Installing {0}" -f $defxConnect.name)
     $defxConnect.packagePath = $defxConnect.packagePath.replace(".zip", ".scwdp.zip")
     $params = @{
@@ -282,7 +287,7 @@ Function Install-DataExchangeFrameworkModules {
     
     Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs") -Verbose
 
-    $defDynamics = $modules | Where-Object { $_.id -eq "defDynamics"}
+    $defDynamics = $defModules | Where-Object { $_.id -eq "defDynamics"}
     Write-Host ("Installing {0}" -f $defDynamics.name)
     $defDynamics.packagePath = $defDynamics.packagePath.replace(".zip", ".scwdp.zip")
     $params = @{
@@ -298,7 +303,7 @@ Function Install-DataExchangeFrameworkModules {
     
     Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs") -Verbose
     
-    $defDynamicsConnect = $modules | Where-Object { $_.id -eq "defDynamicsConnect"}
+    $defDynamicsConnect = $defModules | Where-Object { $_.id -eq "defDynamicsConnect"}
     Write-Host ("Installing {0}" -f $defDynamicsConnect.name)
     $defDynamicsConnect.packagePath = $defDynamicsConnect.packagePath.replace(".zip", ".scwdp.zip")
     $params = @{

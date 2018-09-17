@@ -140,6 +140,7 @@ Function Add-ModuleToConfig{
             name        = $module.name
             isGroup     = $module.isGroup
             download    = $module.download
+            install     = $module.install
             modules     = $modulesPlaceholder
         } 
         $config = $config| ConvertTo-Json
