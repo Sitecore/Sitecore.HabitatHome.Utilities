@@ -7,17 +7,17 @@ Param(
 
 # You can remove any items that you do not need to override. Keep in mind the dependency on other settings when removing items.
 # For example, $assets is used in various sections.
-  
+
 Write-Host "Setting Local Overrides in $configurationFile"
 
 $json = Get-Content -Raw $configurationFile |  ConvertFrom-Json
 
 # Assets and prerequisites
-
-$assets = $json.assets 
+$assets = $json.assets
+$assets.psRepository = "https://sitecore.myget.org/F/sc-powershell/api/v2/"
+$assets.psRepositoryName = "SitecoreGallery"
+$assets.installerVersion = "2.0.0"
 $assets.licenseFilePath = Join-Path $assets.root "license.xml"
-$json.assets = $assets
-
 
 # Settings
 
@@ -28,40 +28,58 @@ $site.suffix = "dev.local"
 $site.webroot = "C:\inetpub\wwwroot"
 $site.hostName = $json.settings.site.prefix + "." + $json.settings.site.suffix
 $site.habitatHomeSslCertificateName = $site.hostName
-$json.settings.site = $site
 
+# Sitecore Parameters
 $sitecore = $json.settings.sitecore
 $sitecore.siteRoot = Join-Path $site.webRoot -ChildPath $site.hostName
-$json.settings.sitecore = $sitecore
+$sitecore.adminPassword = "b"
+$sitecore.exmCryptographicKey = "0x0000000000000000000000000000000000000000000000000000000000000000"
+$sitecore.exmAuthenticationKey = "0x0000000000000000000000000000000000000000000000000000000000000000"
+$sitecore.telerikEncryptionKey = "PutYourCustomEncryptionKeyHereFrom32To256CharactersLong"
 
 # Solr Parameters
 $solr = $json.settings.solr
-$solr.url = "https://localhost:8721/solr"
-$solr.root = "c:\solr\solr-7.2.1"
-$solr.serviceName = "Solr-7.2.1"
+$solr.url = "https://localhost:8662/solr"
+$solr.root = "c:\solr\solr-6.6.2"
+$solr.serviceName = "Solr-6.6.2"
 
-
-$sql = $json.settings.sql
 # SQL Settings
+$sql = $json.settings.sql
+
+$SqlStrongPassword = "Str0NgPA33w0rd!!" # Used for all other services
+
 $sql.server = "."
 $sql.adminUser = "sa"
 $sql.adminPassword = "12345"
-
-$json.settings.sql = $sql
+$sql.coreUser = $site.prefix + "coreuser"
+$sql.corePassword = $SqlStrongPassword
+$sql.masterUser = $site.prefix + "masteruser"
+$sql.masterPassword = $SqlStrongPassword
+$sql.webUser = $site.prefix + "webuser"
+$sql.webPassword = $SqlStrongPassword
+$sql.collectionUser = $site.prefix + "collectionuser"
+$sql.collectionPassword = $SqlStrongPassword
+$sql.reportingUser = $site.prefix + "reportinguser"
+$sql.reportingPassword = $SqlStrongPassword
+$sql.processingPoolsUser = $site.prefix + "poolsuser"
+$sql.processingPoolsPassword = $SqlStrongPassword
+$sql.processingTasksUser = $site.prefix + "tasksuser"
+$sql.processingTasksPassword = $SqlStrongPassword
+$sql.referenceDataUser = $site.prefix + "referencedatauser"
+$sql.referenceDataPassword = $SqlStrongPassword
+$sql.marketingAutomationUser = $site.prefix + "marketingautomationuser"
+$sql.marketingAutomationPassword = $SqlStrongPassword
+$sql.formsUser = $site.prefix + "formsuser"
+$sql.formsPassword = $SqlStrongPassword
+$sql.exmMasterUser = $site.prefix + "exmmasteruser"
+$sql.exmMasterPassword = $SqlStrongPassword
+$sql.messagingUser = $site.prefix + "messaginguser"
+$sql.messagingPassword = $SqlStrongPassword
 
 # XConnect Parameters
 $xConnect = $json.settings.xConnect
-
 $xConnect.siteName = $site.prefix + "_xconnect." + $site.suffix
 $xConnect.certificateName = [string]::Join(".", @($site.prefix, $site.suffix, "xConnect.Client"))
 $xConnect.siteRoot = Join-Path $site.webRoot -ChildPath $xConnect.siteName
 
-
-$identityServer = $json.settings.identityServer
-$identityServer.name = "IdentityServer." + $site.hostname
-$identityServer.url = ("https://{0}" -f $identityServer.name)
-$identityServer.clientSecret = "ClientSecret"
-
-$json.settings.xConnect = $xConnect
-
-Set-Content $configurationFile  (ConvertTo-Json -InputObject $json -Depth 3)
+Set-Content $configurationFile  (ConvertTo-Json -InputObject $json -Depth 5)

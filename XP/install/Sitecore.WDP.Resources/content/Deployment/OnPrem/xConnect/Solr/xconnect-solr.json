@@ -8,7 +8,7 @@
         "SolrRoot": {
             "Type": "string",
             "DefaultValue": "c:\\solr-7.2.1",
-            "Description": "The file path to the Solr instance." 
+            "Description": "The file path to the Solr instance."
         },
         "SolrService": {
             "Type": "string",
@@ -37,7 +37,7 @@
     },
     "Tasks": {
         "StopSolr": {
-			"Description" : "Stops the Solr service if it is running.",
+            "Description" : "Stops the Solr service if it is running.",
             "Type": "ManageService",
             "Params": {
                 "Name": "[parameter('SolrService')]",
@@ -46,7 +46,7 @@
             }
         },
         "CleanCores": {
-			"Description" : "Creates/clears core paths.",
+            "Description" : "Creates/clears core paths.",
             "Type": "EnsurePath",
             "Params": {
                 "Clean": [
@@ -56,7 +56,7 @@
             }
         },
         "PrepareCores": {
-			"Description" : "Copies base configs into the core paths.",
+            "Description" : "Copies base configs into the core paths.",
             "Type": "Copy",
             "Params": [
                 { "Source": "[joinpath(variable('Solr.BaseConfigs'), '*')]", "Destination": "[variable('Core.Root')]" },
@@ -64,7 +64,7 @@
             ]
         },
         "StartSolr": {
-			"Description" : "Starts the Solr service.",
+            "Description" : "Starts the Solr service.",
             "Type": "ManageService",
             "Params": {
                 "Name": "[parameter('SolrService')]",
@@ -73,7 +73,7 @@
             }
         },
         "CreateCores":{
-			"Description" : "Tells Solr to create the new cores.",
+            "Description" : "Tells Solr to create the new cores.",
             "Type": "ManageSolrCore",
             "Params": [
                 { "Action": "Create", "Address": "[parameter('SolrUrl')]", "Arguments": { "name": "[variable('Xdb.Name')]", "property.update.autoCreateFields": "false" } },

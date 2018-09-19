@@ -2,23 +2,28 @@
   "Parameters": {
     "Package": {
       "Type": "string",
-      "Description": "The path to the Web Deploy package to deploy."
+      "Description": "The path to the Web Deploy package to deploy.",
+      "DefaultValue": ""
     },
     "LicenseFile": {
       "Type": "string",
-      "Description": "The path to the Sitecore license file."
+      "Description": "The path to the Sitecore license file.",
+      "DefaultValue": ".\\License.xml"
     },
     "SqlDbPrefix": {
       "Type": "string",
-      "Description": "The prefix used for all Sql databases."
+      "Description": "The prefix used for all Sql databases.",
+      "DefaultValue": ""
     },
     "SolrCorePrefix": {
       "Type": "string",
-      "Description": "The prefix used for all Solr cores."
+      "Description": "The prefix used for all Solr cores.",
+      "DefaultValue": ""
     },
     "XConnectCert": {
       "Type": "string",
-      "Description": "The certificate to use for encryption. Provide the name or the thumbprint."
+      "Description": "The certificate to use for encryption. Provide the name or the thumbprint.",
+      "DefaultValue": ""
     },
     "SiteName": {
       "Type": "string",
