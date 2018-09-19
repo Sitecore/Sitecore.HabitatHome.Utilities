@@ -2,19 +2,23 @@
   "Parameters": {
     "Package": {
       "Type": "string",
-      "Description": "The path to the Web Deploy package to deploy."
+      "Description": "The path to the Web Deploy package to deploy.",
+      "DefaultValue": ""
     },
     "SqlDbPrefix": {
       "Type": "string",
-      "Description": "The prefix used for all Sql databases."
+      "Description": "The prefix used for all Sql databases.",
+      "DefaultValue": ""
     },
     "SitecoreIdentityCert": {
       "Type": "string",
-      "Description": "The certificate to use for encryption. Provide the name or the thumbprint."
+      "Description": "The certificate to use for encryption. Provide the name or the thumbprint.",
+      "DefaultValue": ""
     },
     "LicenseFile": {
       "Type": "string",
-      "Description": "The path to the Sitecore license file."
+      "Description": "The path to the Sitecore license file.",
+      "DefaultValue": ".\\License.xml"
     },
     "SiteName": {
       "Type": "string",
@@ -43,12 +47,23 @@
     },
     "PasswordRecoveryUrl": {
       "Type": "string",
-      "Description": "Password recovery Url (Host name of CM instance)."
+      "Description": "Password recovery Url (Host name of CM instance).",
+      "DefaultValue": "http:\\"
     },
-    "ClientsConfiguration": {
+    "AllowedCorsOrigins": {
+      "Type": "string",
+      "Description": "Pipe-separated list of instances (URIs) that are allowed to login via Sitecore Identity.",
+      "DefaultValue": ""
+    },
+    "ClientSecret": {
+      "Type": "string",
+      "Description": "Client secret of PasswordClient section. It's a random string between 1 and 100 symbols long.",
+      "DefaultValue": "IdentityServerClientSecret"
+    },
+    "CustomConfigurationFile": {
       "Type": "string",
       "DefaultValue": "",
-      "Description": "Sitecore IdentityServer clients configuration"
+      "Description": "Path to file with custom configuration to be deployed in Identity Server folder."
     },
     "WebRoot": {
       "Type": "string",
@@ -62,7 +77,8 @@
     "Security.IdentityServer.CertificateThumbprint": "[GetCertificateThumbprint(parameter('SitecoreIdentityCert'), variable('Security.CertificateStore'))]",
     "Security.IdentityServer.CertificatePath": "[joinpath(variable('Security.CertificateStore'), variable('Security.IdentityServer.CertificateThumbprint'))]",
     "Site.PhysicalPath": "[concat(parameter('WebRoot'),'\\', parameter('SiteName'))]",
-    "Site.LicenseFolder": "[joinpath(variable('Site.PhysicalPath'), 'sitecoreruntime')]"
+    "Site.LicenseFolder": "[joinpath(variable('Site.PhysicalPath'), 'sitecoreruntime')]",
+    "Site.ConfigFolder": "[joinpath(variable('Site.PhysicalPath'), 'Config', 'production')]"
   },
     "Tasks": {
         "CreatePaths": {
@@ -72,19 +88,19 @@
                 "Exists": [ "[variable('Site.PhysicalPath')]" ]
             }
         },
-      "CreateAppPool": {
-        "Description": "Creates or updates the app pool.",
-        "Type": "AppPool",
-        "Params": {
-          "Name": "[parameter('SiteName')]",
-          "Properties": {
-            "ProcessModel": {
-              "identityType": "ApplicationPoolIdentity"
-            },
-            "ManagedRuntimeVersion": ""
-          }
-        }
-      },
+        "CreateAppPool": {
+            "Description": "Creates or updates the app pool.",
+            "Type": "AppPool",
+            "Params": {
+                "Name": "[parameter('SiteName')]",
+                "Properties": {
+                    "ProcessModel": {
+                        "identityType": "ApplicationPoolIdentity"
+                    },
+                "ManagedRuntimeVersion": ""
+                }
+            }
+        },
         "SetAppPoolCertStorePermissions": {
             "Description": "Set permissions for the App Pool User to access the client certificate.",
             "Type": "FilePermissions",
@@ -94,7 +110,7 @@
                     {
                         "User": "[concat('IIS AppPool\\', parameter('SiteName'))]",
                         "FileSystemRights": ["Read"],
-                        "InheritanceFlags": [ "None"]
+                        "InheritanceFlags": ["None"]
                     }
                 ]
             }
@@ -132,7 +148,7 @@
                 "Remove" : [ { "Port": "80", "IPAddress": "*" } ]
             }
         },
-        "CreateBindingsWithThumprint": {
+        "CreateBindingsWithThumbprint": {
             "Description": "Configures the site bindings for the website.",
             "Type": "WebBinding",
             "Params": {
@@ -148,7 +164,7 @@
             },
             "Skip": "[not(parameter('SitecoreIdentityCert'))]"
         },
-        
+
         "CreateHostHeader": {
             "Description": "Sets a hostheader for the website.",
             "Type": "HostHeader",
@@ -169,7 +185,7 @@
                     }
                 ]
             }
-        },       
+        },
         "InstallWDP": {
             "Description": "Syncs the web deploy package with the website.",
             "Type": "WebDeploy",
@@ -181,14 +197,15 @@
                     },
                     "Dest": "Auto",
                     "SetParam": [
-                        { "Name": "IIS Web Application Name", "Value": "[parameter('SiteName')]" },                                                
-                        { "Name": "Database Server Name", "Value": "[parameter('SqlServer')]" },                                              
-                        { "Name": "Core DB Name", "Value": "[variable('Sql.Database.Core')]" },                                                
+                        { "Name": "IIS Web Application Name", "Value": "[parameter('SiteName')]" },
+                        { "Name": "Database Server Name", "Value": "[parameter('SqlServer')]" },
+                        { "Name": "Core DB Name", "Value": "[variable('Sql.Database.Core')]" },
                         { "Name": "Core DB User Name", "Value": "[parameter('SqlCoreUser')]" },
-                        { "Name": "Core DB User Password", "Value": "[parameter('SqlCorePassword')]" },                                                                                                
+                        { "Name": "Core DB User Password", "Value": "[parameter('SqlCorePassword')]" },
                         { "Name": "CertificateThumbprint", "Value": "[variable('Security.IdentityServer.CertificateThumbprint')]" },
                         { "Name": "PasswordRecoveryUrl", "Value": "[parameter('PasswordRecoveryUrl')]" },
-                        { "Name": "ClientsConfiguration", "Value": "[parameter('ClientsConfiguration')]" }                                 
+                        { "Name": "AllowedCorsOrigins", "Value": "[parameter('AllowedCorsOrigins')]" },
+                        { "Name": "ClientSecret", "Value": "[parameter('ClientSecret')]" }
                     ]
                 }
             }
@@ -209,6 +226,15 @@
             },
             "Skip": "[not(parameter('LicenseFile'))]"
         },
+        "CustomConfigFile" : {
+            "Description": "Copies the custom config file to the instance config folder.",
+            "Type": "Copy",
+            "Params": {
+                "Source": "[resolvepath(parameter('CustomConfigurationFile'))]",
+                "Destination": "[variable('Site.ConfigFolder')]"
+            },
+            "Skip": "[not(parameter('CustomConfigurationFile'))]"
+        },
         "StartAppPool": {
             "Description": "Starts the app pool.",
             "Type": "ManageAppPool",
@@ -224,6 +250,6 @@
                 "Name": "[parameter('SiteName')]",
                 "Action": "Start"
             }
-        }        
+        }
     }
 }

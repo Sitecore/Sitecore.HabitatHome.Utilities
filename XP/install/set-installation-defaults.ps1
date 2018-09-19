@@ -10,12 +10,17 @@ Write-host "Setting default 'Assets and prerequisites' parameters"
 
 $assets = $json.assets
 $assets.root = "$PSScriptRoot\assets"
+
+# SIF settings
 $assets.psRepository = "https://sitecore.myget.org/F/sc-powershell/api/v2/"
 $assets.psRepositoryName = "SitecoreGallery"
+$assets.installerVersion = "2.0.0"
+
 $assets.licenseFilePath = Join-Path $assets.root "license.xml"
-$assets.installerVersion = "2.0.0-beta0229"
-$assets.sitecoreVersion = "9.1.0 rev. 001320"
-$assets.identityServerVersion = "2.0.0 rev. 00128"
+$assets.sitecoreVersion = "9.1.0 rev. 001382"
+$assets.identityServerVersion = "2.0.0 rev. 00146"
+
+
 $assets.certificatesPath = Join-Path $assets.root "Certificates"
 $assets.jreRequiredVersion = "8.0.1710"
 $assets.dotnetMinimumVersionValue = "394802"
@@ -30,8 +35,6 @@ $site.prefix = "habitathome"
 $site.suffix = "dev.local"
 $site.webroot = "C:\inetpub\wwwroot"
 $site.hostName = $json.settings.site.prefix + "." + $json.settings.site.suffix
-$site.enableInstallationImprovements = (Get-ChildItem $pwd -filter "enable-installation-improvements.json" -Recurse).FullName
-$site.disableInstallationImprovements = (Get-ChildItem $pwd -filter "disable-installation-improvements.json" -Recurse).FullName
 $site.addSiteBindingWithSSLPath = (Get-ChildItem $pwd -filter "add-new-binding-and-certificate.json" -Recurse).FullName
 $site.configureSearchIndexes = (Get-ChildItem $pwd -filter "configure-search-indexes.json" -Recurse).FullName
 $site.habitatHomeSslCertificateName = $site.prefix + "." + $site.suffix
@@ -84,7 +87,6 @@ $xConnect.siteName = $site.prefix + "_xconnect." + $site.suffix
 $xConnect.certificateName = [string]::Join(".", @($site.prefix, $site.suffix, "xConnect.Client"))
 $xConnect.siteRoot = Join-Path $site.webRoot -ChildPath $xConnect.siteName
 
-
 Write-Host "Setting default 'Sitecore' parameters"
 # Sitecore Parameters
 $sitecore = $json.settings.sitecore
@@ -97,6 +99,7 @@ $sitecore.adminPassword = "b"
 $sitecore.exmCryptographicKey = "0x0000000000000000000000000000000000000000000000000000000000000000"
 $sitecore.exmAuthenticationKey = "0x0000000000000000000000000000000000000000000000000000000000000000"
 $sitecore.telerikEncryptionKey = "PutYourCustomEncryptionKeyHereFrom32To256CharactersLong"
+$sitecore.rootCertificateName = "SitecoreRoot91"
 Write-Host "Setting default 'IdentityServer' parameters"
 $identityServer = $json.settings.identityServer
 $identityServer.packagePath = Join-Path $assets.root $("Sitecore.IdentityServer " + $assets.identityServerVersion + " (OnPrem)_identityserver.scwdp.zip")
@@ -104,10 +107,11 @@ $identityServer.configurationPath = (Get-ChildItem $pwd -filter "IdentityServer.
 $identityServer.name = "IdentityServer." + $site.hostname
 $identityServer.url = ("https://{0}" -f $identityServer.name)
 $identityServer.clientSecret = "ClientSecret"
+
 Write-Host "Setting default 'Solr' parameters"
 # Solr Parameters
 $solr = $json.settings.solr
-$solr.url = "https://localhost:8721	/solr"
+$solr.url = "https://localhost:8721/solr"
 $solr.root = "c:\solr"
 $solr.serviceName = "Solr"
 
@@ -132,24 +136,70 @@ $config = @{
 $config = $config| ConvertTo-Json
 
 $modules += (ConvertFrom-Json -InputObject $config) 
-$config = @{}
-foreach ($module in $modulesConfig.modules) {
-    $config = @{
-        id          = $module.id
-        name        = $module.name
-        packagePath = Join-Path $assets.root ("packages\{0}" -f $module.fileName) 
-        url         = $module.url
-        install     = $module.install
-        download    = $module.download
-        source      = $module.source
-    } 
-    $config = $config| ConvertTo-Json
-
-    $modules += (ConvertFrom-Json -InputObject $config) 
-    $config=@{}
-}
 $json.modules = $modules
+
+Function Add-ModuleToConfig{
+    param(
+        $module,
+        $modulesConfig,
+        $submodule = $false,
+        $parentModuleId
+    )
+    $config={}
+    $modulesPlaceholder=@()
+    if ($module.isGroup){
+        $config = [ordered]@{
+            id          = $module.id
+            name        = $module.name
+            isGroup     = $module.isGroup
+            download    = $module.download
+            install     = $module.install
+            modules     = $modulesPlaceholder
+        } 
+        $config = $config| ConvertTo-Json
+        $modulesConfig += (ConvertFrom-Json -InputObject $config) 
+
+        foreach ($submodule in $module.modules){
+          $modulesConfig =  Add-ModuleToConfig -module $submodule -modulesConfig $modulesConfig -submodule $true -parentModuleId $module.id
+        }
+        return $modulesConfig
+    }
+    else {
+        $config = [ordered]@{
+            id          = $module.id
+            name        = $module.name
+            packagePath = Join-Path $assets.root ("packages\{0}" -f $module.fileName) 
+            url         = $module.url
+            install     = $module.install
+            download    = $module.download
+            convert     = $module.convertToWdp
+            source      = $module.source
+        } 
+        $config =  ConvertTo-Json -InputObject $config 
+    }
+
+    if ($submodule)
+    {
+        $parentModule = $modulesConfig |Where-Object {$_.id -eq $parentModuleId}
+        $parentModule.modules+= $config | ConvertFrom-Json
+    }
+    else
+    {
+        $modulesConfig+= (ConvertFrom-Json -InputObject $config) 
+    }
+   return $modulesConfig
+    
+
+    
+}
+
+foreach ($module in $modulesConfig.modules) {
+   
+   $modules =  Add-ModuleToConfig -module $module -modulesConfig $modules
+   $json.modules = $modules 
+}
+
 
 Write-Host ("Saving Configuration file to {0}" -f $ConfigurationFile)
 
-Set-Content $ConfigurationFile  (ConvertTo-Json -InputObject $json -Depth 3 )
+Set-Content $ConfigurationFile  (ConvertTo-Json -InputObject $json -Depth 6 )

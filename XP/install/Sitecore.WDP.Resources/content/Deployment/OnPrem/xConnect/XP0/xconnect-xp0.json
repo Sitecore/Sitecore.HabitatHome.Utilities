@@ -2,11 +2,13 @@
   "Parameters": {
     "Package": {
       "Type": "string",
-      "Description": "The path to the Web Deploy package to deploy."
+      "Description": "The path to the Web Deploy package to deploy.",
+      "DefaultValue": ""
     },
     "LicenseFile": {
       "Type": "string",
-      "Description": "The path to the Sitecore license file."
+      "Description": "The path to the Sitecore license file.",
+      "DefaultValue": ".\\Licence.xml"
     },
     "SiteName": {
       "Type": "string",
@@ -15,15 +17,18 @@
     },
     "XConnectCert": {
       "Type": "string",
-      "Description": "The certificate to use for encryption. Provide the name or the thumbprint."
+      "Description": "The certificate to use for encryption. Provide the name or the thumbprint.",
+      "DefaultValue": ""
     },
     "SqlDbPrefix": {
       "Type": "string",
-      "Description": "The prefix used for all Sql databases."
+      "Description": "The prefix used for all Sql databases.",
+      "DefaultValue": ""
     },
     "SolrCorePrefix": {
       "Type": "string",
-      "Description": "The prefix used for all Solr cores."
+      "Description": "The prefix used for all Solr cores.",
+      "DefaultValue": ""
     },
     "SSLCert": {
       "Type": "string",
@@ -325,7 +330,7 @@
                 "Remove": [ { "Port": "80", "IPAddress": "*" } ]
             }
         },
-        "CreateBindingsWithThumprint": {
+        "CreateBindingsWithThumbprint": {
             "Description": "Configures the site bindings for the website.",
             "Type": "WebBinding",
             "Params": {
@@ -450,7 +455,7 @@
                 "Destination": "[variable('Site.DataFolder')]"
             }
         },
-        "CreateBindingsWithDevelopmentThumprint": {
+        "CreateBindingsWithDevelopmentThumbprint": {
             "Description": "Creates a new thumbprint with a custom CA",
             "Type": "AddWebFeatureSSL",
             "Params": {

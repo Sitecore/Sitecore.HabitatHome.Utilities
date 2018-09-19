@@ -36,14 +36,15 @@ Write-Host "*******************************************************" -Foreground
 #    Remove-Module "uninstall"
 #}
 
-# $carbon = Get-Module Carbon
-# if (-not $carbon) {
-#     Write-Host "Installing latest version of Carbon" -ForegroundColor Green
-#     Install-Module -Name Carbon -Repository PSGallery -AllowClobber -Verbose
-#     Import-Module Carbon
-# }
+$carbon = Get-Module Carbon
+if (-not $carbon) {
+    Write-Host "Installing latest version of Carbon" -ForegroundColor Green
+    Install-Module -Name Carbon -Repository PSGallery -AllowClobber  -Force
+    Import-Module Carbon
+}
 
 IISRESET /STOP
+
 Import-Module "$PSScriptRoot\uninstall\uninstall.psm1"
 
 $database = Get-SitecoreDatabase -SqlServer $sql.server -SqlAdminUser $sql.adminUser -SqlAdminPassword $sql.adminPassword
@@ -52,6 +53,7 @@ $database = Get-SitecoreDatabase -SqlServer $sql.server -SqlAdminUser $sql.admin
 Remove-SitecoreWindowsService "$($xConnect.siteName)-MarketingAutomationService"
 Remove-SitecoreWindowsService "$($xConnect.siteName)-IndexWorker"
 Remove-SitecoreWindowsService "$($xConnect.siteName)-ProcessingEngineService"
+
 
 # Delete xconnect site
 Remove-SitecoreIisSite $xConnect.siteName
@@ -99,10 +101,10 @@ Remove-SitecoreDatabase -Name "$($site.prefix)_Messaging" -Server $database
 Remove-SitecoreDatabase -Name "$($site.prefix)_ProcessingEngineStorage" -Server $database
 Remove-SitecoreDatabase -Name "$($site.prefix)_ProcessingEngineTasks" -Server $database
 
-
 # Delete sitecore files
 Remove-SitecoreFiles $sitecore.siteRoot
 Remove-SitecoreFiles  (Join-Path $site.webroot ("IdentityServer.{0}" -f $site.hostName))
+
 # Delete sitecore cores
 Get-WmiObject win32_service  -Filter "name like '$($solr.serviceName)'" | Stop-Service 
 Remove-SitecoreSolrCore "$($site.prefix)_core_index" -Root $solr.root
@@ -122,7 +124,7 @@ Get-WmiObject win32_service  -Filter "name like '$($solr.serviceName)'" | Start-
 Remove-SitecoreCertificate $site.hostName
 
 # Drop the SQL Collectionuser login
-Remove-SitecoreDatabaseLogin -Server $database, -Name $($xConnect.sqlCollectionUser)
+Remove-SitecoreDatabaseLogin -Server $database -Name $($sql.collectionUser)
 
 # Remove App Pool membership 
 

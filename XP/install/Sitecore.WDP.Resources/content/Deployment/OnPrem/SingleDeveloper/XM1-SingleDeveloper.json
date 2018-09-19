@@ -1,0 +1,271 @@
+{
+    "Parameters": {
+        "LicenseFile": {
+            "Type": "String",
+            "Description": "The path to the Sitecore license file.",
+            "DefaultValue": ".\\License.xml"
+        },
+        "IdentityServerCertificateName": {
+            "Type": "String",
+            "Description": "The name of the certificate to be created for the identity server.",
+            "DefaultValue": ""
+        },
+        "IdentityServerSiteName": {
+            "Type": "String",
+            "Description": "The name of the identity server to be created.",
+            "DefaultValue": "IdentityServer"
+        },
+        "Prefix": {
+            "Type": "String",
+            "DefaultValue": "SC910",
+            "Description": "The prefix for uniquely identifying instances."
+        },
+        "SitecoreContentManagementSiteName": {
+            "Type": "string",
+            "DefaultValue": "SitecoreXM1CD",
+            "Description": "The name of the content management site to be deployed."
+        },
+        "SitecoreContentDeliverySiteName": {
+            "Type": "string",
+            "DefaultValue": "SitecoreXP1CM",
+            "Description": "The name of the content delivery site to be deployed."
+        },
+        "SqlAdminUser": {
+            "Type": "string",
+            "DefaultValue": "sa",
+            "Description": "The Sql admin user account to use when installing databases."
+        },
+        "SqlAdminPassword": {
+            "Type": "string",
+            "DefaultValue": "12345",
+            "Description": "The Sql admin password to use when installing databases."
+        },
+        "SQLServer": {
+            "Type": "String",
+            "DefaultValue": "Localhost",
+            "Description": "The Sql Server where databases will be installed."
+        },
+        "SolrUrl": {
+            "Type": "String",
+            "DefaultValue": "https://localhost:8983/solr",
+            "Description": "The Solr instance to use."
+        },
+        "SolrRoot": {
+            "Type": "String",
+            "DefaultValue": "C:\\solr-7.2.1",
+            "Description": "The file path to the Solr instance."
+        },
+        "SolrService": {
+            "Type": "String",
+            "DefaultValue": "Solr-7.2.1",
+            "Description": "The name of the Solr service."
+        },
+        "SitecoreContentManagementPackage": {
+            "Type": "String",
+            "DefaultValue": "",
+            "Description": "The path to the Sitecore package to deploy."
+        },
+        "SitecoreContentDeliveryPackage": {
+            "Type": "String",
+            "DefaultValue": "",
+            "Description": "The path to the Sitecore package to deploy."
+        },
+        "IdentityServerPackage": {
+            "Type": "String",
+            "DefaultValue": "",
+            "Description": "The path to the Identity Server package to deploy."
+        },
+        "PasswordRecoveryUrl": {
+            "Type": "string",
+            "Description": "Password recovery Url (Host name of CM instance).",
+            "DefaultValue": "http:\\"
+        },
+        "ClientsConfiguration": {
+            "Type": "string",
+            "DefaultValue": "",
+            "Description": "Sitecore IdentityServer clients configuration"
+        },
+        "AllowedCorsOrigins": {
+            "Type": "string",
+            "Description": "Pipe-separated list of instances (URIs) that are allowed to login via Sitecore Identity.",
+            "DefaultValue": ""
+        },
+        "ClientSecret": {
+            "Type": "string",
+            "Description": "Client secret of PasswordClient section. It's a random string between 1 and 100 symbols long.",
+            "DefaultValue": "IdentityServerClientSecret"
+        },
+        "SitecoreSolr:SolrUrl": {
+            "Type": "String",
+            "Reference": "SolrUrl",
+            "Description": "Override to pass SolrURL value to SitecoreSolr config."
+        },
+        "SitecoreCM:SolrUrl": {
+            "Type": "String",
+            "Reference": "SolrUrl",
+            "Description": "Override to pass SolrURL value to SitecoreCM config."
+        },
+        "SitecoreCD:SolrUrl": {
+            "Type": "String",
+            "Reference": "SolrUrl",
+            "Description": "Override to pass SolrURL value to SitecoreCD config."
+        },
+        "SitecoreSolr:SolrRoot": {
+            "Type": "String",
+            "Reference": "SolrRoot",
+            "Description": "Override to pass SolrRoot value to SitecoreSolr config."
+        },
+        "SitecoreSolr:SolrService": {
+            "Type": "String",
+            "Reference": "SolrService",
+            "Description": "Override to pass SolrService value to SitecoreSolr config."
+        },
+        "SitecoreSolr:CorePrefix": {
+            "Type": "String",
+            "Reference": "Prefix",
+            "Description": "Override to pass Prefix value to SitecoreSolr config."
+        },
+        "SitecoreCM:CorePrefix": {
+            "Type": "String",
+            "Reference": "Prefix",
+            "Description": "Override to pass Prefix value to SitecoreCM config."
+        },
+        "SitecoreCD:CorePrefix": {
+            "Type": "String",
+            "Reference": "Prefix",
+            "Description": "Override to pass Prefix value to SitecoreCD config."
+        },
+        "SitecoreCM:LicenseFile": {
+            "Type": "String",
+            "Reference": "LicenseFile",
+            "Description": "Override to pass LicenseFile value to SitecoreCM config."
+        },
+        "SitecoreCD:LicenseFile": {
+            "Type": "String",
+            "Reference": "LicenseFile",
+            "Description": "Override to pass LicenseFile value to SitecoreCD config."
+        },
+        "IdentityServerCertificates:CertificateName": {
+            "Type": "String",
+            "Reference": "IdentityServerCertificateName",
+            "Description": "Override to pass IdentityServerCertificateName value to IdentityServerCertificates config."
+        },
+        "IdentityServer:SiteName": {
+            "Type": "String",
+            "Reference": "IdentityServerSiteName",
+            "Description": "Override to pass IdentityServerSiteName value to IdentityServer config."
+        },
+        "SitecoreCM:SiteName": {
+            "Type": "String",
+            "Reference": "SitecoreContentManagementSiteName",
+            "Description": "Override to pass SitecoreContentManagmentSiteName value to SitecoreCM config."
+        },
+        "SitecoreCD:SiteName": {
+            "Type": "String",
+            "Reference": "SitecoreContentDeliverySiteName",
+            "Description": "Override to pass SitecoreContentDeliverySiteName value to SitecoreCD config."
+        },
+        "IdentityServer:SitecoreIdentityCert": {
+            "Type": "String",
+            "Reference": "IdentityServerCertificateName",
+            "Description": "Override to pass IdentityServerCertificateName value to IdentityServer config."
+        },
+        "IdentityServer:LicenseFile": {
+            "Type": "String",
+            "Reference": "LicenseFile",
+            "Description": "Override to pass LicenseFile value to IdentityServer config."
+        },
+        "IdentityServer:ClientsConfiguration": {
+            "Type": "String",
+            "Reference": "ClientsConfiguration",
+            "Description": "Override to pass ClientsConfiguration value to IdentityServer config."
+        },
+        "IdentityServer:PasswordRecoveryUrl": {
+            "Type": "String",
+            "Reference": "PasswordRecoveryUrl",
+            "Description": "Override to pass PasswordRecoveryUrl value to IdentityServer config."
+        },
+        "SitecoreCM:Package": {
+            "Type": "String",
+            "Reference": "SitecoreContentManagementPackage",
+            "Description": "Override to pass SitecoreContentManagementPackage value to SitecoreXP0 config."
+        },
+        "SitecoreCD:Package": {
+            "Type": "String",
+            "Reference": "SitecoreContentDeliveryPackage",
+            "Description": "Override to pass SitecoreContentDeliveryPackage value to SitecoreXP0 config."
+        },
+        "IdentityServer:Package": {
+            "Type": "String",
+            "Reference": "IdentityServerPackage",
+            "Description": "Override to pass IdentityServerPackage value to IdentityServer config."
+        },
+        "SitecoreCM:SqlDbPrefix": {
+            "Type": "String",
+            "Reference": "Prefix",
+            "Description": "Override to pass Prefix value to SitecoreCM config."
+        },
+        "SitecoreCD:SqlDbPrefix": {
+            "Type": "String",
+            "Reference": "Prefix",
+            "Description": "Override to pass Prefix value to SitecoreCD config."
+        },
+        "IdentityServer:SqlDbPrefix": {
+            "Type": "String",
+            "Reference": "Prefix",
+            "Description": "Override to pass Prefix value to IdentityServer config."
+        },
+        "SitecoreCM:SqlServer": {
+            "Type": "String",
+            "Reference": "SQLServer",
+            "Description": "Override to pass SqlServer value to SitecoreCM config."
+        },
+        "SitecoreCD:SqlServer": {
+            "Type": "String",
+            "Reference": "SQLServer",
+            "Description": "Override to pass SqlServer value to SitecoreCD config."
+        },
+        "IdentityServer:SqlServer": {
+            "Type": "String",
+            "Reference": "SQLServer",
+            "Description": "Override to pass SqlServer value to IdentityServer config."
+        },
+        "SitecoreCM:SqlAdminUser": {
+            "Type": "String",
+            "Reference": "SqlAdminUser",
+            "Description": "Override to pass SqlAdminUser value to SitecoreCM config."
+        },
+        "SitecoreCM:SqlAdminPassword": {
+            "Type": "String",
+            "Reference": "SqlAdminPassword",
+            "Description": "Override to pass SqlAdminPassword value to SitecoreCM config."
+        },
+        "IdentityServer:AllowedCorsOrigins": {
+            "Type": "String",
+            "Reference": "AllowedCorsOrigins",
+            "Description": "Override to pass AllowedCorsOrigins value to IdentityServer config."
+        },
+        "IdentityServer:ClientSecret": {
+            "Type": "String",
+            "Reference": "ClientSecret",
+            "Description": "Override to pass ClientSecret value to IdentityServer config."
+        }
+    },
+    "Includes" : {
+        "SitecoreSolr": {
+            "Source": ".\\Sitecore-solr.json"
+        },
+        "SitecoreCM": {
+            "Source": ".\\Sitecore-XM1-cm.json"
+        },
+        "SitecoreCD": {
+            "Source": ".\\Sitecore-XM1-cd.json"
+        },
+        "IdentityServerCertificates":{
+            "Source": ".\\createcert.json"
+        },
+        "IdentityServer": {
+            "Source": ".\\identityServer.json"
+        }
+    }
+}

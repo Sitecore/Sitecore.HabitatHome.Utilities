@@ -14,83 +14,82 @@
     "dotnetMinimumVersionValue": "@@assets.netMinimumVersionValue@@",
     "installPackagePath": "@@assets.installPackagePath@@"
   },
-  "settings": {
-    "site": {
-      "prefix": "@@site.prefix@@",
-      "suffix": "@@site.suffix@@",
-      "webRoot": "@@site.webRoot@@",
-      "hostName": "@@site.hostName@@",
-      "enableInstallationImprovements": "@@site.enableInstallationImprovements@@",
-      "disableInstallationImprovements": "@@site.disableInstallationImprovements@@",
-      "configureSearchIndexes": "@@site.configureSearchIndexes@@",
-      "habitatHomeSslCertificateName": "@@site.habitatHomeSslCertificateName@@",
-      "addSiteBindingWithSSLPath": "@@site.addSiteBindingWithSSLPath@@"
+    "settings": {
+        "site": {
+            "prefix": "@@site.prefix@@",
+            "suffix": "@@site.suffix@@",
+            "webRoot": "@@site.webRoot@@",
+            "hostName": "@@site.hostName@@",
+            "configureSearchIndexes":"@@site.configureSearchIndexes@@",
+            "habitatHomeSslCertificateName":"@@site.habitatHomeSslCertificateName@@",
+            "addSiteBindingWithSSLPath":"@@site.addSiteBindingWithSSLPath@@"
+        },
+      "sql": {
+        "server": "@@sql.server@@",
+        "adminUser": "@@sql.adminUser@@",
+        "adminPassword": "@@sql.adminPassword@@",
+        "coreUser": "@@sql.coreUser@@",
+        "corePassword": "@@sql.corePassword@@",
+        "masterUser": "@@sql.masterUser@@",
+        "masterPassword": "@@sql.masterPassword@@",
+        "webUser": "@@sql.webUser@@",
+        "webPassword": "@@sql.webPassword@@",
+        "collectionUser": "@@sql.collectionUser@@",
+        "collectionPassword": "@@sql.collectionPassword@@",
+        "reportingUser": "@@sql.reportingUser@@",
+        "reportingPassword": "@@sql.reportingPassword@@",
+        "processingEngineUser": "@@sql.processingEngineUser@@",
+        "processingEnginePassword": "@@sql.processingEnginePassword@@",
+        "processingPoolsUser": "@@sql.processingPoolsUser@@",
+        "processingPoolsPassword": "@@sql.processingPoolsPassword@@",
+        "processingTasksUser": "@@sql.processingTasksUser@@",
+        "processingTasksPassword": "@@sql.processingTasksPassword@@",
+        "referenceDataUser": "@@sql.referenceDataUser@@",
+        "referenceDataPassword": "@@sql.referenceDataPassword@@",
+        "marketingAutomationUser": "@@sql.marketingAutomationUser@@",
+        "marketingAutomationPassword": "@@sql.marketingAutomationPassword@@",
+        "formsUser": "@@sql.formsUser@@",
+        "formsPassword": "@@sql.formsPassword@@",
+        "exmMasterUser": "@@sql.exmMasterUser@@",
+        "exmMasterPassword": "@@sql.exmMasterPassword@@",
+        "messagingUser": "@@sql.messagingUser@@",
+        "messagingPassword": "@@sql.messagingPassword@@",
+        "minimumVersion": "@@sql.minimumVersion@@"
+      },
+        "xConnect": {
+            "configurationPath": "@@xConnect.configurationPath@@",
+            "certificateConfigurationPath": "@@xConnect.certificateConfigurationPath@@",
+            "solrConfigurationPath": "@@xConnect.solrConfigurationPath@@",
+            "packagePath": "@@xConnect.packagePath@@",
+            "siteName": "@@xConnect.siteName@@",
+            "certificateName": "@@xConnect.certificate@@",
+            "siteRoot": "@@xConnect.siteRoot@@"            
+        },
+      "sitecore": {
+          "solrConfigurationPath": "@@sitecore.solrConfigurationPath@@",
+          "configurationPath": "@@sitecore.configurationPath@@",
+          "sslConfigurationPath": "@@sitecore.sslConfigurationPath@@",
+          "packagePath": "@@sitecore.packagePath@@",
+          "siteRoot": "@@sitecore.siteRoot@@",
+          "adminPassword": "@@sitecore.adminPassword@@",
+          "exmCryptographicKey": "@@sitecore.exmCryptographicKey@@",
+          "exmAuthenticationKey": "@@sitecore.exmAuthenticationKey@@",
+          "telerikEncryptionKey": "@@sitecore.telerikEncryptionKey@@",
+          "rootCertificateName": "@@sitecore.rootCertificateName@@"
+        },
+        "identityServer": {
+          "configurationPath": "@@identityServer.ConfigurationPath@@",
+          "packagePath": "@@identityServer.packagePath@@",
+          "name": "@@identityServer.name@@",
+          "url": "@@identityServer.url@@",
+          "clientSecret": "@@identityServer.clientSecret@@"
+        },
+        "solr": {
+            "url": "@@solr.url@@",
+            "root": "@@solr.root@@",
+            "serviceName": "@@solr.serviceName@@"
+        }
     },
-    "sql": {
-      "server": "@@sql.server@@",
-      "adminUser": "@@sql.adminUser@@",
-      "adminPassword": "@@sql.adminPassword@@",
-      "coreUser": "@@sql.coreUser@@",
-      "corePassword": "@@sql.corePassword@@",
-      "masterUser": "@@sql.masterUser@@",
-      "masterPassword": "@@sql.masterPassword@@",
-      "webUser": "@@sql.webUser@@",
-      "webPassword": "@@sql.webPassword@@",
-      "collectionUser": "@@sql.collectionUser@@",
-      "collectionPassword": "@@sql.collectionPassword@@",
-      "reportingUser": "@@sql.reportingUser@@",
-      "reportingPassword": "@@sql.reportingPassword@@",
-      "processingEngineUser": "@@sql.processingEngineUser@@",
-      "processingEnginePassword": "@@sql.processingEnginePassword@@",
-      "processingPoolsUser": "@@sql.processingPoolsUser@@",
-      "processingPoolsPassword": "@@sql.processingPoolsPassword@@",
-      "processingTasksUser": "@@sql.processingTasksUser@@",
-      "processingTasksPassword": "@@sql.processingTasksPassword@@",
-      "referenceDataUser": "@@sql.referenceDataUser@@",
-      "referenceDataPassword": "@@sql.referenceDataPassword@@",
-      "marketingAutomationUser": "@@sql.marketingAutomationUser@@",
-      "marketingAutomationPassword": "@@sql.marketingAutomationPassword@@",
-      "formsUser": "@@sql.formsUser@@",
-      "formsPassword": "@@sql.formsPassword@@",
-      "exmMasterUser": "@@sql.exmMasterUser@@",
-      "exmMasterPassword": "@@sql.exmMasterPassword@@",
-      "messagingUser": "@@sql.messagingUser@@",
-      "messagingPassword": "@@sql.messagingPassword@@",
-      "minimumVersion": "@@sql.minimumVersion@@"
-    },
-    "xConnect": {
-      "configurationPath": "@@xConnect.configurationPath@@",
-      "certificateConfigurationPath": "@@xConnect.certificateConfigurationPath@@",
-      "solrConfigurationPath": "@@xConnect.solrConfigurationPath@@",
-      "packagePath": "@@xConnect.packagePath@@",
-      "siteName": "@@xConnect.siteName@@",
-      "certificateName": "@@xConnect.certificate@@",
-      "siteRoot": "@@xConnect.siteRoot@@"
-    },
-    "sitecore": {
-      "solrConfigurationPath": "@@sitecore.solrConfigurationPath@@",
-      "configurationPath": "@@sitecore.configurationPath@@",
-      "sslConfigurationPath": "@@sitecore.sslConfigurationPath@@",
-      "packagePath": "@@sitecore.packagePath@@",
-      "siteRoot": "@@sitecore.siteRoot@@",
-      "adminPassword": "@@sitecore.adminPassword@@",
-      "exmCryptographicKey": "@@sitecore.exmCryptographicKey@@",
-      "exmAuthenticationKey": "@@sitecore.exmAuthenticationKey@@",
-      "telerikEncryptionKey": "@@sitecore.telerikEncryptionKey@@"
-    },
-    "identityServer": {
-      "configurationPath": "@@identityServer.ConfigurationPath@@",
-      "packagePath": "@@identityServer.packagePath@@",
-      "name": "@@identityServer.name@@",
-      "url": "@@identityServer.url@@",
-      "clientSecret": "@@identityServer.clientSecret@@"
-    },
-    "solr": {
-      "url": "@@solr.url@@",
-      "root": "@@solr.root@@",
-      "serviceName": "@@solr.serviceName@@"
-    }
-  },
     "modules":[
     ]
 }
