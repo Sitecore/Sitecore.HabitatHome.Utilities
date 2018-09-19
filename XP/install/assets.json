@@ -43,8 +43,8 @@
             "id": "def",
             "name": "Data Exchange Framework",
             "isGroup": true,
-            "download": true,
-            "install": true,
+            "download": false,
+            "install": false,
             "modules": [{
                     "id": "def",
                     "name": "Data Exchange Framework",
@@ -112,8 +112,8 @@
             "name": "Sitecore Connect for Salesforce Marketing Cloud",
             "fileName": "Sitecore Connect for Salesforce Marketing Cloud 1.0.0 rev. 180608.zip",
             "url": "https://dev.sitecore.net/~/media/2AFF0DF06BD24985B1793807D806411D.ashx",
-            "download": true,
-            "install": true,
+            "download": false,
+            "install": false,
             "convertToWdp": true,
             "source": "sitecore"
         }

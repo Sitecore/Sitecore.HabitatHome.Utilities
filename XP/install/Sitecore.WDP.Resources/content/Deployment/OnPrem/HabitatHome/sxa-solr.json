@@ -24,35 +24,39 @@
             "Type": "string",
             "DefaultValue": "sitecore",
             "Description": "The prefix for each of the created indexes."
+        },
+        "SXASolrConfigPath":{
+            "Type":"string",
+            "Description":"The solr configuration which needs to be added to the Solr Core"
         }
     },
     "Variables": {
-        "Solr.FullRoot":    "[resolvepath(parameter('SolrRoot'))]",
-        "Solr.Server":      "[joinpath(variable('Solr.FullRoot'), 'server', 'solr')]",
+        "Solr.FullRoot": "[resolvepath(parameter('SolrRoot'))]",
+        "Solr.Server": "[joinpath(variable('Solr.FullRoot'), 'server', 'solr')]",
         "Solr.BaseConfigs": "[joinpath(variable('Solr.Server'), 'configsets', parameter('BaseConfig'))]",
         "Solr.SchemaFileName": "managed-schema",
         "Solr.Xpath.SchemaRoot": "//schema",
         "Solr.Xpath.UniqueKey": "[concat(variable('Solr.Xpath.SchemaRoot'), '/uniqueKey')]",
-        "Solr.UniqueField" : "_uniqueid",
+        "Solr.UniqueField": "_uniqueid",
         "Solr.UniqueField.Attributes": {
-            "name" : "[variable('Solr.UniqueField')]",
+            "name": "[variable('Solr.UniqueField')]",
             "type": "string",
             "indexed": "true",
             "required": "true",
             "stored": "true"
         },
-        
-        "SXA.Master.Name":      "[concat(parameter('CorePrefix'), '_sxa_master_index')]",
-        "SXA.Web.Name":         "[concat(parameter('CorePrefix'), '_sxa_web_index')]",
-        "SXA.Master.Root":      "[joinpath(variable('Solr.Server'), variable('SXA.Master.Name'))]",
-        "SXA.Web.Root":         "[joinpath(variable('Solr.Server'), variable('SXA.Web.Name'))]",
-        "SXA.Master.Conf":      "[joinpath(variable('SXA.Master.Root'), 'conf')]",
-        "SXA.Web.Conf":         "[joinpath(variable('SXA.Web.Root'), 'conf')]"
+        "SXA.Master.Name": "[concat(parameter('CorePrefix'), '_sxa_master_index')]",
+        "SXA.Web.Name": "[concat(parameter('CorePrefix'), '_sxa_web_index')]",
+        "SXA.Master.Root": "[joinpath(variable('Solr.Server'), variable('SXA.Master.Name'))]",
+        "SXA.Web.Root": "[joinpath(variable('Solr.Server'), variable('SXA.Web.Name'))]",
+        "SXA.Master.Conf": "[joinpath(variable('SXA.Master.Root'), 'conf')]",
+        "SXA.Web.Conf": "[joinpath(variable('SXA.Web.Root'), 'conf')]",
+        "SXA.Solr.Config":"[ReadJson(parameter('SXASolrConfigPath'))]"
     },
     "Tasks": {
         "StopSolr": {
             "Type": "ManageService",
-            "Params":{
+            "Params": {
                 "Name": "[parameter('SolrService')]",
                 "Status": "Stopped",
                 "PostDelay": 1000
@@ -60,7 +64,7 @@
         },
         "CleanCores": {
             "Type": "EnsurePath",
-            "Params":{
+            "Params": {
                 "Clean": [
                     "[variable('SXA.Master.Root')]",
                     "[variable('SXA.Web.Root')]"
@@ -69,39 +73,87 @@
         },
         "PrepareCores": {
             "Type": "Copy",
-            "Params":[
-                { "Source": "[joinpath(variable('Solr.BaseConfigs'), '*')]", "Destination": "[variable('SXA.Master.Root')]" },
-                { "Source": "[joinpath(variable('Solr.BaseConfigs'), '*')]", "Destination": "[variable('SXA.Web.Root')]" }
+            "Params": [{
+                    "Source": "[joinpath(variable('Solr.BaseConfigs'), '*')]",
+                    "Destination": "[variable('SXA.Master.Root')]"
+                },
+                {
+                    "Source": "[joinpath(variable('Solr.BaseConfigs'), '*')]",
+                    "Destination": "[variable('SXA.Web.Root')]"
+                }
             ]
         },
         "AddSchemaUniqueKeyField": {
             "Type": "SetXml",
-            "Params": [
-                { "FilePath": "[joinpath(variable('SXA.Master.Conf'), variable('Solr.SchemaFileName'))]", "Xpath":"[variable('Solr.Xpath.SchemaRoot')]", "Element": "field", "Attributes": "[variable('Solr.UniqueField.Attributes')]" },
-                { "FilePath": "[joinpath(variable('SXA.Web.Conf'), variable('Solr.SchemaFileName'))]", "Xpath":"[variable('Solr.Xpath.SchemaRoot')]", "Element": "field", "Attributes": "[variable('Solr.UniqueField.Attributes')]" }
+            "Params": [{
+                    "FilePath": "[joinpath(variable('SXA.Master.Conf'), variable('Solr.SchemaFileName'))]",
+                    "Xpath": "[variable('Solr.Xpath.SchemaRoot')]",
+                    "Element": "field",
+                    "Attributes": "[variable('Solr.UniqueField.Attributes')]"
+                },
+                {
+                    "FilePath": "[joinpath(variable('SXA.Web.Conf'), variable('Solr.SchemaFileName'))]",
+                    "Xpath": "[variable('Solr.Xpath.SchemaRoot')]",
+                    "Element": "field",
+                    "Attributes": "[variable('Solr.UniqueField.Attributes')]"
+                }
             ]
         },
         "UpdateSchemaUniqueKey": {
             "Type": "SetXml",
-            "Params": [
-                { "FilePath": "[joinpath(variable('SXA.Master.Conf'), 'managed-schema')]", "Xpath":"[variable('Solr.Xpath.UniqueKey')]", "Value": "[variable('Solr.UniqueField')]" },
-                { "FilePath": "[joinpath(variable('SXA.Web.Conf'), 'managed-schema')]", "Xpath":"[variable('Solr.Xpath.UniqueKey')]", "Value": "[variable('Solr.UniqueField')]" }
+            "Params": [{
+                    "FilePath": "[joinpath(variable('SXA.Master.Conf'), 'managed-schema')]",
+                    "Xpath": "[variable('Solr.Xpath.UniqueKey')]",
+                    "Value": "[variable('Solr.UniqueField')]"
+                },
+                {
+                    "FilePath": "[joinpath(variable('SXA.Web.Conf'), 'managed-schema')]",
+                    "Xpath": "[variable('Solr.Xpath.UniqueKey')]",
+                    "Value": "[variable('Solr.UniqueField')]"
+                }
             ]
         },
         "StartSolr": {
             "Type": "ManageService",
-            "Params":{
+            "Params": {
                 "Name": "[parameter('SolrService')]",
                 "Status": "Running",
                 "PostDelay": 8000
             }
         },
-        "CreateCores":{
+        "CreateCores": {
             "Type": "ManageSolrCore",
-            "Params": [
-                { "Action": "Create", "Address": "[parameter('SolrUrl')]", "Arguments": { "Name": "[variable('SXA.Master.Name')]" } },
-                { "Action": "Create", "Address": "[parameter('SolrUrl')]", "Arguments": { "Name": "[variable('SXA.Web.Name')]" } }
+            "Params": [{
+                    "Action": "Create",
+                    "Address": "[parameter('SolrUrl')]",
+                    "Arguments": {
+                        "Name": "[variable('SXA.Master.Name')]"
+                    }
+                },
+                {
+                    "Action": "Create",
+                    "Address": "[parameter('SolrUrl')]",
+                    "Arguments": {
+                        "Name": "[variable('SXA.Web.Name')]"
+                    }
+                }
             ]
+        },
+        "AddSXASuggesterToMaster": {
+            "Type": "ManageSolrConfig",
+            "Params": [{
+                "Address":"[parameter('SolrUrl')]",
+                "CoreName":"[variable('SXA.Master.Name')]",
+                "Config":"[variable('SXA.Solr.Config')]"
+            }]
+        },
+        "AddSXASuggesterToWeb": {
+            "Type": "ManageSolrConfig",
+            "Params": [{
+                "Address":"[parameter('SolrUrl')]",
+                "CoreName":"[variable('SXA.Web.Name')]",
+                "Config":"[variable('SXA.Solr.Config')]"
+            }]
         }
     }
 }

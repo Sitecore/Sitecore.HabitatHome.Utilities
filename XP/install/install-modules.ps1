@@ -25,6 +25,7 @@ $assets = $config.assets
 $modules = $config.modules
 $site = $config.settings.site
 $sitecore = $config.settings.sitecore
+$solr = $config.settings.solr
 $sql = $config.settings.sql
 $xConnect = $config.settings.xConnect
 $resourcePath = Join-Path $PSScriptRoot "Sitecore.WDP.Resources"
@@ -204,13 +205,18 @@ Function Install-SitecorePowerShellExtensions {
 Function Install-SitecoreExperienceAccelerator {
 
     # Install SXA Solr Cores
+    
+    $sxaSolrConfigPath = Join-Path $resourcePath 'content\Deployment\OnPrem\HabitatHome\sxa-solr-config.json'
+    
     try {
         $params = @{
-            Path        = (Join-path $resourcePath 'content\Deployment\OnPrem\HabitatHome\sxa-solr.json')
-            SolrUrl     = $solr.url 
-            SolrRoot    = $solr.root 
-            SolrService = $solr.serviceName 
-            CorePrefix  = $site.prefix
+            Path            = Join-path $resourcePath 'content\Deployment\OnPrem\HabitatHome\sxa-solr.json'
+            SolrUrl         = $solr.url 
+            SolrRoot        = $solr.root 
+            SolrService     = $solr.serviceName 
+            CorePrefix      = $site.prefix
+            SXASolrConfigPath   = $sxaSolrConfigPath
+
         }
         Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs")
     }
@@ -338,6 +344,26 @@ Function Install-DataExchangeFrameworkModules {
     Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs") -Verbose
 
 }
+Function Install-SalesforceMarketingCloudModule{
+    $sfmcConnect = $modules | Where-Object { $_.id -eq "sfmcConnect"}
+    if ($false -eq $sfmcConnect.install) {
+        return;
+    }
+
+    $sfmcConnect.packagePath = $sfmcConnect.packagePath.replace(".zip", ".scwdp.zip")
+    $params = @{
+        Path             = (Join-path $resourcePath 'content\Deployment\OnPrem\HabitatHome\module-mastercore.json')
+        Package          = $sfmcConnect.packagePath
+        SiteName         = $site.hostName
+        SqlDbPrefix      = $site.prefix 
+        SqlAdminUser     = $sql.adminUser 
+        SqlAdminPassword = $sql.adminPassword 
+        SqlServer        = $sql.server 
+
+    }
+    
+    Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs") -Verbose
+}
 Function Enable-ContainedDatabases {
     #Enable Contained Databases
     Write-Host "Enable contained databases" -ForegroundColor Green
@@ -413,11 +439,9 @@ Install-SitecorePowerShellExtensions
 Install-SitecoreExperienceAccelerator
 Update-SXASolrCores
 Install-DataExchangeFrameworkModules
+Install-SalesforceMarketingCloudModule
 Enable-ContainedDatabases
 Add-DatabaseUsers
-
 Start-Services
-
-
 $StopWatch.Stop()
 $StopWatch
