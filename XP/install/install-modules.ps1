@@ -200,7 +200,25 @@ Function Install-SitecorePowerShellExtensions {
     
     Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs") -Verbose
 }
+
 Function Install-SitecoreExperienceAccelerator {
+
+    # Install SXA Solr Cores
+    try {
+        $params = @{
+            Path        = (Join-path $resourcePath 'content\Deployment\OnPrem\HabitatHome\sxa-solr.json')
+            SolrUrl     = $solr.url 
+            SolrRoot    = $solr.root 
+            SolrService = $solr.serviceName 
+            CorePrefix  = $site.prefix
+        }
+        Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs")
+    }
+    catch {
+        write-host "SXA SOLR Failed" -ForegroundColor Red
+        throw
+    }
+
     $spe = $modules | Where-Object { $_.id -eq "sxa"}
     $spe.packagePath = $spe.packagePath.replace(".zip", ".scwdp.zip")
     $params = @{
@@ -393,10 +411,11 @@ Remove-DatabaseUsers
 Stop-Services
 Install-SitecorePowerShellExtensions
 Install-SitecoreExperienceAccelerator
+Update-SXASolrCores
 Install-DataExchangeFrameworkModules
 Enable-ContainedDatabases
 Add-DatabaseUsers
-Update-SXASolrCores
+
 Start-Services
 
 

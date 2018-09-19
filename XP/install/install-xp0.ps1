@@ -28,7 +28,6 @@ $solr = $config.settings.solr
 $assets = $config.assets
 $modules = $config.modules
 $resourcePath = Join-Path $PSScriptRoot "Sitecore.WDP.Resources"
-Import-Module .\scripts\additional-tasks.psm1 -Force
 
 Write-Host "*******************************************************" -ForegroundColor Green
 Write-Host " Installing Sitecore $($assets.sitecoreVersion)" -ForegroundColor Green
