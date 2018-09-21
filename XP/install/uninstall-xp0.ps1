@@ -39,7 +39,7 @@ Write-Host "*******************************************************" -Foreground
 $carbon = Get-Module Carbon
 if (-not $carbon) {
     Write-Host "Installing latest version of Carbon" -ForegroundColor Green
-    Install-Module -Name Carbon -Repository PSGallery -AllowClobber -Verbose
+    Install-Module -Name Carbon -Repository PSGallery -AllowClobber  -Force
     Import-Module Carbon
 }
 
@@ -108,6 +108,8 @@ Remove-SitecoreSolrCore "$($site.prefix)_testing_index" -Root $solr.root
 Remove-SitecoreSolrCore "$($site.prefix)_suggested_test_index" -Root $solr.root
 Remove-SitecoreSolrCore "$($site.prefix)_fxm_master_index" -Root $solr.root
 Remove-SitecoreSolrCore "$($site.prefix)_fxm_web_index" -Root $solr.root
+Remove-SitecoreSolrCore "$($site.prefix)_sxa_master_index" -Root $solr.root
+Remove-SitecoreSolrCore "$($site.prefix)_sxa_web_index" -Root $solr.root
 Get-WmiObject win32_service  -Filter "name like '$($solr.serviceName)'" | Start-Service 
 
 # Delete sitecore certificate
