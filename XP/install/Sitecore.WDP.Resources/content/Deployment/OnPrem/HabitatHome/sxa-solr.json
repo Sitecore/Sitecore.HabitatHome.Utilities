@@ -127,14 +127,14 @@
                     "Action": "Create",
                     "Address": "[parameter('SolrUrl')]",
                     "Arguments": {
-                        "Name": "[variable('SXA.Master.Name')]"
+                        "name": "[variable('SXA.Master.Name')]"
                     }
                 },
                 {
                     "Action": "Create",
                     "Address": "[parameter('SolrUrl')]",
                     "Arguments": {
-                        "Name": "[variable('SXA.Web.Name')]"
+                        "name": "[variable('SXA.Web.Name')]"
                     }
                 }
             ]
