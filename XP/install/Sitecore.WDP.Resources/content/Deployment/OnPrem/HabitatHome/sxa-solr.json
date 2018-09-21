@@ -27,7 +27,7 @@
         },
         "SXASolrConfigPath": {
             "Type": "string",
-            "Description": "The XML Solr configuration which needs to be added to the Solr Core"
+            "Description": "The Solr configuration which needs to be added to the Solr Core"
         },
         "SiteName": {
             "Type": "string",
@@ -43,10 +43,8 @@
         "Solr.Server": "[joinpath(variable('Solr.FullRoot'), 'server', 'solr')]",
         "Solr.BaseConfigs": "[joinpath(variable('Solr.Server'), 'configsets', parameter('BaseConfig'))]",
         "Solr.SchemaFileName": "managed-schema",
-        "Solr.ConfigFileName": "solrconfig.xml",
         "Solr.Xpath.SchemaRoot": "//schema",
         "Solr.Xpath.UniqueKey": "[concat(variable('Solr.Xpath.SchemaRoot'), '/uniqueKey')]",
-        "Solr.Xpath.Configroot": "/config",
         "Solr.UniqueField": "_uniqueid",
         "Solr.UniqueField.Attributes": {
             "name": "[variable('Solr.UniqueField')]",
