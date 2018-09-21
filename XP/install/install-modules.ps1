@@ -129,7 +129,7 @@ Function Process-Packages {
                     Source      = $package.url
                     Destination = $destination
                 }
-                Install-SitecoreConfiguration  @params  -WorkingDirectory $(Join-Path $PWD "logs") -Verbose 
+                Install-SitecoreConfiguration  @params  -WorkingDirectory $(Join-Path $PWD "logs")  
             }
             if ($package.convert) {
                 Write-Host ("Converting {0} to SCWDP" -f $package.name) -ForegroundColor Green
@@ -199,23 +199,51 @@ Function Install-SitecorePowerShellExtensions {
 
     }
     
-    Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs") -Verbose
+    Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs") 
 }
 
 Function Install-SitecoreExperienceAccelerator {
 
     # Install SXA Solr Cores
     
-    $sxaSolrConfigPath = Join-Path $resourcePath 'content\Deployment\OnPrem\HabitatHome\sxa-solr-config.json'
     
+    $sxaSolrSearchComponentConfigXml = @'
+    <searchComponent name="suggest" class="solr.SuggestComponent">
+    <lst name="suggester">
+      <str name="name">default</str>
+      <str name="field">name</str>
+      <str name="suggestAnalyzerFieldType">string</str>
+    </lst>
+    <lst name="suggester">
+      <str name="name">sxaSuggester</str>
+      <str name="field">sxacontent_txm</str>
+      <str name="suggestAnalyzerFieldType">text_en</str>
+    </lst>
+  </searchComponent>
+   
+'@
+    $sxaSolrRequestHandlerConfigXml = @'
+<requestHandler name="/suggest" class="solr.SearchHandler" startup="lazy">
+<lst name="defaults">
+  <str name="suggest">true</str>
+  <str name="suggest.count">10</str>
+  <str name="suggest.dictionary">sxaSuggester</str>
+</lst>
+<arr name="components">
+  <str>suggest</str>
+</arr>
+</requestHandler>
+'@
+
     try {
         $params = @{
-            Path            = Join-path $resourcePath 'content\Deployment\OnPrem\HabitatHome\sxa-solr.json'
-            SolrUrl         = $solr.url 
-            SolrRoot        = $solr.root 
-            SolrService     = $solr.serviceName 
-            CorePrefix      = $site.prefix
-            SXASolrConfigPath   = $sxaSolrConfigPath
+            Path                            = Join-path $resourcePath 'content\Deployment\OnPrem\HabitatHome\sxa-solr.json'
+            SolrUrl                         = $solr.url 
+            SolrRoot                        = $solr.root 
+            SolrService                     = $solr.serviceName 
+            CorePrefix                      = $site.prefix
+            SXASolrSearchComponentConfigXml = $sxaSolrSearchComponentConfigXml
+            SXASolrRequestHandlerConfigXml  = $sxaSolrRequestHandlerConfigXml
 
         }
         Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs")
@@ -238,7 +266,7 @@ Function Install-SitecoreExperienceAccelerator {
 
     }
     
-    Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs") -Verbose
+    Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs")
 }
 
 Function Install-DataExchangeFrameworkModules {
@@ -261,7 +289,7 @@ Function Install-DataExchangeFrameworkModules {
 
     }
     
-    Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs") -Verbose
+    Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs") 
 
     $defSitecore = $defModules | Where-Object { $_.id -eq "defSitecore"}
     Write-Host ("Installing {0}" -f $defSitecore.name)
@@ -277,7 +305,7 @@ Function Install-DataExchangeFrameworkModules {
 
     }
     
-    Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs") -Verbose
+    Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs") 
 
     $defSql = $defModules | Where-Object { $_.id -eq "defSql"}
     Write-Host ("Installing {0}" -f $defSql.name)
@@ -293,7 +321,7 @@ Function Install-DataExchangeFrameworkModules {
 
     }
     
-    Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs") -Verbose
+    Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs") 
 
     $defxConnect = $defModules | Where-Object { $_.id -eq "defxConnect"}
     Write-Host ("Installing {0}" -f $defxConnect.name)
@@ -309,7 +337,7 @@ Function Install-DataExchangeFrameworkModules {
 
     }
     
-    Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs") -Verbose
+    Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs") 
 
     $defDynamics = $defModules | Where-Object { $_.id -eq "defDynamics"}
     Write-Host ("Installing {0}" -f $defDynamics.name)
@@ -325,7 +353,7 @@ Function Install-DataExchangeFrameworkModules {
 
     }
     
-    Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs") -Verbose
+    Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs") 
     
     $defDynamicsConnect = $defModules | Where-Object { $_.id -eq "defDynamicsConnect"}
     Write-Host ("Installing {0}" -f $defDynamicsConnect.name)
@@ -341,10 +369,10 @@ Function Install-DataExchangeFrameworkModules {
 
     }
     
-    Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs") -Verbose
+    Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs") 
 
 }
-Function Install-SalesforceMarketingCloudModule{
+Function Install-SalesforceMarketingCloudModule {
     $sfmcConnect = $modules | Where-Object { $_.id -eq "sfmcConnect"}
     if ($false -eq $sfmcConnect.install) {
         return;
@@ -362,7 +390,7 @@ Function Install-SalesforceMarketingCloudModule{
 
     }
     
-    Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs") -Verbose
+    Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs") 
 }
 Function Enable-ContainedDatabases {
     #Enable Contained Databases
