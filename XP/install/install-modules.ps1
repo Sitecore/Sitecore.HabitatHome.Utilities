@@ -438,7 +438,7 @@ Set-ModulesPath
 Get-OptionalModules
 Remove-DatabaseUsers
 Stop-Services
-#Install-SitecorePowerShellExtensions
+Install-SitecorePowerShellExtensions
 Install-SitecoreExperienceAccelerator
 Install-DataExchangeFrameworkModules
 Install-SalesforceMarketingCloudModule
