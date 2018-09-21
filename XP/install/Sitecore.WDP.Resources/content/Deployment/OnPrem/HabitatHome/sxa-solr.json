@@ -17,7 +17,7 @@
     },
     "BaseConfig": {
       "Type": "string",
-      "DefaultValue": "basic_configs",
+      "DefaultValue": "_default",
       "Description": "The configset to copy as a base for each core."
     },
     "CorePrefix": {
@@ -28,6 +28,14 @@
     "SXASolrConfigPath": {
       "Type": "string",
       "Description": "The solr configuration which needs to be added to the Solr Core"
+    },
+    "SiteName": {
+      "Type": "string",
+      "Description": "Name of Sitecore Site"
+    },
+    "SitecoreAdminPassword": {
+      "Type": "string",
+      "Description": "Sitecore Admin password"
     }
   },
   "Variables": {
@@ -131,14 +139,14 @@
           "Action": "Create",
           "Address": "[parameter('SolrUrl')]",
           "Arguments": {
-            "Name": "[variable('SXA.Master.Name')]"
+            "name": "[variable('SXA.Master.Name')]"
           }
         },
         {
           "Action": "Create",
           "Address": "[parameter('SolrUrl')]",
           "Arguments": {
-            "Name": "[variable('SXA.Web.Name')]"
+            "name": "[variable('SXA.Web.Name')]"
           }
         }
       ]
@@ -162,6 +170,15 @@
           "Config": "[variable('SXA.Solr.Config')]"
         }
       ]
+    },
+    "UpdateSolrSchema": {
+      "Type": "SitecoreUrl",
+      "Params": {
+        "SitecoreInstanceRoot": "[concat('https://', parameter('SiteName'))]",
+        "SitecoreActionPath": "sitecore/admin/PopulateManagedSchema.aspx?indexes=all",
+        "UserName": "admin",
+        "Password": "[parameter('SitecoreAdminPassword')]"
+      }
     }
   }
 }
