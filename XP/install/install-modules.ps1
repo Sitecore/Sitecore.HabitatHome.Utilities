@@ -210,12 +210,14 @@ Function Install-SitecoreExperienceAccelerator {
     
     try {
         $params = @{
-            Path            = Join-path $resourcePath 'content\Deployment\OnPrem\HabitatHome\sxa-solr.json'
-            SolrUrl         = $solr.url 
-            SolrRoot        = $solr.root 
-            SolrService     = $solr.serviceName 
-            CorePrefix      = $site.prefix
-            SXASolrConfigPath   = $sxaSolrConfigPath
+            Path                    = Join-path $resourcePath 'content\Deployment\OnPrem\HabitatHome\sxa-solr.json'
+            SolrUrl                 = $solr.url 
+            SolrRoot                = $solr.root 
+            SolrService             = $solr.serviceName 
+            CorePrefix              = $site.prefix
+            SXASolrConfigPath       = $sxaSolrConfigPath
+            SiteName                = $site.hostName
+            SitecoreAdminPassword   = $sitecore.adminPassword
 
         }
         Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs")
