@@ -25,13 +25,17 @@
             "DefaultValue": "sitecore",
             "Description": "The prefix for each of the created indexes."
         },
-        "SXASolrSearchComponentConfigXml": {
+        "SXASolrConfigPath": {
             "Type": "string",
             "Description": "The XML Solr configuration which needs to be added to the Solr Core"
         },
-        "SXASolrRequestHandlerConfigXml": {
+        "SiteName": {
             "Type": "string",
-            "Description": "The XML Solr configuration which needs to be added to the Solr Core"
+            "Description": "Name of Sitecore Site"
+        },
+        "SitecoreAdminPassword": {
+            "Type": "string",
+            "Description": "Sitecore Admin password"
         }
     },
     "Variables": {
@@ -56,7 +60,9 @@
         "SXA.Master.Root": "[joinpath(variable('Solr.Server'), variable('SXA.Master.Name'))]",
         "SXA.Web.Root": "[joinpath(variable('Solr.Server'), variable('SXA.Web.Name'))]",
         "SXA.Master.Conf": "[joinpath(variable('SXA.Master.Root'), 'conf')]",
-        "SXA.Web.Conf": "[joinpath(variable('SXA.Web.Root'), 'conf')]"
+        "SXA.Web.Conf": "[joinpath(variable('SXA.Web.Root'), 'conf')]",
+        "SXA.Solr.Config": "[ReadJson(parameter('SXASolrConfigPath'))]"
+
     },
     "Tasks": {
         "StopSolr": {
@@ -144,52 +150,29 @@
                 }
             ]
         },
-        "StopSolrService": {
-            "Type": "ManageService",
+        "AddSXASuggesterToMaster": {
+            "Type": "ManageSolrConfig",
+            "Params": [{
+                "Address": "[parameter('SolrUrl')]",
+                "CoreName": "[variable('SXA.Master.Name')]",
+                "Config": "[variable('SXA.Solr.Config')]"
+            }]
+        },
+        "AddSXASuggesterToWeb": {
+            "Type": "ManageSolrConfig",
+            "Params": [{
+                "Address": "[parameter('SolrUrl')]",
+                "CoreName": "[variable('SXA.Web.Name')]",
+                "Config": "[variable('SXA.Solr.Config')]"
+            }]
+        },
+        "UpdateSolrSchema": {
+            "Type": "SitecoreUrl",
             "Params": {
-                "Name": "[parameter('SolrService')]",
-                "Status": "Stopped",
-                "PostDelay": 1000
-            }
-        },
-        "AddSXASearchComponentToMaster": {
-            "Type": "InsertXml",
-            "Params": [{
-                "FilePath": "[joinpath(variable('SXA.Master.Conf'), variable('Solr.ConfigFileName'))]",
-                "XPath": "[variable('Solr.Xpath.Configroot')]",
-                "Xml": "[parameter('SXASolrSearchComponentConfigXml')]"
-            }]
-        },
-        "AddSXASearchComponentToWeb": {
-            "Type": "InsertXml",
-            "Params": [{
-                "FilePath": "[joinpath(variable('SXA.Web.Conf'), variable('Solr.ConfigFileName'))]",
-                "XPath": "[variable('Solr.Xpath.Configroot')]",
-                "Xml": "[parameter('SXASolrSearchComponentConfigXml')]"
-            }]
-        },
-        "AddSXARequestHandlerToMaster": {
-            "Type": "InsertXml",
-            "Params": [{
-                "FilePath": "[joinpath(variable('SXA.Master.Conf'), variable('Solr.ConfigFileName'))]",
-                "XPath": "[variable('Solr.Xpath.Configroot')]",
-                "Xml": "[parameter('SXASolrRequestHandlerConfigXml')]"
-            }]
-        },
-        "AddSXARequestHandlerToWeb": {
-            "Type": "InsertXml",
-            "Params": [{
-                "FilePath": "[joinpath(variable('SXA.Web.Conf'), variable('Solr.ConfigFileName'))]",
-                "XPath": "[variable('Solr.Xpath.Configroot')]",
-                "Xml": "[parameter('SXASolrRequestHandlerConfigXml')]"
-            }]
-        },
-        "StartSolrService": {
-            "Type": "ManageService",
-            "Params": {
-                "Name": "[parameter('SolrService')]",
-                "Status": "Running",
-                "PostDelay": 8000
+                "SitecoreInstanceRoot": "[concat('https://', parameter('SiteName'))]",
+                "SitecoreActionPath": "sitecore/admin/PopulateManagedSchema.aspx?indexes=all",
+                "UserName": "admin",
+                "Password": "[parameter('SitecoreAdminPassword')]"
             }
         }
     }
