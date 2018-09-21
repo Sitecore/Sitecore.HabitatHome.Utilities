@@ -129,7 +129,7 @@ Function Process-Packages {
                     Source      = $package.url
                     Destination = $destination
                 }
-                Install-SitecoreConfiguration  @params  -WorkingDirectory $(Join-Path $PWD "logs") -Verbose 
+                Install-SitecoreConfiguration  @params  -WorkingDirectory $(Join-Path $PWD "logs")  
             }
             if ($package.convert) {
                 Write-Host ("Converting {0} to SCWDP" -f $package.name) -ForegroundColor Green
@@ -199,39 +199,18 @@ Function Install-SitecorePowerShellExtensions {
 
     }
     
-    Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs") -Verbose
+    Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs") 
 }
 
 Function Install-SitecoreExperienceAccelerator {
 
-    # Install SXA Solr Cores
-    
-    $sxaSolrConfigPath = Join-Path $resourcePath 'content\Deployment\OnPrem\HabitatHome\sxa-solr-config.json'
-    
-    try {
-        $params = @{
-            Path                    = Join-path $resourcePath 'content\Deployment\OnPrem\HabitatHome\sxa-solr.json'
-            SolrUrl                 = $solr.url 
-            SolrRoot                = $solr.root 
-            SolrService             = $solr.serviceName 
-            CorePrefix              = $site.prefix
-            SXASolrConfigPath       = $sxaSolrConfigPath
-            SiteName                = $site.hostName
-            SitecoreAdminPassword   = $sitecore.adminPassword
+   # Install SXA
 
-        }
-        Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs")
-    }
-    catch {
-        write-host "SXA SOLR Failed" -ForegroundColor Red
-        throw
-    }
-
-    $spe = $modules | Where-Object { $_.id -eq "sxa"}
-    $spe.packagePath = $spe.packagePath.replace(".zip", ".scwdp.zip")
+    $sxa = $modules | Where-Object { $_.id -eq "sxa"}
+    $sxa.packagePath = $sxa.packagePath.replace(".zip", ".scwdp.zip")
     $params = @{
         Path             = (Join-path $resourcePath 'content\Deployment\OnPrem\HabitatHome\module-mastercore.json')
-        Package          = $spe.packagePath
+        Package          = $sxa.packagePath
         SiteName         = $site.hostName
         SqlDbPrefix      = $site.prefix 
         SqlAdminUser     = $sql.adminUser 
@@ -240,7 +219,7 @@ Function Install-SitecoreExperienceAccelerator {
 
     }
     
-    Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs") -Verbose
+    Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs") 
 }
 
 Function Install-DataExchangeFrameworkModules {
@@ -263,7 +242,7 @@ Function Install-DataExchangeFrameworkModules {
 
     }
     
-    Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs") -Verbose
+    Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs") 
 
     $defSitecore = $defModules | Where-Object { $_.id -eq "defSitecore"}
     Write-Host ("Installing {0}" -f $defSitecore.name)
@@ -279,7 +258,7 @@ Function Install-DataExchangeFrameworkModules {
 
     }
     
-    Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs") -Verbose
+    Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs") 
 
     $defSql = $defModules | Where-Object { $_.id -eq "defSql"}
     Write-Host ("Installing {0}" -f $defSql.name)
@@ -295,7 +274,7 @@ Function Install-DataExchangeFrameworkModules {
 
     }
     
-    Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs") -Verbose
+    Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs") 
 
     $defxConnect = $defModules | Where-Object { $_.id -eq "defxConnect"}
     Write-Host ("Installing {0}" -f $defxConnect.name)
@@ -311,7 +290,7 @@ Function Install-DataExchangeFrameworkModules {
 
     }
     
-    Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs") -Verbose
+    Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs") 
 
     $defDynamics = $defModules | Where-Object { $_.id -eq "defDynamics"}
     Write-Host ("Installing {0}" -f $defDynamics.name)
@@ -327,7 +306,7 @@ Function Install-DataExchangeFrameworkModules {
 
     }
     
-    Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs") -Verbose
+    Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs") 
     
     $defDynamicsConnect = $defModules | Where-Object { $_.id -eq "defDynamicsConnect"}
     Write-Host ("Installing {0}" -f $defDynamicsConnect.name)
@@ -343,7 +322,7 @@ Function Install-DataExchangeFrameworkModules {
 
     }
     
-    Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs") -Verbose
+    Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs") 
 
 }
 Function Install-SalesforceMarketingCloudModule{
@@ -364,7 +343,7 @@ Function Install-SalesforceMarketingCloudModule{
 
     }
     
-    Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs") -Verbose
+    Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs") 
 }
 Function Enable-ContainedDatabases {
     #Enable Contained Databases
@@ -423,6 +402,28 @@ function Update-SXASolrCores {
         write-host "$site.habitatHomeHostName Failed to updated search index configuration" -ForegroundColor Red
         throw
     }
+     # Install SXA Solr Cores
+    
+     $sxaSolrConfigPath = Join-Path $resourcePath 'content\Deployment\OnPrem\HabitatHome\sxa-solr-config.json'
+    
+     try {
+         $params = @{
+             Path                    = Join-path $resourcePath 'content\Deployment\OnPrem\HabitatHome\sxa-solr.json'
+             SolrUrl                 = $solr.url 
+             SolrRoot                = $solr.root 
+             SolrService             = $solr.serviceName 
+             CorePrefix              = $site.prefix
+             SXASolrConfigPath       = $sxaSolrConfigPath
+             SiteName                = $site.hostName
+             SitecoreAdminPassword   = $sitecore.adminPassword
+ 
+         }
+         Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs")
+     }
+     catch {
+         write-host "SXA SOLR Failed" -ForegroundColor Red
+         throw
+     }
 }
 
 Function Start-Services {
@@ -437,13 +438,13 @@ Set-ModulesPath
 Get-OptionalModules
 Remove-DatabaseUsers
 Stop-Services
-Install-SitecorePowerShellExtensions
+#Install-SitecorePowerShellExtensions
 Install-SitecoreExperienceAccelerator
-Update-SXASolrCores
 Install-DataExchangeFrameworkModules
 Install-SalesforceMarketingCloudModule
 Enable-ContainedDatabases
 Add-DatabaseUsers
 Start-Services
+Update-SXASolrCores
 $StopWatch.Stop()
 $StopWatch
