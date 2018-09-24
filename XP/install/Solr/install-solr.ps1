@@ -7,14 +7,11 @@ Param(
     [string]$solrHost = "localhost",
     [bool]$solrSSL = $TRUE,
     [string]$nssmVersion = "2.24",
-    [string]$JREVersion = "1.8.0_171",
 	[string]$keystoreSecret = "secret",
 	[string]$KeystoreFile = 'solr-ssl.keystore.jks',
 	[string]$SolrDomain = 'localhost',
 	[switch]$Clobber
 )
-
-$JREPath = "C:\Program Files\Java\jre$JREVersion"
 
 $solrName = "solr-$solrVersion"
 $solrRoot = "$installFolder\$solrName"
@@ -30,6 +27,12 @@ if(!($elevated))
 {
     throw "In order to install services, please run this script elevated."
 }
+
+$JavaMinVersionRequired = "8.0.1510"
+if (Get-Module("helper")) {
+	Remove-Module "helper"
+ }
+ Import-Module "$PSScriptRoot\helper.psm1"  
 
 function downloadAndUnzipIfRequired
 {
@@ -54,6 +57,15 @@ function downloadAndUnzipIfRequired
     }
 }
 
+$ErrorActionPreference = 'Stop'
+
+# Ensure Java environment variable
+try {
+	$keytool = (Get-Command 'keytool.exe').Source
+} catch {
+	$keytool = Get-JavaKeytool -JavaMinVersionRequired $JavaMinVersionRequired
+}
+
 # download & extract the solr archive to the right folder
 $solrZip = "$downloadFolder\$solrName.zip"
 downloadAndUnzipIfRequired "Solr" $solrRoot $solrZip $solrPackage $installFolder
@@ -61,17 +73,6 @@ downloadAndUnzipIfRequired "Solr" $solrRoot $solrZip $solrPackage $installFolder
 # download & extract the nssm archive to the right folder
 $nssmZip = "$downloadFolder\nssm-$nssmVersion.zip"
 downloadAndUnzipIfRequired "NSSM" $nssmRoot $nssmZip $nssmPackage $installFolder
-
-# Ensure Java environment variable
-$jreVal = [Environment]::GetEnvironmentVariable("JAVA_HOME", [EnvironmentVariableTarget]::Machine)
-if($jreVal -ne $JREPath)
-{
-    Write-Host "Setting JAVA_HOME environment variable"
-    [Environment]::SetEnvironmentVariable("JAVA_HOME", $JREPath, [EnvironmentVariableTarget]::Machine)
-}
-
-
-$ErrorActionPreference = 'Stop'
 
 ### PARAM VALIDATION
 if($keystoreSecret -ne 'secret') {
@@ -96,24 +97,6 @@ if((Test-Path $P12Path)) {
 	} else {
 		$P12Path = Resolve-Path $P12Path
 		Write-Error "Keystore file $P12Path already existed. To regenerate it, pass -Clobber."
-	}
-}
-
-try {
-	$keytool = (Get-Command 'keytool.exe').Source
-} catch {
-	try {
-		$path = $jreVal + '\bin\keytool.exe'
-		Write-Host $path
-		if (Test-Path $path) {
-			$keytool = (Get-Command $path).Source
-		}
-	} catch {
-		$keytool = Read-Host "keytool.exe not on path. Enter path to keytool (found in JRE bin folder)"
-
-		if([string]::IsNullOrEmpty($keytool) -or -not (Test-Path $keytool)) {
-			Write-Error "Keytool path was invalid."
-		}
 	}
 }
 
