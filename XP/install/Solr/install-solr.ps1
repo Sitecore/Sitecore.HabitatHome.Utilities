@@ -34,29 +34,6 @@ if (Get-Module("helper")) {
  }
  Import-Module "$PSScriptRoot\helper.psm1"  
 
-function downloadAndUnzipIfRequired
-{
-    Param(
-        [string]$toolName,
-        [string]$toolFolder,
-        [string]$toolZip,
-        [string]$toolSourceFile,
-        [string]$installRoot
-    )
-
-    if(!(Test-Path -Path $toolFolder))
-    {
-        if(!(Test-Path -Path $toolZip))
-        {
-            Write-Host "Downloading $toolName..."
-            Start-BitsTransfer -Source $toolSourceFile -Destination $toolZip
-        }
-
-        Write-Host "Extracting $toolName to $toolFolder..."
-        Expand-Archive $toolZip -DestinationPath $installRoot
-    }
-}
-
 $ErrorActionPreference = 'Stop'
 
 # Ensure Java environment variable
