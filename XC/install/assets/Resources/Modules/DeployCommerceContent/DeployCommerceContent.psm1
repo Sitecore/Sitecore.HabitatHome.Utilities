@@ -104,6 +104,12 @@ Function Invoke-DeployCommerceContentTask {
 							$p.Host = $SiteHostHeaderName	
 							Write-Host "Replacing in SitecoreConnectionPolicy 'sxa.storefront.com' with $SiteHostHeaderName"
 						}
+					} elseif ($p.'$type' -eq 'Plugin.Sample.Upgrade.MigrationSqlPolicy, Plugin.Sample.Upgrade') {
+						$oldServer = $p.SourceStoreSqlPolicy.Server
+						$oldDatabase = $p.SourceStoreSqlPolicy.Database
+						$p.SourceStoreSqlPolicy.Server = $CommerceServicesDbServer
+						$p.SourceStoreSqlPolicy.Database = $CommerceServicesGlobalDbName
+						Write-Host "Replacing in MigrationSqlPolicy $oldServer to $p.SourceStoreSqlPolicy.Server and $oldDatabase to $p.SourceStoreSqlPolicy.Database"
 					}
 				}
 				$originalJson | ConvertTo-Json -Depth 100 -Compress | set-content $pathToGlobalJson

@@ -334,19 +334,20 @@ Function Install-Commerce {
         InstallDir                                  = $(Join-Path $site.webRoot $site.hostName)
         XConnectInstallDir                          = $xConnect.siteRoot
         CertificateName                             = $site.habitatHomeSslCertificateName
+        RootCertFileName                            = $sitecore.rootCertificateName
         CommerceServicesDbServer                    = $sql.server
         CommerceServicesDbName                      = $($site.prefix + "_SharedEnvironments")
         CommerceServicesGlobalDbName                = $($site.prefix + "_Global")
         SitecoreDbServer                            = $sql.server
         SitecoreCoreDbName                          = $($site.prefix + "_Core")
         SitecoreUsername                            = "sitecore\admin"
-        SitecoreUserPassword                        = "b"
+        SitecoreUserPassword                        = $sitecore.adminPassword
         CommerceSearchProvider                      = "solr"
         SolrUrl                                     = $solr.url
         SolrRoot                                    = $solr.root
         SolrService                                 = $solr.serviceName
         SolrSchemas                                 = (Join-Path -Path $assets.commerce.sifCommerceRoot -ChildPath "SolrSchemas" )
-        SearchIndexPrefix                           = ""
+        SearchIndexPrefix                           = $site.prefix
         AzureSearchServiceName                      = ""
         AzureSearchAdminKey                         = ""
         AzureSearchQueryKey                         = ""
@@ -358,7 +359,6 @@ Function Install-Commerce {
         SitecoreCommerceEnginePath                  = $($publishPath + "\" + $site.prefix + ".Commerce.Engine")
         SitecoreBizFxServicesContentPath            = $($publishPath + "\" + $site.prefix + ".Commerce.BizFX")
         SitecoreBizFxPostFix                        = $site.prefix
-
         SitecoreIdentityServerPath                  = $($publishPath + "\" + $site.prefix + ".Commerce.IdentityServer")
         CommerceEngineCertificatePath               = $(Join-Path -Path $assets.certificatesPath -ChildPath $($xConnect.CertificateName + ".crt") )
         SiteUtilitiesSrc                            = $(Join-Path -Path $assets.commerce.sifCommerceRoot -ChildPath "SiteUtilityPages")
@@ -374,7 +374,6 @@ Function Install-Commerce {
         SXAStorefrontCatalogModuleFullPath          = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include  "Sitecore Commerce Experience Accelerator Habitat Catalog*.zip" -Recurse)
         MergeToolFullPath                           = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include  "*Microsoft.Web.XmlTransform.dll" -Recurse | Select-Object -ExpandProperty FullName)
         HabitatImagesModuleFullPath                 = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include  "Habitat Home Product Images.zip" -Recurse)
-
         UserAccount                                 = @{
             Domain   = $commerce.serviceAccountDomain
             UserName = $commerce.serviceAccountUserName
