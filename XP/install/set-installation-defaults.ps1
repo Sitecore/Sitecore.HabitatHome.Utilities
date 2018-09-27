@@ -47,7 +47,7 @@ $SqlStrongPassword = "Str0NgPA33w0rd!!" # Used for all other services
 
 $sql.server = "."
 $sql.adminUser = "sa"
-$sql.adminPassword = "12345"
+$sql.adminPassword = "Str0NgPA33w0rd!!"
 $sql.coreUser = $site.prefix + "coreuser"
 $sql.corePassword = $SqlStrongPassword
 $sql.masterUser = $site.prefix + "masteruser"

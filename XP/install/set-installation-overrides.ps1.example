@@ -14,9 +14,9 @@ $json = Get-Content -Raw $configurationFile |  ConvertFrom-Json
 
 # Assets and prerequisites
 $assets = $json.assets
-$assets.psRepository = "http://nuget1ca2/nuget/Sitecore_Gallery"
-$assets.psRepositoryName = "SitecoreGallery_Internal"
-$assets.installerVersion = "2.0.0-beta0260"
+#$assets.psRepository = "http://nuget1ca2/nuget/Sitecore_Gallery"
+#$assets.psRepositoryName = "SitecoreGallery_Internal"
+#$assets.installerVersion = "2.0.0-beta0260"
 $assets.licenseFilePath = Join-Path $assets.root "license.xml"
 
 # Settings
@@ -39,9 +39,9 @@ $sitecore.telerikEncryptionKey = "PutYourCustomEncryptionKeyHereFrom32To256Chara
 
 # Solr Parameters
 $solr = $json.settings.solr
-$solr.url = "https://localhost:8662/solr"
-$solr.root = "c:\solr\solr-6.6.2"
-$solr.serviceName = "Solr-6.6.2"
+$solr.url = "https://localhost:8721/solr"
+$solr.root = "c:\solr\solr-7.2.1"
+$solr.serviceName = "Solr-7.2.1"
 
 # SQL Settings
 $sql = $json.settings.sql
@@ -50,7 +50,7 @@ $SqlStrongPassword = "Str0NgPA33w0rd!!" # Used for all other services
 
 $sql.server = "."
 $sql.adminUser = "sa"
-$sql.adminPassword = "12345"
+$sql.adminPassword = "Str0NgPA33w0rd!!"
 $sql.coreUser = $site.prefix + "coreuser"
 $sql.corePassword = $SqlStrongPassword
 $sql.masterUser = $site.prefix + "masteruser"

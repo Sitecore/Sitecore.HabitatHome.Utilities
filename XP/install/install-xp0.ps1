@@ -1,5 +1,7 @@
 Param(
-    [string] $ConfigurationFile = "configuration-xp0.json"
+    [string] $ConfigurationFile = "configuration-xp0.json",
+    [string] $LogFolder = ".\logs\",
+    [string] $LogFileName = "install-sitecore.log"
 )
 
 #####################################################
@@ -9,6 +11,15 @@ Param(
 #####################################################
 $ErrorActionPreference = 'Stop'
 Set-Location $PSScriptRoot
+
+$LogFolder = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($LogFolder) 
+if (!(Test-Path $LogFolder)) {
+    New-item -ItemType Directory -Path $LogFolder
+}
+$LogFile = Join-path $LogFolder $LogFileName
+if (Test-Path $LogFile){
+    Get-Item $LogFile | Remove-Item
+}
 
 if (!(Test-Path $ConfigurationFile)) {
     Write-Host "Configuration file '$($ConfigurationFile)' not found." -ForegroundColor Red
@@ -83,7 +94,7 @@ Function Download-Assets {
     if ($package.download -eq $true) {
         Write-Host ("Downloading {0}  -  if required" -f $package.name )
         
-        $destination =  $package.packagePath
+        $destination = $package.packagePath
             
         if (!(Test-Path $destination)) {
             $params = @{
@@ -92,7 +103,7 @@ Function Download-Assets {
                 Source      = $package.url
                 Destination = $destination
             }
-            Install-SitecoreConfiguration  @params  -WorkingDirectory $(Join-Path $PWD "logs") -Verbose 
+            Install-SitecoreConfiguration  @params  *>&1 | Tee-Object $LogFile -Append 
         }
         if ((Test-Path $destination) -and ( $package.extract -eq $true)) {
             sz x -o"$DownloadFolder" $destination  -y -aoa
@@ -112,7 +123,7 @@ Function Download-Assets {
             Source      = $package.url
             Destination = $destination
         }
-        Install-SitecoreConfiguration  @params  -WorkingDirectory $(Join-Path $PWD "logs") -Verbose 
+        Install-SitecoreConfiguration  @params  *>&1 | Tee-Object $LogFile -Append 
     }
     if ((Test-Path $destination) -and ( $package.install -eq $true)) {
         sz x -o"$DownloadFolder\sat" $destination  -y -aoa
@@ -260,7 +271,7 @@ Function Install-XConnect {
             SolrService = $solr.serviceName 
             CorePrefix  = $site.prefix
         }
-        Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs")
+        Install-SitecoreConfiguration @params *>&1 | Tee-Object $LogFile -Append
     }
     catch {
         write-host "XConnect SOLR Failed" -ForegroundColor Red
@@ -276,7 +287,7 @@ Function Install-XConnect {
             CertPath         = $assets.certificatesPath
             RootCertFileName = $sitecore.rootCertificateName
         }
-        Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs")
+        Install-SitecoreConfiguration @params *>&1 | Tee-Object $LogFile -Append
     }
     catch {
         write-host "XConnect Certificate Creation Failed" -ForegroundColor Red
@@ -286,40 +297,40 @@ Function Install-XConnect {
     #Install xConnect
     try {
         $params = @{
-            Path                           = $xConnect.ConfigurationPath
-            Package                        = $xConnect.PackagePath
-            LicenseFile                    = $assets.licenseFilePath
-            SiteName                       = $xConnect.siteName
-            XConnectCert                   = $xConnect.certificateName
-            SqlDbPrefix                    = $site.prefix
-            SolrCorePrefix                 = $site.prefix
-            SqlAdminUser                   = $sql.adminUser
-            SqlAdminPassword               = $sql.adminPassword
-            SqlServer                      = $sql.server
-            SqlCollectionUser              = $sql.collectionUser
-            SqlCollectionPassword          = $sql.collectionPassword
-            SqlProcessingPoolsUser         = $sql.processingPoolsUser
-            SqlProcessingPoolsPassword     = $sql.processingPoolsPassword
-            SqlReferenceDataUser           = $sql.referenceDataUser
-            SqlReferenceDataPassword       = $sql.referenceDataPassword
-            SqlMarketingAutomationUser     = $sql.marketingAutomationUser
-            SqlMarketingAutomationPassword = $sql.marketingAutomationPassword
-            SqlMessagingUser               = $sql.messagingUser
-            SqlMessagingPassword           = $sql.messagingPassword
-            SolrUrl                        = $solr.url
-			SqlProcessingEngineUser         = $sql.processingEngineUser
-            SqlProcessingEnginePassword     = $sql.processingEnginePassword
-            SqlReportingUser               = $sql.reportingUser
-            SqlReportingPassword           = $sql.reportingPassword
-            MachineLearningServerUrl        = "XXX"
-            MachineLearningServerBlobEndpointCertificatePath    = ""
-            MachineLearningServerBlobEndpointCertificatePassword = ""
-            MachineLearningServerTableEndpointCertificatePath   = ""
-            MachineLearningServerTableEndpointCertificatePassword = ""
+            Path                                                               = $xConnect.ConfigurationPath
+            Package                                                            = $xConnect.PackagePath
+            LicenseFile                                                        = $assets.licenseFilePath
+            SiteName                                                           = $xConnect.siteName
+            XConnectCert                                                       = $xConnect.certificateName
+            SqlDbPrefix                                                        = $site.prefix
+            SolrCorePrefix                                                     = $site.prefix
+            SqlAdminUser                                                       = $sql.adminUser
+            SqlAdminPassword                                                   = $sql.adminPassword
+            SqlServer                                                          = $sql.server
+            SqlCollectionUser                                                  = $sql.collectionUser
+            SqlCollectionPassword                                              = $sql.collectionPassword
+            SqlProcessingPoolsUser                                             = $sql.processingPoolsUser
+            SqlProcessingPoolsPassword                                         = $sql.processingPoolsPassword
+            SqlReferenceDataUser                                               = $sql.referenceDataUser
+            SqlReferenceDataPassword                                           = $sql.referenceDataPassword
+            SqlMarketingAutomationUser                                         = $sql.marketingAutomationUser
+            SqlMarketingAutomationPassword                                     = $sql.marketingAutomationPassword
+            SqlMessagingUser                                                   = $sql.messagingUser
+            SqlMessagingPassword                                               = $sql.messagingPassword
+            SolrUrl                                                            = $solr.url
+            SqlProcessingEngineUser                                            = $sql.processingEngineUser
+            SqlProcessingEnginePassword                                        = $sql.processingEnginePassword
+            SqlReportingUser                                                   = $sql.reportingUser
+            SqlReportingPassword                                               = $sql.reportingPassword
+            MachineLearningServerUrl                                           = "XXX"
+            MachineLearningServerBlobEndpointCertificatePath                   = ""
+            MachineLearningServerBlobEndpointCertificatePassword               = ""
+            MachineLearningServerTableEndpointCertificatePath                  = ""
+            MachineLearningServerTableEndpointCertificatePassword              = ""
             MachineLearningServerEndpointCertificationAuthorityCertificatePath = ""
-            WebRoot							= $site.webRoot
+            WebRoot                                                            = $site.webRoot
         }
-        Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs")
+        Install-SitecoreConfiguration @params *>&1 | Tee-Object $LogFile -Append
     }
     catch {
         write-host "XConnect Setup Failed" -ForegroundColor Red
@@ -352,7 +363,7 @@ Function Install-Sitecore {
             SolrService = $solr.serviceName
             CorePrefix  = $site.prefix
         }
-        Install-SitecoreConfiguration  @params -WorkingDirectory $(Join-Path $PWD "logs")
+        Install-SitecoreConfiguration  @params *>&1 | Tee-Object $LogFile -Append
     }
     catch {
         write-host "Sitecore SOLR Failed" -ForegroundColor Red
@@ -398,17 +409,17 @@ Function Install-Sitecore {
             EXMCryptographicKey                  = $sitecore.exmCryptographicKey
             EXMAuthenticationKey                 = $sitecore.exmAuthenticationKey
             SolrUrl                              = $solr.url
-			XConnectReportingService             = "https://$($xConnect.siteName)" 
+            XConnectReportingService             = "https://$($xConnect.siteName)" 
             XConnectCollectionService            = "https://$($xConnect.siteName)"
             XConnectReferenceDataService         = "https://$($xConnect.siteName)"
             MarketingAutomationOperationsService = "https://$($xConnect.siteName)"
             MarketingAutomationReportingService  = "https://$($xConnect.siteName)"
             TelerikEncryptionKey                 = $sitecore.telerikEncryptionKey
-			SitecoreIdentityAuthority            = $identityServer.url   
+            SitecoreIdentityAuthority            = $identityServer.url   
             SitecoreIdentitySecret               = $identityServer.clientSecret
             WebRoot                              = $site.webRoot
         }
-        Install-SitecoreConfiguration  @sitecoreParams -WorkingDirectory $(Join-Path $PWD "logs")
+        Install-SitecoreConfiguration  @sitecoreParams *>&1 | Tee-Object $LogFile -Append
     }
     catch {
         write-host "Sitecore Setup Failed" -ForegroundColor Red
@@ -433,18 +444,18 @@ Function Install-IdentityServer {
     #################################################################
 
     $identityParams = @{
-        Path                    = $identityServer.configurationPath
-        Package                 = $identityServer.packagePath
-        SqlDbPrefix             = $site.prefix
-        SqlServer               = $sql.server
-        SqlCoreUser             = $sql.adminUser
-        SqlCorePassword         = $sql.adminPassword
-        SitecoreIdentityCert    = $identityServer.name
-        Sitename                = $identityServer.Name
-        PasswordRecoveryUrl     = ("https:// {0}" -f $site.hostname)
-        AllowedCorsOrigins      = $site.hostName
-        ClientSecret            = $identityServer.clientSecret
-        LicenseFile             = $assets.licenseFilePath 
+        Path                 = $identityServer.configurationPath
+        Package              = $identityServer.packagePath
+        SqlDbPrefix          = $site.prefix
+        SqlServer            = $sql.server
+        SqlCoreUser          = $sql.adminUser
+        SqlCorePassword      = $sql.adminPassword
+        SitecoreIdentityCert = $identityServer.name
+        Sitename             = $identityServer.Name
+        PasswordRecoveryUrl  = ("https:// {0}" -f $site.hostname)
+        AllowedCorsOrigins   = $site.hostName
+        ClientSecret         = $identityServer.clientSecret
+        LicenseFile          = $assets.licenseFilePath 
     }
     Install-SitecoreConfiguration @identityParams -Verbose   
     
@@ -467,7 +478,7 @@ Function Add-AppPoolMembership {
     catch {
         Write-Host "Warning: Couldn't add IIS AppPool\$($site.hostName) to Performance Monitor Users -- user may already exist" -ForegroundColor Yellow
     }
-	  try {
+    try {
         Add-LocalGroupMember "Performance Monitor Users" "IIS AppPool\$($xConnect.siteName)"
         Write-Host "Added IIS AppPool\$($xConnect.siteName) to Performance Monitor Users" -ForegroundColor Green
     }
