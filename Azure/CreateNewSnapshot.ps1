@@ -14,11 +14,11 @@ Param(
 $account = Get-AzureRMContext | Select-Object Account
 
 if ($null -eq $account.Account) {
-    Login-AzureRmAccount
+    Connect-AzureRmAccount
 }
 $demoType = $demoType.ToLower()
 $location = $location.ToLower()
-$sourceResourceGroupName = ("{0}{1}{2}" -f $sourceResourceGroupNamePrefix, $demoType, $suffix)
+$sourceResourceGroupName = ("{0}-{1}-{2}" -f $sourceResourceGroupNamePrefix, $demoType, $suffix)
 $vmName = ("{0}-vm" -f $sourceResourceGroupName)
 
 $osSnapshotName = ("{0}{1}-{2}-os-snapshot" -f $snapshotPrefix, $demoType, $version)

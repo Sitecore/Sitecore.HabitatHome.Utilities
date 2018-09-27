@@ -129,7 +129,7 @@ Function Process-Packages {
                     Source      = $package.url
                     Destination = $destination
                 }
-                Install-SitecoreConfiguration  @params  -WorkingDirectory $(Join-Path $PWD "logs")  
+                Install-SitecoreConfiguration  @params -WorkingDirectory $(Join-Path $PWD "logs")  
             }
             if ($package.convert) {
                 Write-Host ("Converting {0} to SCWDP" -f $package.name) -ForegroundColor Green
