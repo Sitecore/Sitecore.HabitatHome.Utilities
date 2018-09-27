@@ -51,45 +51,6 @@ function Install-Prerequisites {
         throw "Invalid SQL version. Expected SQL 2016 SP1 ($($sql.minimumVersion)) or above."
     }
 
-
-    #Verify Java version
-
-    $minVersion = New-Object System.Version($assets.jreRequiredVersion)
-    $foundVersion = $FALSE
-
-
-    function getJavaVersions() {
-        $versions = '', 'Wow6432Node\' |
-            ForEach-Object {Get-ItemProperty -Path HKLM:\SOFTWARE\$($_)Microsoft\Windows\CurrentVersion\Uninstall\* |
-                Where-Object {($_.DisplayName -like '*Java *') -and (-not $_.SystemComponent)} |
-                Select-Object DisplayName, DisplayVersion, @{n = 'Architecture'; e = {If ($_.PSParentPath -like '*Wow6432Node*') {'x86'} Else {'x64'}}}}
-        return $versions
-    }
-    function checkJavaversion($toVersion) {
-        $versions_ = getJavaVersions
-        foreach ($version_ in $versions_) {
-            try {
-                $version = New-Object System.Version($version_.DisplayVersion)
-
-            }
-            catch {
-                continue
-            }
-
-            if ($version.CompareTo($toVersion) -ge 0) {
-                return $TRUE
-            }
-        }
-
-        return $false
-
-    }
-
-    $foundVersion = checkJavaversion($minversion)
-
-    if (-not $foundVersion) {
-        throw "Invalid Java version. Expected $minVersion or above."
-    }
     # Verify Web Deploy
     $webDeployPath = ([IO.Path]::Combine($env:ProgramFiles, 'iis', 'Microsoft Web Deploy V3', 'msdeploy.exe'))
     if (!(Test-Path $webDeployPath)) {
