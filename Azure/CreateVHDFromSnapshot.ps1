@@ -5,7 +5,8 @@ Param(
 	[Parameter(Mandatory = $true)]
     [string] $version,
     [string[]] $regions = @("na", "emea", "ga", "ea"),
-    [string] $snapshotPrefix = "habitathome"
+    [string] $snapshotPrefix = "habitathome",
+    [string] $snapshotResourceGroupName = "habitathome-demo-snapshot"
 
 
 )
@@ -19,7 +20,6 @@ if ($null -eq $account.Account) {
 
 ### DO NOT CHANGE
 $demoType = $demoType.ToLower()
-$snapshotResourceGroupName = ("{0}-demo-snapshot" -f $snapshotPrefix)
 $osSnapshotName = ("{0}{1}-{2}-os-snapshot" -f $snapshotPrefix, $demoType, $version)
 Write-host ("Preparing to copy {0} from {1}" -f $osSnapshotName, $snapshotResourceGroupName)
 #Provide the name of the VHD file to which snapshot will be copied.

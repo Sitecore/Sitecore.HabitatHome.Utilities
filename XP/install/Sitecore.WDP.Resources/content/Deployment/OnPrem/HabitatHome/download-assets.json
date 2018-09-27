@@ -11,6 +11,10 @@
           "Destination":{
               "Type":"String",
               "Description":"Destination Full Path (including file name) where the file will be stored"
+          },
+          "ProgressBar":{
+              "Type":"Boolean",
+              "Description":"Specifies whether the download progress bar should be displayed. Slower."
           }
     },
     "Modules":["DownloadFileWithCredentials"],
@@ -20,7 +24,8 @@
             "Params":{
                 "SourceUri":"[parameter('Source')]",
                 "DestinationPath":"[parameter('Destination')]",
-                "Credentials": "[parameter('Credentials')]"
+                "Credentials": "[parameter('Credentials')]",
+                "ProgressBar":"[parameter('ProgressBar')]"
             }
         }
     }
