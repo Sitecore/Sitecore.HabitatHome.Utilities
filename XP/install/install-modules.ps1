@@ -1,5 +1,7 @@
 Param(
-    [string] $ConfigurationFile = ".\configuration-xp0.json"
+    [string] $ConfigurationFile = ".\configuration-xp0.json",
+    [string] $LogFolder = ".\logs\",
+    [string] $LogFileName = "install-modules.log"
 )
 
 $StopWatch = New-Object -TypeName System.Diagnostics.Stopwatch 
@@ -11,6 +13,15 @@ $StopWatch.Start()
 #####################################################
 $ErrorActionPreference = 'Stop'
 Set-Location $PSScriptRoot
+
+$LogFolder = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($LogFolder) 
+if (!(Test-Path $LogFolder)) {
+    New-item -ItemType Directory -Path $LogFolder
+}
+$LogFile = Join-path $LogFolder $LogFileName
+if (Test-Path $LogFile){
+    Get-Item $LogFile | Remove-Item
+}
 
 if (!(Test-Path $ConfigurationFile)) {
     Write-Host "Configuration file '$($ConfigurationFile)' not found." -ForegroundColor Red
@@ -129,7 +140,7 @@ Function Process-Packages {
                     Source      = $package.url
                     Destination = $destination
                 }
-                Install-SitecoreConfiguration  @params -WorkingDirectory $(Join-Path $PWD "logs")  
+                Install-SitecoreConfiguration  @params *>&1 | Tee-Object $LogFile -Append  
             }
             if ($package.convert) {
                 Write-Host ("Converting {0} to SCWDP" -f $package.name) -ForegroundColor Green
@@ -199,7 +210,7 @@ Function Install-SitecorePowerShellExtensions {
 
     }
     
-    Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs") 
+    Install-SitecoreConfiguration @params *>&1 | Tee-Object $LogFile -Append 
 }
 
 Function Install-SitecoreExperienceAccelerator {
@@ -219,7 +230,7 @@ Function Install-SitecoreExperienceAccelerator {
 
     }
     
-    Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs") 
+    Install-SitecoreConfiguration @params *>&1 | Tee-Object $LogFile -Append 
 }
 
 Function Install-DataExchangeFrameworkModules {
@@ -242,7 +253,7 @@ Function Install-DataExchangeFrameworkModules {
 
     }
     
-    Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs") 
+    Install-SitecoreConfiguration @params *>&1 | Tee-Object $LogFile -Append 
 
     $defSitecore = $defModules | Where-Object { $_.id -eq "defSitecore"}
     Write-Host ("Installing {0}" -f $defSitecore.name)
@@ -258,7 +269,7 @@ Function Install-DataExchangeFrameworkModules {
 
     }
     
-    Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs") 
+    Install-SitecoreConfiguration @params *>&1 | Tee-Object $LogFile -Append 
 
     $defSql = $defModules | Where-Object { $_.id -eq "defSql"}
     Write-Host ("Installing {0}" -f $defSql.name)
@@ -274,7 +285,7 @@ Function Install-DataExchangeFrameworkModules {
 
     }
     
-    Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs") 
+    Install-SitecoreConfiguration @params *>&1 | Tee-Object $LogFile -Append 
 
     $defxConnect = $defModules | Where-Object { $_.id -eq "defxConnect"}
     Write-Host ("Installing {0}" -f $defxConnect.name)
@@ -290,7 +301,7 @@ Function Install-DataExchangeFrameworkModules {
 
     }
     
-    Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs") 
+    Install-SitecoreConfiguration @params *>&1 | Tee-Object $LogFile -Append 
 
     $defDynamics = $defModules | Where-Object { $_.id -eq "defDynamics"}
     Write-Host ("Installing {0}" -f $defDynamics.name)
@@ -306,7 +317,7 @@ Function Install-DataExchangeFrameworkModules {
 
     }
     
-    Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs") 
+    Install-SitecoreConfiguration @params *>&1 | Tee-Object $LogFile -Append 
     
     $defDynamicsConnect = $defModules | Where-Object { $_.id -eq "defDynamicsConnect"}
     Write-Host ("Installing {0}" -f $defDynamicsConnect.name)
@@ -322,7 +333,7 @@ Function Install-DataExchangeFrameworkModules {
 
     }
     
-    Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs") 
+    Install-SitecoreConfiguration @params *>&1 | Tee-Object $LogFile -Append 
 
 }
 Function Install-SalesforceMarketingCloudModule{
@@ -343,7 +354,7 @@ Function Install-SalesforceMarketingCloudModule{
 
     }
     
-    Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs") 
+    Install-SitecoreConfiguration @params *>&1 | Tee-Object $LogFile -Append 
 }
 Function Enable-ContainedDatabases {
     #Enable Contained Databases
@@ -396,7 +407,7 @@ function Update-SXASolrCores {
             ResourceDir = $($assets.root + "\\Sitecore.WDP.Resources")
             SitePrefix  = $site.prefix
         }
-        Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs")
+        Install-SitecoreConfiguration @params *>&1 | Tee-Object $LogFile -Append
     }
     catch {
         write-host "$site.habitatHomeHostName Failed to updated search index configuration" -ForegroundColor Red
@@ -418,7 +429,7 @@ function Update-SXASolrCores {
              SitecoreAdminPassword   = $sitecore.adminPassword
  
          }
-         Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs")
+         Install-SitecoreConfiguration @params *>&1 | Tee-Object $LogFile -Append
      }
      catch {
          write-host "SXA SOLR Failed" -ForegroundColor Red
