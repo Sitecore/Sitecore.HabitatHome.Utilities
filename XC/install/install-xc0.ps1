@@ -51,45 +51,6 @@ function Install-Prerequisites {
         throw "Invalid SQL version. Expected SQL 2016 SP1 ($($sql.minimumVersion)) or above."
     }
 
-
-    #Verify Java version
-
-    $minVersion = New-Object System.Version($assets.jreRequiredVersion)
-    $foundVersion = $FALSE
-
-
-    function getJavaVersions() {
-        $versions = '', 'Wow6432Node\' |
-            ForEach-Object {Get-ItemProperty -Path HKLM:\SOFTWARE\$($_)Microsoft\Windows\CurrentVersion\Uninstall\* |
-                Where-Object {($_.DisplayName -like '*Java *') -and (-not $_.SystemComponent)} |
-                Select-Object DisplayName, DisplayVersion, @{n = 'Architecture'; e = {If ($_.PSParentPath -like '*Wow6432Node*') {'x86'} Else {'x64'}}}}
-        return $versions
-    }
-    function checkJavaversion($toVersion) {
-        $versions_ = getJavaVersions
-        foreach ($version_ in $versions_) {
-            try {
-                $version = New-Object System.Version($version_.DisplayVersion)
-
-            }
-            catch {
-                continue
-            }
-
-            if ($version.CompareTo($toVersion) -ge 0) {
-                return $TRUE
-            }
-        }
-
-        return $false
-
-    }
-
-    $foundVersion = checkJavaversion($minversion)
-
-    if (-not $foundVersion) {
-        throw "Invalid Java version. Expected $minVersion or above."
-    }
     # Verify Web Deploy
     $webDeployPath = ([IO.Path]::Combine($env:ProgramFiles, 'iis', 'Microsoft Web Deploy V3', 'msdeploy.exe'))
     if (!(Test-Path $webDeployPath)) {
@@ -334,6 +295,7 @@ Function Install-Commerce {
         InstallDir                                  = $(Join-Path $site.webRoot $site.hostName)
         XConnectInstallDir                          = $xConnect.siteRoot
         CertificateName                             = $site.habitatHomeSslCertificateName
+        RootCertFileName                            = $sitecore.rootCertificateName
         CommerceServicesDbServer                    = $sql.server
         CommerceServicesDbName                      = $($site.prefix + "_SharedEnvironments")
         CommerceServicesGlobalDbName                = $($site.prefix + "_Global")
@@ -358,7 +320,6 @@ Function Install-Commerce {
         SitecoreCommerceEnginePath                  = $($publishPath + "\" + $site.prefix + ".Commerce.Engine")
         SitecoreBizFxServicesContentPath            = $($publishPath + "\" + $site.prefix + ".Commerce.BizFX")
         SitecoreBizFxPostFix                        = $site.prefix
-
         SitecoreIdentityServerPath                  = $($publishPath + "\" + $site.prefix + ".Commerce.IdentityServer")
         CommerceEngineCertificatePath               = $(Join-Path -Path $assets.certificatesPath -ChildPath $($xConnect.CertificateName + ".crt") )
         SiteUtilitiesSrc                            = $(Join-Path -Path $assets.commerce.sifCommerceRoot -ChildPath "SiteUtilityPages")
@@ -374,7 +335,6 @@ Function Install-Commerce {
         SXAStorefrontCatalogModuleFullPath          = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include  "Sitecore Commerce Experience Accelerator Habitat Catalog*.zip" -Recurse)
         MergeToolFullPath                           = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include  "*Microsoft.Web.XmlTransform.dll" -Recurse | Select-Object -ExpandProperty FullName)
         HabitatImagesModuleFullPath                 = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include  "Habitat Home Product Images.zip" -Recurse)
-
         UserAccount                                 = @{
             Domain   = $commerce.serviceAccountDomain
             UserName = $commerce.serviceAccountUserName
@@ -385,7 +345,7 @@ Function Install-Commerce {
             PublicKey  = $commerce.brainTreeAccountPublicKey
             PrivateKey = $commerce.brainTreeAccountPrivateKey
         }
-        SitecoreIdentityServerName                  = "SitecoreIdentityServer"
+        SitecoreIdentityServerName                  = $commerce.identityServerName
     }
 
     Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs")

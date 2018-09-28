@@ -28,7 +28,6 @@ $solr = $config.settings.solr
 $assets = $config.assets
 $modules = $config.modules
 $resourcePath = Join-Path $PSScriptRoot "Sitecore.WDP.Resources"
-Import-Module .\scripts\additional-tasks.psm1 -Force
 
 Write-Host "*******************************************************" -ForegroundColor Green
 Write-Host " Installing Sitecore $($assets.sitecoreVersion)" -ForegroundColor Green
@@ -36,7 +35,89 @@ Write-Host " Sitecore: $($site.hostName)" -ForegroundColor Green
 Write-Host " xConnect: $($xConnect.siteName)" -ForegroundColor Green
 Write-Host "*******************************************************" -ForegroundColor Green
 
-function Confirm-Prerequisites {
+
+Function Set-ModulesPath {
+    Write-Host "Setting Modules Path" -ForegroundColor Green
+    $modulesPath = ( Join-Path -Path $resourcePath -ChildPath "Modules" )
+    if ($env:PSModulePath -notlike "*$modulesPath*") {
+        $p = $env:PSModulePath + ";" + $modulesPath
+        [Environment]::SetEnvironmentVariable("PSModulePath", $p)
+    }
+}
+Function Install-SitecoreInstallFramework {
+    #Register Assets PowerShell Repository
+    if ((Get-PSRepository | Where-Object {$_.Name -eq $assets.psRepositoryName}).count -eq 0) {
+        Register-PSRepository -Name $assets.psRepositoryName -SourceLocation $assets.psRepository -InstallationPolicy Trusted 
+    }
+
+    #Sitecore Install Framework dependencies
+    Import-Module WebAdministration
+
+    #Install SIF
+    $module = Get-Module -FullyQualifiedName @{ModuleName = "SitecoreInstallFramework"; ModuleVersion = $($assets.installerVersion -replace "-beta[0-9]*$")}
+    if (-not $module) {
+        write-host "Installing the Sitecore Install Framework, version $($assets.installerVersion)" -ForegroundColor Green
+        Install-Module SitecoreInstallFramework -RequiredVersion $assets.installerVersion -Repository $assets.psRepositoryName -Scope CurrentUser -Force
+        Import-Module SitecoreInstallFramework -RequiredVersion $($assets.installerVersion -replace "-beta[0-9]*$")
+    }
+}
+Function Download-Assets {
+
+    $downloadAssets = $modules
+    $downloadFolder = $assets.root
+    $packagesFolder = (Join-Path $downloadFolder "packages")
+    
+   
+    # Download Sitecore
+    if (!(Test-Path $downloadFolder)) {
+        New-Item -ItemType Directory -Force -Path $downloadFolder
+    }
+    $credentials = Get-Credential -Message "Please provide dev.sitecore.com credentials"
+
+
+    $downloadJsonPath = $([io.path]::combine($resourcePath, 'content', 'Deployment', 'OnPrem', 'HabitatHome', 'download-assets.json'))
+    Set-Alias sz 'C:\Program Files\7-Zip\7z.exe'
+    $package = $modules | Where-Object {$_.id -eq "xp"}
+    
+    if ($package.download -eq $true) {
+        Write-Host ("Downloading {0}  -  if required" -f $package.name )
+        
+        $destination =  $package.packagePath
+            
+        if (!(Test-Path $destination)) {
+            $params = @{
+                Path        = $downloadJsonPath
+                Credentials = $credentials
+                Source      = $package.url
+                Destination = $destination
+            }
+            Install-SitecoreConfiguration  @params  -WorkingDirectory $(Join-Path $PWD "logs") -Verbose 
+        }
+        if ((Test-Path $destination) -and ( $package.extract -eq $true)) {
+            sz x -o"$DownloadFolder" $destination  -y -aoa
+        }
+    }
+   
+    
+    # Download Sitecore Azure Toolkit (used for converting modules)
+    $package = $modules | Where-Object {$_.id -eq "sat"}
+   
+    $destination = $package.packagePath
+   
+    if (!(Test-Path $destination) -and $package.download -eq $true) {
+        $params = @{
+            Path        = $downloadJsonPath
+            Credentials = $credentials
+            Source      = $package.url
+            Destination = $destination
+        }
+        Install-SitecoreConfiguration  @params  -WorkingDirectory $(Join-Path $PWD "logs") -Verbose 
+    }
+    if ((Test-Path $destination) -and ( $package.install -eq $true)) {
+        sz x -o"$DownloadFolder\sat" $destination  -y -aoa
+    }
+}
+Function Confirm-Prerequisites {
     #Verify SQL version
     
     [reflection.assembly]::LoadWithPartialName("Microsoft.SqlServer.Smo") | out-null
@@ -44,45 +125,6 @@ function Confirm-Prerequisites {
     $minVersion = New-Object System.Version($sql.minimumVersion)
     if ($srv.Version.CompareTo($minVersion) -lt 0) {
         throw "Invalid SQL version. Expected SQL 2016 SP1 ($($sql.minimumVersion)) or above."
-    }
-
-    #Verify Java version
-    
-    $minVersion = New-Object System.Version($assets.jreRequiredVersion)
-    $foundVersion = $FALSE
-   
-    
-    function getJavaVersions() {
-        $versions = '', 'Wow6432Node\' |
-            ForEach-Object {Get-ItemProperty -Path HKLM:\SOFTWARE\$($_)Microsoft\Windows\CurrentVersion\Uninstall\* |
-                Where-Object {($_.DisplayName -like '*Java *') -and (-not $_.SystemComponent)} |
-                Select-Object DisplayName, DisplayVersion, @{n = 'Architecture'; e = {If ($_.PSParentPath -like '*Wow6432Node*') {'x86'} Else {'x64'}}}}
-        return $versions
-    }
-    function checkJavaversion($toVersion) {
-        $versions_ = getJavaVersions
-        foreach ($version_ in $versions_) {
-            try {
-                $version = New-Object System.Version($version_.DisplayVersion)
-                
-            }
-            catch {
-                continue
-            }
-
-            if ($version.CompareTo($toVersion) -ge 0) {
-                return $TRUE
-            }
-        }
-
-        return $false
-
-    }
-    
-    $foundVersion = checkJavaversion($minversion)
-    
-    if (-not $foundVersion) {
-        throw "Invalid Java version. Expected $minVersion or above."
     }
 
     # Verify Web Deploy
@@ -178,87 +220,7 @@ function Confirm-Prerequisites {
         throw "XConnect package $($xConnect.packagePath) not found"
     }
 }
-function Install-Assets {
-    #Register Assets PowerShell Repository
-    if ((Get-PSRepository | Where-Object {$_.Name -eq $assets.psRepositoryName}).count -eq 0) {
-        Register-PSRepository -Name $assets.psRepositoryName -SourceLocation $assets.psRepository -InstallationPolicy Trusted 
-    }
-
-    #Sitecore Install Framework dependencies
-    Import-Module WebAdministration
-
-    #Install SIF
-    $module = Get-Module -FullyQualifiedName @{ModuleName = "SitecoreInstallFramework"; ModuleVersion = $($assets.installerVersion -replace "-beta[0-9]*$")}
-    if (-not $module) {
-        write-host "Installing the Sitecore Install Framework, version $($assets.installerVersion)" -ForegroundColor Green
-        Install-Module SitecoreInstallFramework -RequiredVersion $assets.installerVersion -Repository $assets.psRepositoryName -Scope CurrentUser -Force
-        Import-Module SitecoreInstallFramework -RequiredVersion $($assets.installerVersion -replace "-beta[0-9]*$")
-    }
-}
-function Get-Assets {
-
-    $downloadAssets = $modules
-    $downloadFolder = $assets.root
-    $packagesFolder = (Join-Path $downloadFolder "packages")
-    
-   
-    # Download Sitecore
-    if (!(Test-Path $downloadFolder)) {
-        New-Item -ItemType Directory -Force -Path $downloadFolder
-    }
-    $credentials = Get-Credential -Message "Please provide dev.sitecore.com credentials"
-
-
-    $downloadJsonPath = $([io.path]::combine($resourcePath, 'content', 'Deployment', 'OnPrem', 'HabitatHome', 'download-assets.json'))
-    Set-Alias sz 'C:\Program Files\7-Zip\7z.exe'
-    $package = $modules | Where-Object {$_.id -eq "xp"}
-    
-    if ($package.download -eq $true) {
-        Write-Host ("Downloading {0}  -  if required" -f $package.name )
-        
-        $destination =  $package.packagePath
-            
-        if (!(Test-Path $destination)) {
-            $params = @{
-                Path        = $downloadJsonPath
-                Credentials = $credentials
-                Source      = $package.url
-                Destination = $destination
-            }
-            Install-SitecoreConfiguration  @params  -WorkingDirectory $(Join-Path $PWD "logs") -Verbose 
-        }
-        if ((Test-Path $destination) -and ( $package.extract -eq $true)) {
-            sz x -o"$DownloadFolder" $destination  -y -aoa
-        }
-    }
-   
-    
-    # Download modules
-    foreach ($package in $downloadAssets) {
-        if ($package.id -eq "xp") {
-            continue;
-        }
-        if (!(Test-Path $packagesFolder)) {
-            New-Item -ItemType Directory -Force -Path $packagesFolder
-        }
-        if ($package.download -eq $true) {
-            Write-Host ("Downloading {0}  -  if required" -f $package.name )
-            $destination = $package.packagePath
-            if (!(Test-Path $destination)) {
-                $params = @{
-                    Path        = $downloadJsonPath
-                    Credentials = $credentials
-                    Source      = $package.url
-                    Destination = $destination
-                }
-                Install-SitecoreConfiguration  @params  -WorkingDirectory $(Join-Path $PWD "logs") -Verbose 
-            }
-        }
-    }
-}
-
-
-function Install-XConnect {
+Function Install-XConnect {
     #Install xConnect Solr
     try {
         $params = @{
@@ -279,9 +241,10 @@ function Install-XConnect {
     try {
         Write-Host $xConnect.certificateConfigurationPath
         $params = @{
-            Path            = $xConnect.certificateConfigurationPath 
-            CertificateName = $xConnect.certificateName 
-            CertPath        = $assets.certificatesPath
+            Path             = $xConnect.certificateConfigurationPath 
+            CertificateName  = $xConnect.certificateName 
+            CertPath         = $assets.certificatesPath
+            RootCertFileName = $sitecore.rootCertificateName
         }
         Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs")
     }
@@ -338,8 +301,7 @@ function Install-XConnect {
         throw
     }
 }
-
-function Install-Sitecore {
+Function Install-Sitecore {
 
     try {
         #Install Sitecore Solr
@@ -411,67 +373,6 @@ function Install-Sitecore {
     }
 }
 
-function Enable-InstallationImprovements {
-    try {
-        $params = @{
-            Path        = $site.enableInstallationImprovements 
-            InstallDir  = $sitecore.siteRoot  
-            ResourceDir = $($assets.root + "\\Sitecore.WDP.Resources")
-        }
-
-        Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs")
-    }
-    catch {
-        write-host "$site.habitatHomeHostName Failed to enable installation improvements" -ForegroundColor Red
-        throw
-    }
-}
-function Disable-InstallationImprovements {
-    try {
-        $params = @{
-            Path        = $site.disableInstallationImprovements 
-            InstallDir  = $sitecore.siteRoot 
-            ResourceDir = $($assets.root + "\\Sitecore.WDP.Resources")
-        }
-        Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs")
-    }
-    catch {
-        write-host "$site.habitatHomeHostName Failed to disable installation improvements" -ForegroundColor Red
-        throw
-    }
-}
-
-function Copy-Tools {
-    #Copy InstallPackage.aspx to webroot
-
-    if (!(Test-Path $assets.installPackagePath)) {
-        throw "$($assets.installPackagePath) not found"
-    }
-
-    try {
-        Write-Host "Copying tools to webroot" -ForegroundColor Green
-        Copy-Item $assets.installPackagePath -Destination $sitecore.siteRoot -Force
-    }
-    catch {
-        write-host "Failed to copy InstallPackage.aspx to web root" -ForegroundColor Red
-    }
-}
-
-
-function Copy-Package ($packagePath, $destination) {
-   
-    if (!(Test-Path $packagePath)) {
-        throw "Package not found"
-    }
-    # Check destination
-    if (! (Test-Path $destination)) { New-Item $destination -Type Directory }
-
-    Write-Host $packageName
-    Copy-Item $packagePath   $destination  -Verbose -Force
-         
-    
-}
-
 Function Add-AppPoolMembership {
 
     #Add ApplicationPoolIdentity to performance log users to avoid Sitecore log errors (https://kb.sitecore.net/articles/404548)
@@ -491,58 +392,11 @@ Function Add-AppPoolMembership {
         Write-Host "Warning: Couldn't add IIS AppPool\$($site.hostName) to Performance Monitor Users -- user may already exist" -ForegroundColor Yellow
     }
 }
-Function Set-ModulesPath {
-    Write-Host "Setting Modules Path" -ForegroundColor Green
-    $modulesPath = ( Join-Path -Path $resourcePath -ChildPath "Modules" )
-    if ($env:PSModulePath -notlike "*$modulesPath*") {
-        $p = $env:PSModulePath + ";" + $modulesPath
-        [Environment]::SetEnvironmentVariable("PSModulePath", $p)
-    }
-}
-
-function Install-OptionalModules {
-    $packageDestination = Join-Path $sitecore.siteRoot "\temp\Packages"
-    foreach ($module in $modules | Where-Object {$_.install -eq $true}) {
-        Write-Host "Copying $($module.name) to the $packageDestination"
-        Copy-Package -packagePath $module.packagePath -destination "$packageDestination"
-        $packageFileName = Split-Path $module.packagePath -Leaf
-
-        $packageInstallerUrl = "https://$($site.hostName)/InstallPackage.aspx?package=/temp/Packages/"
-        $url = $packageInstallerUrl + $packageFileName 
-        $request = [system.net.WebRequest]::Create($url)
-        $request.Timeout = 2400000
-        Write-Host $url
-        Write-Host "Installing Package : $($module.name)" -ForegroundColor Green
-        $request.GetResponse()  
-    }
-}
-
-
-function Update-SXASolrCores {
-    try {
-        $params = @{
-            Path        = $site.configureSearchIndexes 
-            InstallDir  = $sitecore.siteRoot 
-            ResourceDir = $($assets.root + "\\Sitecore.WDP.Resources")
-            SitePrefix  = $site.prefix
-        }
-        Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs")
-    }
-    catch {
-        write-host "$site.habitatHomeHostName Failed to updated search index configuration" -ForegroundColor Red
-        throw
-    }
-}
 
 Set-ModulesPath
-Install-Assets
-Get-Assets
+Install-SitecoreInstallFramework
+Download-Assets
 Confirm-Prerequisites
 Install-XConnect
 Install-Sitecore
 Add-AppPoolMembership
-Enable-InstallationImprovements
-Copy-Tools
-Install-OptionalModules
-Disable-InstallationImprovements
-Update-SXASolrCores

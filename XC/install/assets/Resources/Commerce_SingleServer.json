@@ -217,6 +217,10 @@
     "HabitatImagesModuleFullPath": {
       "Type": "string",
       "Description": "Habitat Images module full path"
+    },
+    "RootCertFileName":{
+      "Type":"string",
+      "Description":"Name of Root certificate"
     }
   },
   "Variables": {
@@ -244,7 +248,8 @@
         "Path": "[concat(parameter('BaseConfigurationFolder'), '\\Commerce\\SXAStorefront\\SXAStorefront.CreateBinding.json')]",
         "SiteName": "[parameter('SiteName')]",
         "CertificateName": "[parameter('CertificateName')]",
-        "StorefrontHostName": "[parameter('SiteHostHeaderName')]"
+        "StorefrontHostName": "[parameter('SiteHostHeaderName')]",
+        "RootCertFileName":"[parameter('RootCertFileName')]"
       }
     },
     "InstallSolrCores": {
@@ -285,7 +290,8 @@
         "SitecoreCommerceEnginePath": "[parameter('SitecoreCommerceEnginePath')]",
         "UserAccount": "[parameter('UserAccount')]",
 		    "BraintreeAccount": "[parameter('BraintreeAccount')]",
-        "SolutionName": "[parameter('SolutionName')]"
+        "SolutionName": "[parameter('SolutionName')]",
+        "RootCertFileName":"[parameter('RootCertFileName')]"
       }
     },
     "DeploySitecoreBizFx": {
@@ -297,7 +303,8 @@
         "SitecoreBizFxPostFix":"[parameter('SitecoreBizFxPostFix')]",
         "CommerceAuthoringServicesPort": "[parameter('CommerceAuthoringServicesPort')]",
         "UserAccount": "[parameter('UserAccount')]",
-        "EnvironmentName":"[concat(parameter('SolutionName'),'Authoring')]"
+        "EnvironmentName":"[concat(parameter('SolutionName'),'Authoring')]",
+        "RootCertFileName":"[parameter('RootCertFileName')]"
       }
     },
     "DeploySitecoreIdentityServer": {
@@ -309,7 +316,8 @@
         "SitecoreDbServer": "[parameter('SitecoreDbServer')]",
         "SitecoreCoreDbName": "[parameter('SitecoreCoreDbName')]",
         "UserAccount": "[parameter('UserAccount')]",
-        "SitecoreIdentityServerName": "[parameter('SitecoreIdentityServerName')]"
+        "SitecoreIdentityServerName": "[parameter('SitecoreIdentityServerName')]",
+        "RootCertFileName":"[parameter('RootCertFileName')]"
       }
     },
     "CopySiteUtilityFolder": {
