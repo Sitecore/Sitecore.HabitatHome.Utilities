@@ -80,11 +80,11 @@ Write-Host "Setting default 'xConnect' parameters"
 # XConnect Parameters
 $xConnect = $json.settings.xConnect
 $xConnect.ConfigurationPath = (Get-ChildItem $pwd -filter "xconnect-xp0.json" -Recurse).FullName
-$xConnect.certificateConfigurationPath = (Get-ChildItem $pwd -filter "xconnect-createcert.json" -Recurse).FullName
+$xConnect.certificateConfigurationPath = (Get-ChildItem $pwd -filter "createcert.json" -Recurse).FullName
 $xConnect.solrConfigurationPath = (Get-ChildItem $pwd -filter "xconnect-solr.json" -Recurse).FullName
 $xConnect.packagePath = Join-Path $assets.root $("Sitecore " + $assets.sitecoreVersion + " (OnPrem)_xp0xconnect.scwdp.zip")
 $xConnect.siteName = $site.prefix + "_xconnect." + $site.suffix
-$xConnect.certificateName = [string]::Join(".", @($site.prefix, $site.suffix, "xConnect.Client"))
+$xConnect.certificateName = [string]::Join(".", @($site.prefix, $site.suffix, ".Client"))
 $xConnect.siteRoot = Join-Path $site.webRoot -ChildPath $xConnect.siteName
 
 Write-Host "Setting default 'Sitecore' parameters"
