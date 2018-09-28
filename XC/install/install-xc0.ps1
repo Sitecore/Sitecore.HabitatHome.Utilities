@@ -345,7 +345,7 @@ Function Install-Commerce {
             PublicKey  = $commerce.brainTreeAccountPublicKey
             PrivateKey = $commerce.brainTreeAccountPrivateKey
         }
-        SitecoreIdentityServerName                  = "SitecoreIdentityServer"
+        SitecoreIdentityServerName                  = $commerce.identityServerName
     }
 
     Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs")
