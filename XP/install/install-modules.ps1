@@ -345,6 +345,26 @@ Function Install-SalesforceMarketingCloudModule{
     
     Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs") 
 }
+Function Install-StacklaModule{
+    $stackla = $modules | Where-Object { $_.id -eq "stackla"}
+    if ($false -eq $stackla.install) {
+        return;
+    }
+
+    $stackla.packagePath = $stackla.packagePath.replace(".zip", ".scwdp.zip")
+    $params = @{
+        Path             = (Join-path $resourcePath 'content\Deployment\OnPrem\HabitatHome\module-mastercore.json')
+        Package          = $stackla.packagePath
+        SiteName         = $site.hostName
+        SqlDbPrefix      = $site.prefix 
+        SqlAdminUser     = $sql.adminUser 
+        SqlAdminPassword = $sql.adminPassword 
+        SqlServer        = $sql.server 
+
+    }
+    
+    Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs") 
+}
 Function Enable-ContainedDatabases {
     #Enable Contained Databases
     Write-Host "Enable contained databases" -ForegroundColor Green
@@ -442,6 +462,7 @@ Install-SitecorePowerShellExtensions
 Install-SitecoreExperienceAccelerator
 Install-DataExchangeFrameworkModules
 Install-SalesforceMarketingCloudModule
+Install-StacklaModule
 Enable-ContainedDatabases
 Add-DatabaseUsers
 Start-Services

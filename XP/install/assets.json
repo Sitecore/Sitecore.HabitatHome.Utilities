@@ -116,6 +116,16 @@
             "install": false,
             "convertToWdp": true,
             "source": "sitecore"
+        },
+        {
+            "id": "stackla",
+            "name": "Stackla Module",
+            "fileName": "Stackla-module-1.4.0-sc9.0.zip",
+            "url": "https://s3-ap-southeast-2.amazonaws.com/stackla-plugin-assets/prod/sitecore/packages/Stackla-module-1.4.0-sc9.0.zip",
+            "download": false,
+            "install": false,
+            "convertToWdp": true,
+            "source": "external"
         }
 
     ],
