@@ -456,6 +456,7 @@ Function Install-IdentityServer {
         AllowedCorsOrigins   = $site.hostName
         ClientSecret         = $identityServer.clientSecret
         LicenseFile          = $assets.licenseFilePath 
+        WebRoot              = $site.webRoot
     }
     Install-SitecoreConfiguration @identityParams -Verbose   
     
