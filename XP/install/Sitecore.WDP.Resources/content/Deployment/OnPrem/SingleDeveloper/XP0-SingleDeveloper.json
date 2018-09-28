@@ -105,6 +105,11 @@
             "Description": "Client secret of PasswordClient section. It's a random string between 1 and 100 symbols long.",
             "DefaultValue": "IdentityServerClientSecret"
         },
+        "SitecoreIdentityAuthority": {
+            "Type": "string",
+            "DefaultValue": "https://SitecoreIdentityServerHost",
+            "Description": "IdentityServer provider URI."
+        },
         "XConnectXP0:Package": {
             "Type": "String",
             "Reference": "XConnectPackage",
@@ -309,9 +314,25 @@
             "Type": "String",
             "Reference": "ClientSecret",
             "Description": "Override to pass ClientSecret value to IdentityServer config."
+        },
+        "SitecoreXP0:SitecoreIdentitySecret": {
+            "Type": "String",
+            "Reference": "ClientSecret",
+            "Description": "Override to pass ClientSecret value to IdentityServer config."
+        },
+        "SitecoreXP0:SitecoreIdentityAuthority": {
+            "Type": "String",
+            "Reference": "SitecoreIdentityAuthority",
+            "Description": "Override to pass SitecoreIdentityAuthority value to Sitecore config."
         }
     },
     "Includes": {
+        "IdentityServerCertificates":{
+            "Source": ".\\createcert.json"
+        },
+        "IdentityServer": {
+            "Source": ".\\identityServer.json"
+        },
         "XConnectCertificates": {
             "Source": ".\\createcert.json"
         },
@@ -326,12 +347,6 @@
         },
         "SitecoreXP0": {
             "Source": ".\\Sitecore-XP0.json"
-        },
-        "IdentityServerCertificates":{
-            "Source": ".\\createcert.json"
-        },
-        "IdentityServer": {
-            "Source": ".\\identityServer.json"
         }
     }
 }

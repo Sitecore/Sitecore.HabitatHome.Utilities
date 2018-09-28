@@ -35,6 +35,11 @@
             "Description": "The path to the XP1 Collection search package to deploy.",
             "DefaultValue": ""
         },
+        "XP1CortexProcessingPackage": {
+            "Type": "string",
+            "Description": "The path to the XP1 Processing package to deploy.",
+            "DefaultValue": ""
+        },
         "XP1MarketingAutomationPackage": {
             "Type": "string",
             "Description": "The path to the XP1 Marketing Automation package to deploy.",
@@ -43,6 +48,11 @@
         "XP1MarketingAutomationReportingPackage": {
             "Type": "string",
             "Description": "The path to the XP1 Marketing Automation Reporting package to deploy.",
+            "DefaultValue": ""
+        },
+        "XP1CortexReportingPackage": {
+            "Type": "string",
+            "Description": "The path to the XP1 reporting package to deploy.",
             "DefaultValue": ""
         },
         "XP1ReferenceDataPackage": {
@@ -75,6 +85,11 @@
             "Description": "The path to the Identity Server package to deploy.",
             "DefaultValue": ""
         },
+        "XP1CortexProcessingSitename": {
+            "Type": "string",
+            "DefaultValue": "CortexProcessing",
+            "Description": "The name of the Cortex Processing site to be deployed."
+        },
         "XP1CollectionSitename": {
             "Type": "string",
             "DefaultValue": "XConnectCollection",
@@ -99,6 +114,11 @@
             "Type": "string",
             "DefaultValue": "XConnectReferenceData",
             "Description": "The name of the XConnect Reference Data site to be deployed."
+        },
+        "XP1CortexReportingSitename": {
+            "Type": "string",
+            "DefaultValue": "CortexReporting",
+            "Description": "The name of the Cortex Reporting site to be deployed."
         },
         "SitecoreXP1CDSitename": {
             "Type": "string",
@@ -129,6 +149,11 @@
             "Type": "string",
             "DefaultValue": "https://SitecoreReporting",
             "Description": "The url for the Reporting Service."
+        },
+        "CortexReportingService": {
+            "Type": "string",
+            "DefaultValue": "https://CortexReporting",
+            "Description": "The url for the Cortex Reporting Service."
         },
         "XConnectCollectionSearchService": {
             "Type": "string",
@@ -183,7 +208,7 @@
         "XConnectReferenceDataService": {
             "Type": "String",
             "DefaultValue": "https://localhost",
-            "Description": "The URL of the XConnect Collection service."
+            "Description": "The URL of the XConnect Reference Data service."
         },
         "MarketingAutomationOperationsService":{
             "Type": "String",
@@ -195,6 +220,11 @@
             "DefaultValue": "https://localhost",
             "Description": "The URL of the Marketing Automation Operations service."
         },
+        "MachineLearningServerUrl": {
+            "Type": "String",
+            "DefaultValue": "http://localhost",
+            "Description": "The URL of the Machine Learning Service."
+        },
         "AllowedCorsOrigins": {
             "Type": "string",
             "Description": "Pipe-separated list of instances (URIs) that are allowed to login via Sitecore Identity.",
@@ -204,6 +234,11 @@
             "Type": "string",
             "Description": "Client secret of PasswordClient section. It's a random string between 1 and 100 symbols long.",
             "DefaultValue": "IdentityServerClientSecret"
+        },
+        "SitecoreIdentityAuthority": {
+            "Type": "string",
+            "DefaultValue": "https://SitecoreIdentityServerHost",
+            "Description": "IdentityServer provider URI."
         },
         "XConnectCertificates:CertificateName": {
             "Type": "String",
@@ -230,10 +265,35 @@
             "Reference": "CertificateName",
             "Description": "Override to pass CertificateName value to XP1MarketingAutomationReporting config."
         },
+        "XP1CortexProcessing:XConnectCert": {
+            "Type": "String",
+            "Reference": "CertificateName",
+            "Description": "Override to pass CertificateName value to XP1CortexProcessing config."
+        },
+        "XP1CortexReporting:XConnectCert": {
+            "Type": "String",
+            "Reference": "CertificateName",
+            "Description": "Override to pass CertificateName value to XP1CortexReporting config."
+        },
         "XP1ReferenceData:XConnectCert": {
             "Type": "String",
             "Reference": "CertificateName",
             "Description": "Override to pass CertificateName value to XP1ReferenceData config."
+        },
+        "SitecoreXP1CD:XConnectCert": {
+            "Type": "String",
+            "Reference": "CertificateName",
+            "Description": "Override to pass CertificateName value to SitecoreXP1CD config."
+        },
+        "SitecoreXP1CM:XConnectCert": {
+            "Type": "String",
+            "Reference": "CertificateName",
+            "Description": "Override to pass CertificateName value to SitecoreXP1CM config."
+        },
+        "SitecoreXP1Prc:XConnectCert": {
+            "Type": "String",
+            "Reference": "CertificateName",
+            "Description": "Override to pass CertificateName value to SitecoreXP1Prc config."
         },
         "XP1Collection:Package": {
             "Type": "String",
@@ -254,6 +314,16 @@
             "Type": "String",
             "Reference": "XP1MarketingAutomationReportingPackage",
             "Description": "Override to pass XP1MarketingAutomationReportingPackage value to XP1MarketingAutomationReporting config."
+        },
+        "XP1CortexProcessing:Package": {
+            "Type": "String",
+            "Reference": "XP1CortexProcessingPackage",
+            "Description": "Override to pass XP1CortexProcessingPackage value to XP1CortexProcessing config."
+        },
+        "XP1CortexReporting:Package": {
+            "Type": "String",
+            "Reference": "XP1CortexReportingPackage",
+            "Description": "Override to pass XP1CortexReportingPackage value to XP1ReferenceData config."
         },
         "XP1ReferenceData:Package": {
             "Type": "String",
@@ -294,6 +364,16 @@
             "Type": "String",
             "Reference": "XP1CollectionSearchSitename",
             "Description": "Override to pass XP1CollectionSearchSitename value to XP1CollectionSearch config."
+        },
+        "XP1CortexProcessing:Sitename": {
+            "Type": "String",
+            "Reference": "XP1CortexProcessingSitename",
+            "Description": "Override to pass XP1CortexProcessingSitename value to XP1CortexProcessing config."
+        },
+        "XP1CortexReporting:Sitename": {
+            "Type": "String",
+            "Reference": "XP1CortexReportingSitename",
+            "Description": "Override to pass XP1CortexReportingSitename value to XP1CortexReporting config."
         },
         "XP1MarketingAutomation:Sitename": {
             "Type": "String",
@@ -345,6 +425,16 @@
             "Reference": "ReportingService",
             "Description": "Override to pass ReportingService value to SitecoreXP1CM config."
         },
+        "SitecoreXP1CM:CortexReportingService": {
+            "Type": "String",
+            "Reference": "CortexReportingService",
+            "Description": "Override to pass CortexReportingService value to SitecoreXP1CM config."
+        },
+        "XP1CortexProcessing:XConnectCollectionSearchService": {
+            "Type": "String",
+            "Reference": "XConnectCollectionSearchService",
+            "Description": "Override to pass XConnectCollectionSearchService value to XP1CortexProcessing config."
+        },
         "SitecoreXP1CM:XConnectCollectionSearchService": {
             "Type": "String",
             "Reference": "XConnectCollectionSearchService",
@@ -359,21 +449,6 @@
             "Type": "String",
             "Reference": "ClientsConfiguration",
             "Description": "Override to pass ClientsConfiguration value to IdentityServer config."
-        },
-        "SitecoreXP1CD:XConnectCert": {
-            "Type": "String",
-            "Reference": "CertificateName",
-            "Description": "Override to pass CertificateName value to SitecoreXP1CD config."
-        },
-        "SitecoreXP1CM:XConnectCert": {
-            "Type": "String",
-            "Reference": "CertificateName",
-            "Description": "Override to pass CertificateName value to SitecoreXP1CM config."
-        },
-        "SitecoreXP1Prc:XConnectCert": {
-            "Type": "String",
-            "Reference": "CertificateName",
-            "Description": "Override to pass CertificateName value to SitecoreXP1Prc config."
         },
         "XConnectSolr:SolrUrl": {
             "Type": "String",
@@ -445,17 +520,27 @@
             "Reference": "Prefix",
             "Description": "Override to pass Prefix value to XConnectSolr config."
         },
+        "XP1CollectionSearch:SolrCorePrefix": {
+            "Type": "String",
+            "Reference": "Prefix",
+            "Description": "Override to pass Prefix value to XP1CollectionSearch config."
+        },
+        "XP1CortexProcessing:SqlDbPrefix": {
+            "Type": "String",
+            "Reference": "Prefix",
+            "Description": "Override to pass Prefix value to XP1CortexProcessing config."
+        },
+        "XP1CortexReporting:SqlDbPrefix": {
+            "Type": "String",
+            "Reference": "Prefix",
+            "Description": "Override to pass Prefix value to XP1CortexReporting config."
+        },
         "XP1Collection:SqlDbPrefix": {
             "Type": "String",
             "Reference": "Prefix",
             "Description": "Override to pass Prefix value to XP1Collection config."
         },
         "XP1CollectionSearch:SqlDbPrefix": {
-            "Type": "String",
-            "Reference": "Prefix",
-            "Description": "Override to pass Prefix value to XP1CollectionSearch config."
-        },
-        "XP1CollectionSearch:SolrCorePrefix": {
             "Type": "String",
             "Reference": "Prefix",
             "Description": "Override to pass Prefix value to XP1CollectionSearch config."
@@ -520,6 +605,16 @@
             "Reference": "SqlServer",
             "Description": "Override to pass SqlServer value to XP1MarketingAutomationReporting config."
         },
+        "XP1CortexProcessing:SqlServer": {
+            "Type": "String",
+            "Reference": "SqlServer",
+            "Description": "Override to pass SqlServer value to XP1CortexProcessing config."
+        },
+        "XP1CortexReporting:SqlServer": {
+            "Type": "String",
+            "Reference": "SqlServer",
+            "Description": "Override to pass SqlServer value to XP1CortexReporting config."
+        },
         "XP1ReferenceData:SqlServer": {
             "Type": "String",
             "Reference": "SqlServer",
@@ -554,6 +649,16 @@
             "Type": "String",
             "Reference": "SqlAdminUser",
             "Description": "Override to pass SqlAdminUser value to XP1Collection config."
+        },
+        "XP1CortexProcessing:SqlAdminUser": {
+            "Type": "String",
+            "Reference": "SqlAdminUser",
+            "Description": "Override to pass SqlAdminUser value to XP1CortexProcessing config."
+        },
+        "XP1CortexReporting:SqlAdminUser": {
+            "Type": "String",
+            "Reference": "SqlAdminUser",
+            "Description": "Override to pass SqlAdminUser value to XP1CortexReporting config."
         },
         "XP1MarketingAutomation:SqlAdminUser": {
             "Type": "String",
@@ -590,6 +695,16 @@
             "Reference": "SqlAdminPassword",
             "Description": "Override to pass SqlAdminPassword value to XP1ReferenceData config."
         },
+        "XP1CortexProcessing:SqlAdminPassword": {
+            "Type": "String",
+            "Reference": "SqlAdminPassword",
+            "Description": "Override to pass SqlAdminPassword value to XP1CortexProcessing config."
+        },
+        "XP1CortexReporting:SqlAdminPassword": {
+            "Type": "String",
+            "Reference": "SqlAdminPassword",
+            "Description": "Override to pass SqlAdminPassword value to XP1CortexReporting config."
+        },
         "SitecoreXP1CM:SqlAdminPassword": {
             "Type": "String",
             "Reference": "SqlAdminPassword",
@@ -625,6 +740,16 @@
             "Reference": "LicenseFile",
             "Description": "Override to pass LicenseFile value to XP1ReferenceData config."
         },
+        "XP1CortexProcessing:LicenseFile": {
+            "Type": "String",
+            "Reference": "LicenseFile",
+            "Description": "Override to pass LicenseFile value to XP1CortexProcessing config."
+        },
+        "XP1CortexReporting:LicenseFile": {
+            "Type": "String",
+            "Reference": "LicenseFile",
+            "Description": "Override to pass LicenseFile value to XP1CortexReporting config."
+        },
         "SitecoreXP1CD:LicenseFile": {
             "Type": "String",
             "Reference": "LicenseFile",
@@ -645,6 +770,11 @@
             "Reference": "LicenseFile",
             "Description": "Override to pass LicenseFile value to SitecoreXP1Prc config."
         },
+        "XP1CortexProcessing:MachineLearningServerUrl": {
+            "Type": "String",
+            "Reference": "MachineLearningServerUrl",
+            "Description": "Override to pass MachineLearningServerUrl value to XP1CortexProcessing config."
+        },
         "IdentityServerCertificates:CertificateName": {
             "Type": "String",
             "Reference": "IdentityServerSiteName",
@@ -664,6 +794,11 @@
             "Type": "String",
             "Reference": "XConnectCollectionService",
             "Description": "Override to pass XConnectCollectionService value to XP1MarketingAutomation config."
+        },
+        "XP1CortexProcessing:XConnectCollectionService": {
+            "Type": "String",
+            "Reference": "XConnectCollectionService",
+            "Description": "Override to pass XConnectCollectionService value to XP1CortexProcessing config."
         },
         "SitecoreXP1CD:XConnectCollectionService": {
             "Type": "String",
@@ -710,6 +845,16 @@
             "Reference": "MarketingAutomationReportingService",
             "Description": "Override to pass MarketingAutomationReportingService value to SitecoreXP1CM config."
         },
+        "SitecoreXP1CM:SitecoreIdentityAuthority": {
+            "Type": "String",
+            "Reference": "SitecoreIdentityAuthority",
+            "Description": "Override to pass SitecoreIdentityAuthority value to SitecoreXP1CM config."
+        },
+        "SitecoreXP1CD:SitecoreIdentityAuthority": {
+            "Type": "String",
+            "Reference": "SitecoreIdentityAuthority",
+            "Description": "Override to pass SitecoreIdentityAuthority value to SitecoreXP1CD config."
+        },
         "IdentityServer:AllowedCorsOrigins": {
             "Type": "String",
             "Reference": "AllowedCorsOrigins",
@@ -719,9 +864,20 @@
             "Type": "String",
             "Reference": "ClientSecret",
             "Description": "Override to pass ClientSecret value to IdentityServer config."
+        },
+        "SitecoreXP1CM:SitecoreIdentitySecret": {
+            "Type": "String",
+            "Reference": "ClientSecret",
+            "Description": "Override to pass ClientSecret value to IdentityServer config."
         }
     },
     "Includes": {
+        "IdentityServerCertificates":{
+            "Source": ".\\createcert.json"
+        },
+        "IdentityServer": {
+            "Source": ".\\IdentityServer.json"
+        },
         "XConnectCertificates": {
             "Source": ".\\createcert.json"
         },
@@ -734,35 +890,35 @@
         "XP1CollectionSearch": {
             "Source": ".\\xconnect-xp1-collectionsearch.json"
         },
+        "XP1ReferenceData": {
+            "Source": ".\\xconnect-xp1-referencedata.json"
+        },
         "XP1MarketingAutomation": {
             "Source": ".\\xconnect-xp1-marketingautomation.json"
         },
         "XP1MarketingAutomationReporting": {
             "Source": ".\\xconnect-xp1-marketingautomationreporting.json"
         },
-        "XP1ReferenceData": {
-            "Source": ".\\xconnect-xp1-referencedata.json"
+        "XP1CortexProcessing": {
+            "Source": ".\\xconnect-xp1-cortexprocessing.json"
+        },
+        "XP1CortexReporting": {
+            "Source": ".\\xconnect-xp1-cortexreporting.json"
         },
         "SitecoreSolr": {
             "Source": ".\\Sitecore-solr.json"
         },
-        "SitecoreXP1CD": {
-            "Source": ".\\Sitecore-xp1-cd.json"
-        },
         "SitecoreXP1CM": {
             "Source": ".\\Sitecore-xp1-cm.json"
         },
-        "SitecoreXP1Rep": {
-            "Source": ".\\Sitecore-xp1-rep.json"
+        "SitecoreXP1CD": {
+            "Source": ".\\Sitecore-xp1-cd.json"
         },
         "SitecoreXP1Prc": {
             "Source": ".\\Sitecore-xp1-prc.json"
         },
-        "IdentityServerCertificates":{
-            "Source": ".\\createcert.json"
-        },
-        "IdentityServer": {
-            "Source": ".\\identityServer.json"
+        "SitecoreXP1Rep": {
+            "Source": ".\\Sitecore-xp1-rep.json"
         }
     }
 }

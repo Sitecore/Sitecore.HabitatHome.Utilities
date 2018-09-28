@@ -200,10 +200,10 @@
       "Reference": "XConnectCollectionService",
       "Description": "The url for the XConnect Marketing Automation Reporting Service."
     },
-    "XConnectReportingService": {
+    "CortexReportingService": {
       "Type": "string",
-      "DefaultValue": "https://XConnect",
-      "Description": "The url for the XConnect Reporting Service."
+      "Reference": "XConnectCollectionService",
+      "Description": "The url for the Cortex Reporting Service."
     },
     "SitecoreIdentityAuthority": {
       "Type": "string",
@@ -537,8 +537,8 @@
               "Value": "[parameter('MarketingAutomationOperationsService')]"
             },
             {
-              "Name": "XConnect Reporting Client",
-              "Value": "[parameter('XConnectReportingService')]"
+              "Name": "Cortex Reporting Client",
+              "Value": "[parameter('CortexReportingService')]"
             },
             {
               "Name": "XConnect Server Certificate Validation Thumbprint",

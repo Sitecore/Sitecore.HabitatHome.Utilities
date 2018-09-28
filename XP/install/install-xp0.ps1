@@ -409,7 +409,7 @@ Function Install-Sitecore {
             EXMCryptographicKey                  = $sitecore.exmCryptographicKey
             EXMAuthenticationKey                 = $sitecore.exmAuthenticationKey
             SolrUrl                              = $solr.url
-            XConnectReportingService             = "https://$($xConnect.siteName)" 
+            CortexReportingService               = "https://$($xConnect.siteName)" 
             XConnectCollectionService            = "https://$($xConnect.siteName)"
             XConnectReferenceDataService         = "https://$($xConnect.siteName)"
             MarketingAutomationOperationsService = "https://$($xConnect.siteName)"

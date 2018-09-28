@@ -95,7 +95,9 @@
                 "Name": "[parameter('SiteName')]",
                 "Properties": {
                     "ProcessModel": {
-                        "identityType": "ApplicationPoolIdentity"
+                        "identityType": "ApplicationPoolIdentity",
+                        "idleTimeoutAction": "Suspend",
+                        "loadUserProfile": "True"
                     },
                 "ManagedRuntimeVersion": ""
                 }
