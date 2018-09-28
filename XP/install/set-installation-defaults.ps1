@@ -17,7 +17,7 @@ $assets.psRepositoryName = "SitecoreGallery"
 $assets.installerVersion = "2.0.0"
 
 $assets.licenseFilePath = Join-Path $assets.root "license.xml"
-$assets.sitecoreVersion = "9.1.0 rev. 001382"
+$assets.sitecoreVersion = "9.1.0 rev. 001442"
 $assets.identityServerVersion = "2.0.0 rev. 00146"
 
 
