@@ -18,8 +18,6 @@
             "suffix": "@@site.suffix@@",
             "webRoot": "@@site.webRoot@@",
             "hostName": "@@site.hostName@@",
-            "enableInstallationImprovements":"@@site.enableInstallationImprovements@@",
-            "disableInstallationImprovements":"@@site.disableInstallationImprovements@@",
             "configureSearchIndexes":"@@site.configureSearchIndexes@@",
             "habitatHomeSslCertificateName":"@@site.habitatHomeSslCertificateName@@",
             "addSiteBindingWithSSLPath":"@@site.addSiteBindingWithSSLPath@@"
