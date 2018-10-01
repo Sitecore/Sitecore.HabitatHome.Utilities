@@ -43,8 +43,8 @@
             "id": "defGroup",
             "name": "Data Exchange Framework",
             "isGroup": true,
-            "download": true,
-            "install": true,
+            "download": false,
+            "install": false,
             "modules": [{
                     "id": "def",
                     "name": "Data Exchange Framework",
@@ -117,8 +117,8 @@
                     "id": "defSalesforceGroup",
                     "name": "Data Exchange Framework Salesforce Modules",
                     "isGroup": true,
-                    "download": true,
-                    "install": true,
+                    "download": false,
+                    "install": false,
                     "modules": [{
                             "id": "defSalesforce",
                             "name": "Salesforce CRM Provider for Data Exchange Framework",
@@ -149,8 +149,8 @@
             "name": "Sitecore Connect for Salesforce Marketing Cloud",
             "fileName": "Sitecore Connect for Salesforce Marketing Cloud 1.0.0 rev. 180608.zip",
             "url": "https://dev.sitecore.net/~/media/2AFF0DF06BD24985B1793807D806411D.ashx",
-            "download": true,
-            "install": true,
+            "download": false,
+            "install": false,
             "convert": true,
             "source": "sitecore"
         },
@@ -159,9 +159,9 @@
             "name": "Stackla Module",
             "fileName": "Stackla-module-1.4.0-sc9.0.zip",
             "url": "https://s3-ap-southeast-2.amazonaws.com/stackla-plugin-assets/prod/sitecore/packages/Stackla-module-1.4.0-sc9.0.zip",
-            "download": true,
-            "install": true,
-            "convert": true,
+            "download": false,
+            "install": false,
+            "convert": false,
             "source": "external"
         }
 
