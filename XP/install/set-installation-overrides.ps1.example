@@ -79,4 +79,4 @@ $xConnect.siteName = $site.prefix + "_xconnect." + $site.suffix
 $xConnect.certificateName = [string]::Join(".", @($site.prefix, $site.suffix, "xConnect.Client"))
 $xConnect.siteRoot = Join-Path $site.webRoot -ChildPath $xConnect.siteName
 
-Set-Content $configurationFile  (ConvertTo-Json -InputObject $json -Depth 5)
+Set-Content $configurationFile  (ConvertTo-Json -InputObject $json -Depth 6)
