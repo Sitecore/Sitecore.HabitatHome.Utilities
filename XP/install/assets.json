@@ -86,7 +86,7 @@
                     "source": "sitecore"
                 },
                 {
-                    "id": "defDyamicsGroup",
+                    "id": "defDynamicsGroup",
                     "name": "Data Exchange Framework Dynamics Modules",
                     "isGroup": true,
                     "download": false,
