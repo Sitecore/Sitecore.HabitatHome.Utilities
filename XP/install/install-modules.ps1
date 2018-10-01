@@ -204,7 +204,7 @@ Function Install-SitecorePowerShellExtensions {
 
 Function Install-SitecoreExperienceAccelerator {
 
-   # Install SXA
+    # Install SXA
 
     $sxa = $modules | Where-Object { $_.id -eq "sxa"}
     $sxa.fileName = $sxa.fileName.replace(".zip", ".scwdp.zip")
@@ -223,11 +223,11 @@ Function Install-SitecoreExperienceAccelerator {
 }
 
 Function Install-DataExchangeFrameworkModules {
-    $defGroup = $modules | Where-Object { $_.id -eq "def"}
+    $defGroup = $modules | Where-Object { $_.id -eq "defGroup"}
     if ($false -eq $defGroup.install) {
         return;
     }
-    $defModules = ($modules | Where-Object { $_.id -eq "def"}).modules
+    $defModules = ($modules | Where-Object { $_.id -eq "defGroup"}).modules
     $def = $defModules | Where-Object { $_.id -eq "def"}
     Write-Host ("Installing {0}" -f $def.name)
     $def.fileName = $def.fileName.replace(".zip", ".scwdp.zip")
@@ -289,43 +289,85 @@ Function Install-DataExchangeFrameworkModules {
         SqlServer        = $sql.server 
 
     }
-    
     Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs") 
 
-    $defDynamics = $defModules | Where-Object { $_.id -eq "defDynamics"}
-    Write-Host ("Installing {0}" -f $defDynamics.name)
-    $defDynamics.fileName = $defDynamics.fileName.replace(".zip", ".scwdp.zip")
-    $params = @{
-        Path             = (Join-path $resourcePath 'content\Deployment\OnPrem\HabitatHome\module-master.json')
-        Package          = $defDynamics.fileName
-        SiteName         = $site.hostName
-        SqlDbPrefix      = $site.prefix 
-        SqlAdminUser     = $sql.adminUser 
-        SqlAdminPassword = $sql.adminPassword 
-        SqlServer        = $sql.server 
+    ### Dynamics
+    
+    $defDynamicsGroup = $defModules | Where-Object {$_.id -eq "defDynamicsGroup"}
+    
+    if ($true -eq $defDynamicsGroup.install) {
+        $defDynamics = $defDynamicsGroup.modules | Where-Object { $_.id -eq "defDynamics"}
+        Write-Host ("Installing {0}" -f $defDynamics.name)
+        $defDynamics.fileName = $defDynamics.fileName.replace(".zip", ".scwdp.zip")
+        $params = @{
+            Path             = (Join-path $resourcePath 'content\Deployment\OnPrem\HabitatHome\module-master.json')
+            Package          = $defDynamics.fileName
+            SiteName         = $site.hostName
+            SqlDbPrefix      = $site.prefix 
+            SqlAdminUser     = $sql.adminUser 
+            SqlAdminPassword = $sql.adminPassword 
+            SqlServer        = $sql.server 
 
+        }
+    
+        Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs") 
+    
+        $defDynamicsConnect = $defDynamicsGroup.modules | Where-Object { $_.id -eq "defDynamicsConnect"}
+        Write-Host ("Installing {0}" -f $defDynamicsConnect.name)
+        $defDynamicsConnect.fileName = $defDynamicsConnect.fileName.replace(".zip", ".scwdp.zip")
+        $params = @{
+            Path             = (Join-path $resourcePath 'content\Deployment\OnPrem\HabitatHome\module-master.json')
+            Package          = $defDynamicsConnect.fileName
+            SiteName         = $site.hostName
+            SqlDbPrefix      = $site.prefix 
+            SqlAdminUser     = $sql.adminUser 
+            SqlAdminPassword = $sql.adminPassword 
+            SqlServer        = $sql.server 
+
+        }
+        Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs") 
     }
-    
-    Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs") 
-    
-    $defDynamicsConnect = $defModules | Where-Object { $_.id -eq "defDynamicsConnect"}
-    Write-Host ("Installing {0}" -f $defDynamicsConnect.name)
-    $defDynamicsConnect.fileName = $defDynamicsConnect.fileName.replace(".zip", ".scwdp.zip")
-    $params = @{
-        Path             = (Join-path $resourcePath 'content\Deployment\OnPrem\HabitatHome\module-master.json')
-        Package          = $defDynamicsConnect.fileName
-        SiteName         = $site.hostName
-        SqlDbPrefix      = $site.prefix 
-        SqlAdminUser     = $sql.adminUser 
-        SqlAdminPassword = $sql.adminPassword 
-        SqlServer        = $sql.server 
 
+    ### Salesforce
+
+    $defSalesforceGroup = $defModules | Where-Object {$_.id -eq "defSalesforceGroup"}
+    
+    if ($true -eq $defSalesforceGroup.install) {
+
+        $defSalesforce = $defSalesforceGroup.modules | Where-Object { $_.id -eq "defSalesforce"}
+        Write-Host ("Installing {0}" -f $defSalesforce.name)
+        $defSalesforce.fileName = $defSalesforce.fileName.replace(".zip", ".scwdp.zip")
+        $params = @{
+            Path             = (Join-path $resourcePath 'content\Deployment\OnPrem\HabitatHome\module-master.json')
+            Package          = $defSalesforce.fileName
+            SiteName         = $site.hostName
+            SqlDbPrefix      = $site.prefix 
+            SqlAdminUser     = $sql.adminUser 
+            SqlAdminPassword = $sql.adminPassword 
+            SqlServer        = $sql.server 
+
+        }
+    
+        Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs") 
+    
+        $defSalesforceConnect = $defSalesforceGroup.modules | Where-Object { $_.id -eq "defSalesforceConnect"}
+        Write-Host ("Installing {0}" -f $defSalesforceConnect.name)
+        $defSalesforceConnect.fileName = $defSalesforceConnect.fileName.replace(".zip", ".scwdp.zip")
+        $params = @{
+            Path             = (Join-path $resourcePath 'content\Deployment\OnPrem\HabitatHome\module-master.json')
+            Package          = $defSalesforceConnect.fileName
+            SiteName         = $site.hostName
+            SqlDbPrefix      = $site.prefix 
+            SqlAdminUser     = $sql.adminUser 
+            SqlAdminPassword = $sql.adminPassword 
+            SqlServer        = $sql.server 
+
+        }
+        Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs") 
     }
-    
-    Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs") 
-
 }
-Function Install-SalesforceMarketingCloudModule{
+
+Function Install-SalesforceMarketingCloudModule {
     $sfmcConnect = $modules | Where-Object { $_.id -eq "sfmcConnect"}
     if ($false -eq $sfmcConnect.install) {
         return;
@@ -345,7 +387,7 @@ Function Install-SalesforceMarketingCloudModule{
     
     Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs") 
 }
-Function Install-StacklaModule{
+Function Install-StacklaModule {
     $stackla = $modules | Where-Object { $_.id -eq "stackla"}
     if ($false -eq $stackla.install) {
         return;
@@ -422,28 +464,28 @@ function Update-SXASolrCores {
         write-host "$site.habitatHomeHostName Failed to updated search index configuration" -ForegroundColor Red
         throw
     }
-     # Install SXA Solr Cores
+    # Install SXA Solr Cores
     
-     $sxaSolrConfigPath = Join-Path $resourcePath 'content\Deployment\OnPrem\HabitatHome\sxa-solr-config.json'
+    $sxaSolrConfigPath = Join-Path $resourcePath 'content\Deployment\OnPrem\HabitatHome\sxa-solr-config.json'
     
-     try {
-         $params = @{
-             Path                    = Join-path $resourcePath 'content\Deployment\OnPrem\HabitatHome\sxa-solr.json'
-             SolrUrl                 = $solr.url 
-             SolrRoot                = $solr.root 
-             SolrService             = $solr.serviceName 
-             CorePrefix              = $site.prefix
-             SXASolrConfigPath       = $sxaSolrConfigPath
-             SiteName                = $site.hostName
-             SitecoreAdminPassword   = $sitecore.adminPassword
+    try {
+        $params = @{
+            Path                  = Join-path $resourcePath 'content\Deployment\OnPrem\HabitatHome\sxa-solr.json'
+            SolrUrl               = $solr.url 
+            SolrRoot              = $solr.root 
+            SolrService           = $solr.serviceName 
+            CorePrefix            = $site.prefix
+            SXASolrConfigPath     = $sxaSolrConfigPath
+            SiteName              = $site.hostName
+            SitecoreAdminPassword = $sitecore.adminPassword
  
-         }
-         Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs")
-     }
-     catch {
-         write-host "SXA SOLR Failed" -ForegroundColor Red
-         throw
-     }
+        }
+        Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs")
+    }
+    catch {
+        write-host "SXA SOLR Failed" -ForegroundColor Red
+        throw
+    }
 }
 
 Function Start-Services {
