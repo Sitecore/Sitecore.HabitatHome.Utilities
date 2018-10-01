@@ -16,7 +16,7 @@
             "url": "https://dev.sitecore.net/~/media/97227BC40EF74028AA1BC7B8F48909A4.ashx",
             "download": true,
             "install": true,
-            "convertToWdp": false,
+            "convert": false,
             "source": "sitecore"
         },
         {
@@ -26,7 +26,7 @@
             "url": "https://marketplace.sitecore.net/services/~/media/3D2CADDAB4A34CEFB1CFD3DD86D198D5.ashx?data=Sitecore%20PowerShell%20Extensions-4.7.2%20for%20Sitecore%208&itemId=6aaea046-83af-4ef1-ab91-87f5f9c1aa57",
             "download": true,
             "install": true,
-            "convertToWdp": true,
+            "convert": true,
             "source": "sitecore"
         },
         {
@@ -36,11 +36,11 @@
             "url": "https://dev.sitecore.net/~/media/1FF242BE683E4DE989925F74B78978FC.ashx",
             "download": true,
             "install": true,
-            "convertToWdp": true,
+            "convert": true,
             "source": "sitecore"
         },
         {
-            "id": "def",
+            "id": "defGroup",
             "name": "Data Exchange Framework",
             "isGroup": true,
             "download": false,
@@ -52,7 +52,7 @@
                     "url": "https://dev.sitecore.net/~/media/C50B044E45FE4C4DA9E675CBEED3AA09.ashx",
                     "download": true,
                     "install": true,
-                    "convertToWdp": true,
+                    "convert": true,
                     "source": "sitecore"
                 },
                 {
@@ -62,7 +62,7 @@
                     "url": "https://dev.sitecore.net/~/media/D57A1FBB98ED4125B78D740E5B5F1772.ashx",
                     "download": true,
                     "install": true,
-                    "convertToWdp": true,
+                    "convert": true,
                     "source": "sitecore"
                 },
                 {
@@ -72,7 +72,7 @@
                     "url": "https://dev.sitecore.net/~/media/F243222B9A95497BAB6B591D39560E95.ashx",
                     "download": true,
                     "install": true,
-                    "convertToWdp": true,
+                    "convert": true,
                     "source": "sitecore"
                 },
                 {
@@ -82,29 +82,66 @@
                     "url": "https://dev.sitecore.net/~/media/C61F1265BB494CAFA4229FC9FC704AB0.ashx",
                     "download": true,
                     "install": true,
-                    "convertToWdp": true,
+                    "convert": true,
                     "source": "sitecore"
                 },
                 {
-                    "id": "defDynamics",
-                    "name": "Dynamics Provider Data Exchange Framework",
-                    "fileName": "Dynamics Provider for Data Exchange Framework 2.0.1 rev. 180108.zip",
-                    "url": "https://dev.sitecore.net/~/media/819FB4C75CC74A8C984C343BEF7B53F1.ashx",
-                    "download": true,
-                    "install": true,
-                    "convertToWdp": true,
-                    "source": "sitecore"
+                    "id": "defDynamicsGroup",
+                    "name": "Data Exchange Framework Dynamics Modules",
+                    "isGroup": true,
+                    "download": false,
+                    "install": false,
+                    "modules": [{
+                            "id": "defDynamics",
+                            "name": "Dynamics Provider Data Exchange Framework",
+                            "fileName": "Dynamics Provider for Data Exchange Framework 2.0.1 rev. 180108.zip",
+                            "url": "https://dev.sitecore.net/~/media/819FB4C75CC74A8C984C343BEF7B53F1.ashx",
+                            "download": true,
+                            "install": true,
+                            "convert": true,
+                            "source": "sitecore"
+                        },
+                        {
+                            "id": "defDynamicsConnect",
+                            "name": "Dynamics Connect Data Exchange Framework",
+                            "fileName": "Connect for Microsoft Dynamics 2.0.1 rev. 180108.zip",
+                            "url": "https://dev.sitecore.net/~/media/ADBAF4CC6736499EBA0EBA6A9767D825.ashx",
+                            "download": true,
+                            "install": true,
+                            "convert": true,
+                            "source": "sitecore"
+                        }
+                    ]
                 },
                 {
-                    "id": "defDynamicsConnect",
-                    "name": "Dynamics Connect Data Exchange Framework",
-                    "fileName": "Connect for Microsoft Dynamics 2.0.1 rev. 180108.zip",
-                    "url": "https://dev.sitecore.net/~/media/ADBAF4CC6736499EBA0EBA6A9767D825.ashx",
-                    "download": true,
-                    "install": true,
-                    "convertToWdp": true,
-                    "source": "sitecore"
+                    "id": "defSalesforceGroup",
+                    "name": "Data Exchange Framework Salesforce Modules",
+                    "isGroup": true,
+                    "download": false,
+                    "install": false,
+                    "modules": [{
+                            "id": "defSalesforce",
+                            "name": "Salesforce CRM Provider for Data Exchange Framework",
+                            "fileName": "Salesforce Provider for Data Exchange Framework 2.0.1 rev. 180108.zip",
+                            "url": "https://dev.sitecore.net/~/media/81FC47CC9E7544F1A0726FD74F561C42.ashx",
+                            "download": true,
+                            "install": true,
+                            "convert": true,
+                            "source": "sitecore"
+                        },
+                        {
+                            "id": "defSalesforceConnect",
+                            "name": "Connect for Salesforce",
+                            "fileName": "Connect for Salesforce 2.0.1 rev. 180108.zip",
+                            "url": "https://dev.sitecore.net/~/media/8419AEDFD65243939CF929C0A2BEC354.ashx",
+                            "download": true,
+                            "install": true,
+                            "convert": true,
+                            "source": "sitecore"
+                        }
+                    ]
                 }
+
             ]
         },
         {
@@ -114,7 +151,7 @@
             "url": "https://dev.sitecore.net/~/media/2AFF0DF06BD24985B1793807D806411D.ashx",
             "download": false,
             "install": false,
-            "convertToWdp": true,
+            "convert": true,
             "source": "sitecore"
         },
         {
@@ -124,7 +161,7 @@
             "url": "https://s3-ap-southeast-2.amazonaws.com/stackla-plugin-assets/prod/sitecore/packages/Stackla-module-1.4.0-sc9.0.zip",
             "download": false,
             "install": false,
-            "convertToWdp": true,
+            "convert": false,
             "source": "external"
         }
 

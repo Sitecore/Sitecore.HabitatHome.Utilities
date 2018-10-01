@@ -82,7 +82,7 @@ Function Download-Assets {
     if ($package.download -eq $true) {
         Write-Host ("Downloading {0}  -  if required" -f $package.name )
         
-        $destination =  $package.packagePath
+        $destination =  $package.fileName
             
         if (!(Test-Path $destination)) {
             $params = @{
@@ -102,7 +102,7 @@ Function Download-Assets {
     # Download Sitecore Azure Toolkit (used for converting modules)
     $package = $modules | Where-Object {$_.id -eq "sat"}
    
-    $destination = $package.packagePath
+    $destination = $package.fileName
    
     if (!(Test-Path $destination) -and $package.download -eq $true) {
         $params = @{
