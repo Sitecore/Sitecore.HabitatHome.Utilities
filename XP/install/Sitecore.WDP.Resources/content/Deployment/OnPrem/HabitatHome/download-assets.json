@@ -3,20 +3,20 @@
         "Credentials": {
             "Type": "PSCredential",
             "Description": "Credentials for downloading Commerce Packages."
-        },
-        "Source": {
-            "Type": "String",
-            "Description": "Source Uri for file to be downloaded"
-        },
-        "Destination": {
-            "Type": "String",
-            "Description": "Destination Full Path (including file name) where the file will be stored"
-        },
-        "ProgressBar": {
-            "Type": "Boolean",
-            "DefaultValue": false,
-            "Description": "Specifies whether the download progress bar should be displayed. Slower."
-        }
+          },
+          "Source":{
+              "Type":"String",
+              "Description":"Source Uri for file to be downloaded"
+          },
+          "Destination":{
+              "Type":"String",
+              "Description":"Destination Full Path (including file name) where the file will be stored"
+          },
+          "ProgressBar":{
+              "Type":"Boolean",
+              "Default": false,
+              "Description":"Specifies whether the download progress bar should be displayed. Slower."
+          }
     },
     "Modules": [
         "DownloadFileWithCredentials"
