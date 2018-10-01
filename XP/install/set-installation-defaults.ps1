@@ -119,72 +119,31 @@ $config = @{
     download    = $sitecore.download
     source      = $sitecore.source
 }
-
 $config = $config| ConvertTo-Json
-
 $modules += (ConvertFrom-Json -InputObject $config) 
-$json.modules = $modules
 
-Function Add-ModuleToConfig{
+Function Replace-Path {
     param(
         $module,
-        $modulesConfig,
-        $submodule = $false,
-        $parentModuleId
+        $root
     )
-    $config={}
-    $modulesPlaceholder=@()
-    if ($module.isGroup){
-        $config = [ordered]@{
-            id          = $module.id
-            name        = $module.name
-            isGroup     = $module.isGroup
-            download    = $module.download
-            install     = $module.install
-            modules     = $modulesPlaceholder
-        } 
-        $config = $config| ConvertTo-Json
-        $modulesConfig += (ConvertFrom-Json -InputObject $config) 
-
-        foreach ($submodule in $module.modules){
-          $modulesConfig =  Add-ModuleToConfig -module $submodule -modulesConfig $modulesConfig -submodule $true -parentModuleId $module.id
+    if ($module.isGroup) {
+        foreach ($module in $module.modules) {
+            Replace-Path $module $root
         }
-        return $modulesConfig
     }
     else {
-        $config = [ordered]@{
-            id          = $module.id
-            name        = $module.name
-            packagePath = Join-Path $assets.root ("packages\{0}" -f $module.fileName) 
-            url         = $module.url
-            install     = $module.install
-            download    = $module.download
-            convert     = $module.convertToWdp
-            source      = $module.source
-        } 
-        $config =  ConvertTo-Json -InputObject $config 
+        $module.fileName = (Join-Path $root ("\{0}" -f $module.fileName))    
     }
-
-    if ($submodule)
-    {
-        $parentModule = $modulesConfig |Where-Object {$_.id -eq $parentModuleId}
-        $parentModule.modules+= $config | ConvertFrom-Json
-    }
-    else
-    {
-        $modulesConfig+= (ConvertFrom-Json -InputObject $config) 
-    }
-   return $modulesConfig
-    
-
-    
 }
+
+$json.modules = $modules
 
 foreach ($module in $modulesConfig.modules) {
-   
-   $modules =  Add-ModuleToConfig -module $module -modulesConfig $modules
-   $json.modules = $modules 
+    Replace-Path $module $assets.root
 }
+$modules += $modulesConfig.modules
+$json.modules = $modules
 
 
 Write-Host ("Saving Configuration file to {0}" -f $ConfigurationFile)

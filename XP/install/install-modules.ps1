@@ -121,7 +121,7 @@ Function Process-Packages {
         }
         elseif ($true -eq $package.download -and (!($package.PSObject.Properties.name -match "isGroup") ) ) {
             Write-Host ("Downloading {0}  -  if required" -f $package.name )
-            $destination = $package.packagePath
+            $destination = $package.fileName
             if (!(Test-Path $destination)) {
                 $params = @{
                     Path        = $downloadJsonPath
@@ -187,10 +187,10 @@ Function Stop-Services {
 Function Install-SitecorePowerShellExtensions {
    
     $spe = $modules | Where-Object { $_.id -eq "spe"}
-    $spe.packagePath = $spe.packagePath.replace(".zip", ".scwdp.zip")
+    $spe.fileName = $spe.fileName.replace(".zip", ".scwdp.zip")
     $params = @{
         Path             = (Join-path $resourcePath 'content\Deployment\OnPrem\HabitatHome\module-mastercore.json')
-        Package          = $spe.packagePath
+        Package          = $spe.fileName
         SiteName         = $site.hostName
         SqlDbPrefix      = $site.prefix 
         SqlAdminUser     = $sql.adminUser 
@@ -207,10 +207,10 @@ Function Install-SitecoreExperienceAccelerator {
    # Install SXA
 
     $sxa = $modules | Where-Object { $_.id -eq "sxa"}
-    $sxa.packagePath = $sxa.packagePath.replace(".zip", ".scwdp.zip")
+    $sxa.fileName = $sxa.fileName.replace(".zip", ".scwdp.zip")
     $params = @{
         Path             = (Join-path $resourcePath 'content\Deployment\OnPrem\HabitatHome\module-mastercore.json')
-        Package          = $sxa.packagePath
+        Package          = $sxa.fileName
         SiteName         = $site.hostName
         SqlDbPrefix      = $site.prefix 
         SqlAdminUser     = $sql.adminUser 
@@ -230,10 +230,10 @@ Function Install-DataExchangeFrameworkModules {
     $defModules = ($modules | Where-Object { $_.id -eq "def"}).modules
     $def = $defModules | Where-Object { $_.id -eq "def"}
     Write-Host ("Installing {0}" -f $def.name)
-    $def.packagePath = $def.packagePath.replace(".zip", ".scwdp.zip")
+    $def.fileName = $def.fileName.replace(".zip", ".scwdp.zip")
     $params = @{
         Path             = (Join-path $resourcePath 'content\Deployment\OnPrem\HabitatHome\module-mastercore.json')
-        Package          = $def.packagePath
+        Package          = $def.fileName
         SiteName         = $site.hostName
         SqlDbPrefix      = $site.prefix 
         SqlAdminUser     = $sql.adminUser 
@@ -246,10 +246,10 @@ Function Install-DataExchangeFrameworkModules {
 
     $defSitecore = $defModules | Where-Object { $_.id -eq "defSitecore"}
     Write-Host ("Installing {0}" -f $defSitecore.name)
-    $defSitecore.packagePath = $defSitecore.packagePath.replace(".zip", ".scwdp.zip")
+    $defSitecore.fileName = $defSitecore.fileName.replace(".zip", ".scwdp.zip")
     $params = @{
         Path             = (Join-path $resourcePath 'content\Deployment\OnPrem\HabitatHome\module-master.json')
-        Package          = $defSitecore.packagePath
+        Package          = $defSitecore.fileName
         SiteName         = $site.hostName
         SqlDbPrefix      = $site.prefix 
         SqlAdminUser     = $sql.adminUser 
@@ -262,10 +262,10 @@ Function Install-DataExchangeFrameworkModules {
 
     $defSql = $defModules | Where-Object { $_.id -eq "defSql"}
     Write-Host ("Installing {0}" -f $defSql.name)
-    $defSql.packagePath = $defSql.packagePath.replace(".zip", ".scwdp.zip")
+    $defSql.fileName = $defSql.fileName.replace(".zip", ".scwdp.zip")
     $params = @{
         Path             = (Join-path $resourcePath 'content\Deployment\OnPrem\HabitatHome\module-master.json')
-        Package          = $defSql.packagePath
+        Package          = $defSql.fileName
         SiteName         = $site.hostName
         SqlDbPrefix      = $site.prefix 
         SqlAdminUser     = $sql.adminUser 
@@ -278,10 +278,10 @@ Function Install-DataExchangeFrameworkModules {
 
     $defxConnect = $defModules | Where-Object { $_.id -eq "defxConnect"}
     Write-Host ("Installing {0}" -f $defxConnect.name)
-    $defxConnect.packagePath = $defxConnect.packagePath.replace(".zip", ".scwdp.zip")
+    $defxConnect.fileName = $defxConnect.fileName.replace(".zip", ".scwdp.zip")
     $params = @{
         Path             = (Join-path $resourcePath 'content\Deployment\OnPrem\HabitatHome\module-mastercore.json')
-        Package          = $defxConnect.packagePath
+        Package          = $defxConnect.fileName
         SiteName         = $site.hostName
         SqlDbPrefix      = $site.prefix 
         SqlAdminUser     = $sql.adminUser 
@@ -294,10 +294,10 @@ Function Install-DataExchangeFrameworkModules {
 
     $defDynamics = $defModules | Where-Object { $_.id -eq "defDynamics"}
     Write-Host ("Installing {0}" -f $defDynamics.name)
-    $defDynamics.packagePath = $defDynamics.packagePath.replace(".zip", ".scwdp.zip")
+    $defDynamics.fileName = $defDynamics.fileName.replace(".zip", ".scwdp.zip")
     $params = @{
         Path             = (Join-path $resourcePath 'content\Deployment\OnPrem\HabitatHome\module-master.json')
-        Package          = $defDynamics.packagePath
+        Package          = $defDynamics.fileName
         SiteName         = $site.hostName
         SqlDbPrefix      = $site.prefix 
         SqlAdminUser     = $sql.adminUser 
@@ -310,10 +310,10 @@ Function Install-DataExchangeFrameworkModules {
     
     $defDynamicsConnect = $defModules | Where-Object { $_.id -eq "defDynamicsConnect"}
     Write-Host ("Installing {0}" -f $defDynamicsConnect.name)
-    $defDynamicsConnect.packagePath = $defDynamicsConnect.packagePath.replace(".zip", ".scwdp.zip")
+    $defDynamicsConnect.fileName = $defDynamicsConnect.fileName.replace(".zip", ".scwdp.zip")
     $params = @{
         Path             = (Join-path $resourcePath 'content\Deployment\OnPrem\HabitatHome\module-master.json')
-        Package          = $defDynamicsConnect.packagePath
+        Package          = $defDynamicsConnect.fileName
         SiteName         = $site.hostName
         SqlDbPrefix      = $site.prefix 
         SqlAdminUser     = $sql.adminUser 
@@ -331,10 +331,10 @@ Function Install-SalesforceMarketingCloudModule{
         return;
     }
 
-    $sfmcConnect.packagePath = $sfmcConnect.packagePath.replace(".zip", ".scwdp.zip")
+    $sfmcConnect.fileName = $sfmcConnect.fileName.replace(".zip", ".scwdp.zip")
     $params = @{
         Path             = (Join-path $resourcePath 'content\Deployment\OnPrem\HabitatHome\module-mastercore.json')
-        Package          = $sfmcConnect.packagePath
+        Package          = $sfmcConnect.fileName
         SiteName         = $site.hostName
         SqlDbPrefix      = $site.prefix 
         SqlAdminUser     = $sql.adminUser 
@@ -351,10 +351,10 @@ Function Install-StacklaModule{
         return;
     }
 
-    $stackla.packagePath = $stackla.packagePath.replace(".zip", ".scwdp.zip")
+    $stackla.fileName = $stackla.fileName.replace(".zip", ".scwdp.zip")
     $params = @{
         Path             = (Join-path $resourcePath 'content\Deployment\OnPrem\HabitatHome\module-mastercore.json')
-        Package          = $stackla.packagePath
+        Package          = $stackla.fileName
         SiteName         = $site.hostName
         SqlDbPrefix      = $site.prefix 
         SqlAdminUser     = $sql.adminUser 
