@@ -131,7 +131,7 @@ Function Replace-Path {
         }
     }
     else {
-        $module.fileName = (Join-Path $root ("\{0}" -f $module.fileName))    
+        $module.fileName = (Join-Path $root ("\packages\{0}" -f $module.fileName))    
     }
 }
 
