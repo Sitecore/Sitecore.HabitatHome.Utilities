@@ -14,7 +14,7 @@
           },
           "ProgressBar":{
               "Type":"Boolean",
-              "Default": false,
+              "DefaultValue": false,
               "Description":"Specifies whether the download progress bar should be displayed. Slower."
           }
     },
