@@ -1,6 +1,9 @@
 Param(
-    [string] $ConfigurationFile = ".\configuration-xp0.json"
+    [string] $ConfigurationFile = ".\configuration-xp0.json",
+    [string] $LogFolder = ".\logs\",
+    [string] $LogFileName = "install-modules.log"
 )
+
 
 $StopWatch = New-Object -TypeName System.Diagnostics.Stopwatch 
 $StopWatch.Start()
@@ -11,6 +14,15 @@ $StopWatch.Start()
 #####################################################
 $ErrorActionPreference = 'Stop'
 Set-Location $PSScriptRoot
+
+$LogFolder = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($LogFolder) 
+if (!(Test-Path $LogFolder)) {
+    New-item -ItemType Directory -Path $LogFolder
+}
+$LogFile = Join-path $LogFolder $LogFileName
+if (Test-Path $LogFile){
+    Get-Item $LogFile | Remove-Item
+}
 
 if (!(Test-Path $ConfigurationFile)) {
     Write-Host "Configuration file '$($ConfigurationFile)' not found." -ForegroundColor Red
