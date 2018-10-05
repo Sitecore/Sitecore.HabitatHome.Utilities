@@ -409,7 +409,7 @@ Function Install-Sitecore {
             EXMCryptographicKey                  = $sitecore.exmCryptographicKey
             EXMAuthenticationKey                 = $sitecore.exmAuthenticationKey
             SolrUrl                              = $solr.url
-            XConnectReportingService             = "https://$($xConnect.siteName)" 
+            CortexReportingService               = "https://$($xConnect.siteName)" 
             XConnectCollectionService            = "https://$($xConnect.siteName)"
             XConnectReferenceDataService         = "https://$($xConnect.siteName)"
             MarketingAutomationOperationsService = "https://$($xConnect.siteName)"
@@ -456,6 +456,7 @@ Function Install-IdentityServer {
         AllowedCorsOrigins   = $site.hostName
         ClientSecret         = $identityServer.clientSecret
         LicenseFile          = $assets.licenseFilePath 
+        WebRoot              = $site.webRoot
     }
     Install-SitecoreConfiguration @identityParams -Verbose   
     
