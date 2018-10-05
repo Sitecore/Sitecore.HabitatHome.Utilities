@@ -67,6 +67,8 @@ Function Install-SitecoreAzureToolkit {
 
      # Download Sitecore Azure Toolkit (used for converting modules)
      $package = $modules | Where-Object {$_.id -eq "sat"}
+
+    Set-Alias sz 'C:\Program Files\7-Zip\7z.exe'
    
      $destination = $package.fileName
     
@@ -209,6 +211,9 @@ Function Stop-Services {
 Function Install-SitecorePowerShellExtensions {
    
     $spe = $modules | Where-Object { $_.id -eq "spe"}
+    if ($false -eq $spe.install){
+	return
+    }
     $spe.fileName = $spe.fileName.replace(".zip", ".scwdp.zip")
     $params = @{
         Path             = (Join-path $resourcePath 'content\Deployment\OnPrem\HabitatHome\module-mastercore.json')
@@ -229,6 +234,9 @@ Function Install-SitecoreExperienceAccelerator {
     # Install SXA
 
     $sxa = $modules | Where-Object { $_.id -eq "sxa"}
+    if ($false -eq $sxa.install){
+	return
+    }
     $sxa.fileName = $sxa.fileName.replace(".zip", ".scwdp.zip")
     $params = @{
         Path             = (Join-path $resourcePath 'content\Deployment\OnPrem\HabitatHome\module-mastercore.json')
@@ -246,9 +254,9 @@ Function Install-SitecoreExperienceAccelerator {
 
 Function Install-DataExchangeFrameworkModules {
     $defGroup = $modules | Where-Object { $_.id -eq "defGroup"}
-    if ($false -eq $defGroup.install) {
-        return;
-    }
+    if ($true -eq $defGroup.install) {
+
+
     $defModules = ($modules | Where-Object { $_.id -eq "defGroup"}).modules
     $def = $defModules | Where-Object { $_.id -eq "def"}
     Write-Host ("Installing {0}" -f $def.name)
@@ -312,7 +320,7 @@ Function Install-DataExchangeFrameworkModules {
 
     }
     Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs") 
-
+    }
     ### Dynamics
     
     $defDynamicsGroup = $defModules | Where-Object {$_.id -eq "defDynamicsGroup"}
@@ -517,19 +525,19 @@ Function Start-Services {
    
 }
 
-Install-SitecoreInstallFramework
-Install-SitecoreAzureToolkit
-Set-ModulesPath
-Get-OptionalModules
-Remove-DatabaseUsers
-Stop-Services
-Install-SitecorePowerShellExtensions
-Install-SitecoreExperienceAccelerator
-Install-DataExchangeFrameworkModules
-Install-SalesforceMarketingCloudModule
-Install-StacklaModule
-Enable-ContainedDatabases
-Add-DatabaseUsers
+#Install-SitecoreInstallFramework
+#Install-SitecoreAzureToolkit
+#Set-ModulesPath
+#Get-OptionalModules
+#Remove-DatabaseUsers
+#Stop-Services
+#Install-SitecorePowerShellExtensions
+#Install-SitecoreExperienceAccelerator
+#Install-DataExchangeFrameworkModules
+#Install-SalesforceMarketingCloudModule
+#Install-StacklaModule
+#Enable-ContainedDatabases
+#Add-DatabaseUsers
 Start-Services
 Update-SXASolrCores
 $StopWatch.Stop()
