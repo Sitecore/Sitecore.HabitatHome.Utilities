@@ -50,7 +50,7 @@ $SqlStrongPassword = "Str0NgPA33w0rd!!" # Used for all other services
 
 $sql.server = "."
 $sql.adminUser = "sa"
-$sql.adminPassword = "Str0NgPA33w0rd!!"
+$sql.adminPassword = $SqlStrongPassword
 $sql.coreUser = $site.prefix + "coreuser"
 $sql.corePassword = $SqlStrongPassword
 $sql.masterUser = $site.prefix + "masteruser"
@@ -82,4 +82,4 @@ $xConnect.siteName = $site.prefix + "_xconnect." + $site.suffix
 $xConnect.certificateName = [string]::Join(".", @($site.prefix, $site.suffix, "xConnect.Client"))
 $xConnect.siteRoot = Join-Path $site.webRoot -ChildPath $xConnect.siteName
 
-Set-Content $configurationFile  (ConvertTo-Json -InputObject $json -Depth 5)
+Set-Content $configurationFile  (ConvertTo-Json -InputObject $json -Depth 6)

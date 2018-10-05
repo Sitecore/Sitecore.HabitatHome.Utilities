@@ -11,7 +11,6 @@ Param(
 #####################################################
 $ErrorActionPreference = 'Stop'
 Set-Location $PSScriptRoot
-
 $LogFolder = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($LogFolder) 
 if (!(Test-Path $LogFolder)) {
     New-item -ItemType Directory -Path $LogFolder
@@ -94,7 +93,7 @@ Function Download-Assets {
     if ($package.download -eq $true) {
         Write-Host ("Downloading {0}  -  if required" -f $package.name )
         
-        $destination = $package.packagePath
+        $destination =  $package.fileName
             
         if (!(Test-Path $destination)) {
             $params = @{
@@ -109,25 +108,6 @@ Function Download-Assets {
             sz x -o"$DownloadFolder" $destination  -y -aoa
         }
     }
-   
-    
-    # Download Sitecore Azure Toolkit (used for converting modules)
-    $package = $modules | Where-Object {$_.id -eq "sat"}
-   
-    $destination = $package.packagePath
-   
-    if (!(Test-Path $destination) -and $package.download -eq $true) {
-        $params = @{
-            Path        = $downloadJsonPath
-            Credentials = $credentials
-            Source      = $package.url
-            Destination = $destination
-        }
-        Install-SitecoreConfiguration  @params  *>&1 | Tee-Object $LogFile -Append 
-    }
-    if ((Test-Path $destination) -and ( $package.install -eq $true)) {
-        sz x -o"$DownloadFolder\sat" $destination  -y -aoa
-    }
 }
 Function Confirm-Prerequisites {
     #Verify SQL version
@@ -139,52 +119,13 @@ Function Confirm-Prerequisites {
         throw "Invalid SQL version. Expected SQL 2016 SP1 ($($sql.minimumVersion)) or above."
     }
 
-    #Verify Java version
-    
-    $minVersion = New-Object System.Version($assets.jreRequiredVersion)
-    $foundVersion = $FALSE
-   
-    
-    function getJavaVersions() {
-        $versions = '', 'Wow6432Node\' |
-            ForEach-Object {Get-ItemProperty -Path HKLM:\SOFTWARE\$($_)Microsoft\Windows\CurrentVersion\Uninstall\* |
-                Where-Object {($_.DisplayName -like '*Java *') -and (-not $_.SystemComponent)} |
-                Select-Object DisplayName, DisplayVersion, @{n = 'Architecture'; e = {If ($_.PSParentPath -like '*Wow6432Node*') {'x86'} Else {'x64'}}}}
-        return $versions
-    }
-    function checkJavaversion($toVersion) {
-        $versions_ = getJavaVersions
-        foreach ($version_ in $versions_) {
-            try {
-                $version = New-Object System.Version($version_.DisplayVersion)
-                
-            }
-            catch {
-                continue
-            }
-
-            if ($version.CompareTo($toVersion) -ge 0) {
-                return $TRUE
-            }
-        }
-
-        return $false
-
-    }
-    
-    $foundVersion = checkJavaversion($minversion)
-    
-    if (-not $foundVersion) {
-        throw "Invalid Java version. Expected $minVersion or above."
-    }
-
     # Verify Web Deploy
     $webDeployPath = ([IO.Path]::Combine($env:ProgramFiles, 'iis', 'Microsoft Web Deploy V3', 'msdeploy.exe'))
     if (!(Test-Path $webDeployPath)) {
         throw "Could not find WebDeploy in $webDeployPath"
     }   
 
-  
+   
     
     #Enable Contained Databases
     Write-Host "Enable contained databases" -ForegroundColor Green
@@ -297,7 +238,7 @@ Function Install-XConnect {
     #Install xConnect
     try {
         $params = @{
-            Path                                                               = $xConnect.ConfigurationPath
+             Path                                                               = $xConnect.ConfigurationPath
             Package                                                            = $xConnect.PackagePath
             LicenseFile                                                        = $assets.licenseFilePath
             SiteName                                                           = $xConnect.siteName
@@ -409,13 +350,14 @@ Function Install-Sitecore {
             EXMCryptographicKey                  = $sitecore.exmCryptographicKey
             EXMAuthenticationKey                 = $sitecore.exmAuthenticationKey
             SolrUrl                              = $solr.url
-            CortexReportingService               = "https://$($xConnect.siteName)" 
+			CortexReportingService               = "https://$($xConnect.siteName)" 
+
             XConnectCollectionService            = "https://$($xConnect.siteName)"
             XConnectReferenceDataService         = "https://$($xConnect.siteName)"
             MarketingAutomationOperationsService = "https://$($xConnect.siteName)"
             MarketingAutomationReportingService  = "https://$($xConnect.siteName)"
             TelerikEncryptionKey                 = $sitecore.telerikEncryptionKey
-            SitecoreIdentityAuthority            = $identityServer.url   
+			 SitecoreIdentityAuthority            = $identityServer.url   
             SitecoreIdentitySecret               = $identityServer.clientSecret
             WebRoot                              = $site.webRoot
         }
@@ -461,6 +403,7 @@ Function Install-IdentityServer {
     Install-SitecoreConfiguration @identityParams -Verbose   
     
 }
+
 Function Add-AppPoolMembership {
 
     #Add ApplicationPoolIdentity to performance log users to avoid Sitecore log errors (https://kb.sitecore.net/articles/404548)
@@ -478,7 +421,7 @@ Function Add-AppPoolMembership {
     }
     catch {
         Write-Host "Warning: Couldn't add IIS AppPool\$($site.hostName) to Performance Monitor Users -- user may already exist" -ForegroundColor Yellow
-    }
+     }
     try {
         Add-LocalGroupMember "Performance Monitor Users" "IIS AppPool\$($xConnect.siteName)"
         Write-Host "Added IIS AppPool\$($xConnect.siteName) to Performance Monitor Users" -ForegroundColor Green
