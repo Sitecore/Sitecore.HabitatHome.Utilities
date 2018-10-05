@@ -30,6 +30,9 @@ $sql = $config.settings.sql
 $xConnect = $config.settings.xConnect
 $resourcePath = Join-Path $PSScriptRoot "Sitecore.WDP.Resources"
 
+$downloadJsonPath = $([io.path]::combine($resourcePath, 'content', 'Deployment', 'OnPrem', 'HabitatHome', 'download-assets.json'))
+$downloadFolder = $assets.root
+$packagesFolder = (Join-Path $downloadFolder "packages")
 
 Function Install-SitecoreInstallFramework {
     #Register Assets PowerShell Repository
@@ -60,6 +63,28 @@ Function Install-SitecoreInstallFramework {
     }
 }
 
+Function Install-SitecoreAzureToolkit {
+
+     # Download Sitecore Azure Toolkit (used for converting modules)
+     $package = $modules | Where-Object {$_.id -eq "sat"}
+   
+     $destination = $package.fileName
+    
+     if (!(Test-Path $destination) -and $package.download -eq $true) {
+         $params = @{
+             Path        = $downloadJsonPath
+             Credentials = $credentials
+             Source      = $package.url
+             Destination = $destination
+         }
+         Install-SitecoreConfiguration  @params  -WorkingDirectory $(Join-Path $PWD "logs") -Verbose 
+     }
+     if ((Test-Path $destination) -and ( $package.install -eq $true)) {
+         sz x -o"$DownloadFolder\sat" $destination  -y -aoa
+     }
+     Import-Module (Join-Path $assets.root "SAT\tools\Sitecore.Cloud.CmdLets.dll") -Force
+
+}
 Function Set-ModulesPath {
     Write-Host "Setting Modules Path" -ForegroundColor Green
     $modulesPath = ( Join-Path -Path $resourcePath -ChildPath "Modules" )
@@ -72,17 +97,14 @@ Function Set-ModulesPath {
 Function Get-OptionalModules {
 
     $downloadAssets = $modules
-    $downloadFolder = $assets.root
-    $packagesFolder = (Join-Path $downloadFolder "packages")
+   
     
-    Import-Module (Join-Path $assets.root "SAT\tools\Sitecore.Cloud.CmdLets.dll") -Force
-
     if (!(Test-Path $downloadFolder)) {
         New-Item -ItemType Directory -Force -Path $downloadFolder
     }
     $credentials = Get-Credential -Message "Please provide dev.sitecore.com credentials"
 
-    $downloadJsonPath = $([io.path]::combine($resourcePath, 'content', 'Deployment', 'OnPrem', 'HabitatHome', 'download-assets.json'))
+
     # Download modules
     $args = @{
         Packages         = $downloadAssets
@@ -496,6 +518,7 @@ Function Start-Services {
 }
 
 Install-SitecoreInstallFramework
+Install-SitecoreAzureToolkit
 Set-ModulesPath
 Get-OptionalModules
 Remove-DatabaseUsers
