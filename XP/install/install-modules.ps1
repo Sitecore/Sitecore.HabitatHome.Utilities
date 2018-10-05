@@ -34,6 +34,8 @@ $downloadJsonPath = $([io.path]::combine($resourcePath, 'content', 'Deployment',
 $downloadFolder = $assets.root
 $packagesFolder = (Join-Path $downloadFolder "packages")
 
+$credentials = Get-Credential -Message "Please provide dev.sitecore.com credentials"
+
 Function Install-SitecoreInstallFramework {
     #Register Assets PowerShell Repository
     if ((Get-PSRepository | Where-Object {$_.Name -eq $assets.psRepositoryName}).count -eq 0) {
@@ -104,7 +106,7 @@ Function Get-OptionalModules {
     if (!(Test-Path $downloadFolder)) {
         New-Item -ItemType Directory -Force -Path $downloadFolder
     }
-    $credentials = Get-Credential -Message "Please provide dev.sitecore.com credentials"
+    
 
 
     # Download modules
@@ -133,7 +135,7 @@ Function Process-Packages {
             New-Item -ItemType Directory -Force -Path $packagesFolder
         }
        
-        if ($package.isGroup -and $package.download -eq $true) {
+        if ($package.isGroup) {
             $submodules = $package.modules
             $args = @{
                 Packages         = $submodules
@@ -254,10 +256,9 @@ Function Install-SitecoreExperienceAccelerator {
 
 Function Install-DataExchangeFrameworkModules {
     $defGroup = $modules | Where-Object { $_.id -eq "defGroup"}
+    $defModules = ($modules | Where-Object { $_.id -eq "defGroup"}).modules
+
     if ($true -eq $defGroup.install) {
-
-
-        $defModules = ($modules | Where-Object { $_.id -eq "defGroup"}).modules
         $def = $defModules | Where-Object { $_.id -eq "def"}
         Write-Host ("Installing {0}" -f $def.name)
         $def.fileName = $def.fileName.replace(".zip", ".scwdp.zip")
@@ -525,9 +526,9 @@ Function Start-Services {
    
 }
 
+Set-ModulesPath
 Install-SitecoreInstallFramework
 Install-SitecoreAzureToolkit
-Set-ModulesPath
 Get-OptionalModules
 Remove-DatabaseUsers
 Stop-Services
