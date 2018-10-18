@@ -82,7 +82,7 @@ Function Download-Assets {
     if ($package.download -eq $true) {
         Write-Host ("Downloading {0}  -  if required" -f $package.name )
         
-        $destination =  $package.packagePath
+        $destination =  $package.fileName
             
         if (!(Test-Path $destination)) {
             $params = @{
@@ -96,25 +96,6 @@ Function Download-Assets {
         if ((Test-Path $destination) -and ( $package.extract -eq $true)) {
             sz x -o"$DownloadFolder" $destination  -y -aoa
         }
-    }
-   
-    
-    # Download Sitecore Azure Toolkit (used for converting modules)
-    $package = $modules | Where-Object {$_.id -eq "sat"}
-   
-    $destination = $package.packagePath
-   
-    if (!(Test-Path $destination) -and $package.download -eq $true) {
-        $params = @{
-            Path        = $downloadJsonPath
-            Credentials = $credentials
-            Source      = $package.url
-            Destination = $destination
-        }
-        Install-SitecoreConfiguration  @params  -WorkingDirectory $(Join-Path $PWD "logs") -Verbose 
-    }
-    if ((Test-Path $destination) -and ( $package.install -eq $true)) {
-        sz x -o"$DownloadFolder\sat" $destination  -y -aoa
     }
 }
 Function Confirm-Prerequisites {

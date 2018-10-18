@@ -14,18 +14,21 @@
           },
           "ProgressBar":{
               "Type":"Boolean",
+              "DefaultValue": false,
               "Description":"Specifies whether the download progress bar should be displayed. Slower."
           }
     },
-    "Modules":["DownloadFileWithCredentials"],
-    "Tasks":{
-        "DownloadSitecore":{
-            "Type":"DownloadFileWithCredentials",
-            "Params":{
-                "SourceUri":"[parameter('Source')]",
-                "DestinationPath":"[parameter('Destination')]",
+    "Modules": [
+        "DownloadFileWithCredentials"
+    ],
+    "Tasks": {
+        "DownloadSitecore": {
+            "Type": "DownloadFileWithCredentials",
+            "Params": {
+                "SourceUri": "[parameter('Source')]",
+                "DestinationPath": "[parameter('Destination')]",
                 "Credentials": "[parameter('Credentials')]",
-                "ProgressBar":"[parameter('ProgressBar')]"
+                "ProgressBar": "[parameter('ProgressBar')]"
             }
         }
     }
