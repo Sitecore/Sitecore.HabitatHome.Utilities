@@ -526,8 +526,8 @@ Function Start-Services {
 }
 
 Install-SitecoreInstallFramework
-Install-SitecoreAzureToolkit
 Set-ModulesPath
+Install-SitecoreAzureToolkit
 Get-OptionalModules
 Remove-DatabaseUsers
 Stop-Services
