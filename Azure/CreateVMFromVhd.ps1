@@ -11,7 +11,8 @@ Param(
     [Parameter(Mandatory = $true)]
     [string] $sourceSnapshotSubscriptionId ,    
     [string] $deploymentName = "habitathome",
-    [string] $sourceSnapshotPrefix = "habitathome"
+    [string] $sourceSnapshotPrefix = "habitathome",
+    [switch] $DisableAutoShutdown
 )
 
 $account = Get-AzureRMContext | Select-Object Account
@@ -181,6 +182,7 @@ $VirtualMachine = Add-AzureRmVMNetworkInterface -VM $VirtualMachine -Id $nic.Id
 #Create the virtual machine with Managed Disk
 Write-Host "Creating Virtual Machine" -ForegroundColor Green
 New-AzureRmVM -VM $VirtualMachine -ResourceGroupName $resourceGroupName -Location $location
-
+if (!$DisableAutoShutdown){
 Write-Host "Enabling Auto-Shutdown" -ForegroundColor Green
 Enable-AzureRMVmAutoShutdown -SubscriptionId $subscriptionId -ResourceGroupName $resourceGroupName -VirtualMachineName $virtualMachineName -TimeZone $timeZone
+}
