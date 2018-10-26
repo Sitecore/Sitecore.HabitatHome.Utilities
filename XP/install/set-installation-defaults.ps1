@@ -16,15 +16,12 @@ $assets.psRepositoryName = "SitecoreGallery"
 $assets.installerVersion = "2.0.0"
 
 $assets.licenseFilePath = Join-Path $assets.root "license.xml"
-$assets.sitecoreVersion = "9.1.0 rev. 001442"
-$assets.identityServerVersion = "2.0.0 rev. 00146"
+
+$assets.sitecoreVersion = "9.1.0 rev. 001551"
+$assets.identityServerVersion = "2.0.0 rev. 00154"
 
 
 $assets.certificatesPath = Join-Path $assets.root "Certificates"
-$assets.jreRequiredVersion = "8.0.1710"
-$assets.dotnetMinimumVersionValue = "394802"
-$assets.dotnetMinimumVersion = "4.7.1"
-$assets.installPackagePath = Join-Path $assets.root "installpackage.aspx"
 
 # Settings
 Write-Host "Setting default 'Site' parameters"
@@ -34,9 +31,6 @@ $site.prefix = "habitathome"
 $site.suffix = "dev.local"
 $site.webroot = "C:\inetpub\wwwroot"
 $site.hostName = $json.settings.site.prefix + "." + $json.settings.site.suffix
-$site.addSiteBindingWithSSLPath = (Get-ChildItem $pwd -filter "add-new-binding-and-certificate.json" -Recurse).FullName
-$site.configureSearchIndexes = (Get-ChildItem $pwd -filter "configure-search-indexes.json" -Recurse).FullName
-$site.habitatHomeSslCertificateName = $site.prefix + "." + $site.suffix
 
 Write-Host "Setting default 'SQL' parameters"
 $sql = $json.settings.sql
@@ -90,10 +84,9 @@ Write-Host "Setting default 'Sitecore' parameters"
 # Sitecore Parameters
 $sitecore = $json.settings.sitecore
 $sitecore.solrConfigurationPath = (Get-ChildItem $pwd -filter "sitecore-solr.json" -Recurse).FullName
-$sitecore.configurationPath = (Get-ChildItem $pwd -filter "sitecore-xp0.json" -Recurse).FullName
+$sitecore.singleDeveloperConfigurationPath = (Get-ChildItem $pwd -filter "XP0-SingleDeveloper.json" -Recurse).FullName
 $sitecore.sslConfigurationPath = "$PSScriptRoot\certificates\sitecore-ssl.json"
 $sitecore.packagePath = Join-Path $assets.root $("Sitecore " + $assets.sitecoreVersion + " (OnPrem)_single.scwdp.zip")
-$sitecore.siteRoot = Join-Path $site.webRoot -ChildPath $site.hostName
 $sitecore.adminPassword = "b"
 $sitecore.exmCryptographicKey = "0x0000000000000000000000000000000000000000000000000000000000000000"
 $sitecore.exmAuthenticationKey = "0x0000000000000000000000000000000000000000000000000000000000000000"

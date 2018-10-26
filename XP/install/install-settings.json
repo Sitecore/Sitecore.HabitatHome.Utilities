@@ -5,24 +5,18 @@
     "psRepositoryName": "@@assets.psRepositoryName@@",
     "licenseFilePath": "@@assets.licenseFilePath@@",
     "certificatesPath": "@@assets.certificatePath@@",
-    "sitecoreVersion": "@@assets.sitecoreVersion@@",
-    "identityServerVersion": "@@assets.identityServerVersion@@",
-
     "installerVersion": "@@assets.installerVersion@@",
-    "jreRequiredVersion": "@@assets.jreRequiredVersion@@",
-    "dotnetMinimumVersion": "@@assets.netMinimumVersion@@",
-    "dotnetMinimumVersionValue": "@@assets.netMinimumVersionValue@@",
-    "installPackagePath": "@@assets.installPackagePath@@"
+    "sitecoreVersion": "@@assets.sitecoreVersion@@",
+    "identityServerVersion": "@@assets.identityServerVersion@@"
+
+
   },
     "settings": {
         "site": {
             "prefix": "@@site.prefix@@",
             "suffix": "@@site.suffix@@",
             "webRoot": "@@site.webRoot@@",
-            "hostName": "@@site.hostName@@",
-            "configureSearchIndexes":"@@site.configureSearchIndexes@@",
-            "habitatHomeSslCertificateName":"@@site.habitatHomeSslCertificateName@@",
-            "addSiteBindingWithSSLPath":"@@site.addSiteBindingWithSSLPath@@"
+            "hostName": "@@site.hostName@@"
         },
       "sql": {
         "server": "@@sql.server@@",
@@ -67,10 +61,10 @@
         },
       "sitecore": {
           "solrConfigurationPath": "@@sitecore.solrConfigurationPath@@",
-          "configurationPath": "@@sitecore.configurationPath@@",
+          "configurationPath": "@@sitecore.ConfigurationPath@@",
+          "singleDeveloperConfigurationPath": "@@sitecore.singleDeveloperConfigurationPath@@",
           "sslConfigurationPath": "@@sitecore.sslConfigurationPath@@",
           "packagePath": "@@sitecore.packagePath@@",
-          "siteRoot": "@@sitecore.siteRoot@@",
           "adminPassword": "@@sitecore.adminPassword@@",
           "exmCryptographicKey": "@@sitecore.exmCryptographicKey@@",
           "exmAuthenticationKey": "@@sitecore.exmAuthenticationKey@@",
