@@ -18,12 +18,11 @@
               "Description":"Specifies whether the download progress bar should be displayed. Slower."
           }
     },
-    "Modules":["DownloadFileWithCredentials"],
     "Tasks":{
         "DownloadSitecore":{
-            "Type":"DownloadFileWithCredentials",
+            "Type":"DownloadFile",
             "Params":{
-                "SourceUri":"[parameter('Source')]",
+                "SourceUrl":"[parameter('Source')]",
                 "DestinationPath":"[parameter('Destination')]",
                 "Credentials": "[parameter('Credentials')]",
                 "ProgressBar":"[parameter('ProgressBar')]"

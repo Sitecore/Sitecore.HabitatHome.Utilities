@@ -63,13 +63,15 @@ Function Install-SitecoreInstallFramework {
 
     #Sitecore Install Framework dependencies
     Import-Module WebAdministration
-
+    
     #Install SIF
-    $module = Get-Module -FullyQualifiedName @{ModuleName = "SitecoreInstallFramework"; ModuleVersion = $($assets.installerVersion -replace "-beta[0-9]*$")}
+    $sifVersion = $assets.installerVersion -replace "-beta[0-9]*$"
+    
+    $module = Get-Module -FullyQualifiedName @{ModuleName = "SitecoreInstallFramework"; ModuleVersion = $sifVersion }
     if (-not $module) {
         write-host "Installing the Sitecore Install Framework, version $($assets.installerVersion)" -ForegroundColor Green
         Install-Module SitecoreInstallFramework -RequiredVersion $assets.installerVersion -Repository $assets.psRepositoryName -Scope CurrentUser -Force -AllowPrerelease
-        Import-Module SitecoreInstallFramework -RequiredVersion $($assets.installerVersion -replace "-beta[0-9]*$")
+        Import-Module SitecoreInstallFramework -RequiredVersion $sifVersion
     }
 }
 Function Download-Assets {
@@ -214,17 +216,22 @@ Function Install-SingleDeveloper {
         SitecorePackage               = $sitecore.packagePath
         IdentityServerPackage         = $identityServer.packagePath
         XConnectSiteName              = $xConnect.siteName
-        SitecoreSitename              = $sitecore.hostName
-        PasswordRecoveryUrl           = $sitecore.hostName
+        SitecoreSitename              = $site.hostName
+        PasswordRecoveryUrl           = $site.hostName
         SitecoreIdentityAuthority     = $identityServer.name
         XConnectCollectionService     = $xConnect.siteName
         ClientSecret                  = $identityServer.clientSecret
-        AllowedCorsOrigins            = $sitecore.hostName
+        AllowedCorsOrigins            = $site.hostName
     }
 
     Push-Location $resourcePath
-
-    Install-SitecoreConfiguration @singleDeveloperParams *>&1 | Tee-Object XP0-SingleDeveloper.log
+    Try{
+        Install-SitecoreConfiguration @singleDeveloperParams   *>&1 | Tee-Object XP0-SingleDeveloper.log
+    }
+    Catch{
+        Pop-Location
+        Exit 1
+    }
     Pop-Location
 }
 Function Add-AppPoolMembership {
