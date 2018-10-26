@@ -37,7 +37,7 @@
     },
     "SqlCorePassword": {
       "Type": "string",
-      "DefaultValue": "Test12345",
+      "DefaultValue": "SIF-Default",
       "Description": "The Sql password for the Core connection string in Sitecore."
     },
     "SqlServer": {
