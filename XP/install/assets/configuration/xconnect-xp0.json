@@ -57,7 +57,7 @@
     },
     "SqlCollectionPassword": {
       "Type": "string",
-      "DefaultValue": "Test12345",
+      "DefaultValue": "SIF-Default",
       "Description": "The Sql admin password to use when installing databases."
     },
     "SqlProcessingPoolsUser": {
@@ -67,7 +67,7 @@
     },
     "SqlProcessingPoolsPassword": {
       "Type": "string",
-      "DefaultValue": "Test12345",
+      "DefaultValue": "SIF-Default",
       "Description": "The Sql password for the Processing Pools connection string in Sitecore."
     },
     "SqlReferenceDataUser": {
@@ -77,7 +77,7 @@
     },
     "SqlReferenceDataPassword": {
       "Type": "string",
-      "DefaultValue": "Test12345",
+      "DefaultValue": "SIF-Default",
       "Description": "The Sql password for the Reference Data connection string in Sitecore."
     },
     "SqlMarketingAutomationUser": {
@@ -87,7 +87,7 @@
     },
     "SqlMarketingAutomationPassword": {
       "Type": "string",
-      "DefaultValue": "Test12345",
+      "DefaultValue": "SIF-Default",
       "Description": "The Sql password for the Marketing Automation connection string in Sitecore."
     },
     "SqlMessagingUser": {
@@ -97,7 +97,7 @@
     },
     "SqlMessagingPassword": {
       "Type": "string",
-      "DefaultValue": "Test12345",
+      "DefaultValue": "SIF-Default",
       "Description": "The Sql password for the Messaging connection string in Sitecore."
     },
     "SqlProcessingEngineUser": {
@@ -107,7 +107,7 @@
     },
     "SqlProcessingEnginePassword": {
       "Type": "string",
-      "DefaultValue": "Test12345",
+      "DefaultValue": "SIF-Default",
       "Description": "The Sql password for the Processing Engine Tasks and Storage database connection strings in Sitecore."
     },
     "SqlReportingUser": {
@@ -117,7 +117,7 @@
     },
     "SqlReportingPassword": {
       "Type": "string",
-      "DefaultValue": "Test12345",
+      "DefaultValue": "SIF-Default",
       "Description": "The Sql password for the Reporting connection string in Sitecore."
     },
     "SqlServer": {
@@ -164,6 +164,16 @@
       "Type": "string",
       "DefaultValue": "",
       "Description": "The path to certificate of certification authority that issued certificates for Machine Learning Server Blob and Table storage endpoints."
+    },
+    "HostMappingName": {
+      "Type": "string",
+      "Reference": "SiteName",
+      "Description": "The host mapping name of the site."
+    },
+    "DnsName": {
+      "Type": "string",
+      "Reference": "SiteName",
+      "Description": "The dns name of the site."
     },
     "WebRoot": {
       "Type": "string",
@@ -229,8 +239,33 @@
     "Xdb.Rebuild.Name": "[concat(variable('Xdb.Name'), '_rebuild')]",
     "Solr.Url.Xdb": "[concat(parameter('SolrUrl'), '/', variable('Xdb.Name'))]",
 
-    "Solr.Config.Path": "[joinpath(variable('Site.DataFolder'), 'solrcommands', 'schema.json')]"
+    "Solr.Config.Path": "[joinpath(variable('Site.DataFolder'), 'solrcommands', 'schema.json')]",
+
+    "SqlProcessingPools.Password": "[parameter('SqlProcessingPoolsPassword'))]",
+    "SqlCollection.Password": "[parameter('SqlCollectionPassword'))]",
+    "SqlReferenceData.Password": "[parameter('SqlReferenceDataPassword'))]",
+    "SqlMarketingAutomation.Password": "[parameter('SqlMarketingAutomationPassword'))]",
+    "SqlMessaging.Password": "[parameter('SqlMessagingPassword'))]",
+    "SqlProcessingEngine.Password": "[parameter('SqlProcessingEnginePassword'))]",
+    "SqlReporting.Password": "[parameter('SqlReportingPassword'))]",
+
+    "SqlCollection.User": "[if(variable('Test.SqlCollection.User'),variable('Generate.SqlCollection.User'),parameter('SqlCollectionUser'))]",
+    "Test.SqlCollection.User": "[equal(parameter('SqlCollectionUser'),'collectionuser')]",
+    "Generate.SqlCollection.User": "[concat(parameter('SqlDbPrefix'), '_collectionuser')]",
+
+    "Sql.Secure.Password": "[ConvertToSecureString(String:parameter('SqlAdminPassword'),AsPlainText:true,Force:true)]",
+    "Sql.Credential": "[NewPSCredential(Username:parameter('SqlAdminUser'),Password:variable('SQL.Secure.Password'))]"
+
   },
+    "Register":{
+        "Tasks": {
+            "RemoveItem": "Remove-Item",
+            "RemoveSqlLogin": "Remove-SqlLogin"
+        },
+        "ConfigFunction": {
+            "ConvertToSecureString": "ConvertTo-SecureString"
+        }
+    },
     "Tasks": {
         "CreatePaths": {
             "Description": "Ensure the destination path for the site exists.",
@@ -337,7 +372,7 @@
                 "SiteName": "[parameter('SiteName')]",
                 "Add": [
                     {
-                        "HostHeader": "[parameter('SiteName')]",
+                        "HostHeader": "[parameter('DnsName')]",
                         "Protocol": "https",
                         "SSLFlags": 1,
                         "Thumbprint": "[variable('Security.SSL.CertificateThumbprint')]"
@@ -366,8 +401,9 @@
             "Description": "Sets a hostheader for the website.",
             "Type": "HostHeader",
             "Params": {
-                "HostName": "[parameter('SiteName')]"
-            }
+                "HostName": "[parameter('HostMappingName')]"
+            },
+            "Skip": "[not(parameter('HostMappingName'))]"
         },
         "SetPermissions": {
             "Description": "Sets permissions for the app pool user.",
@@ -424,20 +460,20 @@
                         { "Name": "Processing Engine Blob Storage WebApi Endpoint", "Value": "[variable('Endpoint.Processing.BlobStorage')]" },
                         { "Name": "Processing Engine Table Storage WebApi Endpoint", "Value": "[variable('Endpoint.Processing.TableStorage')]" },
                         { "Name": "Processing Engine Machine Learning Server Endpoint", "Value": "[parameter('MachineLearningServerUrl')]" },
-                        { "Name": "Collection Database Application User Name", "Value": "[parameter('SqlCollectionUser')]" },
-                        { "Name": "Collection Database Application User Password", "Value": "[parameter('SqlCollectionPassword')]" },
+                        { "Name": "Collection Database Application User Name", "Value": "[variable('SqlCollection.User')]" },
+                        { "Name": "Collection Database Application User Password", "Value": "[variable('SqlCollection.Password')]" },
                         { "Name": "Processing Pool Database Application User Name", "Value": "[parameter('SqlProcessingPoolsUser')]" },
-                        { "Name": "Processing Pool Database Application User Password", "Value": "[parameter('SqlProcessingPoolsPassword')]" },
+                        { "Name": "Processing Pool Database Application User Password", "Value": "[variable('SqlProcessingPools.Password')]" },
                         { "Name": "Reference Data Database Application User Name", "Value": "[parameter('SqlReferenceDataUser')]" },
-                        { "Name": "Reference Data Database Application User Password", "Value": "[parameter('SqlReferenceDataPassword')]" },
+                        { "Name": "Reference Data Database Application User Password", "Value": "[variable('SqlReferenceData.Password')]" },
                         { "Name": "Reporting Database Application User Name", "Value": "[parameter('SqlReportingUser')]" },
-                        { "Name": "Reporting Database Application User Password", "Value": "[parameter('SqlReportingPassword')]" },
+                        { "Name": "Reporting Database Application User Password", "Value": "[variable('SqlReporting.Password')]" },
                         { "Name": "Marketing Automation Database Application User Name", "Value": "[parameter('SqlMarketingAutomationUser')]" },
-                        { "Name": "Marketing Automation Database Application User Password", "Value": "[parameter('SqlMarketingAutomationPassword')]" },
+                        { "Name": "Marketing Automation Database Application User Password", "Value": "[variable('SqlMarketingAutomation.Password')]" },
                         { "Name": "Messaging Database Application User Name", "Value": "[parameter('SqlMessagingUser')]" },
-                        { "Name": "Messaging Database Application User Password", "Value": "[parameter('SqlMessagingPassword')]" },
+                        { "Name": "Messaging Database Application User Password", "Value": "[variable('SqlMessaging.Password')]" },
                         { "Name": "Processing Engine Database Application User Name", "Value": "[parameter('SqlProcessingEngineUser')]" },
-                        { "Name": "Processing Engine Database Application User Password", "Value": "[parameter('SqlProcessingEnginePassword')]" },
+                        { "Name": "Processing Engine Database Application User Password", "Value": "[variable('SqlProcessingEngine.Password')]" },
                         { "Name": "Machine Learning Server Blob Storage WebApi Endpoint Certificate Path", "Value": "[parameter('MachineLearningServerBlobEndpointCertificatePath')]" },
                         { "Name": "Machine Learning Server Blob Storage WebApi Endpoint Certificate Password", "Value": "[parameter('MachineLearningServerBlobEndpointCertificatePassword')]" },
                         { "Name": "Machine Learning Server Table Storage WebApi Endpoint Certificate Path", "Value": "[parameter('MachineLearningServerTableEndpointCertificatePath')]" },
@@ -459,7 +495,8 @@
             "Description": "Creates a new thumbprint with a custom CA",
             "Type": "AddWebFeatureSSL",
             "Params": {
-                "HostName": "[parameter('SiteName')]",
+                "SiteName": "[parameter('SiteName')]",
+                "HostName": "[parameter('DnsName')]",
                 "OutputDirectory": "[variable('Site.DataFolder')]"
             },
             "Skip": "[parameter('SSLCert')]"
@@ -527,9 +564,9 @@
                     "-P",
                     "[parameter('SqlAdminPassword')]",
                     "-v",
-                    "[concat('UserName=',parameter('SqlCollectionUser'))]",
+                    "[concat('UserName=',variable('SqlCollection.User'))]",
                     "-v",
-                    "[concat('Password=',parameter('SqlCollectionPassword'))]"
+                    "[concat('Password=',variable('SqlCollection.Password'))]"
                 ]
             }
         },
@@ -548,7 +585,7 @@
                     "-P",
                     "[parameter('SqlAdminPassword')]",
                     "-v",
-                    "[concat('UserName=',parameter('SqlCollectionUser'))]",
+                    "[concat('UserName=',variable('SqlCollection.User'))]",
                     "-v",
                     "[concat('ShardMapManagerDatabaseName=',variable('Sql.Database.ShardMapManager'))]"
                 ]
@@ -569,7 +606,7 @@
                     "-P",
                     "[parameter('SqlAdminPassword')]",
                     "-v",
-                    "[concat('UserName=',parameter('SqlCollectionUser'))]",
+                    "[concat('UserName=',variable('SqlCollection.User'))]",
                     "-v",
                     "[concat('ShardDatabaseName=',variable('Sql.Database.Shard0'))]"
                 ]
@@ -590,7 +627,7 @@
                     "-P",
                     "[parameter('SqlAdminPassword')]",
                     "-v",
-                    "[concat('UserName=',parameter('SqlCollectionUser'))]",
+                    "[concat('UserName=',variable('SqlCollection.User'))]",
                     "-v",
                     "[concat('ShardDatabaseName=',variable('Sql.Database.Shard1'))]"
                 ]
@@ -691,6 +728,22 @@
                 }
             ]
         },
+        "StartAppPool": {
+            "Description": "Starts the app pool.",
+            "Type": "ManageAppPool",
+            "Params": {
+                "Name": "[parameter('SiteName')]",
+                "Action": "Start"
+            }
+        },
+        "StartWebsite": {
+            "Description": "Starts the website.",
+            "Type": "ManageWebsite",
+            "Params": {
+                "Name": "[parameter('SiteName')]",
+                "Action": "Start"
+            }
+        },
         "StartServices": {
             "Description": "Starts the service.",
             "Type": "ManageService",
@@ -709,22 +762,6 @@
                 }
             ]
         },
-        "StartAppPool": {
-            "Description": "Starts the app pool.",
-            "Type": "ManageAppPool",
-            "Params": {
-                "Name": "[parameter('SiteName')]",
-                "Action": "Start"
-            }
-        },
-        "StartWebsite": {
-            "Description": "Starts the website.",
-            "Type": "ManageWebsite",
-            "Params": {
-                "Name": "[parameter('SiteName')]",
-                "Action": "Start"
-            }
-        },
         "ConfigureSolrSchemas": {
             "Description": "Applies schema to the new cores.",
             "Type": "ManageSolrSchema",
@@ -740,6 +777,119 @@
                     "ArgumentsFile": "[variable('Solr.Config.Path')]"
                 }
             ]
+        }
+    },
+    "UninstallTasks": {
+        "StopServices": {
+            "Description": "Stops the services if they are running.",
+            "Type": "ManageService",
+            "Params": [
+                {
+                    "Name": "[variable('Services.IndexWorker.Name')]",
+                    "Status": "Stopped",
+                    "PostDelay": 3000
+                },
+                {
+                    "Name": "[variable('Services.MarketingAutomationEngine.Name')]",
+                    "Status": "Stopped",
+                    "PostDelay": 3000
+                },
+                {
+                    "Name": "[variable('Services.ProcessingEngine.Name')]",
+                    "Status": "Stopped",
+                    "PostDelay": 3000
+                }
+            ]
+        },
+        "RemoveServices": {
+            "Description": "Removes the services.",
+            "Type": "RemoveService",
+            "Params": [
+                { "Name": "[variable('Services.IndexWorker.Name')]" },
+                { "Name": "[variable('Services.MarketingAutomationEngine.Name')]" },
+                { "Name": "[variable('Services.ProcessingEngine.Name')]" }
+            ]
+        },
+        "StopWebsite": {
+            "Description": "Stops the website if it is running.",
+            "Type": "ManageWebsite",
+            "Params": {
+                "Name": "[parameter('SiteName')]",
+                "Action": "Stop",
+                "ErrorAction": "SilentlyContinue"
+            }
+        },
+        "StopAppPool": {
+            "Description": "Stops the app pool if it is running.",
+            "Type": "ManageAppPool",
+            "Params": {
+                "Name": "[parameter('SiteName')]",
+                "Action": "Stop",
+                "ErrorAction": "SilentlyContinue"
+            }
+        },
+        "RemoveAppPool": {
+            "Description": "Removes the AppPool.",
+            "Type": "RemoveAppPool",
+            "Params": {
+                "Name":  "[parameter('SiteName')]"
+            }
+        },
+        "RemoveWebsite": {
+            "Description": "Removes the website.",
+            "Type": "RemoveWebsite",
+            "Params": {
+                "Name":  "[parameter('SiteName')]"
+            }
+        },
+        "RemoveContent": {
+            "Description": "Removes website content.",
+            "Type": "RemoveItem",
+            "Params": {
+                "Path": "[variable('Site.PhysicalPath')]",
+                "Recurse": true,
+                "ErrorAction": "SilentlyContinue"
+            }
+        },
+        "RemoveHostHeader": {
+            "Description": "Removes the hostheader for the website.",
+            "Type": "HostHeader",
+            "Params": {
+                "HostName": "[parameter('HostMappingName')]",
+                "Action": "Remove"
+            }
+        },
+        "RemoveDatabases": {
+            "Description": "Removes the databases.",
+            "Type": "RemoveSQLDatabase",
+            "Params": {
+                "ServerName": "[parameter('SqlServer')]",
+                "Username": "[parameter('SqlAdminUser')]",
+                "Password": "[variable('Sql.Secure.Password')]",
+                "DatabaseName": [
+                    "[variable('Sql.Database.ShardMapManager')]",
+                    "[variable('Sql.Database.Shard0')]",
+                    "[variable('Sql.Database.Shard1')]",
+                    "[variable('Sql.Database.Pools')]",
+                    "[variable('Sql.Database.MarketingAutomation')]",
+                    "[variable('Sql.Database.Messaging')]",
+                    "[variable('Sql.Database.Reference')]",
+                    "[variable('Sql.Database.Reporting')]",
+                    "[variable('Sql.Database.ProcessingEngineTasks')]",
+                    "[variable('Sql.Database.ProcessingEngineStorage')]"
+                ]
+            }
+        },
+        "Removelogin":{
+            "Description": "Removes the sqlcollectionuser login from the database server.",
+            "Type": "RemoveSQLLogin",
+            "Params": {
+                "LoginName": "[variable('SqlCollection.User')]",
+                "ServerInstance": "[parameter('SqlServer')]",
+                "Credential": "[variable('Sql.Credential')]",
+                "Force": true,
+                "ErrorAction": "SilentlyContinue"
+            }
         }
     }
 }
