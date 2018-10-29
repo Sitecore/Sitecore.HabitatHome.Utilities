@@ -180,7 +180,7 @@ Function Remove-DatabaseUsers {
     # Delete master and core database users
     Write-Host ("Removing {0}" -f $sql.coreUser) -ForegroundColor Green
     try {
-        $sqlVariables = "DatabasePrefix = $($site.hostName)", "DatabaseSuffix = Core", "UserName = $($sql.coreUser)"
+        $sqlVariables = "DatabasePrefix = $($site.prefix)", "DatabaseSuffix = Core", "UserName = $($sql.coreUser)"
         Invoke-Sqlcmd -ServerInstance $sql.server `
             -Username $sql.adminUser `
             -Password $sql.adminPassword `
@@ -191,10 +191,22 @@ Function Remove-DatabaseUsers {
         write-host ("Removing Core user failed") -ForegroundColor Red
         throw
     }
-
+    Write-Host ("Removing {0}" -f $sql.securityUser) -ForegroundColor Green
+    try {
+        $sqlVariables = "DatabasePrefix = $($site.prefix)", "DatabaseSuffix = Core", "UserName = $($sql.securityUser)"
+        Invoke-Sqlcmd -ServerInstance $sql.server `
+            -Username $sql.adminUser `
+            -Password $sql.adminPassword `
+            -InputFile "$PSScriptRoot\database\removedatabaseuser.sql" `
+            -Variable $sqlVariables
+    }
+    catch {
+        write-host ("Removing Core user failed") -ForegroundColor Red
+        throw
+    }
     Write-Host ("Removing {0}" -f $sql.masterUser) -ForegroundColor Green
     try {
-        $sqlVariables = "DatabasePrefix = $($site.hostName)", "DatabaseSuffix = Master", "UserName = $($sql.masterUser)"
+        $sqlVariables = "DatabasePrefix = $($site.prefix)", "DatabaseSuffix = Master", "UserName = $($sql.masterUser)"
         Invoke-Sqlcmd -ServerInstance $sql.server `
             -Username $sql.adminUser `
             -Password $sql.adminPassword `
@@ -478,6 +490,20 @@ Function Add-DatabaseUsers {
         write-host "Set Collection User rights failed" -ForegroundColor Red
         throw
     }
+    
+    Write-Host ("Adding {0}" -f $sql.securityuser) -ForegroundColor Green
+    try {
+        $sqlVariables = "DatabasePrefix = $($site.prefix)", "DatabaseSuffix = Core", "UserName = $($sql.securityUser)", "Password = $($sql.securityPassword)"
+        Invoke-Sqlcmd -ServerInstance $sql.server `
+            -Username $sql.adminUser `
+            -Password $sql.adminPassword `
+            -InputFile "$PSScriptRoot\database\addcoredatabaseuser.sql" `
+            -Variable $sqlVariables
+    }
+    catch {
+        write-host "Set Collection User rights failed" -ForegroundColor Red
+        throw
+    }
     Write-Host ("Adding {0}" -f $sql.masterUser) -ForegroundColor Green
     try {
         $sqlVariables = "DatabasePrefix = $($site.prefix)", "DatabaseSuffix = Master", "UserName = $($sql.masterUser)", "Password = $($sql.masterPassword)"
@@ -495,15 +521,15 @@ Function Add-DatabaseUsers {
 function Update-SXASolrCores {
     try {
         $params = @{
-            Path        = $site.configureSearchIndexes 
-            InstallDir  = $sitecore.siteRoot 
-            ResourceDir = $($assets.root + "\\Sitecore.WDP.Resources")
+            Path        = Join-Path $resourcePath "HabitatHome\configure-search-indexes.json"
+            InstallDir  = Join-Path $site.webRoot $site.hostName
+            ResourceDir = $($assets.root + "\\configuration")
             SitePrefix  = $site.prefix
         }
         Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs")
     }
     catch {
-        write-host "$site.habitatHomeHostName Failed to updated search index configuration" -ForegroundColor Red
+        write-host "$site.hostName Failed to updated search index configuration" -ForegroundColor Red
         throw
     }
     # Install SXA Solr Cores
@@ -534,6 +560,7 @@ Function Start-Services {
     IISRESET /START
     Start-Service "$($xConnect.siteName)-MarketingAutomationService"
     Start-Service "$($xConnect.siteName)-IndexWorker"
+    Start-Service "$($xConnect.siteName)-ProcessingEngineService"
    
 }
 
