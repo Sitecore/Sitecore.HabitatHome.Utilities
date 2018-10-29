@@ -199,29 +199,42 @@ Function Confirm-Prerequisites {
 }
 Function Install-SingleDeveloper {
     $singleDeveloperParams = @{
-        Path                          = $sitecore.singleDeveloperConfigurationPath
-        SqlServer                     = $sql.server
-        SqlAdminUser                  = $sql.adminUser
-        SqlAdminPassword              = $sql.adminPassword
-        SitecoreAdminPassword         = $sitecore.adminPassword
-        SolrUrl                       = $solr.url
-        SolrRoot                      = $solr.root
-        SolrService                   = $solr.serviceName
-        Prefix                        = $site.hostName
-        XConnectCertificateName       = $xconnect.siteName
-        IdentityServerCertificateName = $identityServer.name
-        IdentityServerSiteName        = $identityServer.name
-        LicenseFile                   = $assets.licenseFilePath
-        XConnectPackage               = $xConnect.packagePath
-        SitecorePackage               = $sitecore.packagePath
-        IdentityServerPackage         = $identityServer.packagePath
-        XConnectSiteName              = $xConnect.siteName
-        SitecoreSitename              = $site.hostName
-        PasswordRecoveryUrl           = "https://" + $site.hostName
-        SitecoreIdentityAuthority     = "https://" + $identityServer.name
-        XConnectCollectionService     = "https://" + $xConnect.siteName
-        ClientSecret                  = $identityServer.clientSecret
-        AllowedCorsOrigins            = "https://" + $site.hostName
+        Path                            = $sitecore.singleDeveloperConfigurationPath
+        SqlServer                       = $sql.server
+        SqlAdminUser                    = $sql.adminUser
+        SqlAdminPassword                = $sql.adminPassword
+        SqlCollectionPassword           = $sql.collectionPassword
+        SqlReferenceDataPassword        = $sql.referenceDataPassword
+        SqlMarketingAutomationPassword  = $sql.marketingAutomationPassword
+        SqlMessagingPassword            = $sql.messagingPassword
+        SqlProcessingEnginePassword     = $sql.processingEnginePassword
+        SqlReportingPassword            = $sql.reportingPassword
+        SqlCorePassword                 = $sql.corePassword
+        SqlSecurityPassword             = $sql.securityPassword
+        SqlMasterPassword               = $sql.masterPassword
+        SqlWebPassword                  = $sql.webPassword
+        SqlProcessingTasksPassword      = $sql.processingTasksPassword
+        SqlFormsPassword                = $sql.formsPassword
+        SqlExmMasterPassword            = $sql.exmMasterPassword
+        SitecoreAdminPassword           = $sitecore.adminPassword
+        SolrUrl                         = $solr.url
+        SolrRoot                        = $solr.root
+        SolrService                     = $solr.serviceName
+        Prefix                          = $site.prefix
+        XConnectCertificateName         = $xconnect.siteName
+        IdentityServerCertificateName   = $identityServer.name
+        IdentityServerSiteName          = $identityServer.name
+        LicenseFile                     = $assets.licenseFilePath
+        XConnectPackage                 = $xConnect.packagePath
+        SitecorePackage                 = $sitecore.packagePath
+        IdentityServerPackage           = $identityServer.packagePath
+        XConnectSiteName                = $xConnect.siteName
+        SitecoreSitename                = $site.hostName
+        PasswordRecoveryUrl             = "https://" + $site.hostName
+        SitecoreIdentityAuthority       = "https://" + $identityServer.name
+        XConnectCollectionService       = "https://" + $xConnect.siteName
+        ClientSecret                    = $identityServer.clientSecret
+        AllowedCorsOrigins              = "https://" + $site.hostName
     }
 
     Push-Location $resourcePath
