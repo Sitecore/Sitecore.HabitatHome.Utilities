@@ -217,11 +217,11 @@ Function Install-SingleDeveloper {
         IdentityServerPackage         = $identityServer.packagePath
         XConnectSiteName              = $xConnect.siteName
         SitecoreSitename              = $site.hostName
-        PasswordRecoveryUrl           = $site.hostName
-        SitecoreIdentityAuthority     = $identityServer.name
-        XConnectCollectionService     = $xConnect.siteName
+        PasswordRecoveryUrl           = "https://" + $site.hostName
+        SitecoreIdentityAuthority     = "https://" + $identityServer.name
+        XConnectCollectionService     = "https://" + $xConnect.siteName
         ClientSecret                  = $identityServer.clientSecret
-        AllowedCorsOrigins            = $site.hostName
+        AllowedCorsOrigins            = "https://" + $site.hostName
     }
 
     Push-Location $resourcePath

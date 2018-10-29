@@ -22,10 +22,9 @@
         "DownloadSitecore":{
             "Type":"DownloadFile",
             "Params":{
-                "SourceUrl":"[parameter('Source')]",
+                "SourceUri":"[parameter('Source')]",
                 "DestinationPath":"[parameter('Destination')]",
-                "Credentials": "[parameter('Credentials')]",
-                "ProgressBar":"[parameter('ProgressBar')]"
+                "Credentials": "[parameter('Credentials')]"
             }
         }
     }
