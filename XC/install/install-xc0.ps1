@@ -1,5 +1,6 @@
 Param(
-    [string] $ConfigurationFile = '.\configuration-xc0.json'
+    [string] $ConfigurationFile = '.\configuration-xc0.json',
+    [switch] $Blank
 )
 
 #####################################################
@@ -347,8 +348,11 @@ Function Install-Commerce {
         }
         SitecoreIdentityServerName                  = $commerce.identityServerName
     }
-
-    Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs")
+    If (!$Blank){
+        Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs")
+    } Else {
+        Install-SitecoreConfiguration @params -Skip "InitializeCommerceEngine","GenerateCatalogTemplates","InstallHabitatImagesModule","Reindex" -WorkingDirectory $(Join-Path $PWD "logs")
+    }
 }
 
 
