@@ -16,15 +16,12 @@ $assets.psRepositoryName = "SitecoreGallery"
 $assets.installerVersion = "2.0.0"
 
 $assets.licenseFilePath = Join-Path $assets.root "license.xml"
-$assets.sitecoreVersion = "9.1.0 rev. 001442"
-$assets.identityServerVersion = "2.0.0 rev. 00146"
+
+$assets.sitecoreVersion = "9.1.0 rev. 001551"
+$assets.identityServerVersion = "2.0.0 rev. 00154"
 
 
 $assets.certificatesPath = Join-Path $assets.root "Certificates"
-$assets.jreRequiredVersion = "8.0.1710"
-$assets.dotnetMinimumVersionValue = "394802"
-$assets.dotnetMinimumVersion = "4.7.1"
-$assets.installPackagePath = Join-Path $assets.root "installpackage.aspx"
 
 # Settings
 Write-Host "Setting default 'Site' parameters"
@@ -34,9 +31,6 @@ $site.prefix = "habitathome"
 $site.suffix = "dev.local"
 $site.webroot = "C:\inetpub\wwwroot"
 $site.hostName = $json.settings.site.prefix + "." + $json.settings.site.suffix
-$site.addSiteBindingWithSSLPath = (Get-ChildItem $pwd -filter "add-new-binding-and-certificate.json" -Recurse).FullName
-$site.configureSearchIndexes = (Get-ChildItem $pwd -filter "configure-search-indexes.json" -Recurse).FullName
-$site.habitatHomeSslCertificateName = $site.prefix + "." + $site.suffix
 
 Write-Host "Setting default 'SQL' parameters"
 $sql = $json.settings.sql
@@ -47,32 +41,35 @@ $SqlStrongPassword = "Str0NgPA33w0rd!!" # Used for all other services
 $sql.server = "."
 $sql.adminUser = "sa"
 $sql.adminPassword = "Str0NgPA33w0rd!!"
-$sql.coreUser = $site.prefix + "coreuser"
+$sql.userPassword = $SqlStrongPassword
+$sql.coreUser =  "coreuser"
 $sql.corePassword = $SqlStrongPassword
-$sql.masterUser = $site.prefix + "masteruser"
+$sql.masterUser =  "masteruser"
 $sql.masterPassword = $SqlStrongPassword
-$sql.webUser = $site.prefix + "webuser"
+$sql.webUser =  "webuser"
 $sql.webPassword = $SqlStrongPassword
-$sql.collectionUser = $site.prefix + "collectionuser"
+$sql.collectionUser =  "collectionuser"
 $sql.collectionPassword = $SqlStrongPassword
-$sql.reportingUser = $site.prefix + "reportinguser"
+$sql.reportingUser =  "reportinguser"
 $sql.reportingPassword = $SqlStrongPassword
-$sql.processingPoolsUser = $site.prefix + "poolsuser"
+$sql.processingPoolsUser =  "poolsuser"
 $sql.processingPoolsPassword = $SqlStrongPassword
-$sql.processingEngineUser = $site.prefix + "processingengineuser"
+$sql.processingEngineUser =  "processingengineuser"
 $sql.processingEnginePassword = $SqlStrongPassword
-$sql.processingTasksUser = $site.prefix + "tasksuser"
+$sql.processingTasksUser =  "tasksuser"
 $sql.processingTasksPassword = $SqlStrongPassword
-$sql.referenceDataUser = $site.prefix + "referencedatauser"
+$sql.referenceDataUser =  "referencedatauser"
 $sql.referenceDataPassword = $SqlStrongPassword
-$sql.marketingAutomationUser = $site.prefix + "marketingautomationuser"
+$sql.marketingAutomationUser =  "marketingautomationuser"
 $sql.marketingAutomationPassword = $SqlStrongPassword
-$sql.formsUser = $site.prefix + "formsuser"
+$sql.formsUser =  "formsuser"
 $sql.formsPassword = $SqlStrongPassword
-$sql.exmMasterUser = $site.prefix + "exmmasteruser"
+$sql.exmMasterUser =  "exmmasteruser"
 $sql.exmMasterPassword = $SqlStrongPassword
-$sql.messagingUser = $site.prefix + "messaginguser"
+$sql.messagingUser =  "messaginguser"
 $sql.messagingPassword = $SqlStrongPassword
+$sql.securityuser =  "securityuser"
+$sql.securityPassword = $SqlStrongPassword
 $sql.minimumVersion = "13.0.4001"
 
 Write-Host "Setting default 'xConnect' parameters"
@@ -90,10 +87,9 @@ Write-Host "Setting default 'Sitecore' parameters"
 # Sitecore Parameters
 $sitecore = $json.settings.sitecore
 $sitecore.solrConfigurationPath = (Get-ChildItem $pwd -filter "sitecore-solr.json" -Recurse).FullName
-$sitecore.configurationPath = (Get-ChildItem $pwd -filter "sitecore-xp0.json" -Recurse).FullName
+$sitecore.singleDeveloperConfigurationPath = (Get-ChildItem $pwd -filter "XP0-SingleDeveloper.json" -Recurse).FullName
 $sitecore.sslConfigurationPath = "$PSScriptRoot\certificates\sitecore-ssl.json"
 $sitecore.packagePath = Join-Path $assets.root $("Sitecore " + $assets.sitecoreVersion + " (OnPrem)_single.scwdp.zip")
-$sitecore.siteRoot = Join-Path $site.webRoot -ChildPath $site.hostName
 $sitecore.adminPassword = "b"
 $sitecore.exmCryptographicKey = "0x0000000000000000000000000000000000000000000000000000000000000000"
 $sitecore.exmAuthenticationKey = "0x0000000000000000000000000000000000000000000000000000000000000000"

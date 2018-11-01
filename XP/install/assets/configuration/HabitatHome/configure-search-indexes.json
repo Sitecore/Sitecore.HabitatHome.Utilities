@@ -18,7 +18,6 @@
         "SolrSearchMasterIndexCoreNameXpath": "//configuration/sitecore/contentSearch/configuration/indexes/index[@id='sitecore_sxa_master_index']/param[@desc='core']",
         "SolrSearchWebIndexCoreNameXpath": "//configuration/sitecore/contentSearch/configuration/indexes/index[@id='sitecore_sxa_web_index']/param[@desc='core']"
     },
-	"Modules": ["SitecoreUtilityTasks"],
     "Tasks": {
 
         "UpdateMasterSXAIndex": {

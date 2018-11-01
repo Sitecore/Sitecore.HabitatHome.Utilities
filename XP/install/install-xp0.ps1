@@ -16,7 +16,7 @@ if (!(Test-Path $LogFolder)) {
     New-item -ItemType Directory -Path $LogFolder
 }
 $LogFile = Join-path $LogFolder $LogFileName
-if (Test-Path $LogFile){
+if (Test-Path $LogFile) {
     Get-Item $LogFile | Remove-Item
 }
 
@@ -93,7 +93,7 @@ Function Download-Assets {
     if ($package.download -eq $true) {
         Write-Host ("Downloading {0}  -  if required" -f $package.name )
         
-        $destination =  $package.fileName
+        $destination = $package.fileName
             
         if (!(Test-Path $destination)) {
             $params = @{
@@ -238,7 +238,7 @@ Function Install-XConnect {
     #Install xConnect
     try {
         $params = @{
-             Path                                                               = $xConnect.ConfigurationPath
+            Path                                                               = $xConnect.ConfigurationPath
             Package                                                            = $xConnect.PackagePath
             LicenseFile                                                        = $assets.licenseFilePath
             SiteName                                                           = $xConnect.siteName
@@ -350,14 +350,13 @@ Function Install-Sitecore {
             EXMCryptographicKey                  = $sitecore.exmCryptographicKey
             EXMAuthenticationKey                 = $sitecore.exmAuthenticationKey
             SolrUrl                              = $solr.url
-			CortexReportingService               = "https://$($xConnect.siteName)" 
-
+            CortexReportingService               = "https://$($xConnect.siteName)" 
             XConnectCollectionService            = "https://$($xConnect.siteName)"
             XConnectReferenceDataService         = "https://$($xConnect.siteName)"
             MarketingAutomationOperationsService = "https://$($xConnect.siteName)"
             MarketingAutomationReportingService  = "https://$($xConnect.siteName)"
             TelerikEncryptionKey                 = $sitecore.telerikEncryptionKey
-			 SitecoreIdentityAuthority            = $identityServer.url   
+            SitecoreIdentityAuthority            = $identityServer.url   
             SitecoreIdentitySecret               = $identityServer.clientSecret
             WebRoot                              = $site.webRoot
         }
@@ -421,7 +420,7 @@ Function Add-AppPoolMembership {
     }
     catch {
         Write-Host "Warning: Couldn't add IIS AppPool\$($site.hostName) to Performance Monitor Users -- user may already exist" -ForegroundColor Yellow
-     }
+    }
     try {
         Add-LocalGroupMember "Performance Monitor Users" "IIS AppPool\$($xConnect.siteName)"
         Write-Host "Added IIS AppPool\$($xConnect.siteName) to Performance Monitor Users" -ForegroundColor Green
