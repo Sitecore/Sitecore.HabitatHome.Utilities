@@ -29,7 +29,7 @@ if (!$config) {
 #    Import-Module Carbon
 #}
 
-$engineSites = @("CommerceAuthoring_{0}:5000", "CommerceMinions_{0}:5010", "CommerceOps_{0}:5015", "CommerceShops_{0}:5005", "SitecoreBizFx:4200", "SitecoreIdentityServer:5050")
+$engineSites = @("CommerceAuthoring_{0}:5000", "CommerceMinions_{0}:5010", "CommerceOps_{0}:5015", "CommerceShops_{0}:5005", "SitecoreBizFx_{0}:4200", "SitecoreIdentityServer_{0}:5050")
 
 $site = $config.settings.site
 $assets = $config.assets
