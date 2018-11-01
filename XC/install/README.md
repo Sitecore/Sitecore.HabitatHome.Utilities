@@ -38,15 +38,15 @@ Still in an elevated PowerShell session
 
 Once the above files have been downloaded, these are **_2 options_** to install the Sitecore Experience Commerce
 
-- If you plan to install the **Sitecore.HabitatHome.Commerce** later, just execute the script (without parameter)
+- If you plan on installing Habitat Home Demo (**Sitecore.HabitatHome.Commerce**), execute the script without parameter
 
     ```powershell
     .\install-xc0.ps1
     ```
-- Otherwise, you plan to install the fresh Sitecore Experience Commerce without **HabitatAuthoring** has been bootstrapped. Just simply append `-SkipInstallHabitatAuthoring` as below
+- If you simply want a fresh instance of Sitecore Experience Commerce without the pre-loaded demo assets, simply append `-SkipHabitatHomeInstall` as below
   
     ```powershell
-    .\install-xc0.ps1 -SkipInstallHabitatAuthoring
+    .\install-xc0.ps1 -SkipHabitatHomeInstall
     ```
 
 ## Troubleshooting
