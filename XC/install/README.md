@@ -38,7 +38,7 @@ Still in an elevated PowerShell session
 
 Once the above files have been downloaded, these are **_2 options_** to install the Sitecore Experience Commerce
 
-- If you plan on installing Habitat Home Demo (**Sitecore.HabitatHome.Commerce**), execute the script without parameter
+- If you plan on installing the Habitat Home Demo (**Sitecore.HabitatHome.Commerce**), execute the script without parameter
 
     ```powershell
     .\install-xc0.ps1
