@@ -1,7 +1,7 @@
 Param(
     [string] $hostName = "my.hostname",
     [string]$CertificateName = "my.hostname",
-    [string[]]$sites = @("CommerceAuthoring_habitathome:5000", "CommerceMinions_habitathome:5010", "CommerceOps_habitathome:5015", "CommerceShops_habitathome:5020", "SitecoreBizFx:4200", "SitecoreIdentityServer:5050")
+    [string[]]$sites = @("CommerceAuthoring_habitathome:5000", "CommerceMinions_habitathome:5010", "CommerceOps_habitathome:5015", "CommerceShops_habitathome:5005", "SitecoreBizFx_habitathome:4200", "SitecoreIdentityServer_habitathome:5050")
 )
 
 Set-Location (Resolve-Path "..\..\XP\Install")
