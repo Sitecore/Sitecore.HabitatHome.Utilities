@@ -16,7 +16,7 @@ $json = Get-Content -Raw $configurationFile |  ConvertFrom-Json
 $assets = $json.assets
 $assets.psRepository = "http://nuget1ca2/nuget/Sitecore_Gallery"
 $assets.psRepositoryName = "SitecoreGallery_Internal"
-$assets.installerVersion = "2.0.0-beta0263"
+$assets.installerVersion = "2.0.0-beta0325"
 $assets.licenseFilePath = Join-Path $assets.root "license.xml"
 
 # Settings
@@ -27,11 +27,9 @@ $site.prefix = "habitathome"
 $site.suffix = "dev.local"
 $site.webroot = "C:\inetpub\wwwroot"
 $site.hostName = $json.settings.site.prefix + "." + $json.settings.site.suffix
-$site.habitatHomeSslCertificateName = $site.hostName
 
 # Sitecore Parameters
 $sitecore = $json.settings.sitecore
-$sitecore.siteRoot = Join-Path $site.webRoot -ChildPath $site.hostName
 $sitecore.adminPassword = "b"
 $sitecore.exmCryptographicKey = "0x0000000000000000000000000000000000000000000000000000000000000000"
 $sitecore.exmAuthenticationKey = "0x0000000000000000000000000000000000000000000000000000000000000000"
@@ -51,31 +49,33 @@ $SqlStrongPassword = "Str0NgPA33w0rd!!" # Used for all other services
 $sql.server = "."
 $sql.adminUser = "sa"
 $sql.adminPassword = $SqlStrongPassword
-$sql.coreUser = $site.prefix + "coreuser"
+$sql.userPassword = $SqlStrongPassword
+$sql.coreUser =  "coreuser"
 $sql.corePassword = $SqlStrongPassword
-$sql.masterUser = $site.prefix + "masteruser"
+$sql.masterUser =  "masteruser"
 $sql.masterPassword = $SqlStrongPassword
-$sql.webUser = $site.prefix + "webuser"
+$sql.webUser =  "webuser"
 $sql.webPassword = $SqlStrongPassword
-$sql.collectionUser = $site.prefix + "collectionuser"
+$sql.collectionUser =  "collectionuser"
 $sql.collectionPassword = $SqlStrongPassword
-$sql.reportingUser = $site.prefix + "reportinguser"
+$sql.reportingUser =  "reportinguser"
 $sql.reportingPassword = $SqlStrongPassword
-$sql.processingPoolsUser = $site.prefix + "poolsuser"
+$sql.processingPoolsUser =  "poolsuser"
 $sql.processingPoolsPassword = $SqlStrongPassword
-$sql.processingTasksUser = $site.prefix + "tasksuser"
+$sql.processingTasksUser =  "tasksuser"
 $sql.processingTasksPassword = $SqlStrongPassword
-$sql.referenceDataUser = $site.prefix + "referencedatauser"
+$sql.referenceDataUser =  "referencedatauser"
 $sql.referenceDataPassword = $SqlStrongPassword
-$sql.marketingAutomationUser = $site.prefix + "marketingautomationuser"
+$sql.marketingAutomationUser =  "marketingautomationuser"
 $sql.marketingAutomationPassword = $SqlStrongPassword
-$sql.formsUser = $site.prefix + "formsuser"
+$sql.formsUser =  "formsuser"
 $sql.formsPassword = $SqlStrongPassword
-$sql.exmMasterUser = $site.prefix + "exmmasteruser"
+$sql.exmMasterUser =  "exmmasteruser"
 $sql.exmMasterPassword = $SqlStrongPassword
-$sql.messagingUser = $site.prefix + "messaginguser"
+$sql.messagingUser =  "messaginguser"
 $sql.messagingPassword = $SqlStrongPassword
-
+$sql.securityuser =  "securityuser"
+$sql.securityPassword = $SqlStrongPassword
 # XConnect Parameters
 $xConnect = $json.settings.xConnect
 $xConnect.siteName = $site.prefix + "_xconnect." + $site.suffix

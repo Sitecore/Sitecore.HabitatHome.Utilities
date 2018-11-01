@@ -5,29 +5,24 @@
     "psRepositoryName": "@@assets.psRepositoryName@@",
     "licenseFilePath": "@@assets.licenseFilePath@@",
     "certificatesPath": "@@assets.certificatePath@@",
-    "sitecoreVersion": "@@assets.sitecoreVersion@@",
-    "identityServerVersion": "@@assets.identityServerVersion@@",
-
     "installerVersion": "@@assets.installerVersion@@",
-    "jreRequiredVersion": "@@assets.jreRequiredVersion@@",
-    "dotnetMinimumVersion": "@@assets.netMinimumVersion@@",
-    "dotnetMinimumVersionValue": "@@assets.netMinimumVersionValue@@",
-    "installPackagePath": "@@assets.installPackagePath@@"
+    "sitecoreVersion": "@@assets.sitecoreVersion@@",
+    "identityServerVersion": "@@assets.identityServerVersion@@"
+
+
   },
     "settings": {
         "site": {
             "prefix": "@@site.prefix@@",
             "suffix": "@@site.suffix@@",
             "webRoot": "@@site.webRoot@@",
-            "hostName": "@@site.hostName@@",
-            "configureSearchIndexes":"@@site.configureSearchIndexes@@",
-            "habitatHomeSslCertificateName":"@@site.habitatHomeSslCertificateName@@",
-            "addSiteBindingWithSSLPath":"@@site.addSiteBindingWithSSLPath@@"
+            "hostName": "@@site.hostName@@"
         },
       "sql": {
         "server": "@@sql.server@@",
         "adminUser": "@@sql.adminUser@@",
         "adminPassword": "@@sql.adminPassword@@",
+        "userPassword": "@@sql.userPassword@@",
         "coreUser": "@@sql.coreUser@@",
         "corePassword": "@@sql.corePassword@@",
         "masterUser": "@@sql.masterUser@@",
@@ -46,6 +41,8 @@
         "processingTasksPassword": "@@sql.processingTasksPassword@@",
         "referenceDataUser": "@@sql.referenceDataUser@@",
         "referenceDataPassword": "@@sql.referenceDataPassword@@",
+        "securityUser": "@@sql.referenceDataUser@@",
+        "securityPassword": "@@sql.referenceDataPassword@@",
         "marketingAutomationUser": "@@sql.marketingAutomationUser@@",
         "marketingAutomationPassword": "@@sql.marketingAutomationPassword@@",
         "formsUser": "@@sql.formsUser@@",
@@ -67,10 +64,10 @@
         },
       "sitecore": {
           "solrConfigurationPath": "@@sitecore.solrConfigurationPath@@",
-          "configurationPath": "@@sitecore.configurationPath@@",
+          "configurationPath": "@@sitecore.ConfigurationPath@@",
+          "singleDeveloperConfigurationPath": "@@sitecore.singleDeveloperConfigurationPath@@",
           "sslConfigurationPath": "@@sitecore.sslConfigurationPath@@",
           "packagePath": "@@sitecore.packagePath@@",
-          "siteRoot": "@@sitecore.siteRoot@@",
           "adminPassword": "@@sitecore.adminPassword@@",
           "exmCryptographicKey": "@@sitecore.exmCryptographicKey@@",
           "exmAuthenticationKey": "@@sitecore.exmAuthenticationKey@@",
