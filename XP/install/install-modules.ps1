@@ -108,14 +108,10 @@ Function Install-SitecoreAzureToolkit {
 Function Get-OptionalModules {
 
     $downloadAssets = $modules
-   
-    
     if (!(Test-Path $downloadFolder)) {
         New-Item -ItemType Directory -Force -Path $downloadFolder
     }
-    
-
-
+  
     # Download modules
     $args = @{
         Packages         = $downloadAssets
@@ -167,13 +163,13 @@ Function Process-Packages {
                 }
                 Install-SitecoreConfiguration  @params -WorkingDirectory $(Join-Path $PWD "logs")  
             }
+            Write-Host $package
             if ($package.convert) {
                 Write-Host ("Converting {0} to SCWDP" -f $package.name) -ForegroundColor Green
                 ConvertTo-SCModuleWebDeployPackage  -Path $destination -Destination $PackagesFolder -Force
             }
         }
     }
-
 }
 
 Function Remove-DatabaseUsers {
@@ -239,7 +235,7 @@ Function Install-SitecorePowerShellExtensions {
     if ($false -eq $spe.install) {
         return
     }
-    $spe.fileName = $spe.fileName.replace(".zip", ".scwdp.zip")
+    #$spe.fileName = $spe.fileName.replace(".zip", ".scwdp.zip")
     $params = @{
         Path             = (Join-path $resourcePath 'HabitatHome\module-mastercore.json')
         Package          = $spe.fileName
@@ -262,7 +258,7 @@ Function Install-SitecoreExperienceAccelerator {
     if ($false -eq $sxa.install) {
         return
     }
-    $sxa.fileName = $sxa.fileName.replace(".zip", ".scwdp.zip")
+   # $sxa.fileName = $sxa.fileName.replace(".zip", ".scwdp.zip")
     $params = @{
         Path             = (Join-path $resourcePath 'HabitatHome\module-mastercore.json')
         Package          = $sxa.fileName

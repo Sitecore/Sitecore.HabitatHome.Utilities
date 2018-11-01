@@ -24,21 +24,21 @@
         {
             "id": "spe",
             "name": "Sitecore PowerShell Extensions",
-            "fileName": "Sitecore PowerShell Extensions-5.0.zip",
-            "url": "https://marketplace.sitecore.net/services/~/download/E988B12D15D74CCA83ADBFD0CA56192E.ashx?data=Sitecore%20PowerShell%20Extensions-5.0&itemId=6aaea046-83af-4ef1-ab91-87f5f9c1aa57",
+            "fileName": "Sitecore PowerShell Extensions-4.7.2 for Sitecore 8.scwdp.zip",
+            "url": "https://dev.sitecore.net/~/media/4918E7ADAAF049F4BC7BA5B73561F24F.ashx",
             "download": true,
             "install": true,
-            "convert": true,
+            "convert": false,
             "source": "sitecore"
         },
         {
             "id": "sxa",
             "name": "Sitecore Experience Accelerator",
-            "fileName": "Sitecore Experience Accelerator 1.8 rev. 181027 for 9.1.zip",
+            "fileName": "Sitecore Experience Accelerator 1.8 rev. 181027 for 9.1.scwdp.zip",
             "url": "https://dev.sitecore.net/~/media/1FF242BE683E4DE989925F74B78978FC.ashx",
             "download": true,
             "install": true,
-            "convert": true,
+            "convert": false,
             "source": "sitecore"
         },
         {
