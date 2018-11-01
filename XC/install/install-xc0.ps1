@@ -1,6 +1,6 @@
 Param(
     [string] $ConfigurationFile = '.\configuration-xc0.json',
-    [switch] $SkipInstallHabitatAuthoring
+    [switch] $SkipHabitatHomeInstall
 )
 
 #####################################################
@@ -348,7 +348,7 @@ Function Install-Commerce {
         }
         SitecoreIdentityServerName                  = $commerce.identityServerName
     }
-    If (!$SkipInstallHabitatAuthoring){
+    If (!$SkipHabitatHomeInstall){
         Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs")
     } Else {
         Install-SitecoreConfiguration @params -Skip "InitializeCommerceEngine","GenerateCatalogTemplates","InstallHabitatImagesModule","Reindex" -WorkingDirectory $(Join-Path $PWD "logs")
