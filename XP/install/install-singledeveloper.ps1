@@ -235,6 +235,7 @@ Function Install-SingleDeveloper {
         XConnectCollectionService       = "https://" + $xConnect.siteName
         ClientSecret                    = $identityServer.clientSecret
         AllowedCorsOrigins              = "https://" + $site.hostName
+        WebRoot                         = $site.webRoot
     }
 
     Push-Location $resourcePath
