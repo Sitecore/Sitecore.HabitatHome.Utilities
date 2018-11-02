@@ -215,20 +215,40 @@
             "DefaultValue": "",
             "Description": "The path to certificate of certification authority that issued certificates for Machine Learning Server Blob and Table storage endpoints."
         },
+        "WebRoot": {
+            "Type": "string",
+            "DefaultValue": "",
+            "Description": "Desired WebRoot"
+        },
         "XConnectXP0:Package": {
             "Type": "String",
             "Reference": "XConnectPackage",
             "Description": "Override to pass XConnectPackage value to XConnectXP0 config."
+        },
+        "XConnectXP0:WebRoot": {
+            "Type": "String",
+            "Reference": "WebRoot",
+            "Description": "Override to pass WebRoot"
         },
         "SitecoreXP0:Package": {
             "Type": "String",
             "Reference": "SitecorePackage",
             "Description": "Override to pass SitecorePackage value to SitecoreXP0 config."
         },
+        "SitecoreXP0:WebRoot": {
+            "Type": "String",
+            "Reference": "WebRoot",
+            "Description": "Override to pass WebRoot"
+        },
         "IdentityServer:Package": {
             "Type": "String",
             "Reference": "IdentityServerPackage",
             "Description": "Override to pass IdentityServerPackage value to IdentityServer config."
+        },
+        "IdentityServer:WebRoot": {
+            "Type": "String",
+            "Reference": "WebRoot",
+            "Description": "Override to pass WebRoot"
         },
         "XConnectXP0:Sitename": {
             "Type": "String",
@@ -533,7 +553,7 @@
         "Test.Admin.Password": "[equal(parameter('SitecoreAdminPassword'),'SIF-Default')]",
         "Generate.Admin.Password": "[randomstring(Length:20,DisAllowSpecial:True,EnforceComplexity:True)]",
 
-        "Client.Secret" : "[if(variable('Test.Client.Secret'),variable('Generate.Client.Secret'),parameter('ClientSecret'))]",
+        "Client.Secret": "[if(variable('Test.Client.Secret'),variable('Generate.Client.Secret'),parameter('ClientSecret'))]",
         "IdentityServer:Client.Secret": "[variable('Client.Secret')]",
         "SitecoreXP0:Sitecore.IdentitySecret": "[variable('Client.Secret')]",
         "Test.Client.Secret": "[equal(parameter('ClientSecret'),'SIF-Default')]",
@@ -541,7 +561,7 @@
 
     },
     "Includes": {
-        "IdentityServerCertificates":{
+        "IdentityServerCertificates": {
             "Source": ".\\createcert.json"
         },
         "IdentityServer": {
@@ -573,7 +593,7 @@
             "Description": "Generates all shared passwords and secrets.",
             "Type": "OutNull",
             "Params": {
-                "InputObject":  [
+                "InputObject": [
                     "[variable('SqlProcessingPools.Password')]",
                     "[variable('SqlCollection.Password')]",
                     "[variable('SqlReferenceData.Password')]",
