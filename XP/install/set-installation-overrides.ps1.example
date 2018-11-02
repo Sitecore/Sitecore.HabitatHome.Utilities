@@ -16,7 +16,7 @@ $json = Get-Content -Raw $configurationFile |  ConvertFrom-Json
 $assets = $json.assets
 $assets.psRepository = "http://nuget1ca2/nuget/Sitecore_Gallery"
 $assets.psRepositoryName = "SitecoreGallery_Internal"
-$assets.installerVersion = "2.0.0-beta0325"
+$assets.installerVersion = "2.0.0"
 $assets.licenseFilePath = Join-Path $assets.root "license.xml"
 
 # Settings
