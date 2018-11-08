@@ -47,14 +47,6 @@ Write-Host " xConnect: $($xConnect.siteName)" -ForegroundColor Green
 Write-Host "*******************************************************" -ForegroundColor Green
 
 
-# Function Set-ModulesPath {
-#     Write-Host "Setting Modules Path" -ForegroundColor Green
-#     $modulesPath = ( Join-Path -Path $resourcePath -ChildPath "Modules" )
-#     if ($env:PSModulePath -notlike "*$modulesPath*") {
-#         $p = $env:PSModulePath + ";" + $modulesPath
-#         [Environment]::SetEnvironmentVariable("PSModulePath", $p)
-#     }
-# }
 Function Install-SitecoreInstallFramework {
     #Register Assets PowerShell Repository
     if ((Get-PSRepository | Where-Object {$_.Name -eq $assets.psRepositoryName}).count -eq 0) {
@@ -70,8 +62,8 @@ Function Install-SitecoreInstallFramework {
     $module = Get-Module -FullyQualifiedName @{ModuleName = "SitecoreInstallFramework"; ModuleVersion = $sifVersion }
     if (-not $module) {
         write-host "Installing the Sitecore Install Framework, version $($assets.installerVersion)" -ForegroundColor Green
-        Install-Module SitecoreInstallFramework -RequiredVersion $assets.installerVersion -Repository $assets.psRepositoryName -Scope CurrentUser -Force -AllowPrerelease
-        Import-Module SitecoreInstallFramework -RequiredVersion $sifVersion
+        Install-Module SitecoreInstallFramework -Repository $assets.psRepositoryName -Scope CurrentUser -Force -AllowPrerelease
+        Import-Module SitecoreInstallFramework -Force
     }
 }
 Function Download-Assets {
@@ -239,13 +231,7 @@ Function Install-SingleDeveloper {
     }
 
     Push-Location $resourcePath
-    Try{
         Install-SitecoreConfiguration @singleDeveloperParams   *>&1 | Tee-Object XP0-SingleDeveloper.log
-    }
-    Catch{
-        Pop-Location
-        Exit 1
-    }
     Pop-Location
 }
 Function Add-AppPoolMembership {
