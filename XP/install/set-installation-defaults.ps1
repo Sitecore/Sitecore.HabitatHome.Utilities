@@ -13,12 +13,12 @@ $assets.root = "$PSScriptRoot\assets"
 # SIF settings
 $assets.psRepository = "https://sitecore.myget.org/F/sc-powershell/api/v2/"
 $assets.psRepositoryName = "SitecoreGallery"
-$assets.installerVersion = "2.0.0"
+$assets.installerVersion = "2.0.1"
 
 $assets.licenseFilePath = Join-Path $assets.root "license.xml"
 
-$assets.sitecoreVersion = "9.1.0 rev. 001551"
-$assets.identityServerVersion = "2.0.0 rev. 00154"
+$assets.sitecoreVersion = "9.1.0 rev. 001564"
+$assets.identityServerVersion = "2.0.1 rev. 00158"
 
 
 $assets.certificatesPath = Join-Path $assets.root "Certificates"
