@@ -1,8 +1,8 @@
 {
     "Parameters": {
-        "Credentials": {
-            "Type": "PSCredential",
-            "Description": "Credentials for downloading Commerce Packages."
+          "LoginSession":{
+            "Type":"Microsoft.PowerShell.Commands.WebRequestSession",
+            "Description":"Web Session to be used for downloading"
           },
           "Source":{
               "Type":"String",
@@ -24,7 +24,7 @@
             "Params":{
                 "SourceUri":"[parameter('Source')]",
                 "DestinationPath":"[parameter('Destination')]",
-                "Credentials": "[parameter('Credentials')]"
+                "LoginSession": "[parameter('LoginSession')]"
             }
         }
     }
