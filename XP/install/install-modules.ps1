@@ -47,33 +47,23 @@ $downloadFolder = $assets.root
 $packagesFolder = (Join-Path $downloadFolder "packages")
 
 $credentials = $null
-
+$loginSession = $null
 Function Install-SitecoreInstallFramework {
-    #Register Assets PowerShell Repository
     if ((Get-PSRepository | Where-Object {$_.Name -eq $assets.psRepositoryName}).count -eq 0) {
         Register-PSRepository -Name $assets.psRepositoryName -SourceLocation $assets.psRepository -InstallationPolicy Trusted 
     }
 
     #Sitecore Install Framework dependencies
     Import-Module WebAdministration
-    #Install SIF
-    $SIFVersion = $($assets.installerVersion -replace "-beta[0-9]*$")
-    Write-Host ("Loading Sitecore Installer Framework {0}" -f $SIFVersion) -ForegroundColor Green
-
-    $module = Get-Module -FullyQualifiedName @{ModuleName = "SitecoreInstallFramework"; ModuleVersion = $SIFVersion}
     
-
-
+    #Install SIF
+    $sifVersion = $assets.installerVersion -replace "-beta[0-9]*$"
+    
+    $module = Get-Module -FullyQualifiedName @{ModuleName = "SitecoreInstallFramework"; ModuleVersion = $sifVersion }
     if (-not $module) {
         write-host "Installing the Sitecore Install Framework, version $($assets.installerVersion)" -ForegroundColor Green
-        if ($assets.installerversion -like "*beta*") {
-            Install-Module SitecoreInstallFramework -RequiredVersion $assets.installerVersion -Repository $assets.psRepositoryName -Scope CurrentUser -Force -AllowPrerelease
-        }
-        else {
-            Install-Module SitecoreInstallFramework -RequiredVersion $assets.installerVersion -Repository $assets.psRepositoryName -Scope CurrentUser -Force 
-        }
-        
-        Import-Module SitecoreInstallFramework -RequiredVersion $SIFVersion -Force
+        Install-Module SitecoreInstallFramework -Repository $assets.psRepositoryName -RequiredVersion $sifVersion -Scope CurrentUser -Force -AllowPrerelease
+        Import-Module SitecoreInstallFramework -Force
     }
 }
 
@@ -89,20 +79,26 @@ Function Install-SitecoreAzureToolkit {
     if (!(Test-Path $destination) -and $package.download -eq $true) {
         if ($null -eq $credentials) {
             $credentials = Get-Credential -Message "Please provide dev.sitecore.com credentials"
+        }
+        $user = $credentials.GetNetworkCredential().UserName
+        $password = $Credentials.GetNetworkCredential().Password
 
-        }
+        $loginRequest = Invoke-RestMethod -Uri https://dev.sitecore.net/api/authorization -Method Post -ContentType "application/json" -Body "{username: '$user', password: '$password'}" -SessionVariable loginSession -UseBasicParsing 
+
         $params = @{
-            Path        = $downloadJsonPath
-            Credentials = $credentials
-            Source      = $package.url
-            Destination = $destination
+            Path         = $downloadJsonPath
+            LoginSession = $loginSession
+            Source       = $package.url
+            Destination  = $destination
         }
-        Install-SitecoreConfiguration  @params  -WorkingDirectory $(Join-Path $PWD "logs") -Verbose 
+        $Global:ProgressPreference = 'SilentlyContinue'
+        Install-SitecoreConfiguration  @params  -Verbose 
+        $Global:ProgressPreference = 'Continue'
     }
     if ((Test-Path $destination) -and ( $package.install -eq $true)) {
         sz x -o"$DownloadFolder\sat" $destination  -y -aoa
     }
-    Import-Module (Join-Path $assets.root "SAT\tools\Sitecore.Cloud.CmdLets.dll") -Force
+    Import-Module (Join-Path $assets.root "SAT\tools\Sitecore.Cloud.CmdLets.dll") -Force 
 
 }
 Function Get-OptionalModules {
@@ -155,13 +151,19 @@ Function Process-Packages {
                 if ($null -eq $credentials) {
                     $credentials = Get-Credential -Message "Please provide dev.sitecore.com credentials"
                 }
+                $user = $credentials.GetNetworkCredential().UserName
+                $password = $Credentials.GetNetworkCredential().Password
+
+                $loginRequest = Invoke-RestMethod -Uri https://dev.sitecore.net/api/authorization -Method Post -ContentType "application/json" -Body "{username: '$user', password: '$password'}" -SessionVariable loginSession -UseBasicParsing 
                 $params = @{
-                    Path        = $downloadJsonPath
-                    Credentials = $credentials
-                    Source      = $package.url
-                    Destination = $destination
+                    Path         = $downloadJsonPath
+                    LoginSession = $loginSession
+                    Source       = $package.url
+                    Destination  = $destination
                 }
+                $Global:ProgressPreference = 'SilentlyContinue'
                 Install-SitecoreConfiguration  @params -WorkingDirectory $(Join-Path $PWD "logs")  
+                $Global:ProgressPreference = 'Continue'
             }
             Write-Host $package
             if ($package.convert) {
@@ -258,7 +260,7 @@ Function Install-SitecoreExperienceAccelerator {
     if ($false -eq $sxa.install) {
         return
     }
-   # $sxa.fileName = $sxa.fileName.replace(".zip", ".scwdp.zip")
+    # $sxa.fileName = $sxa.fileName.replace(".zip", ".scwdp.zip")
     $params = @{
         Path             = (Join-path $resourcePath 'HabitatHome\module-mastercore.json')
         Package          = $sxa.fileName
