@@ -43,32 +43,32 @@ Write-Host "*******************************************************" -Foreground
 
 try {
     Remove-LocalGroupMember "Performance Log Users" "IIS AppPool\$($site.hostName)"
-    Write-Host "Removed IIS AppPool\$($site.hostName) to Performance Log Users" -ForegroundColor Green
+    Write-Host "Removed IIS AppPool\$($site.hostName) from Performance Log Users" -ForegroundColor Green
   
 }
 catch {
-    Write-Host "Warning: Couldn't remove IIS AppPool\$($site.hostName) to Performance Log Users -- user may already exist" -ForegroundColor Yellow
+    Write-Host "Warning: Couldn't remove IIS AppPool\$($site.hostName) from Performance Log Users -- user may not exist" -ForegroundColor Yellow
 }
 try {
     Remove-LocalGroupMember "Performance Monitor Users" "IIS AppPool\$($site.hostName)"
-    Write-Host "Removed IIS AppPool\$($site.hostName) to Performance Monitor Users" -ForegroundColor Green
+    Write-Host "Removed IIS AppPool\$($site.hostName) from Performance Monitor Users" -ForegroundColor Green
 }
 catch {
-    Write-Host "Warning: Couldn't remove IIS AppPool\$($site.hostName) to Performance Monitor Users -- user may already exist" -ForegroundColor Yellow
+    Write-Host "Warning: Couldn't remove IIS AppPool\$($site.hostName) from Performance Monitor Users -- user may not exist" -ForegroundColor Yellow
 }
 try {
     Remove-LocalGroupMember "Performance Monitor Users" "IIS AppPool\$($xConnect.siteName)"
-    Write-Host "Removed IIS AppPool\$($xConnect.siteName) to Performance Monitor Users" -ForegroundColor Green
+    Write-Host "Removed IIS AppPool\$($xConnect.siteName) from Performance Monitor Users" -ForegroundColor Green
 }
 catch {
-    Write-Host "Warning: Couldn't remove IIS AppPool\$($site.hostName) to Performance Monitor Users -- user may already exist" -ForegroundColor Yellow
+    Write-Host "Warning: Couldn't remove IIS AppPool\$($site.hostName) from Performance Monitor Users -- user may not exist" -ForegroundColor Yellow
 }
 try {
     Remove-LocalGroupMember "Performance Log Users" "IIS AppPool\$($xConnect.siteName)"
-    Write-Host "Removed IIS AppPool\$($xConnect.siteName) to Performance Log Users" -ForegroundColor Green
+    Write-Host "Removed IIS AppPool\$($xConnect.siteName) from Performance Log Users" -ForegroundColor Green
 }
 catch {
-    Write-Host "Warning: Couldn't remove IIS AppPool\$($xConnect.siteName) to Performance Log Users -- user may already exist" -ForegroundColor Yellow
+    Write-Host "Warning: Couldn't remove IIS AppPool\$($xConnect.siteName) from Performance Log Users -- user may not exist" -ForegroundColor Yellow
 }
 
 
@@ -100,3 +100,12 @@ $singleDeveloperParams = @{
 Push-Location $resourcePath
 Install-SitecoreConfiguration @singleDeveloperParams -Uninstall  *>&1 | Tee-Object XP0-SingleDeveloper.log
 Pop-Location
+
+Write-Host "Removing folders from webroot" -ForegroundColor Green
+$webRoot = $site.webRoot
+Write-Host ("Removing {0}" -f (Join-path $webRoot $site.hostName)) 
+Remove-Item -Path (Join-path $webRoot $site.hostName) -Recurse -Force -ErrorAction SilentlyContinue
+Write-Host ("Removing {0}" -f (Join-path $webRoot $xconnect.siteName)) 
+Remove-Item -Path (Join-path $webRoot $xconnect.siteName) -Recurse -Force -ErrorAction SilentlyContinue
+Write-Host ("Removing {0}" -f (Join-path $webRoot $identityServer.name)) 
+Remove-Item -Path (Join-path $webRoot $identityServer.name) -Recurse -Force -ErrorAction SilentlyContinue
