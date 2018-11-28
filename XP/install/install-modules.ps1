@@ -139,7 +139,7 @@ Function Process-Packages {
             New-Item -ItemType Directory -Force -Path $packagesFolder
         }
        
-        if ($package.isGroup) {
+        if ($package.isGroup -and $true -eq $package.download) {
             $submodules = $package.modules
             $args = @{
                 Packages         = $submodules
