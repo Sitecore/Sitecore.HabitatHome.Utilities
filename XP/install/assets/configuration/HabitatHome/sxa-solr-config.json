@@ -1,0 +1,26 @@
+{
+  "add-searchComponent": {
+    "name": "suggest",
+    "class": "solr.SuggestComponent",
+    "defaults": {
+      "field": "name",
+      "name": "default",
+      "suggestAnalyzerFieldType": "string"
+    },
+    "suggester": {
+      "field": "sxacontent_txm",
+      "name": "sxaSuggester",
+      "suggestAnalyzerFieldType": "text_en"
+    }
+  },
+  "add-requesthandler": {
+    "name": "/suggest",
+    "class": "solr.SearchHandler",
+    "defaults": {
+      "components": "suggest",
+      "suggest.count": "10",
+      "suggest.dictionary": "sxaSuggester",
+      "suggest": "true"
+    }
+  }
+}

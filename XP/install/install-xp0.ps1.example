@@ -1,5 +1,7 @@
 Param(
-    [string] $ConfigurationFile = "configuration-xp0.json"
+    [string] $ConfigurationFile = "configuration-xp0.json",
+    [string] $LogFolder = ".\logs\",
+    [string] $LogFileName = "install-sitecore.log"
 )
 
 #####################################################
@@ -9,6 +11,14 @@ Param(
 #####################################################
 $ErrorActionPreference = 'Stop'
 Set-Location $PSScriptRoot
+$LogFolder = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($LogFolder) 
+if (!(Test-Path $LogFolder)) {
+    New-item -ItemType Directory -Path $LogFolder
+}
+$LogFile = Join-path $LogFolder $LogFileName
+if (Test-Path $LogFile) {
+    Get-Item $LogFile | Remove-Item
+}
 
 if (!(Test-Path $ConfigurationFile)) {
     Write-Host "Configuration file '$($ConfigurationFile)' not found." -ForegroundColor Red
@@ -24,6 +34,7 @@ $site = $config.settings.site
 $sql = $config.settings.sql
 $xConnect = $config.settings.xConnect
 $sitecore = $config.settings.sitecore
+$identityServer = $config.settings.identityServer
 $solr = $config.settings.solr
 $assets = $config.assets
 $modules = $config.modules
@@ -57,7 +68,7 @@ Function Install-SitecoreInstallFramework {
     $module = Get-Module -FullyQualifiedName @{ModuleName = "SitecoreInstallFramework"; ModuleVersion = $($assets.installerVersion -replace "-beta[0-9]*$")}
     if (-not $module) {
         write-host "Installing the Sitecore Install Framework, version $($assets.installerVersion)" -ForegroundColor Green
-        Install-Module SitecoreInstallFramework -RequiredVersion $assets.installerVersion -Repository $assets.psRepositoryName -Scope CurrentUser -Force
+        Install-Module SitecoreInstallFramework -RequiredVersion $assets.installerVersion -Repository $assets.psRepositoryName -Scope CurrentUser -Force -AllowPrerelease
         Import-Module SitecoreInstallFramework -RequiredVersion $($assets.installerVersion -replace "-beta[0-9]*$")
     }
 }
@@ -82,7 +93,7 @@ Function Download-Assets {
     if ($package.download -eq $true) {
         Write-Host ("Downloading {0}  -  if required" -f $package.name )
         
-        $destination =  $package.fileName
+        $destination = $package.fileName
             
         if (!(Test-Path $destination)) {
             $params = @{
@@ -91,7 +102,7 @@ Function Download-Assets {
                 Source      = $package.url
                 Destination = $destination
             }
-            Install-SitecoreConfiguration  @params  -WorkingDirectory $(Join-Path $PWD "logs") -Verbose 
+            Install-SitecoreConfiguration  @params  *>&1 | Tee-Object $LogFile -Append 
         }
         if ((Test-Path $destination) -and ( $package.extract -eq $true)) {
             sz x -o"$DownloadFolder" $destination  -y -aoa
@@ -114,17 +125,7 @@ Function Confirm-Prerequisites {
         throw "Could not find WebDeploy in $webDeployPath"
     }   
 
-    # Verify DAC Fx
-    # Verify Microsoft.SqlServer.TransactSql.ScriptDom.dll
-    try {
-        $assembly = [reflection.assembly]::LoadWithPartialName("Microsoft.SqlServer.TransactSql.ScriptDom")
-        if (-not $assembly) {
-            throw "error"
-        }
-    }
-    catch {
-        throw "Could load the Microsoft.SqlServer.TransactSql.ScriptDom assembly. Please make sure it is installed and registered in the GAC"
-    }
+   
     
     #Enable Contained Databases
     Write-Host "Enable contained databases" -ForegroundColor Green
@@ -211,7 +212,7 @@ Function Install-XConnect {
             SolrService = $solr.serviceName 
             CorePrefix  = $site.prefix
         }
-        Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs")
+        Install-SitecoreConfiguration @params *>&1 | Tee-Object $LogFile -Append
     }
     catch {
         write-host "XConnect SOLR Failed" -ForegroundColor Red
@@ -227,7 +228,7 @@ Function Install-XConnect {
             CertPath         = $assets.certificatesPath
             RootCertFileName = $sitecore.rootCertificateName
         }
-        Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs")
+        Install-SitecoreConfiguration @params *>&1 | Tee-Object $LogFile -Append
     }
     catch {
         write-host "XConnect Certificate Creation Failed" -ForegroundColor Red
@@ -237,30 +238,40 @@ Function Install-XConnect {
     #Install xConnect
     try {
         $params = @{
-            Path                           = $xConnect.ConfigurationPath
-            Package                        = $xConnect.PackagePath
-            LicenseFile                    = $assets.licenseFilePath
-            SiteName                       = $xConnect.siteName
-            XConnectCert                   = $xConnect.certificateName
-            SqlDbPrefix                    = $site.prefix
-            SolrCorePrefix                 = $site.prefix
-            SqlAdminUser                   = $sql.adminUser
-            SqlAdminPassword               = $sql.adminPassword
-            SqlServer                      = $sql.server
-            SqlCollectionUser              = $sql.collectionUser
-            SqlCollectionPassword          = $sql.collectionPassword
-            SqlProcessingPoolsUser         = $sql.processingPoolsUser
-            SqlProcessingPoolsPassword     = $sql.processingPoolsPassword
-            SqlReferenceDataUser           = $sql.referenceDataUser
-            SqlReferenceDataPassword       = $sql.referenceDataPassword
-            SqlMarketingAutomationUser     = $sql.marketingAutomationUser
-            SqlMarketingAutomationPassword = $sql.marketingAutomationPassword
-            SqlMessagingUser               = $sql.messagingUser
-            SqlMessagingPassword           = $sql.messagingPassword
-            SolrUrl                        = $solr.url
-            WebRoot                        = $site.webRoot
+            Path                                                               = $xConnect.ConfigurationPath
+            Package                                                            = $xConnect.PackagePath
+            LicenseFile                                                        = $assets.licenseFilePath
+            SiteName                                                           = $xConnect.siteName
+            XConnectCert                                                       = $xConnect.certificateName
+            SqlDbPrefix                                                        = $site.prefix
+            SolrCorePrefix                                                     = $site.prefix
+            SqlAdminUser                                                       = $sql.adminUser
+            SqlAdminPassword                                                   = $sql.adminPassword
+            SqlServer                                                          = $sql.server
+            SqlCollectionUser                                                  = $sql.collectionUser
+            SqlCollectionPassword                                              = $sql.collectionPassword
+            SqlProcessingPoolsUser                                             = $sql.processingPoolsUser
+            SqlProcessingPoolsPassword                                         = $sql.processingPoolsPassword
+            SqlReferenceDataUser                                               = $sql.referenceDataUser
+            SqlReferenceDataPassword                                           = $sql.referenceDataPassword
+            SqlMarketingAutomationUser                                         = $sql.marketingAutomationUser
+            SqlMarketingAutomationPassword                                     = $sql.marketingAutomationPassword
+            SqlMessagingUser                                                   = $sql.messagingUser
+            SqlMessagingPassword                                               = $sql.messagingPassword
+            SolrUrl                                                            = $solr.url
+            SqlProcessingEngineUser                                            = $sql.processingEngineUser
+            SqlProcessingEnginePassword                                        = $sql.processingEnginePassword
+            SqlReportingUser                                                   = $sql.reportingUser
+            SqlReportingPassword                                               = $sql.reportingPassword
+            MachineLearningServerUrl                                           = "XXX"
+            MachineLearningServerBlobEndpointCertificatePath                   = ""
+            MachineLearningServerBlobEndpointCertificatePassword               = ""
+            MachineLearningServerTableEndpointCertificatePath                  = ""
+            MachineLearningServerTableEndpointCertificatePassword              = ""
+            MachineLearningServerEndpointCertificationAuthorityCertificatePath = ""
+            WebRoot                                                            = $site.webRoot
         }
-        Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs")
+        Install-SitecoreConfiguration @params *>&1 | Tee-Object $LogFile -Append
     }
     catch {
         write-host "XConnect Setup Failed" -ForegroundColor Red
@@ -293,7 +304,7 @@ Function Install-Sitecore {
             SolrService = $solr.serviceName
             CorePrefix  = $site.prefix
         }
-        Install-SitecoreConfiguration  @params -WorkingDirectory $(Join-Path $PWD "logs")
+        Install-SitecoreConfiguration  @params *>&1 | Tee-Object $LogFile -Append
     }
     catch {
         write-host "Sitecore SOLR Failed" -ForegroundColor Red
@@ -302,7 +313,7 @@ Function Install-Sitecore {
 
     try {
         #Install Sitecore
-        $params = @{
+        $sitecoreParams = @{
             Path                                 = $sitecore.configurationPath
             Package                              = $sitecore.packagePath
             LicenseFile                          = $assets.licenseFilePath
@@ -339,19 +350,57 @@ Function Install-Sitecore {
             EXMCryptographicKey                  = $sitecore.exmCryptographicKey
             EXMAuthenticationKey                 = $sitecore.exmAuthenticationKey
             SolrUrl                              = $solr.url
+            CortexReportingService               = "https://$($xConnect.siteName)" 
             XConnectCollectionService            = "https://$($xConnect.siteName)"
             XConnectReferenceDataService         = "https://$($xConnect.siteName)"
             MarketingAutomationOperationsService = "https://$($xConnect.siteName)"
             MarketingAutomationReportingService  = "https://$($xConnect.siteName)"
             TelerikEncryptionKey                 = $sitecore.telerikEncryptionKey
+            SitecoreIdentityAuthority            = $identityServer.url   
+            SitecoreIdentitySecret               = $identityServer.clientSecret
             WebRoot                              = $site.webRoot
         }
-        Install-SitecoreConfiguration  @params -WorkingDirectory $(Join-Path $PWD "logs")
+        Install-SitecoreConfiguration  @sitecoreParams *>&1 | Tee-Object $LogFile -Append
     }
     catch {
         write-host "Sitecore Setup Failed" -ForegroundColor Red
         throw
     }
+}
+Function Install-IdentityServer {
+    #################################################################
+    # Install client certificate for Identity Server
+    #################################################################
+      
+      
+    $certParamsForIdentityServer = @{
+        Path            = $xConnect.certificateConfigurationPath 
+        CertificateName = $identityServer.name
+    }
+    Install-SitecoreConfiguration @certParamsForIdentityServer -Verbose
+
+
+    #################################################################
+    # Deploy Identity Server
+    #################################################################
+
+    $identityParams = @{
+        Path                 = $identityServer.configurationPath
+        Package              = $identityServer.packagePath
+        SqlDbPrefix          = $site.prefix
+        SqlServer            = $sql.server
+        SqlCoreUser          = $sql.adminUser
+        SqlCorePassword      = $sql.adminPassword
+        SitecoreIdentityCert = $identityServer.name
+        Sitename             = $identityServer.Name
+        PasswordRecoveryUrl  = ("https:// {0}" -f $site.hostname)
+        AllowedCorsOrigins   = $site.hostName
+        ClientSecret         = $identityServer.clientSecret
+        LicenseFile          = $assets.licenseFilePath 
+        WebRoot              = $site.webRoot
+    }
+    Install-SitecoreConfiguration @identityParams -Verbose   
+    
 }
 
 Function Add-AppPoolMembership {
@@ -372,6 +421,20 @@ Function Add-AppPoolMembership {
     catch {
         Write-Host "Warning: Couldn't add IIS AppPool\$($site.hostName) to Performance Monitor Users -- user may already exist" -ForegroundColor Yellow
     }
+    try {
+        Add-LocalGroupMember "Performance Monitor Users" "IIS AppPool\$($xConnect.siteName)"
+        Write-Host "Added IIS AppPool\$($xConnect.siteName) to Performance Monitor Users" -ForegroundColor Green
+    }
+    catch {
+        Write-Host "Warning: Couldn't add IIS AppPool\$($site.hostName) to Performance Monitor Users -- user may already exist" -ForegroundColor Yellow
+    }
+    try {
+        Add-LocalGroupMember "Performance Log Users" "IIS AppPool\$($xConnect.siteName)"
+        Write-Host "Added IIS AppPool\$($xConnect.siteName) to Performance Log Users" -ForegroundColor Green
+    }
+    catch {
+        Write-Host "Warning: Couldn't add IIS AppPool\$($xConnect.siteName) to Performance Log Users -- user may already exist" -ForegroundColor Yellow
+    }
 }
 
 Set-ModulesPath
@@ -380,4 +443,5 @@ Download-Assets
 Confirm-Prerequisites
 Install-XConnect
 Install-Sitecore
+Install-IdentityServer
 Add-AppPoolMembership
