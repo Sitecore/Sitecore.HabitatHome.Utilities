@@ -18,7 +18,7 @@ $assets.installerVersion = "2.0.0"
 $assets.licenseFilePath = Join-Path $assets.root "license.xml"
 
 $assets.sitecoreVersion = "9.1.0 rev. 001564"
-$assets.identityServerVersion = "2.0.1 rev. 00158"
+$assets.identityServerVersion = "2.0.0-r00157"
 
 
 $assets.certificatesPath = Join-Path $assets.root "Certificates"
@@ -97,7 +97,7 @@ $sitecore.telerikEncryptionKey = "PutYourCustomEncryptionKeyHereFrom32To256Chara
 $sitecore.rootCertificateName = "SitecoreRoot91"
 Write-Host "Setting default 'IdentityServer' parameters"
 $identityServer = $json.settings.identityServer
-$identityServer.packagePath = Join-Path $assets.root $("Sitecore.IdentityServer " + $assets.identityServerVersion + " (OnPrem)_identityserver.scwdp.zip")
+$identityServer.packagePath = Join-Path $assets.root $("Sitecore.IdentityServer." + $assets.identityServerVersion + ".scwdp.zip")
 $identityServer.configurationPath = (Get-ChildItem $pwd -filter "IdentityServer.json" -Recurse).FullName 
 $identityServer.name = "IdentityServer." + $site.hostname
 $identityServer.url = ("https://{0}" -f $identityServer.name)
