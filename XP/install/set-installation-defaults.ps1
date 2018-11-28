@@ -18,7 +18,7 @@ $assets.installerVersion = "2.0.0"
 $assets.licenseFilePath = Join-Path $assets.root "license.xml"
 
 $assets.sitecoreVersion = "9.1.0 rev. 001564"
-$assets.identityServerVersion = "2.0.1 rev. 00158"
+$assets.identityServerVersion = "2.0.0 rev. 00157"
 
 
 $assets.certificatesPath = Join-Path $assets.root "Certificates"
