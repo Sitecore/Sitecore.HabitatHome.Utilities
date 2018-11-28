@@ -28,6 +28,10 @@ Enable-WindowsOptionalFeature -Online -FeatureName IIS-IIS6ManagementCompatibili
 Enable-WindowsOptionalFeature -Online -FeatureName IIS-Metabase
 Enable-WindowsOptionalFeature -Online -FeatureName IIS-LegacySnapIn
 
+Install-Module PowerShellGet -Repository PSGallery -AllowClobber
+Update-Module PowerShellGet
+Install-Module SqlServer -Repository PSGallery -AllowClobber
+
 Set-ExecutionPolicy Bypass -Scope Process -Force; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
 
 choco install packages.config -y
