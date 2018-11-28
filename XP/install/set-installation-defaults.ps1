@@ -42,33 +42,33 @@ $sql.server = "."
 $sql.adminUser = "sa"
 $sql.adminPassword = "Str0NgPA33w0rd!!"
 $sql.userPassword = $SqlStrongPassword
-$sql.coreUser =  "coreuser"
+$sql.coreUser = "coreuser"
 $sql.corePassword = $SqlStrongPassword
-$sql.masterUser =  "masteruser"
+$sql.masterUser = "masteruser"
 $sql.masterPassword = $SqlStrongPassword
-$sql.webUser =  "webuser"
+$sql.webUser = "webuser"
 $sql.webPassword = $SqlStrongPassword
-$sql.collectionUser =  "collectionuser"
+$sql.collectionUser = "collectionuser"
 $sql.collectionPassword = $SqlStrongPassword
-$sql.reportingUser =  "reportinguser"
+$sql.reportingUser = "reportinguser"
 $sql.reportingPassword = $SqlStrongPassword
-$sql.processingPoolsUser =  "poolsuser"
+$sql.processingPoolsUser = "poolsuser"
 $sql.processingPoolsPassword = $SqlStrongPassword
-$sql.processingEngineUser =  "processingengineuser"
+$sql.processingEngineUser = "processingengineuser"
 $sql.processingEnginePassword = $SqlStrongPassword
-$sql.processingTasksUser =  "tasksuser"
+$sql.processingTasksUser = "tasksuser"
 $sql.processingTasksPassword = $SqlStrongPassword
-$sql.referenceDataUser =  "referencedatauser"
+$sql.referenceDataUser = "referencedatauser"
 $sql.referenceDataPassword = $SqlStrongPassword
-$sql.marketingAutomationUser =  "marketingautomationuser"
+$sql.marketingAutomationUser = "marketingautomationuser"
 $sql.marketingAutomationPassword = $SqlStrongPassword
-$sql.formsUser =  "formsuser"
+$sql.formsUser = "formsuser"
 $sql.formsPassword = $SqlStrongPassword
-$sql.exmMasterUser =  "exmmasteruser"
+$sql.exmMasterUser = "exmmasteruser"
 $sql.exmMasterPassword = $SqlStrongPassword
-$sql.messagingUser =  "messaginguser"
+$sql.messagingUser = "messaginguser"
 $sql.messagingPassword = $SqlStrongPassword
-$sql.securityuser =  "securityuser"
+$sql.securityuser = "securityuser"
 $sql.securityPassword = $SqlStrongPassword
 $sql.minimumVersion = "13.0.4001"
 
@@ -119,13 +119,13 @@ $modules = $json.modules
 $sitecore = $modulesConfig.sitecore
 
 $config = @{
-    id          = $sitecore.id
-    name        = $sitecore.name
-    fileName    = Join-Path $assets.root ("\{0}" -f $sitecore.fileName) 
-    url         = $sitecore.url
-    extract     = $sitecore.extract
-    download    = $sitecore.download
-    source      = $sitecore.source
+    id       = $sitecore.id
+    name     = $sitecore.name
+    fileName = Join-Path $assets.root ("\{0}" -f $sitecore.fileName) 
+    url      = $sitecore.url
+    extract  = $sitecore.extract
+    download = $sitecore.download
+    source   = $sitecore.source
 }
 $config = $config| ConvertTo-Json
 $modules += (ConvertFrom-Json -InputObject $config) 
@@ -141,14 +141,19 @@ Function Replace-Path {
         }
     }
     else {
-        $module.fileName = (Join-Path $root ("\packages\{0}" -f $module.fileName))    
+        if ($module.id -eq "si") {
+        $module.fileName = (Join-Path $root ("{0}" -f $module.fileName))    
+        }
+        else {
+            $module.fileName = (Join-Path $root ("\packages\{0}" -f $module.fileName))    
+        }
     }
 }
 
 $json.modules = $modules
 
 foreach ($module in $modulesConfig.modules) {
-    Replace-Path $module $assets.root
+        Replace-Path $module $assets.root
 }
 $modules += $modulesConfig.modules
 $json.modules = $modules
