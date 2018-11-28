@@ -14,11 +14,10 @@
         }        
 	},
     "Variables": {
-        "SolrSearchConfig": "[concat(parameter('InstallDir'), '\\App_Config\\Include\\Z.Foundation.Overrides\\Sitecore.XA.Foundation.Search.Solr.config')]",
+        "SolrSearchConfig": "[concat(parameter('InstallDir'), '\\App_Config\\Modules\\SXA\\Z.Foundation.Overrides\\Sitecore.XA.Foundation.Search.Solr.config')]",
         "SolrSearchMasterIndexCoreNameXpath": "//configuration/sitecore/contentSearch/configuration/indexes/index[@id='sitecore_sxa_master_index']/param[@desc='core']",
         "SolrSearchWebIndexCoreNameXpath": "//configuration/sitecore/contentSearch/configuration/indexes/index[@id='sitecore_sxa_web_index']/param[@desc='core']"
     },
-	"Modules": ["SitecoreUtilityTasks"],
     "Tasks": {
 
         "UpdateMasterSXAIndex": {
