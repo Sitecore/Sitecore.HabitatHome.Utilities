@@ -1,9 +1,9 @@
 # Credit primarily to jermdavis for the original script
 
 Param(
-    [string]$solrVersion = "6.6.2",
+    [string]$solrVersion = "7.2.1",
     [string]$installFolder = "c:\solr",
-    [string]$solrPort = "8662",
+    [string]$solrPort = "8721",
     [string]$solrHost = "localhost",
     [bool]$solrSSL = $TRUE,
     [string]$nssmVersion = "2.24",
@@ -18,8 +18,11 @@ $solrRoot = "$installFolder\$solrName"
 $nssmRoot = "$installFolder\nssm-$nssmVersion"
 $solrPackage = "http://archive.apache.org/dist/lucene/solr/$solrVersion/$solrName.zip"
 $nssmPackage = "http://nssm.cc/release/nssm-$nssmVersion.zip"
-$downloadFolder =(Resolve-Path "..\assets")
 
+$downloadFolder = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath("..\assets") 
+if (!(Test-Path $downloadFolder)){
+	New-Item -ItemType Directory -Path $downloadFolder
+}
 ## Verify elevated
 ## https://superuser.com/questions/749243/detect-if-powershell-is-running-as-administrator
 $elevated = [bool](([System.Security.Principal.WindowsIdentity]::GetCurrent()).groups -match "S-1-5-32-544")

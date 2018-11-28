@@ -20,11 +20,16 @@ if (!$config){
     throw "Error trying to load configuration!"
 }
 $site = $config.settings.site
-$sql  = $config.settings.sql
+$sql = $config.settings.sql
 $xConnect = $config.settings.xConnect
 $sitecore = $config.settings.sitecore
+$identityServer = $config.settings.identityServer
 $solr = $config.settings.solr
 $assets = $config.assets
+$modules = $config.modules
+$resourcePath = Join-Path $assets.root "configuration"
+
+Import-Module -Name SitecoreInstallFramework -RequiredVersion 2.0.0 -Force
 
 Write-Host "*******************************************************" -ForegroundColor Green
 Write-Host " UNInstalling Sitecore $($assets.sitecoreVersion)" -ForegroundColor Green
@@ -32,109 +37,75 @@ Write-Host " Sitecore: $($site.hostName)" -ForegroundColor Green
 Write-Host " xConnect: $($xConnect.siteName)" -ForegroundColor Green
 Write-Host "*******************************************************" -ForegroundColor Green
 
-#if (Get-Module("uninstall")) {
-#    Remove-Module "uninstall"
-#}
 
-$carbon = Get-Module Carbon
-if (-not $carbon) {
-    Write-Host "Installing latest version of Carbon" -ForegroundColor Green
-    Install-Module -Name Carbon -Repository PSGallery -AllowClobber  -Force
-    Import-Module Carbon
-}
-
-Import-Module "$PSScriptRoot\uninstall\uninstall.psm1"
-
-$database = Get-SitecoreDatabase -SqlServer $sql.server -SqlAdminUser $sql.adminUser -SqlAdminPassword $sql.adminPassword
-
-# Unregister xconnect services
-Remove-SitecoreWindowsService "$($xConnect.siteName)-MarketingAutomationService"
-Remove-SitecoreWindowsService "$($xConnect.siteName)-IndexWorker"
-
-# Delete xconnect site
-Remove-SitecoreIisSite $xConnect.siteName
-
-# Drop xconnect databases
-Remove-SitecoreDatabase -Name "$($site.prefix)_Xdb.Collection.Shard0" -Server $database
-Remove-SitecoreDatabase -Name "$($site.prefix)_Xdb.Collection.Shard1" -Server $database
-Remove-SitecoreDatabase -Name "$($site.prefix)_Xdb.Collection.ShardMapManager" -Server $database
-Remove-SitecoreDatabase -Name "$($site.prefix)_MarketingAutomation" -Server $database
-Remove-SitecoreDatabase -Name "$($site.prefix)_Processing.Pools" -Server $database
-Remove-SitecoreDatabase -Name "$($site.prefix)_Processing.Tasks" -Server $database
-Remove-SitecoreDatabase -Name "$($site.prefix)_ReferenceData" -Server $database
-Remove-SitecoreDatabase -Name "$($site.prefix)_Reporting" -Server $database
-
-# Delete xconnect files
-Remove-SitecoreFiles $xConnect.siteRoot
-
-# Delete xconnect cores
-
-Get-WmiObject win32_service  -Filter "name like '$($solr.serviceName)'" | Stop-Service 
-Remove-SitecoreSolrCore "$($site.prefix)_xdb" -Root $solr.root
-Remove-SitecoreSolrCore "$($site.prefix)_xdb_rebuild" -Root $solr.root
-Get-WmiObject win32_service  -Filter "name like '$($solr.serviceName)'" | Start-Service 
-
-# Delete xconnect server certificate
-Remove-SitecoreCertificate $xConnect.siteName
-# Delete xconnect client certificate
-Remove-SitecoreCertificate $xConnect.certificateName
-# Delete SSL certificate
-Remove-SitecoreCertificate $site.habitatHomeSslCertificateName
-
-# Delete sitecore site
-Remove-SitecoreIisSite $site.hostName
-
-# Drop sitecore databases
-Remove-SitecoreDatabase -Name "$($site.prefix)_Core" -Server $database
-Remove-SitecoreDatabase -Name "$($site.prefix)_ExperienceForms" -Server $database
-Remove-SitecoreDatabase -Name "$($site.prefix)_Master" -Server $database
-Remove-SitecoreDatabase -Name "$($site.prefix)_Web" -Server $database
-Remove-SitecoreDatabase -Name "$($site.prefix)_EXM.Master" -Server $database
-Remove-SitecoreDatabase -Name "$($site.prefix)_Messaging" -Server $database
-
-# Delete sitecore files
-Remove-SitecoreFiles $sitecore.siteRoot
-
-# Delete sitecore cores
-Get-WmiObject win32_service  -Filter "name like '$($solr.serviceName)'" | Stop-Service 
-Remove-SitecoreSolrCore "$($site.prefix)_core_index" -Root $solr.root
-Remove-SitecoreSolrCore "$($site.prefix)_master_index" -Root $solr.root
-Remove-SitecoreSolrCore "$($site.prefix)_web_index" -Root $solr.root
-Remove-SitecoreSolrCore "$($site.prefix)_marketingdefinitions_master" -Root $solr.root
-Remove-SitecoreSolrCore "$($site.prefix)_marketingdefinitions_web" -Root $solr.root
-Remove-SitecoreSolrCore "$($site.prefix)_marketing_asset_index_master" -Root $solr.root
-Remove-SitecoreSolrCore "$($site.prefix)_marketing_asset_index_web" -Root $solr.root
-Remove-SitecoreSolrCore "$($site.prefix)_testing_index" -Root $solr.root
-Remove-SitecoreSolrCore "$($site.prefix)_suggested_test_index" -Root $solr.root
-Remove-SitecoreSolrCore "$($site.prefix)_fxm_master_index" -Root $solr.root
-Remove-SitecoreSolrCore "$($site.prefix)_fxm_web_index" -Root $solr.root
-Remove-SitecoreSolrCore "$($site.prefix)_sxa_master_index" -Root $solr.root
-Remove-SitecoreSolrCore "$($site.prefix)_sxa_web_index" -Root $solr.root
-Get-WmiObject win32_service  -Filter "name like '$($solr.serviceName)'" | Start-Service 
-
-# Delete sitecore certificate
-Remove-SitecoreCertificate $site.hostName
-
-# Drop the SQL Collectionuser login
-Remove-SitecoreDatabaseLogin -Server $database -Name $($sql.collectionUser)
 
 # Remove App Pool membership 
 
-try 
-{
+try {
     Remove-LocalGroupMember "Performance Log Users" "IIS AppPool\$($site.hostName)"
     Write-Host "Removed IIS AppPool\$($site.hostName) from Performance Log Users" -ForegroundColor Green
+  
 }
-catch 
-{
-    Write-Host "Could not find IIS AppPool\$($site.hostName) in Performance Log Users" -ForegroundColor Yellow
+catch {
+    Write-Host "Warning: Couldn't remove IIS AppPool\$($site.hostName) from Performance Log Users -- user may not exist" -ForegroundColor Yellow
 }
-try 
-{
+try {
     Remove-LocalGroupMember "Performance Monitor Users" "IIS AppPool\$($site.hostName)"
     Write-Host "Removed IIS AppPool\$($site.hostName) from Performance Monitor Users" -ForegroundColor Green
 }
-catch 
-{
-    Write-Host "Could not find IIS AppPool\$($site.hostName) to Performance Monitor Users" -ForegroundColor Yellow
+catch {
+    Write-Host "Warning: Couldn't remove IIS AppPool\$($site.hostName) from Performance Monitor Users -- user may not exist" -ForegroundColor Yellow
 }
+try {
+    Remove-LocalGroupMember "Performance Monitor Users" "IIS AppPool\$($xConnect.siteName)"
+    Write-Host "Removed IIS AppPool\$($xConnect.siteName) from Performance Monitor Users" -ForegroundColor Green
+}
+catch {
+    Write-Host "Warning: Couldn't remove IIS AppPool\$($site.hostName) from Performance Monitor Users -- user may not exist" -ForegroundColor Yellow
+}
+try {
+    Remove-LocalGroupMember "Performance Log Users" "IIS AppPool\$($xConnect.siteName)"
+    Write-Host "Removed IIS AppPool\$($xConnect.siteName) from Performance Log Users" -ForegroundColor Green
+}
+catch {
+    Write-Host "Warning: Couldn't remove IIS AppPool\$($xConnect.siteName) from Performance Log Users -- user may not exist" -ForegroundColor Yellow
+}
+
+
+$singleDeveloperParams = @{
+    Path                          = $sitecore.singleDeveloperConfigurationPath
+    SqlServer                     = $sql.server
+    SqlAdminUser                  = $sql.adminUser
+    SqlAdminPassword              = $sql.adminPassword
+    SitecoreAdminPassword         = $sitecore.adminPassword
+    SolrUrl                       = $solr.url
+    SolrRoot                      = $solr.root
+    SolrService                   = $solr.serviceName
+    Prefix                        = $site.prefix
+    XConnectCertificateName       = $xconnect.siteName
+    IdentityServerCertificateName = $identityServer.name
+    IdentityServerSiteName        = $identityServer.name
+    LicenseFile                   = $assets.licenseFilePath
+    XConnectPackage               = $xConnect.packagePath
+    SitecorePackage               = $sitecore.packagePath
+    IdentityServerPackage         = $identityServer.packagePath
+    XConnectSiteName              = $xConnect.siteName
+    SitecoreSitename              = $site.hostName
+    PasswordRecoveryUrl           = $site.hostName
+    SitecoreIdentityAuthority     = $identityServer.name
+    XConnectCollectionService     = $xConnect.siteName
+    ClientSecret                  = $identityServer.clientSecret
+    AllowedCorsOrigins            = $site.hostName
+}
+Push-Location $resourcePath
+Install-SitecoreConfiguration @singleDeveloperParams -Uninstall  *>&1 | Tee-Object XP0-SingleDeveloper.log
+Pop-Location
+
+Write-Host "Removing folders from webroot" -ForegroundColor Green
+$webRoot = $site.webRoot
+Write-Host ("Removing {0}" -f (Join-path $webRoot $site.hostName)) 
+Remove-Item -Path (Join-path $webRoot $site.hostName) -Recurse -Force -ErrorAction SilentlyContinue
+Write-Host ("Removing {0}" -f (Join-path $webRoot $xconnect.siteName)) 
+Remove-Item -Path (Join-path $webRoot $xconnect.siteName) -Recurse -Force -ErrorAction SilentlyContinue
+Write-Host ("Removing {0}" -f (Join-path $webRoot $identityServer.name)) 
+Remove-Item -Path (Join-path $webRoot $identityServer.name) -Recurse -Force -ErrorAction SilentlyContinue

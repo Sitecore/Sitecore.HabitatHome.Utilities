@@ -7,17 +7,17 @@
         },
         "SolrRoot": {
             "Type": "string",
-            "DefaultValue": "c:\\solr-6.6.1",
+            "DefaultValue": "c:\\solr-7.2.1",
             "Description": "The file path to the Solr instance."
         },
         "SolrService": {
             "Type": "string",
-            "DefaultValue": "Solr-6.6.1",
+            "DefaultValue": "Solr-7.2.1",
             "Description": "The name of the Solr service."
         },
         "BaseConfig": {
             "Type": "string",
-            "DefaultValue": "basic_configs",
+            "DefaultValue": "_default",
             "Description": "The configset to copy as a base for each core."
         },
         "CorePrefix": {
@@ -41,6 +41,7 @@
             "required": "true",
             "stored": "true"
         },
+
         "Core.Name":        "[concat(parameter('CorePrefix'), '_core_index')]",
         "Master.Name":      "[concat(parameter('CorePrefix'), '_master_index')]",
         "Web.Name":         "[concat(parameter('CorePrefix'), '_web_index')]",
@@ -52,6 +53,7 @@
         "Suggested.Name":   "[concat(parameter('CorePrefix'), '_suggested_test_index')]",
         "FXM.Master.Name":  "[concat(parameter('CorePrefix'), '_fxm_master_index')]",
         "FXM.Web.Name":     "[concat(parameter('CorePrefix'), '_fxm_web_index')]",
+
         "Core.Root":        "[joinpath(variable('Solr.Server'), variable('Core.Name'))]",
         "Master.Root":      "[joinpath(variable('Solr.Server'), variable('Master.Name'))]",
         "Web.Root":         "[joinpath(variable('Solr.Server'), variable('Web.Name'))]",
@@ -63,6 +65,7 @@
         "Suggested.Root":   "[joinpath(variable('Solr.Server'), variable('Suggested.Name'))]",
         "FXM.Master.Root":  "[joinpath(variable('Solr.Server'), variable('FXM.Master.Name'))]",
         "FXM.Web.Root":     "[joinpath(variable('Solr.Server'), variable('FXM.Web.Name'))]",
+
         "Core.Conf":        "[joinpath(variable('Core.Root'), 'conf')]",
         "Master.Conf":      "[joinpath(variable('Master.Root'), 'conf')]",
         "Web.Conf":         "[joinpath(variable('Web.Root'), 'conf')]",
@@ -77,6 +80,7 @@
     },
     "Tasks": {
         "StopSolr": {
+            "Description" : "Stops the Solr service if it is running.",
             "Type": "ManageService",
             "Params":{
                 "Name": "[parameter('SolrService')]",
@@ -85,6 +89,7 @@
             }
         },
         "CleanCores": {
+			"Description" : "Creates/clears core paths.",
             "Type": "EnsurePath",
             "Params":{
                 "Clean": [
@@ -103,6 +108,7 @@
             }
         },
         "PrepareCores": {
+			"Description" : "Copies base configs into the core paths.",
             "Type": "Copy",
             "Params":[
                 { "Source": "[joinpath(variable('Solr.BaseConfigs'), '*')]", "Destination": "[variable('Core.Root')]" },
@@ -119,6 +125,7 @@
             ]
         },
         "AddSchemaUniqueKeyField": {
+			"Description" : "Amends the core managed schema uniqueKey element.",
             "Type": "SetXml",
             "Params": [
                 { "FilePath": "[joinpath(variable('Core.Conf'), variable('Solr.SchemaFileName'))]", "Xpath":"[variable('Solr.Xpath.SchemaRoot')]", "Element": "field", "Attributes": "[variable('Solr.UniqueField.Attributes')]" },
@@ -135,6 +142,7 @@
             ]
         },
         "UpdateSchemaUniqueKey": {
+			"Description" : "Amends the core managed schema uniqueKey element.",
             "Type": "SetXml",
             "Params": [
                 { "FilePath": "[joinpath(variable('Core.Conf'), 'managed-schema')]", "Xpath":"[variable('Solr.Xpath.UniqueKey')]", "Value": "[variable('Solr.UniqueField')]" },
@@ -151,6 +159,7 @@
             ]
         },
         "StartSolr": {
+			"Description" : "Starts the Solr service.",
             "Type": "ManageService",
             "Params":{
                 "Name": "[parameter('SolrService')]",
@@ -159,19 +168,39 @@
             }
         },
         "CreateCores":{
+			"Description" : "Tells Solr to create the new cores.",
             "Type": "ManageSolrCore",
             "Params": [
-                { "Action": "Create", "Address": "[parameter('SolrUrl')]", "Arguments": { "Name": "[variable('Core.Name')]" } },
-                { "Action": "Create", "Address": "[parameter('SolrUrl')]", "Arguments": { "Name": "[variable('Master.Name')]" } },
-                { "Action": "Create", "Address": "[parameter('SolrUrl')]", "Arguments": { "Name": "[variable('Web.Name')]" } },
-                { "Action": "Create", "Address": "[parameter('SolrUrl')]", "Arguments": { "Name": "[variable('MD.Master.Name')]" } },
-                { "Action": "Create", "Address": "[parameter('SolrUrl')]", "Arguments": { "Name": "[variable('MD.Web.Name')]" } },
-                { "Action": "Create", "Address": "[parameter('SolrUrl')]", "Arguments": { "Name": "[variable('MA.Master.Name')]" } },
-                { "Action": "Create", "Address": "[parameter('SolrUrl')]", "Arguments": { "Name": "[variable('MA.Web.Name')]" } },
-                { "Action": "Create", "Address": "[parameter('SolrUrl')]", "Arguments": { "Name": "[variable('Testing.Name')]" } },
-                { "Action": "Create", "Address": "[parameter('SolrUrl')]", "Arguments": { "Name": "[variable('Suggested.Name')]" } },
-                { "Action": "Create", "Address": "[parameter('SolrUrl')]", "Arguments": { "Name": "[variable('FXM.Master.Name')]" } },
-                { "Action": "Create", "Address": "[parameter('SolrUrl')]", "Arguments": { "Name": "[variable('FXM.Web.Name')]" } }
+                { "Action": "Create", "Address": "[parameter('SolrUrl')]", "Arguments": { "name": "[variable('Core.Name')]", "property.update.autoCreateFields": "false" } },
+                { "Action": "Create", "Address": "[parameter('SolrUrl')]", "Arguments": { "name": "[variable('Master.Name')]", "property.update.autoCreateFields": "false" } },
+                { "Action": "Create", "Address": "[parameter('SolrUrl')]", "Arguments": { "name": "[variable('Web.Name')]", "property.update.autoCreateFields": "false" } },
+                { "Action": "Create", "Address": "[parameter('SolrUrl')]", "Arguments": { "name": "[variable('MD.Master.Name')]", "property.update.autoCreateFields": "false" } },
+                { "Action": "Create", "Address": "[parameter('SolrUrl')]", "Arguments": { "name": "[variable('MD.Web.Name')]", "property.update.autoCreateFields": "false" } },
+                { "Action": "Create", "Address": "[parameter('SolrUrl')]", "Arguments": { "name": "[variable('MA.Master.Name')]", "property.update.autoCreateFields": "false" } },
+                { "Action": "Create", "Address": "[parameter('SolrUrl')]", "Arguments": { "name": "[variable('MA.Web.Name')]", "property.update.autoCreateFields": "false" } },
+                { "Action": "Create", "Address": "[parameter('SolrUrl')]", "Arguments": { "name": "[variable('Testing.Name')]", "property.update.autoCreateFields": "false" } },
+                { "Action": "Create", "Address": "[parameter('SolrUrl')]", "Arguments": { "name": "[variable('Suggested.Name')]", "property.update.autoCreateFields": "false" } },
+                { "Action": "Create", "Address": "[parameter('SolrUrl')]", "Arguments": { "name": "[variable('FXM.Master.Name')]", "property.update.autoCreateFields": "false" } },
+                { "Action": "Create", "Address": "[parameter('SolrUrl')]", "Arguments": { "name": "[variable('FXM.Web.Name')]", "property.update.autoCreateFields": "false" } }
+            ]
+        }
+    },
+    "UninstallTasks": {
+        "RemoveCores": {
+            "Description": "Removes the cores and instance folders.",
+            "Type": "ManageSolrCore",
+            "Params": [
+                { "Action": "Unload", "Address": "[parameter('SolrUrl')]", "Arguments": { "core": "[variable('Core.Name')]", "deleteInstanceDir": "true" }, "ErrorAction": "SilentlyContinue" },
+                { "Action": "Unload", "Address": "[parameter('SolrUrl')]", "Arguments": { "core": "[variable('Master.Name')]", "deleteInstanceDir": "true" }, "ErrorAction": "SilentlyContinue" },
+                { "Action": "Unload", "Address": "[parameter('SolrUrl')]", "Arguments": { "core": "[variable('Web.Name')]", "deleteInstanceDir": "true" }, "ErrorAction": "SilentlyContinue" },
+                { "Action": "Unload", "Address": "[parameter('SolrUrl')]", "Arguments": { "core": "[variable('MD.Master.Name')]", "deleteInstanceDir": "true" }, "ErrorAction": "SilentlyContinue" },
+                { "Action": "Unload", "Address": "[parameter('SolrUrl')]", "Arguments": { "core": "[variable('MD.Web.Name')]", "deleteInstanceDir": "true" }, "ErrorAction": "SilentlyContinue" },
+                { "Action": "Unload", "Address": "[parameter('SolrUrl')]", "Arguments": { "core": "[variable('MA.Master.Name')]", "deleteInstanceDir": "true" }, "ErrorAction": "SilentlyContinue" },
+                { "Action": "Unload", "Address": "[parameter('SolrUrl')]", "Arguments": { "core": "[variable('MA.Web.Name')]", "deleteInstanceDir": "true" }, "ErrorAction": "SilentlyContinue" },
+                { "Action": "Unload", "Address": "[parameter('SolrUrl')]", "Arguments": { "core": "[variable('Testing.Name')]", "deleteInstanceDir": "true" }, "ErrorAction": "SilentlyContinue" },
+                { "Action": "Unload", "Address": "[parameter('SolrUrl')]", "Arguments": { "core": "[variable('Suggested.Name')]", "deleteInstanceDir": "true" }, "ErrorAction": "SilentlyContinue" },
+                { "Action": "Unload", "Address": "[parameter('SolrUrl')]", "Arguments": { "core": "[variable('FXM.Master.Name')]", "deleteInstanceDir": "true" }, "ErrorAction": "SilentlyContinue" },
+                { "Action": "Unload", "Address": "[parameter('SolrUrl')]", "Arguments": { "core": "[variable('FXM.Web.Name')]", "deleteInstanceDir": "true" }, "ErrorAction": "SilentlyContinue" }
             ]
         }
     }
