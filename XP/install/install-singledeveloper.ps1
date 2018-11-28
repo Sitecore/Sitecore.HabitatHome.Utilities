@@ -109,28 +109,6 @@ Function Download-Assets {
             sz x -o"$DownloadFolder" $destination  -y -aoa
         }
     }
-    $sipackage = $modules | Where-Object {$_.id -eq "si"}
-    
-    if ($sipackage.download -eq $true) {
-        Write-Host ("Downloading {0}  -  if required" -f $sipackage.name )
-        
-        $destination = $sipackage.fileName
-            
-        if (!(Test-Path $destination)) {
-            $params = @{
-                Path         = $downloadJsonPath
-                LoginSession = $loginSession
-                Source       = $package.url
-                Destination  = $destination
-            }
-            $Global:ProgressPreference = 'SilentlyContinue'
-            Install-SitecoreConfiguration  @params  *>&1 | Tee-Object $LogFile -Append 
-            $Global:ProgressPreference = 'Continue'
-        }
-        if ((Test-Path $destination) -and ( $sipackage.extract -eq $true)) {
-            sz x -o"$DownloadFolder" $destination  -y -aoa
-        }
-    }
 }
 Function Confirm-Prerequisites {
     #Verify SQL version
