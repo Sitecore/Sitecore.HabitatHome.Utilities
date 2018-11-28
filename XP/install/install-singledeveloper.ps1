@@ -101,8 +101,9 @@ Function Download-Assets {
                 Source       = $package.url
                 Destination  = $destination
             }
-        
+            $Global:ProgressPreference = 'SilentlyContinue'
             Install-SitecoreConfiguration  @params  *>&1 | Tee-Object $LogFile -Append 
+            $Global:ProgressPreference = 'Continue'
         }
         if ((Test-Path $destination) -and ( $package.extract -eq $true)) {
             sz x -o"$DownloadFolder" $destination  -y -aoa
@@ -122,8 +123,9 @@ Function Download-Assets {
                 Source       = $package.url
                 Destination  = $destination
             }
-        
+            $Global:ProgressPreference = 'SilentlyContinue'
             Install-SitecoreConfiguration  @params  *>&1 | Tee-Object $LogFile -Append 
+            $Global:ProgressPreference = 'Continue'
         }
         if ((Test-Path $destination) -and ( $sipackage.extract -eq $true)) {
             sz x -o"$DownloadFolder" $destination  -y -aoa
