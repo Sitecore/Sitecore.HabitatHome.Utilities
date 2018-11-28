@@ -77,8 +77,13 @@ Function Download-Assets {
     if (!(Test-Path $downloadFolder)) {
         New-Item -ItemType Directory -Force -Path $downloadFolder
     }
-    $credentials = Get-Credential -Message "Please provide dev.sitecore.com credentials"
+    if ($null -eq $credentials) {
+        $credentials = Get-Credential -Message "Please provide dev.sitecore.com credentials"
+    }
+    $user = $credentials.GetNetworkCredential().UserName
+    $password = $Credentials.GetNetworkCredential().Password
 
+    $loginRequest = Invoke-RestMethod -Uri https://dev.sitecore.net/api/authorization -Method Post -ContentType "application/json" -Body "{username: '$user', password: '$password'}" -SessionVariable loginSession -UseBasicParsing 
 
     $downloadJsonPath = $([io.path]::combine($resourcePath, 'HabitatHome', 'download-assets.json'))
     Set-Alias sz 'C:\Program Files\7-Zip\7z.exe'
@@ -91,11 +96,12 @@ Function Download-Assets {
             
         if (!(Test-Path $destination)) {
             $params = @{
-                Path        = $downloadJsonPath
-                Credentials = $credentials
-                Source      = $package.url
-                Destination = $destination
+                Path         = $downloadJsonPath
+                LoginSession = $loginSession
+                Source       = $package.url
+                Destination  = $destination
             }
+        
             Install-SitecoreConfiguration  @params  *>&1 | Tee-Object $LogFile -Append 
         }
         if ((Test-Path $destination) -and ( $package.extract -eq $true)) {
@@ -111,11 +117,12 @@ Function Download-Assets {
             
         if (!(Test-Path $destination)) {
             $params = @{
-                Path        = $downloadJsonPath
-                Credentials = $credentials
-                Source      = $sipackage.url
-                Destination = $destination
+                Path         = $downloadJsonPath
+                LoginSession = $loginSession
+                Source       = $package.url
+                Destination  = $destination
             }
+        
             Install-SitecoreConfiguration  @params  *>&1 | Tee-Object $LogFile -Append 
         }
         if ((Test-Path $destination) -and ( $sipackage.extract -eq $true)) {
