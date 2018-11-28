@@ -14,8 +14,8 @@
     "modules": [{
             "id": "sat",
             "name": "Sitecore Azure Toolkit",
-            "fileName": "Sitecore Azure Toolkit 2.0.4 rev. 180605.zip",
-            "url": "https://dev.sitecore.net/~/media/97227BC40EF74028AA1BC7B8F48909A4.ashx",
+            "fileName": "Sitecore Azure Toolkit 2.1.0 rev. 181023.zip",
+            "url": "https://dev.sitecore.net/~/media/2976CA2FB22C47D18DCCD03581F7E67C.ashx",
             "download": true,
             "install": true,
             "convert": false,
