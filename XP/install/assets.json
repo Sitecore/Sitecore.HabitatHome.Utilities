@@ -4,8 +4,8 @@
     {
       "id": "xp",
       "name": "Sitecore Experience Platform",
-      "fileName": "Sitecore 9.1.0 rev. 001564 (WDP XP0 packages).zip",
-      "url": "",
+      "fileName": "Sitecore 9.1.0 rev. 001564 (WDP XPSingle packages).zip",
+      "url": "https://dev.sitecore.net/~/media/442BA3B6E6334CEA9546C647D434BC13.ashx",
       "extract": true,
       "download": true,
       "source": "sitecore"
@@ -22,10 +22,20 @@
             "source": "sitecore"
         },
         {
+            "id": "si",
+            "name": "Sitecore Identity",
+            "fileName": "Sitecore.IdentityServer.2.0.0-r00157.scwdp.zip",
+            "url": "https://dev.sitecore.net/~/media/B6C57F3892E14E0291FC80A38439983D.ashx",
+            "download": true,
+            "install": true,
+            "convert": false,
+            "source": "sitecore"
+        },
+        {
             "id": "spe",
             "name": "Sitecore PowerShell Extensions",
             "fileName": "Sitecore PowerShell Extensions-5.0.scwdp.zip",
-            "url": "https://dev.sitecore.net/~/media/4918E7ADAAF049F4BC7BA5B73561F24F.ashx",
+            "url": "https://dev.sitecore.net/~/media/2C02EB17879548139937A41E5DA0EFCF.ashx",
             "download": true,
             "install": true,
             "convert": false,
@@ -35,7 +45,7 @@
             "id": "sxa",
             "name": "Sitecore Experience Accelerator",
             "fileName": "Sitecore Experience Accelerator 1.8 rev. 181112 for 9.1.scwdp.zip",
-            "url": "https://dev.sitecore.net/~/media/1FF242BE683E4DE989925F74B78978FC.ashx",
+            "url": "https://dev.sitecore.net/~/media/D494E255F40A49F097DE86C001495FFD.ashx",
             "download": true,
             "install": true,
             "convert": false,

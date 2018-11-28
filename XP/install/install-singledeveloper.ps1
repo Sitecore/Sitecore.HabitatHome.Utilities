@@ -80,7 +80,7 @@ Function Download-Assets {
     $credentials = Get-Credential -Message "Please provide dev.sitecore.com credentials"
 
 
-    $downloadJsonPath = $([io.path]::combine($resourcePath, 'content', 'Deployment', 'OnPrem', 'HabitatHome', 'download-assets.json'))
+    $downloadJsonPath = $([io.path]::combine($resourcePath, 'HabitatHome', 'download-assets.json'))
     Set-Alias sz 'C:\Program Files\7-Zip\7z.exe'
     $package = $modules | Where-Object {$_.id -eq "xp"}
     
@@ -99,6 +99,26 @@ Function Download-Assets {
             Install-SitecoreConfiguration  @params  *>&1 | Tee-Object $LogFile -Append 
         }
         if ((Test-Path $destination) -and ( $package.extract -eq $true)) {
+            sz x -o"$DownloadFolder" $destination  -y -aoa
+        }
+    }
+    $sipackage = $modules | Where-Object {$_.id -eq "si"}
+    
+    if ($sipackage.download -eq $true) {
+        Write-Host ("Downloading {0}  -  if required" -f $sipackage.name )
+        
+        $destination = $sipackage.fileName
+            
+        if (!(Test-Path $destination)) {
+            $params = @{
+                Path        = $downloadJsonPath
+                Credentials = $credentials
+                Source      = $sipackage.url
+                Destination = $destination
+            }
+            Install-SitecoreConfiguration  @params  *>&1 | Tee-Object $LogFile -Append 
+        }
+        if ((Test-Path $destination) -and ( $sipackage.extract -eq $true)) {
             sz x -o"$DownloadFolder" $destination  -y -aoa
         }
     }
