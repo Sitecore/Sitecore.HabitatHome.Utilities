@@ -48,6 +48,11 @@ $packagesFolder = (Join-Path $downloadFolder "packages")
 
 $credentials = $null
 $loginSession = $null
+
+if (!(Test-Path $packagesFolder))
+{
+    New-Item $packagesFolder -ItemType Directory -Force  > $null  
+}
 Function Install-SitecoreInstallFramework {
     if ((Get-PSRepository | Where-Object {$_.Name -eq $assets.psRepositoryName}).count -eq 0) {
         Register-PSRepository -Name $assets.psRepositoryName -SourceLocation $assets.psRepository -InstallationPolicy Trusted 
@@ -57,7 +62,7 @@ Function Install-SitecoreInstallFramework {
     Import-Module WebAdministration
     
     #Install SIF
-    $sifVersion = $assets.installerVersion -replace "-beta[0-9]*$"
+    $sifVersion = $assets.installerVersion
     
     $module = Get-Module -FullyQualifiedName @{ModuleName = "SitecoreInstallFramework"; ModuleVersion = $sifVersion }
     if (-not $module) {
