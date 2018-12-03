@@ -85,7 +85,7 @@ The `set-installation-overrides.ps1.example` script needs to be renamed and modi
 
 - Let's GO!
   ```
-  .\install-xp0.ps1
+  .\install-singledeveloper.ps1
   ```
 - Install Modules
 ```.\install-modules.ps1```
