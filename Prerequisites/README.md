@@ -35,7 +35,7 @@ Import-Module SitecoreInstallFramework
 ```
 - Install prerequisites
     ```
-	Install-SitecoreConfiguration -Path (Resolve-Path prerequisites.json)
+	Install-SitecoreConfiguration -Path (Resolve-Path .\prerequisites.json)
 	```
 - Set Progress Bar preferences back to defaults
 ```
