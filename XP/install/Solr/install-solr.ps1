@@ -158,7 +158,7 @@ if($solrSSL)
 Invoke-Expression "start $($protocol)://$($solrHost):$solrPort/solr/#/"
 
 # Resetting Progress Bar back to default
-$Global:ProgressPreference = "SilentlyContinue"
+$Global:ProgressPreference = "Continue"
 
 Write-Host ''
 Write-Host 'Done!' -ForegroundColor Green
