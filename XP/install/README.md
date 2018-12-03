@@ -1,6 +1,6 @@
 ## Installation helpers for Sitecore Experience Platform (XP)
 
-> These steps assume you have all of the prerequisites installed or have followed the instructions at [README.md](../../Prerequisits/README.md)
+> These steps assume you have all of the prerequisites installed or have followed the instructions at [README.md](../../Prerequisites/README.md)
 
 ### Solr
 
