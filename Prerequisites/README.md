@@ -1,39 +1,46 @@
-### Suggested Steps for semi-automated install of prerequisites
+### Suggested Steps for installation of prerequisites
 
-#### Boxstarter - install Windows features
+#### Install Sitecore Install Framework (SIF)
 
 - Open PowerShell session as Administrator
+```
+Install-Package SitecoreInstallFramework -Version 2.0.0 -Source https://sitecore.myget.org/F/sc-powershell/api/v3/index.json
+Import-Module SitecoreInstallFramework
+```
 
-#### Install other prerequisites and tools
+
+#### Install Prerequisites
 
 - Create a working directory
 	```
 	md c:\projects
 	Set-Location c:\projects
 	```
-
-- Download packages.config and install.ps1 from repository
-	```
-	Invoke-WebRequest -Uri https://raw.githubusercontent.com/Sitecore/Sitecore.HabitatHome.Utilities/master/Prerequisites/packages.config | set-content packages.config
-
-	Invoke-WebRequest -Uri https://raw.githubusercontent.com/Sitecore/Sitecore.HabitatHome.Utilities/master/Prerequisites/install.ps1 | set-content install.ps1
-	```
-
-- **Review `packages.config`** to ensure it matches what you'd like to install
-- Install prerequisites and tools
-    ```
-	.\install.ps1
-	```
-
-- Manually install and configure SQL Server
-
-
-### RESTART COMPUTER
-
 - Clone the [Sitecore.HabitatHome.Utilities](https://github.com/Sitecore/Sitecore.HabitatHome.Utilities/) repository
 
 	```
 	git clone https://github.com/Sitecore/Sitecore.HabitatHome.Utilities.git
 	```
+	
+- Navigate to the XP\install\assets\Configuration folder
 
-See the [README.md](../XP/install/README.md) in the XP/install folder
+```
+	Set-Location c:\projects\Sitecore.HabitatHome.Utilities\XP\install\assets\configuration
+```
+
+- Turn off PowerShell Progress Bar to greatly enhance download speeds
+
+```
+	$Global:ProgressPreference = 'SilentlyContinue'
+```
+- Install prerequisites
+    ```
+	Install-SitecoreConfiguration -Path (Resolve-Path prerequisites.json)
+	```
+- Set Progress Bar preferences back to defaults
+```
+	$Global:ProgressPreference = 'Continue'
+	
+### RESTART COMPUTER
+
+See the [README.md](../XP/install/README.md) in the XP/install folder for next steps
