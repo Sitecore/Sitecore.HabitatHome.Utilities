@@ -1,16 +1,14 @@
 {
 
-  "sitecore": [
-    {
-      "id": "xp",
-      "name": "Sitecore Experience Platform",
-      "fileName": "Sitecore 9.1.0 rev. 001564 (WDP XPSingle packages).zip",
-      "url": "https://dev.sitecore.net/~/media/442BA3B6E6334CEA9546C647D434BC13.ashx",
-      "extract": true,
-      "download": true,
-      "source": "sitecore"
-    }
-  ],
+    "sitecore": [{
+        "id": "xp",
+        "name": "Sitecore Experience Platform",
+        "fileName": "Sitecore 9.1.0 rev. 001564 (WDP XPSingle packages).zip",
+        "url": "https://dev.sitecore.net/~/media/442BA3B6E6334CEA9546C647D434BC13.ashx",
+        "extract": true,
+        "download": true,
+        "source": "sitecore"
+    }],
     "modules": [{
             "id": "sat",
             "name": "Sitecore Azure Toolkit",
@@ -165,14 +163,38 @@
             "install": false,
             "convert": false,
             "source": "external"
+        },
+        {
+            "id": "xGen",
+            "name": "xGenerator",
+            "fileName": "ExperienceGenerator_91.zip",
+            "url": "https://github.com/Sitecore/xGenerator/releases/download/9.1.0.0/ExperienceGenerator_91.zip",
+            "download": true,
+            "install": true,
+            "convert": true,
+            "source": "external"
         }
-
     ],
-    "prerequisites": [{
-        "id": "webPlatformInstaller",
-        "fileName": "WebPlatformInstaller_amd64_en-US.msi",
-        "url": "https://download.microsoft.com/download/C/F/F/CFF3A0B8-99D4-41A2-AE1A-496C08BEB904/WebPlatformInstaller_amd64_en-US.msi",
-        "download": true,
-        "source": "external"
-    }]
+    "habitatHome": [{
+            "id": "habitathome",
+            "name": "Habitat Home",
+            "fileName": "HabitatHome_single.scwdp.zip",
+            "url": "https://github.com/Sitecore/Sitecore.HabitatHome.Platform/releases/download/9.1.0.0-beta1/HabitatHome_single.scwdp.zip",
+            "download": true,
+            "install": true,
+            "convert": false,
+            "source": "external"
+        },
+        {
+            "id": "habitathome_xConnect",
+            "name": "Habitat Home xConnect",
+            "fileName": "xConnect_single.scwdp.zip",
+            "url": "https://github.com/Sitecore/Sitecore.HabitatHome.Platform/releases/download/9.1.0.0-beta1/xConnect_single.scwdp.zip",
+            "download": true,
+            "install": true,
+            "convert": false,
+            "source": "external"
+        }
+    ]
+
 }

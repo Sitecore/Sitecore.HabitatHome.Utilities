@@ -151,6 +151,15 @@ foreach ($module in $modulesConfig.modules) {
     Replace-Path $module $assets.root
 }
 $modules += $modulesConfig.modules
+
+$habitatHome = $modulesConfig.habitatHome
+
+foreach ($entry in $habitatHome){
+    Replace-Path $entry $assets.root
+}
+
+$modules+=$habitatHome
+
 $json.modules = $modules
 
 

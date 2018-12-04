@@ -4,6 +4,7 @@ Param(
     [string] $LogFileName = "install-modules.log"
 )
 
+[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
 $StopWatch = New-Object -TypeName System.Diagnostics.Stopwatch 
 $StopWatch.Start()
@@ -106,6 +107,7 @@ Function Install-SitecoreAzureToolkit {
     Import-Module (Join-Path $assets.root "SAT\tools\Sitecore.Cloud.CmdLets.dll") -Force 
 
 }
+
 Function Get-OptionalModules {
 
     $downloadAssets = $modules
@@ -170,7 +172,7 @@ Function Process-Packages {
                 Install-SitecoreConfiguration  @params -WorkingDirectory $(Join-Path $PWD "logs")  
                 $Global:ProgressPreference = 'Continue'
             }
-            Write-Host $package
+            
             if ($package.convert) {
                 Write-Host ("Converting {0} to SCWDP" -f $package.name) -ForegroundColor Green
                 ConvertTo-SCModuleWebDeployPackage  -Path $destination -Destination $PackagesFolder -Force
@@ -464,6 +466,32 @@ Function Install-StacklaModule {
     
     Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs") 
 }
+
+
+Function Install-ExperienceGenerator {
+
+    # Install xGenerator
+
+    $xGen = $modules | Where-Object { $_.id -eq "xGen"}
+    if ($false -eq $xGen.install) {
+        return
+    }
+    $xGen.fileName = $xGen.fileName.replace(".zip", ".scwdp.zip")
+    $params = @{
+        Path             = (Join-path $resourcePath 'HabitatHome\module-core.json')
+        Package          = $xGen.fileName
+        SiteName         = $site.hostName
+        SqlDbPrefix      = $site.prefix 
+        SqlAdminUser     = $sql.adminUser 
+        SqlAdminPassword = $sql.adminPassword 
+        SqlServer        = $sql.server 
+
+    }
+    
+    Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs") 
+}
+
+
 Function Enable-ContainedDatabases {
     #Enable Contained Databases
     Write-Host "Enable contained databases" -ForegroundColor Green
@@ -523,6 +551,10 @@ Function Add-DatabaseUsers {
 }
 function Update-SXASolrCores {
     try {
+        $sxa = $modules | Where-Object { $_.id -eq "sxa"}
+        if ($false -eq $sxa.install) {
+            return
+        }
         $params = @{
             Path        = Join-Path $resourcePath "HabitatHome\configure-search-indexes.json"
             InstallDir  = Join-Path $site.webRoot $site.hostName
@@ -577,6 +609,7 @@ Install-SitecoreExperienceAccelerator
 Install-DataExchangeFrameworkModules
 Install-SalesforceMarketingCloudModule
 Install-StacklaModule
+Install-ExperienceGenerator
 Enable-ContainedDatabases
 Add-DatabaseUsers
 Start-Services
