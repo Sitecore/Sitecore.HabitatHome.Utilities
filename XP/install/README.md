@@ -1,6 +1,6 @@
 ## Installation helpers for Sitecore Experience Platform (XP)
 
-> These steps assume you have all of the prerequisites installed or have followed the instructions at [README.md](../../Prerequisits/README.md)
+> These steps assume you have all of the prerequisites installed or have followed the instructions at [README.md](../../Prerequisites/README.md)
 
 ### Solr
 
@@ -85,7 +85,7 @@ The `set-installation-overrides.ps1.example` script needs to be renamed and modi
 
 - Let's GO!
   ```
-  .\install-xp0.ps1
+  .\install-singledeveloper.ps1
   ```
 - Install Modules
 ```.\install-modules.ps1```
