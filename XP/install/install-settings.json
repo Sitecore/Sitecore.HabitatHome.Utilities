@@ -16,7 +16,8 @@
             "prefix": "@@site.prefix@@",
             "suffix": "@@site.suffix@@",
             "webRoot": "@@site.webRoot@@",
-            "hostName": "@@site.hostName@@"
+            "hostName": "@@site.hostName@@",
+            "addSiteBindingWithSSLPath":"@@site.addSiteBindingWithSSLPath@@"
         },
       "sql": {
         "server": "@@sql.server@@",
