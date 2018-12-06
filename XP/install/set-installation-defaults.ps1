@@ -154,15 +154,21 @@ foreach ($module in $modulesConfig.modules) {
 }
 $modules += $modulesConfig.modules
 
-$habitatHome = $modulesConfig.habitatHome
+$habitatHomeModules = $modulesConfig.habitatHome
 
-foreach ($entry in $habitatHome){
+foreach ($entry in $habitatHomeModules){
     Replace-Path $entry $assets.root
 }
 
 $modules+=$habitatHome
 
 $json.modules = $modules
+
+$habitatHome = $json.habitatHome
+($habitatHome | Where-Object {$_.id -eq "Root Host Name"}).value = "dev.local"
+($habitatHome | Where-Object {$_.id -eq "Analytics Cookie Domain"}).value = "$(rootHostName)"
+
+
 
 
 Write-Host ("Saving Configuration file to {0}" -f $ConfigurationFile)

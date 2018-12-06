@@ -213,15 +213,29 @@ Function Stop-Services {
         restart-service -force $mssqlService
     }
 }
+Function Install-Bootloader{
+    $bootLoaderPackagePath = [IO.Path]::Combine( $assets.root, "SAT\resources\9.1.0\Addons\Sitecore.Cloud.Integration.Bootload.wdp.zip")
+    
+    $params = @{
+        Path             = (Join-path $resourcePath 'HabitatHome\module-nodb.json')
+        Package          = $bootLoaderPackagePath
+        SiteName         = $site.hostName
+    }
+    
+    Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs")
+}
+
 Function Install-HabitatHome {
 
+
+$sitecoreWDPpathArray.Add($(Get-Item -Path $([IO.Path]::Combine($assetsFolder, 'Sitecore Azure Toolkit', 'resources', $sepversion, 'Addons', 'Sitecore.Cloud.Integration.Bootload.wdp.zip')))) | out-null
     $hh = $habitatHome | Where-Object { $_.id -eq "habitathome"}
     if ($false -eq $hh.install) {
         return
     }
     
     $params = @{
-        Path             = (Join-path $resourcePath 'HabitatHome\module-mastercore.json')
+        Path             = (Join-path $resourcePath 'HabitatHome\habitathome.json')
         Package          = $hh.fileName
         SiteName         = $site.hostName
         SqlDbPrefix      = $site.prefix 
@@ -323,6 +337,7 @@ Install-SitecoreAzureToolkit
 Get-HabitatHome
 Remove-DatabaseUsers
 Stop-Services
+Install-Bootloader
 Install-HabitatHome
 Install-HabitatHomeXConnect
 Enable-ContainedDatabases

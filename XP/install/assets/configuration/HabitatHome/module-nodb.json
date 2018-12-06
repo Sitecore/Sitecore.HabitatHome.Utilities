@@ -1,0 +1,34 @@
+{
+    "Parameters": {
+      "Package": {
+        "Type": "string",
+        "Description": "The path to the Web Deploy package to deploy."
+      },
+      "SiteName": {
+        "Type": "string",
+        "DefaultValue": "Sitecore",
+        "Description": "The name of the site to be deployed."
+      }
+    },
+    "Tasks": {
+      "InstallWDP": {
+        "Type": "WebDeploy",
+        "Params": {
+          "Verb": "Sync",
+          "Arguments": {
+            "Source": {
+              "Package": "[resolvepath(parameter('Package'))]"
+            },
+            "Dest": "Auto",
+            "EnableRule":"DoNotDeleteRule",
+            "SetParam": [
+              {
+                "Name": "Application Path",
+                "Value": "[parameter('SiteName')]"
+              }
+            ]
+          }
+        }
+      }
+    }
+  }

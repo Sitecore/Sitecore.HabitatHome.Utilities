@@ -1,0 +1,202 @@
+{
+  "Parameters": {
+    "Package": {
+      "Type": "string",
+      "Description": "The path to the Web Deploy package to deploy."
+    },
+    "SiteName": {
+      "Type": "string",
+      "DefaultValue": "Sitecore",
+      "Description": "The name of the site to be deployed."
+    },
+    "SqlDbPrefix": {
+      "Type": "string",
+      "Description": "SQL DB Prefix"
+    },
+    "SqlAdminUser": {
+      "Type": "string",
+      "DefaultValue": "sa",
+      "Description": "The Sql admin user account to use when installing databases."
+    },
+    "SqlAdminPassword": {
+      "Type": "string",
+      "DefaultValue": "12345",
+      "Description": "The Sql admin password to use when installing databases."
+    },
+    "SqlServer": {
+      "Type": "string",
+      "DefaultValue": ".\\SQLSERVER",
+      "Description": "The Sql Server where databases will be installed."
+    },
+    "DemoDynamicsCRMConnectionString": {
+      "Type": "string",
+      "DefaultValue":"",
+      "Description": "Connection string for Dynamics CRM"
+    },
+    "DemoCRMSalesForceConnectionString": {
+      "Type": "string",
+      "DefaultValue":"",
+      "Description": "Connection string for SalesForce CRM connector"
+    },
+    "EnableEXMmodule": {
+      "Type": "string",
+      "DefaultValue": "yes",
+      "Description": "Enable or disable the EXM module. Values: 'yes' or 'no'"
+    },
+    "AllowInvalidSSLCertificate": {
+      "Type": "boolean",
+      "DefaultValue": true,
+      "Description": "Allows the use of self-signed certificates for communication with XConnect. Values: 'True' or 'False'"
+    },
+    "EnvironmentType": {
+      "Type": "string",
+      "DefaultValue": "Local",
+      "Description": "Define the environment (Local or Production) - this affect some configuration settings"
+    },
+    "UnicornEnabled": {
+      "Type": "string",
+      "DefaultValue": "Off",
+      "Description": "Turn Unicorn functionality on or off"
+    },
+    "3rdPartyIntegrations": {
+      "Type": "string",
+      "DefaultValue": "None",
+      "Description": "Use a keyword like CDN, Dynamics, Salesforce, Facebook, MS to enable. See README for details."
+    },
+    "ASPNETDebugging": {
+      "Type": "boolean",
+      "DefaultValue": false,
+      "Description": "Turn debugging on or off for the environment. Values: 'true' or 'false'"
+    },
+    "CDNEnabled": {
+      "Type": "boolean",
+      "DefaultValue": false,
+      "Description": "Enable or disable CDN. Values: 'True' or 'False'"
+    },
+    "MediaAlwaysIncludeServerURL": {
+      "Type": "boolean",
+      "DefaultValue": false,
+      "Description": "Enable or disable Media URL display behavior. Values: 'True' or 'False'"
+    },
+    "MediaLinkServerURL": {
+      "Type": "string",
+      "DefaultValue":"",
+      "Description": "URL to the media server (if any)"
+    },
+    "MediaResponseCacheabilityType": {
+      "Type": "string",
+      "DefaultValue": "private",
+      "Description": "The type of cacheability of the media files on remote or proxy servers - private or public"
+    },
+    "DemoEnabled": {
+      "Type": "boolean",
+      "DefaultValue": true,
+      "Description": "Enable or disable the demo mode. Values: 'True' or 'False'"
+    },
+    "RootHostName": {
+      "Type": "string",
+      "DefaultValue": "dev.local",
+      "Description": "Habitat hostname"
+    },
+    "AnalyticsCookieDomain": {
+      "Type": "string",
+      "DefaultValue": "dev.local",
+      "Description": "Analytics cookie domain name"
+    }
+  },
+  "Variables": {
+    "Sql.Database.Core": "[concat(parameter('SqlDbPrefix'), '_Core')]",
+    "Sql.Database.Master": "[concat(parameter('SqlDbPrefix'), '_Master')]",
+    "Sql.Core.ConnectionString": "[SqlConnectionString(parameter('SqlServer'),variable('Sql.Database.Core'), parameter('SqlAdminUser'), parameter('SqlAdminPassword'))]",
+    "Sql.Master.ConnectionString": "[SqlConnectionString(parameter('SqlServer'),variable('Sql.Database.Master'), parameter('SqlAdminUser'), parameter('SqlAdminPassword'))]"
+  },
+  "Tasks": {
+    "InstallWDP": {
+      "Type": "WebDeploy",
+      "Params": {
+        "Verb": "Sync",
+        "Arguments": {
+          "Source": {
+            "Package": "[resolvepath(parameter('Package'))]"
+          },
+          "Dest": "Auto",
+          "EnableRule": "DoNotDeleteRule",
+          "SetParam": [
+            {
+              "Name": "Application Path",
+              "Value": "[parameter('SiteName')]"
+            },
+            {
+              "Name": "Core Admin Connection String",
+              "Value": "[variable('Sql.Core.ConnectionString')]"
+            },
+            {
+              "Name": "Master Admin Connection String",
+              "Value": "[variable('Sql.Master.ConnectionString')]"
+            },
+            {
+              "Name": "Demo Dynamics CRM Connection String",
+              "Value":"[parameter('DemoDynamicsCRMConnectionString')]"
+            },
+            {
+              "Name": "Demo CRM SalesForce Connection String",
+              "Value":"[parameter('DemoCRMSalesForceConnectionString')]"
+            },
+            {
+              "Name": "Enable EXM module",
+              "Value":"[parameter('EnableEXMmodule')]"
+            },
+            {
+              "Name": "Allow Invalid SSL Certificate",
+              "Value":"[parameter('AllowInvalidSSLCertificate')]"
+            },
+            {
+              "Name": "Environment Type",
+              "Value":"[parameter('EnvironmentType')]"
+            },
+            {
+              "Name": "Unicorn On/Off",
+              "Value":"[parameter('UnicornEnabled')]"
+            },
+            {
+              "Name": "3rd Party Integrations",
+              "Value":"[parameter('3rdPartyIntegrations')]"
+            },
+            {
+              "Name": "ASP.NET Debugging",
+              "Value":"[parameter('ASPNETDebugging')]"
+            },
+            {
+              "Name": "CDN Enabled",
+              "Value":"[parameter('CDNEnabled')]"
+            },
+            {
+              "Name": "Media/Always Include Server URL",
+              "Value":"[parameter('MediaAlwaysIncludeServerURL')]"
+            },
+            {
+              "Name": "Media/Link Server URL",
+              "Value":"[parameter('MediaLinkServerURL')]"
+            },
+            {
+              "Name": "Media Response/Cacheability type",
+              "Value":"[parameter('MediaResponseCacheabilityType')]"
+            },
+            {
+              "Name": "Demo Enabled",
+              "Value":"[parameter('DemoEnabled')]"
+            },
+            {
+              "Name": "Root Host Name",
+              "Value":"[parameter('RootHostName')]"
+            },
+            {
+              "Name": "Analytics Cookie Domain",
+              "Value":"[parameter('AnalyticsCookieDomain')]"
+            }
+          ]
+        }
+      }
+    }
+  }
+}

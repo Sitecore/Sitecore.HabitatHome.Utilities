@@ -8,86 +8,160 @@
     "installerVersion": "@@assets.installerVersion@@",
     "sitecoreVersion": "@@assets.sitecoreVersion@@",
     "identityServerVersion": "@@assets.identityServerVersion@@"
-
-
   },
-    "settings": {
-        "site": {
-            "prefix": "@@site.prefix@@",
-            "suffix": "@@site.suffix@@",
-            "webRoot": "@@site.webRoot@@",
-            "hostName": "@@site.hostName@@",
-            "addSiteBindingWithSSLPath":"@@site.addSiteBindingWithSSLPath@@"
-        },
-      "sql": {
-        "server": "@@sql.server@@",
-        "adminUser": "@@sql.adminUser@@",
-        "adminPassword": "@@sql.adminPassword@@",
-        "userPassword": "@@sql.userPassword@@",
-        "coreUser": "@@sql.coreUser@@",
-        "corePassword": "@@sql.corePassword@@",
-        "masterUser": "@@sql.masterUser@@",
-        "masterPassword": "@@sql.masterPassword@@",
-        "webUser": "@@sql.webUser@@",
-        "webPassword": "@@sql.webPassword@@",
-        "collectionUser": "@@sql.collectionUser@@",
-        "collectionPassword": "@@sql.collectionPassword@@",
-        "reportingUser": "@@sql.reportingUser@@",
-        "reportingPassword": "@@sql.reportingPassword@@",
-        "processingEngineUser": "@@sql.processingEngineUser@@",
-        "processingEnginePassword": "@@sql.processingEnginePassword@@",
-        "processingPoolsUser": "@@sql.processingPoolsUser@@",
-        "processingPoolsPassword": "@@sql.processingPoolsPassword@@",
-        "processingTasksUser": "@@sql.processingTasksUser@@",
-        "processingTasksPassword": "@@sql.processingTasksPassword@@",
-        "referenceDataUser": "@@sql.referenceDataUser@@",
-        "referenceDataPassword": "@@sql.referenceDataPassword@@",
-        "securityUser": "@@sql.referenceDataUser@@",
-        "securityPassword": "@@sql.referenceDataPassword@@",
-        "marketingAutomationUser": "@@sql.marketingAutomationUser@@",
-        "marketingAutomationPassword": "@@sql.marketingAutomationPassword@@",
-        "formsUser": "@@sql.formsUser@@",
-        "formsPassword": "@@sql.formsPassword@@",
-        "exmMasterUser": "@@sql.exmMasterUser@@",
-        "exmMasterPassword": "@@sql.exmMasterPassword@@",
-        "messagingUser": "@@sql.messagingUser@@",
-        "messagingPassword": "@@sql.messagingPassword@@",
-        "minimumVersion": "@@sql.minimumVersion@@"
-      },
-        "xConnect": {
-            "configurationPath": "@@xConnect.configurationPath@@",
-            "certificateConfigurationPath": "@@xConnect.certificateConfigurationPath@@",
-            "solrConfigurationPath": "@@xConnect.solrConfigurationPath@@",
-            "packagePath": "@@xConnect.packagePath@@",
-            "siteName": "@@xConnect.siteName@@",
-            "certificateName": "@@xConnect.certificate@@",
-            "siteRoot": "@@xConnect.siteRoot@@"            
-        },
-      "sitecore": {
-          "solrConfigurationPath": "@@sitecore.solrConfigurationPath@@",
-          "configurationPath": "@@sitecore.ConfigurationPath@@",
-          "singleDeveloperConfigurationPath": "@@sitecore.singleDeveloperConfigurationPath@@",
-          "sslConfigurationPath": "@@sitecore.sslConfigurationPath@@",
-          "packagePath": "@@sitecore.packagePath@@",
-          "adminPassword": "@@sitecore.adminPassword@@",
-          "exmCryptographicKey": "@@sitecore.exmCryptographicKey@@",
-          "exmAuthenticationKey": "@@sitecore.exmAuthenticationKey@@",
-          "telerikEncryptionKey": "@@sitecore.telerikEncryptionKey@@",
-          "rootCertificateName": "@@sitecore.rootCertificateName@@"
-        },
-        "identityServer": {
-          "configurationPath": "@@identityServer.ConfigurationPath@@",
-          "packagePath": "@@identityServer.packagePath@@",
-          "name": "@@identityServer.name@@",
-          "url": "@@identityServer.url@@",
-          "clientSecret": "@@identityServer.clientSecret@@"
-        },
-        "solr": {
-            "url": "@@solr.url@@",
-            "root": "@@solr.root@@",
-            "serviceName": "@@solr.serviceName@@"
-        }
+  "settings": {
+    "site": {
+      "prefix": "@@site.prefix@@",
+      "suffix": "@@site.suffix@@",
+      "webRoot": "@@site.webRoot@@",
+      "hostName": "@@site.hostName@@",
+      "addSiteBindingWithSSLPath": "@@site.addSiteBindingWithSSLPath@@"
     },
-    "modules":[
+    "sql": {
+      "server": "@@sql.server@@",
+      "adminUser": "@@sql.adminUser@@",
+      "adminPassword": "@@sql.adminPassword@@",
+      "userPassword": "@@sql.userPassword@@",
+      "coreUser": "@@sql.coreUser@@",
+      "corePassword": "@@sql.corePassword@@",
+      "masterUser": "@@sql.masterUser@@",
+      "masterPassword": "@@sql.masterPassword@@",
+      "webUser": "@@sql.webUser@@",
+      "webPassword": "@@sql.webPassword@@",
+      "collectionUser": "@@sql.collectionUser@@",
+      "collectionPassword": "@@sql.collectionPassword@@",
+      "reportingUser": "@@sql.reportingUser@@",
+      "reportingPassword": "@@sql.reportingPassword@@",
+      "processingEngineUser": "@@sql.processingEngineUser@@",
+      "processingEnginePassword": "@@sql.processingEnginePassword@@",
+      "processingPoolsUser": "@@sql.processingPoolsUser@@",
+      "processingPoolsPassword": "@@sql.processingPoolsPassword@@",
+      "processingTasksUser": "@@sql.processingTasksUser@@",
+      "processingTasksPassword": "@@sql.processingTasksPassword@@",
+      "referenceDataUser": "@@sql.referenceDataUser@@",
+      "referenceDataPassword": "@@sql.referenceDataPassword@@",
+      "securityUser": "@@sql.referenceDataUser@@",
+      "securityPassword": "@@sql.referenceDataPassword@@",
+      "marketingAutomationUser": "@@sql.marketingAutomationUser@@",
+      "marketingAutomationPassword": "@@sql.marketingAutomationPassword@@",
+      "formsUser": "@@sql.formsUser@@",
+      "formsPassword": "@@sql.formsPassword@@",
+      "exmMasterUser": "@@sql.exmMasterUser@@",
+      "exmMasterPassword": "@@sql.exmMasterPassword@@",
+      "messagingUser": "@@sql.messagingUser@@",
+      "messagingPassword": "@@sql.messagingPassword@@",
+      "minimumVersion": "@@sql.minimumVersion@@"
+    },
+    "xConnect": {
+      "configurationPath": "@@xConnect.configurationPath@@",
+      "certificateConfigurationPath": "@@xConnect.certificateConfigurationPath@@",
+      "solrConfigurationPath": "@@xConnect.solrConfigurationPath@@",
+      "packagePath": "@@xConnect.packagePath@@",
+      "siteName": "@@xConnect.siteName@@",
+      "certificateName": "@@xConnect.certificate@@",
+      "siteRoot": "@@xConnect.siteRoot@@"
+    },
+    "sitecore": {
+      "solrConfigurationPath": "@@sitecore.solrConfigurationPath@@",
+      "configurationPath": "@@sitecore.ConfigurationPath@@",
+      "singleDeveloperConfigurationPath": "@@sitecore.singleDeveloperConfigurationPath@@",
+      "sslConfigurationPath": "@@sitecore.sslConfigurationPath@@",
+      "packagePath": "@@sitecore.packagePath@@",
+      "adminPassword": "@@sitecore.adminPassword@@",
+      "exmCryptographicKey": "@@sitecore.exmCryptographicKey@@",
+      "exmAuthenticationKey": "@@sitecore.exmAuthenticationKey@@",
+      "telerikEncryptionKey": "@@sitecore.telerikEncryptionKey@@",
+      "rootCertificateName": "@@sitecore.rootCertificateName@@"
+    },
+    "identityServer": {
+      "configurationPath": "@@identityServer.ConfigurationPath@@",
+      "packagePath": "@@identityServer.packagePath@@",
+      "name": "@@identityServer.name@@",
+      "url": "@@identityServer.url@@",
+      "clientSecret": "@@identityServer.clientSecret@@"
+    },
+    "solr": {
+      "url": "@@solr.url@@",
+      "root": "@@solr.root@@",
+      "serviceName": "@@solr.serviceName@@"
+    },
+    "habitatHome": [
+      {
+        "id": "Demo Dynamics CRM Connection String",
+        "value": "",
+        "description": "Connection string for Dynamics CRM"
+      },
+      {
+        "id": "Demo CRM SalesForce Connection String",
+        "value": "",
+        "description": "Connection string for SalesForce CRM connector"
+      },
+      {
+        "id": "Enable EXM module",
+        "value": "yes",
+        "description": "Enable or disable the EXM module. Values: 'yes' or 'no'"
+      },
+      {
+        "id": "Allow Invalid SSL Certificate",
+        "value": "True",
+        "description": "Allows the use of self-signed certificates for communication with XConnect. Values: 'True' or 'False'"
+      },
+      {
+        "id": "Environment Type",
+        "value": "Local",
+        "description": "Define the environment (Local or Production) - this affect some configuration settings"
+      },
+      {
+        "id": "Unicorn On/Off",
+        "value": "Off",
+        "description": "Turn Unicorn functionality on or off"
+      },
+      {
+        "id": "3rd Party Integrations",
+        "value": "None",
+        "description": "Use a keyword like CDN, Dynamics, Salesforce, Facebook, MS to enable"
+      },
+      {
+        "id": "ASP.NET Debugging",
+        "value": "false",
+        "description": "Turn debugging on or off for the environment. Values: 'true' or 'false'"
+      },
+      {
+        "id": "CDN Enabled",
+        "value": "False",
+        "description": "Enable or disable CDN. Values: 'True' or 'False'"
+      },
+      {
+        "id": "Media/Always Include Server URL",
+        "value": "False",
+        "description": "Enable or disable Media URL display behavior. Values: 'True' or 'False'"
+      },
+      {
+        "id": "Media/Link Server URL",
+        "value": "",
+        "description": "URL to the media server (if any)"
+      },
+      {
+        "id": "Media Response/Cacheability type",
+        "value": "private",
+        "description": "The type of cacheability of the media files on remote or proxy servers - private or public"
+      },
+      {
+        "id": "Demo Enabled",
+        "value": "True",
+        "description": "Enable or disable the demo mode. Values: 'True' or 'False'"
+      },
+      {
+        "id": "Root Host Name",
+        "value": "",
+        "description": "Habitat hostname"
+      },
+      {
+        "id": "Analytics Cookie Domain",
+        "value": "",
+        "description": "Analytics cookie domain name"
+      }
     ]
+  },
+  "modules": []
 }
