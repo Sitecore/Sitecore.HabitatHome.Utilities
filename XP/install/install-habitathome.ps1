@@ -215,20 +215,23 @@ Function Stop-Services {
 }
 Function Install-Bootloader{
     $bootLoaderPackagePath = [IO.Path]::Combine( $assets.root, "SAT\resources\9.1.0\Addons\Sitecore.Cloud.Integration.Bootload.wdp.zip")
+    $bootloaderConfigurationOverride = $([io.path]::combine($resourcePath, 'Sitecore.Cloud.Integration.Bootload.InstallJob.exe.config'))
+    $bootloaderInstallationPath = $([io.path]::combine($site.webRoot,$site.hostName,"App_Data\tools\InstallJob"))
     
     $params = @{
-        Path             = (Join-path $resourcePath 'HabitatHome\module-nodb.json')
-        Package          = $bootLoaderPackagePath
-        SiteName         = $site.hostName
+        Path                                = (Join-path $resourcePath 'HabitatHome\bootloader.json')
+        Package                             = $bootLoaderPackagePath
+        SiteName                            = $site.hostName
+        ConfigurationOverrideSource         = $bootloaderConfigurationOverride
+        ConfigurationOverrideDestination    = $bootloaderInstallationPath
     }
     
     Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs")
+
 }
 
 Function Install-HabitatHome {
 
-
-$sitecoreWDPpathArray.Add($(Get-Item -Path $([IO.Path]::Combine($assetsFolder, 'Sitecore Azure Toolkit', 'resources', $sepversion, 'Addons', 'Sitecore.Cloud.Integration.Bootload.wdp.zip')))) | out-null
     $hh = $habitatHome | Where-Object { $_.id -eq "habitathome"}
     if ($false -eq $hh.install) {
         return
