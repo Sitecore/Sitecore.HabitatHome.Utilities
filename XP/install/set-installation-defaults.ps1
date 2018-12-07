@@ -31,6 +31,8 @@ $site.prefix = "habitathome"
 $site.suffix = "dev.local"
 $site.webroot = "C:\inetpub\wwwroot"
 $site.hostName = $json.settings.site.prefix + "." + $json.settings.site.suffix
+$site.addSiteBindingWithSSLPath = (Get-ChildItem $pwd -filter "add-new-binding-and-certificate.json" -Recurse).FullName
+
 
 Write-Host "Setting default 'SQL' parameters"
 $sql = $json.settings.sql
@@ -151,6 +153,15 @@ foreach ($module in $modulesConfig.modules) {
     Replace-Path $module $assets.root
 }
 $modules += $modulesConfig.modules
+
+$habitatHome = $modulesConfig.habitatHome
+
+foreach ($entry in $habitatHome){
+    Replace-Path $entry $assets.root
+}
+
+$modules+=$habitatHome
+
 $json.modules = $modules
 
 

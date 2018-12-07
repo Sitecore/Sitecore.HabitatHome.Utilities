@@ -12,6 +12,8 @@ Param(
 	[string]$SolrDomain = 'localhost',
 	[switch]$Clobber
 )
+# Turning off progress bar to (greatly) speed up installation
+$Global:ProgressPreference = "SilentlyContinue"
 
 $solrName = "solr-$solrVersion"
 $solrRoot = "$installFolder\$solrName"
@@ -154,6 +156,9 @@ if($solrSSL)
 }
 
 Invoke-Expression "start $($protocol)://$($solrHost):$solrPort/solr/#/"
+
+# Resetting Progress Bar back to default
+$Global:ProgressPreference = "Continue"
 
 Write-Host ''
 Write-Host 'Done!' -ForegroundColor Green
