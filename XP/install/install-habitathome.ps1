@@ -213,6 +213,23 @@ Function Stop-Services {
         restart-service -force $mssqlService
     }
 }
+Function Install-Bootloader{
+    $bootLoaderPackagePath = [IO.Path]::Combine( $assets.root, "SAT\resources\9.1.0\Addons\Sitecore.Cloud.Integration.Bootload.wdp.zip")
+    $bootloaderConfigurationOverride = $([io.path]::combine($resourcePath, 'Sitecore.Cloud.Integration.Bootload.InstallJob.exe.config'))
+    $bootloaderInstallationPath = $([io.path]::combine($site.webRoot,$site.hostName,"App_Data\tools\InstallJob"))
+    
+    $params = @{
+        Path                                = (Join-path $resourcePath 'HabitatHome\bootloader.json')
+        Package                             = $bootLoaderPackagePath
+        SiteName                            = $site.hostName
+        ConfigurationOverrideSource         = $bootloaderConfigurationOverride
+        ConfigurationOverrideDestination    = $bootloaderInstallationPath
+    }
+    
+    Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs")
+
+}
+
 Function Install-HabitatHome {
 
     $hh = $habitatHome | Where-Object { $_.id -eq "habitathome"}
@@ -221,7 +238,7 @@ Function Install-HabitatHome {
     }
     
     $params = @{
-        Path             = (Join-path $resourcePath 'HabitatHome\module-mastercore.json')
+        Path             = (Join-path $resourcePath 'HabitatHome\habitathome.json')
         Package          = $hh.fileName
         SiteName         = $site.hostName
         SqlDbPrefix      = $site.prefix 
@@ -323,6 +340,7 @@ Install-SitecoreAzureToolkit
 Get-HabitatHome
 Remove-DatabaseUsers
 Stop-Services
+Install-Bootloader
 Install-HabitatHome
 Install-HabitatHomeXConnect
 Enable-ContainedDatabases
