@@ -160,13 +160,13 @@ foreach ($entry in $habitatHomeModules){
     Replace-Path $entry $assets.root
 }
 
-$modules+=$habitatHome
+$modules+=$habitatHomeModules
 
 $json.modules = $modules
 
-$habitatHome = $json.habitatHome
+$habitatHome = $json.settings.habitatHome
 ($habitatHome | Where-Object {$_.id -eq "Root Host Name"}).value = "dev.local"
-($habitatHome | Where-Object {$_.id -eq "Analytics Cookie Domain"}).value = "$(rootHostName)"
+($habitatHome | Where-Object {$_.id -eq "Analytics Cookie Domain"}).value = "`$(rootHostName)"
 
 
 
