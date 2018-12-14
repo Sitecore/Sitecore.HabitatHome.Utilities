@@ -1,7 +1,9 @@
 Param(
     [string] $ConfigurationFile = "configuration-xp0.json",
     [string] $LogFolder = ".\logs\",
-    [string] $LogFileName = "install-sitecore.log"
+    [string] $LogFileName = "install-sitecore.log",
+    [string] $devSitecoreUsername,
+    [string] $devSitecorePassword
 )
 
 #####################################################
@@ -78,7 +80,17 @@ Function Download-Assets {
         New-Item -ItemType Directory -Force -Path $downloadFolder
     }
     if ($null -eq $credentials) {
-        $credentials = Get-Credential -Message "Please provide dev.sitecore.com credentials"
+        if ([string]::IsNullOrEmpty($devSitecoreUsername)){
+            $credentials = Get-Credential -Message "Please provide dev.sitecore.com credentials"
+        }
+        elseif (![string]::IsNullOrEmpty($devSitecoreUsername) -and ![string]::IsNullOrEmpty($devSitecorePassword)) {
+            $secpasswd = ConvertTo-SecureString $devSitecorePassword -AsPlainText -Force
+            $credentials = New-Object System.Management.Automation.PSCredential ($devSitecoreUsername, $secpasswd)
+        }
+        else {
+            throw "Credentials required for download"
+        }
+        
     }
     $user = $credentials.GetNetworkCredential().UserName
     $password = $Credentials.GetNetworkCredential().Password
@@ -277,6 +289,6 @@ Function Add-AppPoolMembership {
 
 Install-SitecoreInstallFramework
 Download-Assets
-Confirm-Prerequisites
-Install-SingleDeveloper
-Add-AppPoolMembership
+#Confirm-Prerequisites
+#Install-SingleDeveloper
+#Add-AppPoolMembership
