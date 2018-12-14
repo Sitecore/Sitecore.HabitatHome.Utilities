@@ -1,7 +1,9 @@
 Param(
     [string] $ConfigurationFile = "configuration-xp0.json",
     [string] $LogFolder = ".\logs\",
-    [string] $LogFileName = "install-sitecore.log"
+    [string] $LogFileName = "install-sitecore.log",
+    [string] $devSitecoreUsername,
+    [string] $devSitecorePassword
 )
 
 #####################################################
@@ -10,6 +12,10 @@ Param(
 # 
 #####################################################
 $ErrorActionPreference = 'Stop'
+
+[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+
+
 Set-Location $PSScriptRoot
 $LogFolder = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($LogFolder) 
 if (!(Test-Path $LogFolder)) {
@@ -78,7 +84,16 @@ Function Download-Assets {
         New-Item -ItemType Directory -Force -Path $downloadFolder
     }
     if ($null -eq $credentials) {
-        $credentials = Get-Credential -Message "Please provide dev.sitecore.com credentials"
+        if ([string]::IsNullOrEmpty($devSitecoreUsername)){
+            $credentials = Get-Credential -Message "Please provide dev.sitecore.com credentials"
+        }
+        elseif (![string]::IsNullOrEmpty($devSitecoreUsername) -and ![string]::IsNullOrEmpty($devSitecorePassword)) {
+            $secpasswd = ConvertTo-SecureString $devSitecorePassword -AsPlainText -Force
+            $credentials = New-Object System.Management.Automation.PSCredential ($devSitecoreUsername, $secpasswd)
+        }
+        else {
+            throw "Credentials required for download"
+        }
     }
     $user = $credentials.GetNetworkCredential().UserName
     $password = $Credentials.GetNetworkCredential().Password
@@ -111,23 +126,6 @@ Function Download-Assets {
     }
 }
 Function Confirm-Prerequisites {
-    #Verify SQL version
-    
-    [reflection.assembly]::LoadWithPartialName("Microsoft.SqlServer.Smo") | out-null
-    $srv = New-Object "Microsoft.SqlServer.Management.Smo.Server" $sql.server
-    $minVersion = New-Object System.Version($sql.minimumVersion)
-    if ($srv.Version.CompareTo($minVersion) -lt 0) {
-        throw "Invalid SQL version. Expected SQL 2016 SP1 ($($sql.minimumVersion)) or above."
-    }
-
-    # Verify Web Deploy
-    $webDeployPath = ([IO.Path]::Combine($env:ProgramFiles, 'iis', 'Microsoft Web Deploy V3', 'msdeploy.exe'))
-    if (!(Test-Path $webDeployPath)) {
-        throw "Could not find WebDeploy in $webDeployPath"
-    }   
-
-   
-    
     #Enable Contained Databases
     Write-Host "Enable contained databases" -ForegroundColor Green
     try {
