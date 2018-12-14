@@ -58,7 +58,7 @@
       "DefaultValue": "Off",
       "Description": "Turn Unicorn functionality on or off"
     },
-    "3rdPartyIntegrations": {
+    "ThirdPartyIntegrations": {
       "Type": "string",
       "DefaultValue": "None",
       "Description": "Use a keyword like CDN, Dynamics, Salesforce, Facebook, MS to enable. See README for details."
@@ -160,7 +160,7 @@
             },
             {
               "Name": "3rd Party Integrations",
-              "Value":"[parameter('3rdPartyIntegrations')]"
+              "Value":"[parameter('ThirdPartyIntegrations')]"
             },
             {
               "Name": "ASP.NET Debugging",

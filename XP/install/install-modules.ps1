@@ -132,8 +132,8 @@ Function Process-Packages {
         $DownloadJsonPath
     )
     foreach ($package in $Packages) {
-        if ($package.id -eq "xp" -or $package.id -eq "sat" -or $package.id -eq "si") {
-            # Skip Sitecore Azure Toolkit and XP package and Sitecore identity - previously downloaded
+        if ($package.id -eq "xp" -or $package.id -eq "sat" -or $package.id -eq "si" -or $package.id -eq "habitatHome") {
+            # Skip Sitecore Azure Toolkit and XP package and Sitecore identity - downloaded separately
             continue;
         }
 

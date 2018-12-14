@@ -44,33 +44,33 @@ $sql.server = "."
 $sql.adminUser = "sa"
 $sql.adminPassword = "Str0NgPA33w0rd!!"
 $sql.userPassword = $SqlStrongPassword
-$sql.coreUser =  "coreuser"
+$sql.coreUser = "coreuser"
 $sql.corePassword = $SqlStrongPassword
-$sql.masterUser =  "masteruser"
+$sql.masterUser = "masteruser"
 $sql.masterPassword = $SqlStrongPassword
-$sql.webUser =  "webuser"
+$sql.webUser = "webuser"
 $sql.webPassword = $SqlStrongPassword
-$sql.collectionUser =  "collectionuser"
+$sql.collectionUser = "collectionuser"
 $sql.collectionPassword = $SqlStrongPassword
-$sql.reportingUser =  "reportinguser"
+$sql.reportingUser = "reportinguser"
 $sql.reportingPassword = $SqlStrongPassword
-$sql.processingPoolsUser =  "poolsuser"
+$sql.processingPoolsUser = "poolsuser"
 $sql.processingPoolsPassword = $SqlStrongPassword
-$sql.processingEngineUser =  "processingengineuser"
+$sql.processingEngineUser = "processingengineuser"
 $sql.processingEnginePassword = $SqlStrongPassword
-$sql.processingTasksUser =  "tasksuser"
+$sql.processingTasksUser = "tasksuser"
 $sql.processingTasksPassword = $SqlStrongPassword
-$sql.referenceDataUser =  "referencedatauser"
+$sql.referenceDataUser = "referencedatauser"
 $sql.referenceDataPassword = $SqlStrongPassword
-$sql.marketingAutomationUser =  "marketingautomationuser"
+$sql.marketingAutomationUser = "marketingautomationuser"
 $sql.marketingAutomationPassword = $SqlStrongPassword
-$sql.formsUser =  "formsuser"
+$sql.formsUser = "formsuser"
 $sql.formsPassword = $SqlStrongPassword
-$sql.exmMasterUser =  "exmmasteruser"
+$sql.exmMasterUser = "exmmasteruser"
 $sql.exmMasterPassword = $SqlStrongPassword
-$sql.messagingUser =  "messaginguser"
+$sql.messagingUser = "messaginguser"
 $sql.messagingPassword = $SqlStrongPassword
-$sql.securityuser =  "securityuser"
+$sql.securityuser = "securityuser"
 $sql.securityPassword = $SqlStrongPassword
 $sql.minimumVersion = "13.0.4001"
 
@@ -114,6 +114,42 @@ $solr.serviceName = "Solr"
 
 Write-Host "Setting default 'modules' parameters"
 # Modules
+
+Function Get-HabitathomeAssetUrls {
+    Param(
+        [PSCustomObject]$habitatHome
+    )
+    $release = @{};
+    $urls = @{};
+    
+    if ($habitatHome.prerelease) {
+        # Get latest pre-release version
+        $release = (Invoke-RestMethod -Uri "https://api.github.com/repos/Sitecore/Sitecore.HabitatHome.Platform/releases")[0]
+    }
+    elseif (![string]::IsNullOrEmpty($habitatHome.version) ) {
+        # Get version specified (uses wildcard - 9.1.0.0 will return latest )
+        $release = ((Invoke-RestMethod -Uri "https://api.github.com/repos/Sitecore/Sitecore.HabitatHome.Platform/releases") | Where-Object {$_.tag_name -like "{0}*" -f $habitatHome.version -and -not $_.prerelease})
+        if ($null -ne $release)
+        {
+            $release= $release[0]
+        }
+    }
+    else {
+        # Get latest, non-prelease assets
+        $release = Invoke-RestMethod -Uri "https://api.github.com/repos/Sitecore/Sitecore.HabitatHome.Platform/releases/latest"
+    }
+    if ($null -ne $release) {
+        $releaseId = $release.id
+        $assets = Invoke-RestMethod -Uri ("https://api.github.com/repos/Sitecore/Sitecore.HabitatHome.Platform/releases/{0}/assets" -f $releaseId)
+        $urls.habitatHomePackageUrl = $assets | Where-Object {$_.name -eq "HabitatHome_single.scwdp.zip"} | Select -ExpandProperty browser_download_url
+        $urls.habitatHomexConnectPackageUrl = $assets | Where-Object {$_.name -eq "xConnect_single.scwdp.zip"} | Select -ExpandProperty browser_download_url
+        return $urls
+    }
+    return $null
+    
+    
+}
+
 $modulesConfig = Get-Content -Raw .\assets.json -Encoding Ascii |  ConvertFrom-Json
 
 $modules = $json.modules
@@ -121,13 +157,13 @@ $modules = $json.modules
 $sitecore = $modulesConfig.sitecore
 
 $config = @{
-    id          = $sitecore.id
-    name        = $sitecore.name
-    fileName    = Join-Path $assets.root ("\{0}" -f $sitecore.fileName) 
-    url         = $sitecore.url
-    extract     = $sitecore.extract
-    download    = $sitecore.download
-    source      = $sitecore.source
+    id       = $sitecore.id
+    name     = $sitecore.name
+    fileName = Join-Path $assets.root ("\{0}" -f $sitecore.fileName) 
+    url      = $sitecore.url
+    extract  = $sitecore.extract
+    download = $sitecore.download
+    source   = $sitecore.source
 }
 $config = $config| ConvertTo-Json
 $modules += (ConvertFrom-Json -InputObject $config) 
@@ -147,6 +183,19 @@ Function Replace-Path {
     }
 }
 
+$habitatHome = $modulesConfig.habitatHome
+
+$habitatHomeurls = Get-HabitathomeAssetUrls $habitatHome
+($habitathome.modules | Where-Object {$_.id -eq "habitathome"}).url = $habitatHomeurls.habitatHomePackageUrl
+($habitathome.modules | Where-Object {$_.id -eq "habitathome_xConnect"}).url = $habitatHomeurls.habitatHomexConnectPackageUrl
+
+
+foreach ($entry in $habitatHome.modules) {
+    Replace-Path $entry $assets.root 
+}
+
+$modules += $modulesConfig.habitatHome
+
 $json.modules = $modules
 
 foreach ($module in $modulesConfig.modules) {
@@ -154,19 +203,13 @@ foreach ($module in $modulesConfig.modules) {
 }
 $modules += $modulesConfig.modules
 
-$habitatHomeModules = $modulesConfig.habitatHome
 
-foreach ($entry in $habitatHomeModules){
-    Replace-Path $entry $assets.root
-}
-
-$modules+=$habitatHomeModules
 
 $json.modules = $modules
 
 $habitatHome = $json.settings.habitatHome
-($habitatHome | Where-Object {$_.id -eq "Root Host Name"}).value = "dev.local"
-($habitatHome | Where-Object {$_.id -eq "Analytics Cookie Domain"}).value = "`$(rootHostName)"
+($habitatHome | Where-Object {$_.id -eq "RootHostName"}).value = "dev.local"
+($habitatHome | Where-Object {$_.id -eq "AnalyticsCookieDomain"}).value = "`$(rootHostName)"
 
 
 
