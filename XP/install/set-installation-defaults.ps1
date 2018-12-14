@@ -1,6 +1,7 @@
 Param(
     [string] $ConfigurationFile = "configuration-xp0.json"
 )
+[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
 Write-Host "Setting Defaults and creating $ConfigurationFile"
 
