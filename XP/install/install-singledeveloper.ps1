@@ -233,7 +233,7 @@ Function Install-SingleDeveloper {
         SitecoreIdentityAuthority       = "https://" + $identityServer.name
         XConnectCollectionService       = "https://" + $xConnect.siteName
         ClientSecret                    = $identityServer.clientSecret
-        AllowedCorsOrigins              = "https://" + $site.hostName
+        AllowedCorsOrigins              = ("https://{0}|https://{1}" -f  $site.hostName, "habitathomebasic.dev.local") # Need to add to proper config
         WebRoot                         = $site.webRoot
     }
 
