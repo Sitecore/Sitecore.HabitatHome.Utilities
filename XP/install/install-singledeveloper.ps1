@@ -94,7 +94,6 @@ Function Download-Assets {
         else {
             throw "Credentials required for download"
         }
-        
     }
     $user = $credentials.GetNetworkCredential().UserName
     $password = $Credentials.GetNetworkCredential().Password
