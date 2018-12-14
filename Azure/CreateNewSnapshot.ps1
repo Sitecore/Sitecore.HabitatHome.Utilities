@@ -1,5 +1,7 @@
 Param(
+    [Parameter(Mandatory = $true)]
     [string] $subscriptionId,
+    [Parameter(Mandatory = $true)]
     [ValidateSet('xp', 'xc')]
     [string] $demoType,
 	[Parameter(Mandatory = $true)]
@@ -11,6 +13,7 @@ Param(
     [string] $snapshotDestinationResourceGroup = "habitathome-demo-snapshot"
 
 )
+Import-Module AzureRM
 $account = Get-AzureRMContext | Select-Object Account
 
 if ($null -eq $account.Account) {
