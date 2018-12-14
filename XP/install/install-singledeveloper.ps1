@@ -12,6 +12,10 @@ Param(
 # 
 #####################################################
 $ErrorActionPreference = 'Stop'
+
+[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+
+
 Set-Location $PSScriptRoot
 $LogFolder = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($LogFolder) 
 if (!(Test-Path $LogFolder)) {
