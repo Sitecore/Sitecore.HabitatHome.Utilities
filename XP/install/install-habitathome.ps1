@@ -247,7 +247,7 @@ Function Install-HabitatHome {
         SqlAdminUser                        = $sql.adminUser 
         SqlAdminPassword                    = $sql.adminPassword 
         SqlServer                           = $sql.server
-        DemoDynamicsCRMConnectionString     = ($habitatHomeSettings | Where-Object {$_.id -eq "Demo Dynamics CRM Connection String"}).value
+        DemoDynamicsCRMConnectionString     = ($habitatHomeSettings | Where-Object {$_.id -eq "DemoDynamicsCRMConnectionString"}).value
         DemoCRMSalesForceConnectionString   = ($habitatHomeSettings | Where-Object {$_.id -eq "DemoCRMSalesForceConnectionString"}).value
         EnableEXMmodule                     = ($habitatHomeSettings | Where-Object {$_.id -eq "EnableEXMmodule"}).value
         AllowInvalidSSLCertificate          = ($habitatHomeSettings | Where-Object {$_.id -eq "AllowInvalidSSLCertificate"}).value
