@@ -293,6 +293,6 @@ Function Add-AppPoolMembership {
 
 Install-SitecoreInstallFramework
 Download-Assets
-#Confirm-Prerequisites
-#Install-SingleDeveloper
-#Add-AppPoolMembership
+Confirm-Prerequisites
+Install-SingleDeveloper
+Add-AppPoolMembership
