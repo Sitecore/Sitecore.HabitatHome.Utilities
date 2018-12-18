@@ -1,6 +1,7 @@
 Param(
     [string] $ConfigurationFile = "configuration-xp0.json",
-    [string] $assetsRoot
+    [string] $assetsRoot,
+    [string] $sitecoreVersion
 )
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
@@ -18,6 +19,12 @@ if (![string]::IsNullOrEmpty($assetsRoot)) {
 else {
     $assets.root = "$PSScriptRoot\assets"
 }
+if (![string]::IsNullOrEmpty($sitecoreVersion)) {
+    $assets.sitecoreVersion = $sitecoreVersion
+}
+else {
+    $assets.sitecoreVersion = "9.1.0 rev. 001564"
+}
 # SIF settings
 $assets.psRepository = "https://sitecore.myget.org/F/sc-powershell/api/v2/"
 $assets.psRepositoryName = "SitecoreGallery"
@@ -25,7 +32,7 @@ $assets.installerVersion = "2.0.0"
 
 $assets.licenseFilePath = Join-Path $assets.root "license.xml"
 
-$assets.sitecoreVersion = "9.1.0 rev. 001564"
+
 $assets.identityServerVersion = "2.0.0 rev. 00157"
 
 
