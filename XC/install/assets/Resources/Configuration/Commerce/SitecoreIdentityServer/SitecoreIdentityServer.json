@@ -38,7 +38,7 @@
     "SitecoreIdentityServerPhysicalPath": "[joinpath(parameter('WebRoot'), parameter('SitecoreIdentityServerName'))]",
     "Root.Cert.DnsName": "[concat('DO_NOT_TRUST_', parameter('RootCertFileName'))]",
     "Root.Cert.Store": "cert:\\LocalMachine\\Root",
-    "Security.CertificateName": "identity.server",
+    "Security.CertificateName": "[parameter('SitecoreIdentityServerName')]",
     "Security.CertificateStore": "cert:\\Localmachine\\My",
     "Security.CertificateThumbprint": "[GetCertificateThumbprint(variable('Security.CertificateName'), variable('Security.CertificateStore'))]",
     "Security.CertificatePath": "[joinpath(variable('Security.CertificateStore'), variable('Security.CertificateThumbprint'))]"
@@ -131,7 +131,7 @@
         "CertificateDnsName": "[variable('Security.CertificateName')]",
         "CertificatePassword": "sitecore",
         "CertificateStore": "[variable('Security.CertificateStore')]",
-        "CertificateFriendlyName": "Sitecore Identity Server",
+        "CertificateFriendlyName": "[parameter('SitecoreIdentityServerName')]",
         "IDServerPath": "[variable('SitecoreIdentityServerPhysicalPath')]"
       }
     },

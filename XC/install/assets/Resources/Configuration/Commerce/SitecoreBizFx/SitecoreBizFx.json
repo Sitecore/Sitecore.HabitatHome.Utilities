@@ -35,7 +35,8 @@
     }
   },
   "Variables": {
-    "SitecoreBizFxPhysicalPath": "[joinpath(parameter('WebRoot'), concat('\\SitecoreBizFx', parameter('SitecoreBizFxPostFix')))]",
+		"SitecoreBizFxSiteName": "[concat('SitecoreBizFx_', parameter('SitecoreBizFxPostFix'))]",
+    "SitecoreBizFxPhysicalPath": "[joinpath(parameter('WebRoot'), concat('\\', variable('SitecoreBizFxSiteName')))]",
     "Root.Cert.DnsName": "[concat('DO_NOT_TRUST_', parameter('RootCertFileName'))]",
     "Root.Cert.Store": "cert:\\LocalMachine\\Root"
   },
@@ -48,7 +49,7 @@
 		"StopSite": {
 			"Type": "ManageWebsite",
 			"Params": {
-				"Name": "SitecoreBizFx",
+				"Name": "[variable('SitecoreBizFxSiteName')]",
 				"Action": "Stop",
 				"ErrorAction": "SilentlyContinue"
 			}
@@ -56,14 +57,14 @@
 		"RemoveSite": {
 			"Type": "ManageCommerceService",
 			"Params": {
-				"Name": "SitecoreBizFx",
+				"Name": "[variable('SitecoreBizFxSiteName')]",
 				"Action": "Remove-Website"
 			}
 		},
 		"StopAppPool": {
 			"Type": "ManageAppPool",
 			"Params": {
-				"Name": "SitecoreBizFx",
+				"Name": "[variable('SitecoreBizFxSiteName')]",
 				"Action": "Stop",
 				"ErrorAction": "SilentlyContinue"
 			}
@@ -71,7 +72,7 @@
 		"RemoveAppPool": {
 			"Type": "ManageCommerceService",
 			"Params": {
-				"Name": "SitecoreBizFx",
+				"Name": "[variable('SitecoreBizFxSiteName')]",
 				"Action": "Remove-WebAppPool"
 			}
 		},
@@ -105,7 +106,7 @@
 		"CreateWebAppPool": {
 			"Type": "ManageCommerceService",
 			"Params": {
-				"Name": "SitecoreBizFx",
+				"Name": "[variable('SitecoreBizFxSiteName')]",
 				"Action": "Create-WebAppPool",
 				"UserAccount": "[parameter('UserAccount')]"
 			}
@@ -113,9 +114,9 @@
 		"CreateWebsite": {
 			"Type": "ManageCommerceService",
 			"Params": {
-				"Name": "SitecoreBizFx",
+				"Name": "[variable('SitecoreBizFxSiteName')]",
 				"Action": "Create-Website",
-				"AppPoolName": "SitecoreBizFx",
+				"AppPoolName": "[variable('SitecoreBizFxSiteName')]",
 				"PhysicalPath": "[variable('SitecoreBizFxPhysicalPath')]",
 				"Port": "4200",
 				"Signer": "[GetCertificate(variable('Root.Cert.DnsName'), variable('Root.Cert.Store'))]"

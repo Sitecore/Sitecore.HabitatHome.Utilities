@@ -30,7 +30,7 @@ $commerce.brainTreeAccountMerchandId = ""
 $commerce.brainTreeAccountPublicKey = ""
 $commerce.brainTreeAccountPrivateKey = ""
 
-$commerce.identityServerName = "SitecoreIdentityServer"
+$commerce.identityServerName = "SitecoreIdentityServer_$($site.prefix)"
 
 # XConnect Parameters
 $xConnect = $json.settings.xConnect
