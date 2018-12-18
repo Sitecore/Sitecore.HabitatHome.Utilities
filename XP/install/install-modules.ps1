@@ -1,7 +1,9 @@
 Param(
     [string] $ConfigurationFile = ".\configuration-xp0.json",
     [string] $LogFolder = ".\logs\",
-    [string] $LogFileName = "install-modules.log"
+    [string] $LogFileName = "install-modules.log",
+    [string] $devSitecoreUsername,
+    [string] $devSitecorePassword
 )
 
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
@@ -83,8 +85,18 @@ Function Install-SitecoreAzureToolkit {
     $destination = $package.fileName
     
     if (!(Test-Path $destination) -and $package.download -eq $true) {
+       
         if ($null -eq $credentials) {
-            $credentials = Get-Credential -Message "Please provide dev.sitecore.com credentials"
+            if ([string]::IsNullOrEmpty($devSitecoreUsername)){
+                $credentials = Get-Credential -Message "Please provide dev.sitecore.com credentials"
+            }
+            elseif (![string]::IsNullOrEmpty($devSitecoreUsername) -and ![string]::IsNullOrEmpty($devSitecorePassword)) {
+                $secpasswd = ConvertTo-SecureString $devSitecorePassword -AsPlainText -Force
+                $credentials = New-Object System.Management.Automation.PSCredential ($devSitecoreUsername, $secpasswd)
+            }
+            else {
+                throw "Credentials required for download"
+            }
         }
         $user = $credentials.GetNetworkCredential().UserName
         $password = $Credentials.GetNetworkCredential().Password
@@ -132,8 +144,8 @@ Function Process-Packages {
         $DownloadJsonPath
     )
     foreach ($package in $Packages) {
-        if ($package.id -eq "xp" -or $package.id -eq "sat" -or $package.id -eq "si") {
-            # Skip Sitecore Azure Toolkit and XP package and Sitecore identity - previously downloaded
+        if ($package.id -eq "xp" -or $package.id -eq "sat" -or $package.id -eq "si" -or $package.id -eq "habitatHome") {
+            # Skip Sitecore Azure Toolkit and XP package and Sitecore identity - downloaded separately
             continue;
         }
 
@@ -156,7 +168,16 @@ Function Process-Packages {
             $destination = $package.fileName
             if (!(Test-Path $destination)) {
                 if ($null -eq $credentials) {
-                    $credentials = Get-Credential -Message "Please provide dev.sitecore.com credentials"
+                    if ([string]::IsNullOrEmpty($devSitecoreUsername)){
+                        $credentials = Get-Credential -Message "Please provide dev.sitecore.com credentials"
+                    }
+                    elseif (![string]::IsNullOrEmpty($devSitecoreUsername) -and ![string]::IsNullOrEmpty($devSitecorePassword)) {
+                        $secpasswd = ConvertTo-SecureString $devSitecorePassword -AsPlainText -Force
+                        $credentials = New-Object System.Management.Automation.PSCredential ($devSitecoreUsername, $secpasswd)
+                    }
+                    else {
+                        throw "Credentials required for download"
+                    }
                 }
                 $user = $credentials.GetNetworkCredential().UserName
                 $password = $Credentials.GetNetworkCredential().Password

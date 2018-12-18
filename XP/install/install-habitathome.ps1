@@ -41,7 +41,7 @@ $site = $config.settings.site
 $sql = $config.settings.sql
 $xConnect = $config.settings.xConnect
 $resourcePath = Join-Path $assets.root "configuration"
-
+$habitatHomeSettings = $config.settings.habitatHome
 $downloadJsonPath = $([io.path]::combine($resourcePath, 'HabitatHome', 'download-assets.json'))
 $downloadFolder = $assets.root
 $packagesFolder = (Join-Path $downloadFolder "packages")
@@ -114,7 +114,7 @@ Function Get-HabitatHome {
   
     # Download modules
     $args = @{
-        Packages         = $downloadAssets
+        Packages         = $downloadAssets.modules
         PackagesFolder   = $packagesFolder
         DownloadJsonPath = $downloadJsonPath
     }
@@ -135,7 +135,9 @@ Function Get-Packages {
         if ($true -eq $package.download) {
             Write-Host ("Downloading {0}  -  if required" -f $package.name )
             $destination = $package.fileName
-            if (!(Test-Path $destination)) {
+            if ((Test-Path $destination)) {
+                Remove-Item $destination # Ensure we always have the latest.
+            }
                 $user = ""# $credentials.GetNetworkCredential().UserName
                 $password = ""# $Credentials.GetNetworkCredential().Password
 
@@ -150,7 +152,7 @@ Function Get-Packages {
                 $Global:ProgressPreference = 'SilentlyContinue'
                 Install-SitecoreConfiguration  @params -WorkingDirectory $(Join-Path $PWD "logs")  
                 $Global:ProgressPreference = 'Continue'
-            }
+            
         }
     }
 }
@@ -232,26 +234,42 @@ Function Install-Bootloader{
 
 Function Install-HabitatHome {
 
-    $hh = $habitatHome | Where-Object { $_.id -eq "habitathome"}
+    $hh = $habitatHome.modules | Where-Object { $_.id -eq "habitathome"} 
     if ($false -eq $hh.install) {
         return
     }
     
     $params = @{
-        Path             = (Join-path $resourcePath 'HabitatHome\habitathome.json')
-        Package          = $hh.fileName
-        SiteName         = $site.hostName
-        SqlDbPrefix      = $site.prefix 
-        SqlAdminUser     = $sql.adminUser 
-        SqlAdminPassword = $sql.adminPassword 
-        SqlServer        = $sql.server 
+        Path                                = (Join-path $resourcePath 'HabitatHome\habitathome.json')
+        Package                             = $hh.fileName
+        SiteName                            = $site.hostName
+        SqlDbPrefix                         = $site.prefix 
+        SqlAdminUser                        = $sql.adminUser 
+        SqlAdminPassword                    = $sql.adminPassword 
+        SqlServer                           = $sql.server
+        DemoDynamicsCRMConnectionString     = ($habitatHomeSettings | Where-Object {$_.id -eq "DemoDynamicsCRMConnectionString"}).value
+        DemoCRMSalesForceConnectionString   = ($habitatHomeSettings | Where-Object {$_.id -eq "DemoCRMSalesForceConnectionString"}).value
+        EnableEXMmodule                     = ($habitatHomeSettings | Where-Object {$_.id -eq "EnableEXMmodule"}).value
+        AllowInvalidSSLCertificate          = ($habitatHomeSettings | Where-Object {$_.id -eq "AllowInvalidSSLCertificate"}).value
+        EnvironmentType                     = ($habitatHomeSettings | Where-Object {$_.id -eq "EnvironmentType"}).value
+        UnicornEnabled                      = ($habitatHomeSettings | Where-Object {$_.id -eq "UnicornEnabled"}).value
+        ThirdPartyIntegrations              = ($habitatHomeSettings | Where-Object {$_.id -eq "ThirdPartyIntegrations"}).value
+        ASPNETDebugging                     = ($habitatHomeSettings | Where-Object {$_.id -eq "ASPNETDebugging"}).value
+        CDNEnabled                          = ($habitatHomeSettings | Where-Object {$_.id -eq "CDNEnabled"}).value
+        MediaAlwaysIncludeServerURL         = ($habitatHomeSettings | Where-Object {$_.id -eq "MediaAlwaysIncludeServerURL"}).value
+        MediaLinkServerURL                  = ($habitatHomeSettings | Where-Object {$_.id -eq "MediaLinkServerURL"}).value
+        MediaResponseCacheabilityType       = ($habitatHomeSettings | Where-Object {$_.id -eq "MediaResponseCacheabilityType"}).value
+        DemoEnabled                         = ($habitatHomeSettings | Where-Object {$_.id -eq "DemoEnabled"}).value
+        RootHostName                        = ($habitatHomeSettings | Where-Object {$_.id -eq "RootHostName"}).value
+        AnalyticsCookieDomain               = ($habitatHomeSettings | Where-Object {$_.id -eq "AnalyticsCookieDomain"}).value
+  
     }
     
     Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs") 
 }
 Function Install-HabitatHomeXConnect {
 
-    $xc = $habitatHome | Where-Object { $_.id -eq "habitathome_xConnect"}
+    $xc = $habitatHome.modules | Where-Object { $_.id -eq "habitathome_xConnect"}
     if ($false -eq $xc.install) {
         return
     }
