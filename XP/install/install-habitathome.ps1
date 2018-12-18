@@ -1,7 +1,9 @@
 Param(
     [string] $ConfigurationFile = ".\configuration-xp0.json",
     [string] $LogFolder = ".\logs\",
-    [string] $LogFileName = "install-habitathome.log"
+    [string] $LogFileName = "install-habitathome.log",
+    [string] $PathToHabitatHome
+    
 )
 
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
@@ -111,14 +113,20 @@ Function Get-HabitatHome {
     if (!(Test-Path $downloadFolder)) {
         New-Item -ItemType Directory -Force -Path $downloadFolder
     }
-  
-    # Download modules
-    $args = @{
-        Packages         = $downloadAssets.modules
-        PackagesFolder   = $packagesFolder
-        DownloadJsonPath = $downloadJsonPath
+    if (![string]::IsNullOrEmpty($PathToHabitatHome)) {
+        # Path to Habitat Home assets provided. Use those instead of downloading
+        Get-ChildItem $PathToHabitatHome -Recurse -Filter *.zip | Select-Object -ExpandProperty FullName | ForEach-Object { Copy-Item $_ $packagesFolder }
     }
-    Get-Packages @args
+    else {
+
+        # Download modules
+        $args = @{
+            Packages         = $downloadAssets.modules
+            PackagesFolder   = $packagesFolder
+            DownloadJsonPath = $downloadJsonPath
+        }
+        Get-Packages @args
+    }
 }
 
 Function Get-Packages {
@@ -138,20 +146,20 @@ Function Get-Packages {
             if ((Test-Path $destination)) {
                 Remove-Item $destination # Ensure we always have the latest.
             }
-                $user = ""# $credentials.GetNetworkCredential().UserName
-                $password = ""# $Credentials.GetNetworkCredential().Password
+            $user = ""# $credentials.GetNetworkCredential().UserName
+            $password = ""# $Credentials.GetNetworkCredential().Password
 
-                $loginRequest = Invoke-RestMethod -Uri https://dev.sitecore.net/api/authorization -Method Post -ContentType "application/json" -Body "{username: '$user', password: '$password'}" -SessionVariable loginSession -UseBasicParsing 
+            $loginRequest = Invoke-RestMethod -Uri https://dev.sitecore.net/api/authorization -Method Post -ContentType "application/json" -Body "{username: '$user', password: '$password'}" -SessionVariable loginSession -UseBasicParsing 
 
-                $params = @{
-                    Path        = $downloadJsonPath
-                    loginSession = $loginSession
-                    Source      = $package.url
-                    Destination = $destination
-                }
-                $Global:ProgressPreference = 'SilentlyContinue'
-                Install-SitecoreConfiguration  @params -WorkingDirectory $(Join-Path $PWD "logs")  
-                $Global:ProgressPreference = 'Continue'
+            $params = @{
+                Path         = $downloadJsonPath
+                loginSession = $loginSession
+                Source       = $package.url
+                Destination  = $destination
+            }
+            $Global:ProgressPreference = 'SilentlyContinue'
+            Install-SitecoreConfiguration  @params -WorkingDirectory $(Join-Path $PWD "logs")  
+            $Global:ProgressPreference = 'Continue'
             
         }
     }
@@ -215,17 +223,17 @@ Function Stop-Services {
         restart-service -force $mssqlService
     }
 }
-Function Install-Bootloader{
+Function Install-Bootloader {
     $bootLoaderPackagePath = [IO.Path]::Combine( $assets.root, "SAT\resources\9.1.0\Addons\Sitecore.Cloud.Integration.Bootload.wdp.zip")
     $bootloaderConfigurationOverride = $([io.path]::combine($resourcePath, 'Sitecore.Cloud.Integration.Bootload.InstallJob.exe.config'))
-    $bootloaderInstallationPath = $([io.path]::combine($site.webRoot,$site.hostName,"App_Data\tools\InstallJob"))
+    $bootloaderInstallationPath = $([io.path]::combine($site.webRoot, $site.hostName, "App_Data\tools\InstallJob"))
     
     $params = @{
-        Path                                = (Join-path $resourcePath 'HabitatHome\bootloader.json')
-        Package                             = $bootLoaderPackagePath
-        SiteName                            = $site.hostName
-        ConfigurationOverrideSource         = $bootloaderConfigurationOverride
-        ConfigurationOverrideDestination    = $bootloaderInstallationPath
+        Path                             = (Join-path $resourcePath 'HabitatHome\bootloader.json')
+        Package                          = $bootLoaderPackagePath
+        SiteName                         = $site.hostName
+        ConfigurationOverrideSource      = $bootloaderConfigurationOverride
+        ConfigurationOverrideDestination = $bootloaderInstallationPath
     }
     
     Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs")
@@ -240,28 +248,28 @@ Function Install-HabitatHome {
     }
     
     $params = @{
-        Path                                = (Join-path $resourcePath 'HabitatHome\habitathome.json')
-        Package                             = $hh.fileName
-        SiteName                            = $site.hostName
-        SqlDbPrefix                         = $site.prefix 
-        SqlAdminUser                        = $sql.adminUser 
-        SqlAdminPassword                    = $sql.adminPassword 
-        SqlServer                           = $sql.server
-        DemoDynamicsCRMConnectionString     = ($habitatHomeSettings | Where-Object {$_.id -eq "DemoDynamicsCRMConnectionString"}).value
-        DemoCRMSalesForceConnectionString   = ($habitatHomeSettings | Where-Object {$_.id -eq "DemoCRMSalesForceConnectionString"}).value
-        EnableEXMmodule                     = ($habitatHomeSettings | Where-Object {$_.id -eq "EnableEXMmodule"}).value
-        AllowInvalidSSLCertificate          = ($habitatHomeSettings | Where-Object {$_.id -eq "AllowInvalidSSLCertificate"}).value
-        EnvironmentType                     = ($habitatHomeSettings | Where-Object {$_.id -eq "EnvironmentType"}).value
-        UnicornEnabled                      = ($habitatHomeSettings | Where-Object {$_.id -eq "UnicornEnabled"}).value
-        ThirdPartyIntegrations              = ($habitatHomeSettings | Where-Object {$_.id -eq "ThirdPartyIntegrations"}).value
-        ASPNETDebugging                     = ($habitatHomeSettings | Where-Object {$_.id -eq "ASPNETDebugging"}).value
-        CDNEnabled                          = ($habitatHomeSettings | Where-Object {$_.id -eq "CDNEnabled"}).value
-        MediaAlwaysIncludeServerURL         = ($habitatHomeSettings | Where-Object {$_.id -eq "MediaAlwaysIncludeServerURL"}).value
-        MediaLinkServerURL                  = ($habitatHomeSettings | Where-Object {$_.id -eq "MediaLinkServerURL"}).value
-        MediaResponseCacheabilityType       = ($habitatHomeSettings | Where-Object {$_.id -eq "MediaResponseCacheabilityType"}).value
-        DemoEnabled                         = ($habitatHomeSettings | Where-Object {$_.id -eq "DemoEnabled"}).value
-        RootHostName                        = ($habitatHomeSettings | Where-Object {$_.id -eq "RootHostName"}).value
-        AnalyticsCookieDomain               = ($habitatHomeSettings | Where-Object {$_.id -eq "AnalyticsCookieDomain"}).value
+        Path                              = (Join-path $resourcePath 'HabitatHome\habitathome.json')
+        Package                           = $hh.fileName
+        SiteName                          = $site.hostName
+        SqlDbPrefix                       = $site.prefix 
+        SqlAdminUser                      = $sql.adminUser 
+        SqlAdminPassword                  = $sql.adminPassword 
+        SqlServer                         = $sql.server
+        DemoDynamicsCRMConnectionString   = ($habitatHomeSettings | Where-Object {$_.id -eq "DemoDynamicsCRMConnectionString"}).value
+        DemoCRMSalesForceConnectionString = ($habitatHomeSettings | Where-Object {$_.id -eq "DemoCRMSalesForceConnectionString"}).value
+        EnableEXMmodule                   = ($habitatHomeSettings | Where-Object {$_.id -eq "EnableEXMmodule"}).value
+        AllowInvalidSSLCertificate        = ($habitatHomeSettings | Where-Object {$_.id -eq "AllowInvalidSSLCertificate"}).value
+        EnvironmentType                   = ($habitatHomeSettings | Where-Object {$_.id -eq "EnvironmentType"}).value
+        UnicornEnabled                    = ($habitatHomeSettings | Where-Object {$_.id -eq "UnicornEnabled"}).value
+        ThirdPartyIntegrations            = ($habitatHomeSettings | Where-Object {$_.id -eq "ThirdPartyIntegrations"}).value
+        ASPNETDebugging                   = ($habitatHomeSettings | Where-Object {$_.id -eq "ASPNETDebugging"}).value
+        CDNEnabled                        = ($habitatHomeSettings | Where-Object {$_.id -eq "CDNEnabled"}).value
+        MediaAlwaysIncludeServerURL       = ($habitatHomeSettings | Where-Object {$_.id -eq "MediaAlwaysIncludeServerURL"}).value
+        MediaLinkServerURL                = ($habitatHomeSettings | Where-Object {$_.id -eq "MediaLinkServerURL"}).value
+        MediaResponseCacheabilityType     = ($habitatHomeSettings | Where-Object {$_.id -eq "MediaResponseCacheabilityType"}).value
+        DemoEnabled                       = ($habitatHomeSettings | Where-Object {$_.id -eq "DemoEnabled"}).value
+        RootHostName                      = ($habitatHomeSettings | Where-Object {$_.id -eq "RootHostName"}).value
+        AnalyticsCookieDomain             = ($habitatHomeSettings | Where-Object {$_.id -eq "AnalyticsCookieDomain"}).value
   
     }
     
