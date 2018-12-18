@@ -46,7 +46,7 @@ $site.prefix = "habitathome"
 $site.suffix = "dev.local"
 $site.webroot = "C:\inetpub\wwwroot"
 $site.hostName = $json.settings.site.prefix + "." + $json.settings.site.suffix
-$site.addSiteBindingWithSSLPath = (Get-ChildItem $pwd -filter "add-new-binding-and-certificate.json" -Recurse).FullName
+$site.addSiteBindingWithSSLPath = (Get-ChildItem $assets.root -filter "add-new-binding-and-certificate.json" -Recurse).FullName
 
 
 Write-Host "Setting default 'SQL' parameters"
@@ -92,9 +92,9 @@ $sql.minimumVersion = "13.0.4001"
 Write-Host "Setting default 'xConnect' parameters"
 # XConnect Parameters
 $xConnect = $json.settings.xConnect
-$xConnect.ConfigurationPath = (Get-ChildItem $pwd -filter "xconnect-xp0.json" -Recurse).FullName
-$xConnect.certificateConfigurationPath = (Get-ChildItem $pwd -filter "createcert.json" -Recurse).FullName
-$xConnect.solrConfigurationPath = (Get-ChildItem $pwd -filter "xconnect-solr.json" -Recurse).FullName
+$xConnect.ConfigurationPath = (Get-ChildItem $assets.root -filter "xconnect-xp0.json" -Recurse).FullName
+$xConnect.certificateConfigurationPath = (Get-ChildItem $assets.root -filter "createcert.json" -Recurse).FullName
+$xConnect.solrConfigurationPath = (Get-ChildItem $assets.root -filter "xconnect-solr.json" -Recurse).FullName
 $xConnect.packagePath = Join-Path $assets.root $("Sitecore " + $assets.sitecoreVersion + " (OnPrem)_xp0xconnect.scwdp.zip")
 $xConnect.siteName = $site.prefix + "_xconnect." + $site.suffix
 $xConnect.certificateName = [string]::Join(".", @($site.prefix, $site.suffix, ".Client"))
@@ -103,8 +103,8 @@ $xConnect.siteRoot = Join-Path $site.webRoot -ChildPath $xConnect.siteName
 Write-Host "Setting default 'Sitecore' parameters"
 # Sitecore Parameters
 $sitecore = $json.settings.sitecore
-$sitecore.solrConfigurationPath = (Get-ChildItem $pwd -filter "sitecore-solr.json" -Recurse).FullName
-$sitecore.singleDeveloperConfigurationPath = (Get-ChildItem $pwd -filter "XP0-SingleDeveloper.json" -Recurse).FullName
+$sitecore.solrConfigurationPath = (Get-ChildItem $assets.root -filter "sitecore-solr.json" -Recurse).FullName
+$sitecore.singleDeveloperConfigurationPath = (Get-ChildItem $assets.root -filter "XP0-SingleDeveloper.json" -Recurse).FullName
 $sitecore.sslConfigurationPath = "$PSScriptRoot\certificates\sitecore-ssl.json"
 $sitecore.packagePath = Join-Path $assets.root $("Sitecore " + $assets.sitecoreVersion + " (OnPrem)_single.scwdp.zip")
 $sitecore.adminPassword = "b"
@@ -115,7 +115,7 @@ $sitecore.rootCertificateName = "SitecoreRoot91"
 Write-Host "Setting default 'IdentityServer' parameters"
 $identityServer = $json.settings.identityServer
 $identityServer.packagePath = Join-Path $assets.root $("Sitecore.IdentityServer " + $assets.identityServerVersion + " (OnPrem)_identityserver.scwdp.zip")
-$identityServer.configurationPath = (Get-ChildItem $pwd -filter "IdentityServer.json" -Recurse).FullName 
+$identityServer.configurationPath = (Get-ChildItem $assets.root -filter "IdentityServer.json" -Recurse).FullName 
 $identityServer.name = "IdentityServer." + $site.hostname
 $identityServer.url = ("https://{0}" -f $identityServer.name)
 $identityServer.clientSecret = "ClientSecret"
