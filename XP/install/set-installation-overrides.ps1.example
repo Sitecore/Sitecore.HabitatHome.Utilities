@@ -88,4 +88,105 @@ $identityServer.name = "IdentityServer." + $site.hostname
 $identityServer.url = ("https://{0}" -f $identityServer.name)
 $identityServer.clientSecret = "ClientSecret"
 
+
+Write-Host "Setting  'modules' parameters"
+# Modules
+
+Function Get-HabitathomeAssetUrls {
+    Param(
+        [PSCustomObject]$habitatHome
+    )
+    $release = @{};
+    $urls = @{};
+    
+    if ($habitatHome.prerelease) {
+        # Get latest pre-release version
+        $release = (Invoke-RestMethod -Uri "https://api.github.com/repos/Sitecore/Sitecore.HabitatHome.Platform/releases")[0]
+    }
+    elseif (![string]::IsNullOrEmpty($habitatHome.version) ) {
+        # Get version specified (uses wildcard - 9.1.0.0 will return latest )
+        $release = ((Invoke-RestMethod -Uri "https://api.github.com/repos/Sitecore/Sitecore.HabitatHome.Platform/releases") | Where-Object {$_.tag_name -like "{0}*" -f $habitatHome.version -and -not $_.prerelease})
+        if ($null -ne $release)
+        {
+            $release= $release[0]
+        }
+    }
+    else {
+        # Get latest, non-prelease assets
+        $release = Invoke-RestMethod -Uri "https://api.github.com/repos/Sitecore/Sitecore.HabitatHome.Platform/releases/latest"
+    }
+    if ($null -ne $release) {
+        $releaseId = $release.id
+        $assets = Invoke-RestMethod -Uri ("https://api.github.com/repos/Sitecore/Sitecore.HabitatHome.Platform/releases/{0}/assets" -f $releaseId)
+        $urls.habitatHomePackageUrl = $assets | Where-Object {$_.name -eq "HabitatHome_single.scwdp.zip"} | Select -ExpandProperty browser_download_url
+        $urls.habitatHomexConnectPackageUrl = $assets | Where-Object {$_.name -eq "xConnect_single.scwdp.zip"} | Select -ExpandProperty browser_download_url
+        return $urls
+    }
+    return $null
+    
+    
+}
+
+$modulesConfig = Get-Content -Raw .\assets.json -Encoding Ascii |  ConvertFrom-Json
+
+$modules = $json.modules
+
+$sitecore = $modulesConfig.sitecore
+
+$config = @{
+    id       = $sitecore.id
+    name     = $sitecore.name
+    fileName = Join-Path $assets.root ("\{0}" -f $sitecore.fileName) 
+    url      = $sitecore.url
+    extract  = $sitecore.extract
+    download = $sitecore.download
+    source   = $sitecore.source
+}
+$config = $config| ConvertTo-Json
+$modules += (ConvertFrom-Json -InputObject $config) 
+
+Function Replace-Path {
+    param(
+        $module,
+        $root
+    )
+    if ($module.isGroup) {
+        foreach ($module in $module.modules) {
+            Replace-Path $module $root
+        }
+    }
+    else {
+        $module.fileName = (Join-Path $root ("\packages\{0}" -f $module.fileName))    
+    }
+}
+
+$habitatHome = $modulesConfig.habitatHome
+
+$habitatHomeurls = Get-HabitathomeAssetUrls $habitatHome
+($habitathome.modules | Where-Object {$_.id -eq "habitathome"}).url = $habitatHomeurls.habitatHomePackageUrl
+($habitathome.modules | Where-Object {$_.id -eq "habitathome_xConnect"}).url = $habitatHomeurls.habitatHomexConnectPackageUrl
+
+
+foreach ($entry in $habitatHome.modules) {
+    Replace-Path $entry $assets.root 
+}
+
+$modules += $modulesConfig.habitatHome
+
+$json.modules = $modules
+
+foreach ($module in $modulesConfig.modules) {
+    Replace-Path $module $assets.root
+}
+$modules += $modulesConfig.modules
+
+
+
+$json.modules = $modules
+
+$habitatHome = $json.settings.habitatHome
+($habitatHome | Where-Object {$_.id -eq "RootHostName"}).value = "dev.local"
+($habitatHome | Where-Object {$_.id -eq "AnalyticsCookieDomain"}).value = "`$(rootHostName)"
+
+
 Set-Content $configurationFile  (ConvertTo-Json -InputObject $json -Depth 6)
