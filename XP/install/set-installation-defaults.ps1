@@ -105,7 +105,7 @@ Write-Host "Setting default 'Sitecore' parameters"
 $sitecore = $json.settings.sitecore
 $sitecore.solrConfigurationPath = (Get-ChildItem $assets.root -filter "sitecore-solr.json" -Recurse).FullName
 $sitecore.singleDeveloperConfigurationPath = (Get-ChildItem $assets.root -filter "XP0-SingleDeveloper.json" -Recurse).FullName
-$sitecore.sslConfigurationPath = "$PSScriptRoot\certificates\sitecore-ssl.json"
+$sitecore.sslConfigurationPath = "$($assets.root)\certificates\sitecore-ssl.json"
 $sitecore.packagePath = Join-Path $assets.root $("Sitecore " + $assets.sitecoreVersion + " (OnPrem)_single.scwdp.zip")
 $sitecore.adminPassword = "b"
 $sitecore.exmCryptographicKey = "0x0000000000000000000000000000000000000000000000000000000000000000"
