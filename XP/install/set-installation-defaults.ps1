@@ -1,5 +1,6 @@
 Param(
-    [string] $ConfigurationFile = "configuration-xp0.json"
+    [string] $ConfigurationFile = "configuration-xp0.json",
+    [string] $assetsRoot
 )
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
@@ -10,7 +11,13 @@ $json = Get-Content -Raw .\install-settings.json -Encoding Ascii |  ConvertFrom-
 Write-host "Setting default 'Assets and prerequisites' parameters"
 
 $assets = $json.assets
-$assets.root = "$PSScriptRoot\assets"
+
+if (![string]::IsNullOrEmpty($assetsRoot)) {
+    $assets.root = $assetsRoot
+}
+else {
+    $assets.root = "$PSScriptRoot\assets"
+}
 # SIF settings
 $assets.psRepository = "https://sitecore.myget.org/F/sc-powershell/api/v2/"
 $assets.psRepositoryName = "SitecoreGallery"
