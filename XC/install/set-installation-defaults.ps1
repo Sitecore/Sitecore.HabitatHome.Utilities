@@ -56,7 +56,7 @@ $commerce.serviceAccountPassword = "Pu8azaCr"
 $commerce.brainTreeAccountMerchandId = ""
 $commerce.brainTreeAccountPublicKey = ""
 $commerce.brainTreeAccountPrivateKey = ""
-$commerce.identityServerName = "SitecoreIdentityServer"
+$commerce.identityServerName = "SitecoreIdentityServer_$($site.prefix)"
 
 # Site Settings
 $site = $json.settings.site

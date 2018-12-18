@@ -1,17 +1,17 @@
 {
-
-  "sitecore": [
-    {
-      "id": "xp",
-      "name": "Sitecore Experience Platform",
-      "fileName": "Sitecore 9.1.0 rev. 001564 (WDP XPSingle packages).zip",
-      "url": "https://dev.sitecore.net/~/media/442BA3B6E6334CEA9546C647D434BC13.ashx",
-      "extract": true,
-      "download": true,
-      "source": "sitecore"
-    }
-  ],
-    "modules": [{
+    "sitecore": [
+        {
+            "id": "xp",
+            "name": "Sitecore Experience Platform",
+            "fileName": "Sitecore 9.1.0 rev. 001564 (WDP XPSingle packages).zip",
+            "url": "https://dev.sitecore.net/~/media/442BA3B6E6334CEA9546C647D434BC13.ashx",
+            "extract": true,
+            "download": true,
+            "source": "sitecore"
+        }
+    ],
+    "modules": [
+        {
             "id": "sat",
             "name": "Sitecore Azure Toolkit",
             "fileName": "Sitecore Azure Toolkit 2.1.0 rev. 181023.zip",
@@ -47,7 +47,8 @@
             "isGroup": true,
             "download": false,
             "install": false,
-            "modules": [{
+            "modules": [
+                {
                     "id": "def",
                     "name": "Data Exchange Framework",
                     "fileName": "Data Exchange Framework 2.0.1 rev. 180108.zip",
@@ -93,7 +94,8 @@
                     "isGroup": true,
                     "download": false,
                     "install": false,
-                    "modules": [{
+                    "modules": [
+                        {
                             "id": "defDynamics",
                             "name": "Dynamics Provider Data Exchange Framework",
                             "fileName": "Dynamics Provider for Data Exchange Framework 2.0.1 rev. 180108.zip",
@@ -121,7 +123,8 @@
                     "isGroup": true,
                     "download": false,
                     "install": false,
-                    "modules": [{
+                    "modules": [
+                        {
                             "id": "defSalesforce",
                             "name": "Salesforce CRM Provider for Data Exchange Framework",
                             "fileName": "Salesforce Provider for Data Exchange Framework 2.0.1 rev. 180108.zip",
@@ -143,7 +146,6 @@
                         }
                     ]
                 }
-
             ]
         },
         {
@@ -165,14 +167,46 @@
             "install": false,
             "convert": false,
             "source": "external"
+        },
+        {
+            "id": "xGen",
+            "name": "xGenerator",
+            "fileName": "ExperienceGenerator_91.zip",
+            "url": "https://github.com/Sitecore/xGenerator/releases/download/9.1.0.0/ExperienceGenerator_91.zip",
+            "download": true,
+            "install": true,
+            "convert": true,
+            "source": "external"
         }
-
     ],
-    "prerequisites": [{
-        "id": "webPlatformInstaller",
-        "fileName": "WebPlatformInstaller_amd64_en-US.msi",
-        "url": "https://download.microsoft.com/download/C/F/F/CFF3A0B8-99D4-41A2-AE1A-496C08BEB904/WebPlatformInstaller_amd64_en-US.msi",
+    "habitatHome": {
+        "id": "habitatHome",
+        "isGroup": true,
         "download": true,
-        "source": "external"
-    }]
+        "install": true,
+        "version": "9.1.0.0",
+        "prerelease": true,
+        "modules": [
+            {
+                "id": "habitathome",
+                "name": "Habitat Home",
+                "fileName": "HabitatHome_single.scwdp.zip",
+                "url": "https://github.com/Sitecore/Sitecore.HabitatHome.Platform/releases/download/{version}/HabitatHome_single.scwdp.zip",
+                "download": true,
+                "install": true,
+                "convert": false,
+                "source": "external"
+            },
+            {
+                "id": "habitathome_xConnect",
+                "name": "Habitat Home xConnect",
+                "fileName": "xConnect_single.scwdp.zip",
+                "url": "https://github.com/Sitecore/Sitecore.HabitatHome.Platform/releases/download/{version}/xConnect_single.scwdp.zip",
+                "download": true,
+                "install": true,
+                "convert": false,
+                "source": "external"
+            }
+        ]
+    }
 }

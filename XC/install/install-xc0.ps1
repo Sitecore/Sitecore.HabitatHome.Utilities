@@ -1,5 +1,6 @@
 Param(
-    [string] $ConfigurationFile = '.\configuration-xc0.json'
+    [string] $ConfigurationFile = '.\configuration-xc0.json',
+    [switch] $SkipHabitatHomeInstall
 )
 
 #####################################################
@@ -345,10 +346,13 @@ Function Install-Commerce {
             PublicKey  = $commerce.brainTreeAccountPublicKey
             PrivateKey = $commerce.brainTreeAccountPrivateKey
         }
-        SitecoreIdentityServerName                  = "SitecoreIdentityServer"
+        SitecoreIdentityServerName                  = $commerce.identityServerName
     }
-
-    Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs")
+    If (!$SkipHabitatHomeInstall){
+        Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs")
+    } Else {
+        Install-SitecoreConfiguration @params -Skip "InitializeCommerceEngine","GenerateCatalogTemplates","InstallHabitatImagesModule","Reindex" -WorkingDirectory $(Join-Path $PWD "logs")
+    }
 }
 
 
