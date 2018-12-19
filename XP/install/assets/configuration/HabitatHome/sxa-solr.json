@@ -180,5 +180,15 @@
         "Password": "[parameter('SitecoreAdminPassword')]"
       }
     }
-  }
+  },
+  "UninstallTasks": {
+    "RemoveCores": {
+        "Description": "Removes the cores and instance folders.",
+        "Type": "ManageSolrCore",
+        "Params": [
+            { "Action": "Unload", "Address": "[parameter('SolrUrl')]", "Arguments": { "core": "[variable('SXA.Master.Name')]", "deleteInstanceDir": "true" }, "ErrorAction": "SilentlyContinue" },
+            { "Action": "Unload", "Address": "[parameter('SolrUrl')]", "Arguments": { "core": "[variable('SXA.Web.Name')]", "deleteInstanceDir": "true" }, "ErrorAction": "SilentlyContinue" }
+        ]
+    }
+ }
 }
