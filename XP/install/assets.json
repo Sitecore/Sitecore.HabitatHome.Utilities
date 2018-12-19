@@ -200,8 +200,8 @@
             {
                 "id": "habitathome_xConnect",
                 "name": "Habitat Home xConnect",
-                "fileName": "xConnect_single.scwdp.zip",
-                "url": "https://github.com/Sitecore/Sitecore.HabitatHome.Platform/releases/download/{version}/xConnect_single.scwdp.zip",
+                "fileName": "HabitatHome_xConnect_single.scwdp.zip",
+                "url": "https://github.com/Sitecore/Sitecore.HabitatHome.Platform/releases/download/{version}/HabitatHome_xConnect_single.scwdp.zip",
                 "download": true,
                 "install": true,
                 "convert": false,
