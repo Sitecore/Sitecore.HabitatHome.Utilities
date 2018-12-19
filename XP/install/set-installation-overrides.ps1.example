@@ -119,7 +119,7 @@ Function Get-HabitathomeAssetUrls {
         $releaseId = $release.id
         $assets = Invoke-RestMethod -Uri ("https://api.github.com/repos/Sitecore/Sitecore.HabitatHome.Platform/releases/{0}/assets" -f $releaseId)
         $urls.habitatHomePackageUrl = $assets | Where-Object {$_.name -eq "HabitatHome_single.scwdp.zip"} | Select -ExpandProperty browser_download_url
-        $urls.habitatHomexConnectPackageUrl = $assets | Where-Object {$_.name -eq "xConnect_single.scwdp.zip"} | Select -ExpandProperty browser_download_url
+        $urls.habitatHomexConnectPackageUrl = $assets | Where-Object {$_.name -eq "HabitatHome_xConnect_single.scwdp.zip"} | Select -ExpandProperty browser_download_url
         return $urls
     }
     return $null
