@@ -112,7 +112,6 @@ $sxaSolrUninstallParams = @{
     SiteName              = $site.hostName
     SitecoreAdminPassword = $sitecore.adminPassword
 }
-Push-Location $resourcePath
 
 Install-SitecoreConfiguration @sxaSolrUninstallParams -Uninstall  *>&1 | Tee-Object XP0-SingleDeveloper.log
 
