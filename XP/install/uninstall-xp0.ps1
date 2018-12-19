@@ -10,13 +10,13 @@ Param(
 $ErrorActionPreference = 'Stop'
 Set-Location $PSScriptRoot
 
-if (!(Test-Path $ConfigurationFile)){
+if (!(Test-Path $ConfigurationFile)) {
     Write-Host "Configuration file '$($ConfigurationFile)' not found." -ForegroundColor Red
     Write-Host  "Please use 'set-installation...ps1' files to generate a configuration file." -ForegroundColor Red
     Exit 1
 }
-$config =  Get-Content -Raw $ConfigurationFile -Force |  ConvertFrom-Json 
-if (!$config){
+$config = Get-Content -Raw $ConfigurationFile -Force |  ConvertFrom-Json 
+if (!$config) {
     throw "Error trying to load configuration!"
 }
 $site = $config.settings.site
@@ -99,6 +99,22 @@ $singleDeveloperParams = @{
 }
 Push-Location $resourcePath
 Install-SitecoreConfiguration @singleDeveloperParams -Uninstall  *>&1 | Tee-Object XP0-SingleDeveloper.log
+
+$sxaSolrConfigPath = Join-Path $resourcePath 'HabitatHome\sxa-solr-config.json'
+
+$sxaSolrUninstallParams = @{
+    Path                  = Join-path $resourcePath 'HabitatHome\sxa-solr.json'
+    SolrUrl               = $solr.url 
+    SolrRoot              = $solr.root 
+    SolrService           = $solr.serviceName 
+    CorePrefix            = $site.prefix
+    SXASolrConfigPath     = $sxaSolrConfigPath
+    SiteName              = $site.hostName
+    SitecoreAdminPassword = $sitecore.adminPassword
+}
+
+Install-SitecoreConfiguration @sxaSolrUninstallParams -Uninstall  *>&1 | Tee-Object XP0-SingleDeveloper.log
+
 Pop-Location
 
 Write-Host "Removing folders from webroot" -ForegroundColor Green
