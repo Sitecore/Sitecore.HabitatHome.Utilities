@@ -119,19 +119,20 @@ Function Install-SitecoreAzureToolkit {
 
 }
 
-Function Install-Module {
+Function Install-SiteModule {
     param(
-        $module
+        $sitecoreModule
     )
     $baseConfigurationPath = Join-Path $resourcePath 'HabitatHome'
-    $configurationPath = Join-Path $baseConfigurationPath ("module-{0}.json" -f $module.databases.replace(",", ""))
-    if ($true -eq $module.convert) {
-        $module.filename = $module.filename.replace(".zip", ".scwdp.zip")
+    $configuration = ("module-{0}.json" -f $sitecoreModule.databases.replace(",", ""))
+    $configurationPath = Join-Path $baseConfigurationPath $configuration
+    if ($true -eq $sitecoreModule.convert) {
+        $sitecoreModule.filename = $sitecoreModule.filename.replace(".zip", ".scwdp.zip")
     }
 
     $params = @{
         Path             = $configurationPath
-        Package          = $module.fileName
+        Package          = $sitecoreModule.fileName
         SiteName         = $site.hostName
         SqlDbPrefix      = $site.prefix 
         SqlAdminUser     = $sql.adminUser 
@@ -190,7 +191,7 @@ Function Install-Modules {
                 Write-Host ("Converting {0} to SCWDP" -f $package.name) -ForegroundColor Green
                 ConvertTo-SCModuleWebDeployPackage  -Path $destination -Destination $PackagesFolder -Force
             }
-            Install-Module $package
+            Install-SitecoreModule $package
         }
     }
 }
