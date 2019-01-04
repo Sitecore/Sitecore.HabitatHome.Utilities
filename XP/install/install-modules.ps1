@@ -45,15 +45,13 @@ $sql = $config.settings.sql
 $xConnect = $config.settings.xConnect
 $resourcePath = Join-Path $assets.root "configuration"
 
-$downloadJsonPath = $([io.path]::combine($resourcePath, 'HabitatHome', 'download-assets.json'))
 $downloadFolder = $assets.root
 $packagesFolder = (Join-Path $downloadFolder "packages")
 
-$credentials = $null
+
 $loginSession = $null
 
-if (!(Test-Path $packagesFolder))
-{
+if (!(Test-Path $packagesFolder)) {
     New-Item $packagesFolder -ItemType Directory -Force  > $null  
 }
 Function Install-SitecoreInstallFramework {
@@ -84,27 +82,28 @@ Function Install-SitecoreAzureToolkit {
    
     $destination = $package.fileName
     
-    if (!(Test-Path $destination) -and $package.download -eq $true) {
+    if (!(Test-Path $destination)) {
        
-        if ($null -eq $credentials) {
-            if ([string]::IsNullOrEmpty($devSitecoreUsername)){
-                $credentials = Get-Credential -Message "Please provide dev.sitecore.com credentials"
+        if ($null -eq $global:credentials) {
+            if ([string]::IsNullOrEmpty($devSitecoreUsername)) {
+                $global:credentials = Get-Credential -Message "Please provide dev.sitecore.com credentials"
             }
             elseif (![string]::IsNullOrEmpty($devSitecoreUsername) -and ![string]::IsNullOrEmpty($devSitecorePassword)) {
                 $secpasswd = ConvertTo-SecureString $devSitecorePassword -AsPlainText -Force
-                $credentials = New-Object System.Management.Automation.PSCredential ($devSitecoreUsername, $secpasswd)
+                $global:credentials = New-Object System.Management.Automation.PSCredential ($devSitecoreUsername, $secpasswd)
             }
             else {
                 throw "Credentials required for download"
             }
         }
-        $user = $credentials.GetNetworkCredential().UserName
-        $password = $Credentials.GetNetworkCredential().Password
+        $user = $global:credentials.GetNetworkCredential().UserName
+        $password = $global:credentials.GetNetworkCredential().Password
 
         $loginRequest = Invoke-RestMethod -Uri https://dev.sitecore.net/api/authorization -Method Post -ContentType "application/json" -Body "{username: '$user', password: '$password'}" -SessionVariable loginSession -UseBasicParsing 
+        
 
         $params = @{
-            Path         = $downloadJsonPath
+            Path         = $([io.path]::combine($resourcePath, 'HabitatHome', 'download-assets.json'))
             LoginSession = $loginSession
             Source       = $package.url
             Destination  = $destination
@@ -120,71 +119,64 @@ Function Install-SitecoreAzureToolkit {
 
 }
 
-Function Get-OptionalModules {
-
-    $downloadAssets = $modules
-    if (!(Test-Path $downloadFolder)) {
-        New-Item -ItemType Directory -Force -Path $downloadFolder
-    }
-  
-    # Download modules
-    $args = @{
-        Packages         = $downloadAssets
-        PackagesFolder   = $packagesFolder
-        Credentials      = $credentials
-        DownloadJsonPath = $downloadJsonPath
-    }
-    Process-Packages @args
-}
-
-Function Process-Packages {
-    param(   [PSCustomObject] $Packages,
-        $PackagesFolder,
-        $Credentials,
-        $DownloadJsonPath
+Function Install-Module {
+    param(
+        $module
     )
-    foreach ($package in $Packages) {
-        if ($package.id -eq "xp" -or $package.id -eq "sat" -or $package.id -eq "si" -or $package.id -eq "habitatHome") {
-            # Skip Sitecore Azure Toolkit and XP package and Sitecore identity - downloaded separately
-            continue;
-        }
+    $baseConfigurationPath = Join-Path $resourcePath 'HabitatHome'
+    $configurationPath = Join-Path $baseConfigurationPath ("module-{0}.json" -f $module.databases.replace(",", ""))
+    if ($true -eq $module.convert) {
+        $module.filename = $module.filename.replace(".zip", ".scwdp.zip")
+    }
 
-        if (!(Test-Path $packagesFolder)) {
-            New-Item -ItemType Directory -Force -Path $packagesFolder
-        }
-       
-        if ($package.isGroup -and $true -eq $package.download) {
+    $params = @{
+        Path             = $configurationPath
+        Package          = $module.fileName
+        SiteName         = $site.hostName
+        SqlDbPrefix      = $site.prefix 
+        SqlAdminUser     = $sql.adminUser 
+        SqlAdminPassword = $sql.adminPassword 
+        SqlServer        = $sql.server 
+    }
+    
+    Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs") 
+}
+Function Install-Modules {
+    param(
+        [PSCustomObject] $Packages,
+        $Credentials
+    )
+    foreach ($package in $packages) {
+        if ($package.isGroup -and  $true -eq $package.install) {
             $submodules = $package.modules
             $args = @{
-                Packages         = $submodules
-                PackagesFolder   = $PackagesFolder
-                Credentials      = $Credentials
-                DownloadJsonPath = $DownloadJsonPath
+                Packages    = $submodules
+                Credentials = $Credentials
             }
-            Process-Packages @args
+            Install-Modules @args
         }
-        elseif ($true -eq $package.download -and (!($package.PSObject.Properties.name -match "isGroup") ) ) {
+        elseif (!($package.PSObject.Properties.name -match "isGroup") -and $true -eq $package.install ) {
             Write-Host ("Downloading {0}  -  if required" -f $package.name )
             $destination = $package.fileName
             if (!(Test-Path $destination)) {
                 if ($null -eq $credentials) {
-                    if ([string]::IsNullOrEmpty($devSitecoreUsername)){
+                    if ([string]::IsNullOrEmpty($devSitecoreUsername)) {
                         $credentials = Get-Credential -Message "Please provide dev.sitecore.com credentials"
                     }
                     elseif (![string]::IsNullOrEmpty($devSitecoreUsername) -and ![string]::IsNullOrEmpty($devSitecorePassword)) {
                         $secpasswd = ConvertTo-SecureString $devSitecorePassword -AsPlainText -Force
-                        $credentials = New-Object System.Management.Automation.PSCredential ($devSitecoreUsername, $secpasswd)
+                        $Credentials = New-Object System.Management.Automation.PSCredential ($devSitecoreUsername, $secpasswd)
                     }
                     else {
                         throw "Credentials required for download"
                     }
                 }
                 $user = $credentials.GetNetworkCredential().UserName
-                $password = $Credentials.GetNetworkCredential().Password
+                $password = $credentials.GetNetworkCredential().Password
 
-                $loginRequest = Invoke-RestMethod -Uri https://dev.sitecore.net/api/authorization -Method Post -ContentType "application/json" -Body "{username: '$user', password: '$password'}" -SessionVariable loginSession -UseBasicParsing 
+                Invoke-RestMethod -Uri https://dev.sitecore.net/api/authorization -Method Post -ContentType "application/json" -Body "{username: '$user', password: '$password'}" -SessionVariable loginSession -UseBasicParsing 
                 $params = @{
-                    Path         = $downloadJsonPath
+                    Path         = $([io.path]::combine($resourcePath, 'HabitatHome', 'download-assets.json'))
                     LoginSession = $loginSession
                     Source       = $package.url
                     Destination  = $destination
@@ -198,10 +190,25 @@ Function Process-Packages {
                 Write-Host ("Converting {0} to SCWDP" -f $package.name) -ForegroundColor Green
                 ConvertTo-SCModuleWebDeployPackage  -Path $destination -Destination $PackagesFolder -Force
             }
+            Install-Module $package
         }
     }
 }
-
+Function Start-ModuleInstallation {
+    $excluded = @("xp", "sat", "si", "habitatHome")
+    $installableModules = $modules | Where-Object { $_.id -notin $excluded }  #  if ($package.id -eq "xp" -or $package.id -eq "sat" -or $package.id -eq "si" -or $package.id -eq "habitatHome") {
+   
+    if (!(Test-Path $downloadFolder)) {
+        New-Item -ItemType Directory -Force -Path $downloadFolder
+    }
+      
+    # Download modules
+    $args = @{
+        Packages    = $installableModules
+        Credentials = $global:credentials
+    }
+    Install-Modules @args
+}
 Function Remove-DatabaseUsers {
     # Delete master and core database users
     Write-Host ("Removing {0}" -f $sql.coreUser) -ForegroundColor Green
@@ -259,259 +266,6 @@ Function Stop-Services {
         restart-service -force $mssqlService
     }
 }
-Function Install-SitecorePowerShellExtensions {
-   
-    $spe = $modules | Where-Object { $_.id -eq "spe"}
-    if ($false -eq $spe.install) {
-        return
-    }
-    #$spe.fileName = $spe.fileName.replace(".zip", ".scwdp.zip")
-    $params = @{
-        Path             = (Join-path $resourcePath 'HabitatHome\module-mastercore.json')
-        Package          = $spe.fileName
-        SiteName         = $site.hostName
-        SqlDbPrefix      = $site.prefix 
-        SqlAdminUser     = $sql.adminUser 
-        SqlAdminPassword = $sql.adminPassword 
-        SqlServer        = $sql.server 
-
-    }
-    
-    Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs") 
-}
-
-Function Install-SitecoreExperienceAccelerator {
-
-    # Install SXA
-
-    $sxa = $modules | Where-Object { $_.id -eq "sxa"}
-    if ($false -eq $sxa.install) {
-        return
-    }
-    # $sxa.fileName = $sxa.fileName.replace(".zip", ".scwdp.zip")
-    $params = @{
-        Path             = (Join-path $resourcePath 'HabitatHome\module-mastercore.json')
-        Package          = $sxa.fileName
-        SiteName         = $site.hostName
-        SqlDbPrefix      = $site.prefix 
-        SqlAdminUser     = $sql.adminUser 
-        SqlAdminPassword = $sql.adminPassword 
-        SqlServer        = $sql.server 
-
-    }
-    
-    Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs") 
-}
-
-Function Install-DataExchangeFrameworkModules {
-    $defGroup = $modules | Where-Object { $_.id -eq "defGroup"}
-    $defModules = ($modules | Where-Object { $_.id -eq "defGroup"}).modules
-
-    if ($true -eq $defGroup.install) {
-        $def = $defModules | Where-Object { $_.id -eq "def"}
-        Write-Host ("Installing {0}" -f $def.name)
-        $def.fileName = $def.fileName.replace(".zip", ".scwdp.zip")
-        $params = @{
-            Path             = (Join-path $resourcePath 'HabitatHome\module-mastercore.json')
-            Package          = $def.fileName
-            SiteName         = $site.hostName
-            SqlDbPrefix      = $site.prefix 
-            SqlAdminUser     = $sql.adminUser 
-            SqlAdminPassword = $sql.adminPassword 
-            SqlServer        = $sql.server 
-
-        }
-    
-        Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs") 
-
-        $defSitecore = $defModules | Where-Object { $_.id -eq "defSitecore"}
-        Write-Host ("Installing {0}" -f $defSitecore.name)
-        $defSitecore.fileName = $defSitecore.fileName.replace(".zip", ".scwdp.zip")
-        $params = @{
-            Path             = (Join-path $resourcePath 'HabitatHome\module-master.json')
-            Package          = $defSitecore.fileName
-            SiteName         = $site.hostName
-            SqlDbPrefix      = $site.prefix 
-            SqlAdminUser     = $sql.adminUser 
-            SqlAdminPassword = $sql.adminPassword 
-            SqlServer        = $sql.server 
-
-        }
-    
-        Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs") 
-
-        $defSql = $defModules | Where-Object { $_.id -eq "defSql"}
-        Write-Host ("Installing {0}" -f $defSql.name)
-        $defSql.fileName = $defSql.fileName.replace(".zip", ".scwdp.zip")
-        $params = @{
-            Path             = (Join-path $resourcePath 'HabitatHome\module-master.json')
-            Package          = $defSql.fileName
-            SiteName         = $site.hostName
-            SqlDbPrefix      = $site.prefix 
-            SqlAdminUser     = $sql.adminUser 
-            SqlAdminPassword = $sql.adminPassword 
-            SqlServer        = $sql.server 
-
-        }
-    
-        Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs") 
-
-        $defxConnect = $defModules | Where-Object { $_.id -eq "defxConnect"}
-        Write-Host ("Installing {0}" -f $defxConnect.name)
-        $defxConnect.fileName = $defxConnect.fileName.replace(".zip", ".scwdp.zip")
-        $params = @{
-            Path             = (Join-path $resourcePath 'HabitatHome\module-mastercore.json')
-            Package          = $defxConnect.fileName
-            SiteName         = $site.hostName
-            SqlDbPrefix      = $site.prefix 
-            SqlAdminUser     = $sql.adminUser 
-            SqlAdminPassword = $sql.adminPassword 
-            SqlServer        = $sql.server 
-
-        }
-        Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs") 
-    }
-    ### Dynamics
-    
-    $defDynamicsGroup = $defModules | Where-Object {$_.id -eq "defDynamicsGroup"}
-    
-    if ($true -eq $defDynamicsGroup.install) {
-        $defDynamics = $defDynamicsGroup.modules | Where-Object { $_.id -eq "defDynamics"}
-        Write-Host ("Installing {0}" -f $defDynamics.name)
-        $defDynamics.fileName = $defDynamics.fileName.replace(".zip", ".scwdp.zip")
-        $params = @{
-            Path             = (Join-path $resourcePath 'HabitatHome\module-master.json')
-            Package          = $defDynamics.fileName
-            SiteName         = $site.hostName
-            SqlDbPrefix      = $site.prefix 
-            SqlAdminUser     = $sql.adminUser 
-            SqlAdminPassword = $sql.adminPassword 
-            SqlServer        = $sql.server 
-
-        }
-    
-        Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs") 
-    
-        $defDynamicsConnect = $defDynamicsGroup.modules | Where-Object { $_.id -eq "defDynamicsConnect"}
-        Write-Host ("Installing {0}" -f $defDynamicsConnect.name)
-        $defDynamicsConnect.fileName = $defDynamicsConnect.fileName.replace(".zip", ".scwdp.zip")
-        $params = @{
-            Path             = (Join-path $resourcePath 'HabitatHome\module-master.json')
-            Package          = $defDynamicsConnect.fileName
-            SiteName         = $site.hostName
-            SqlDbPrefix      = $site.prefix 
-            SqlAdminUser     = $sql.adminUser 
-            SqlAdminPassword = $sql.adminPassword 
-            SqlServer        = $sql.server 
-
-        }
-        Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs") 
-    }
-
-    ### Salesforce
-
-    $defSalesforceGroup = $defModules | Where-Object {$_.id -eq "defSalesforceGroup"}
-    
-    if ($true -eq $defSalesforceGroup.install) {
-
-        $defSalesforce = $defSalesforceGroup.modules | Where-Object { $_.id -eq "defSalesforce"}
-        Write-Host ("Installing {0}" -f $defSalesforce.name)
-        $defSalesforce.fileName = $defSalesforce.fileName.replace(".zip", ".scwdp.zip")
-        $params = @{
-            Path             = (Join-path $resourcePath 'HabitatHome\module-master.json')
-            Package          = $defSalesforce.fileName
-            SiteName         = $site.hostName
-            SqlDbPrefix      = $site.prefix 
-            SqlAdminUser     = $sql.adminUser 
-            SqlAdminPassword = $sql.adminPassword 
-            SqlServer        = $sql.server 
-
-        }
-    
-        Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs") 
-    
-        $defSalesforceConnect = $defSalesforceGroup.modules | Where-Object { $_.id -eq "defSalesforceConnect"}
-        Write-Host ("Installing {0}" -f $defSalesforceConnect.name)
-        $defSalesforceConnect.fileName = $defSalesforceConnect.fileName.replace(".zip", ".scwdp.zip")
-        $params = @{
-            Path             = (Join-path $resourcePath 'HabitatHome\module-master.json')
-            Package          = $defSalesforceConnect.fileName
-            SiteName         = $site.hostName
-            SqlDbPrefix      = $site.prefix 
-            SqlAdminUser     = $sql.adminUser 
-            SqlAdminPassword = $sql.adminPassword 
-            SqlServer        = $sql.server 
-
-        }
-        Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs") 
-    }
-}
-
-Function Install-SalesforceMarketingCloudModule {
-    $sfmcConnect = $modules | Where-Object { $_.id -eq "sfmcConnect"}
-    if ($false -eq $sfmcConnect.install) {
-        return;
-    }
-
-    $sfmcConnect.fileName = $sfmcConnect.fileName.replace(".zip", ".scwdp.zip")
-    $params = @{
-        Path             = (Join-path $resourcePath 'HabitatHome\module-mastercore.json')
-        Package          = $sfmcConnect.fileName
-        SiteName         = $site.hostName
-        SqlDbPrefix      = $site.prefix 
-        SqlAdminUser     = $sql.adminUser 
-        SqlAdminPassword = $sql.adminPassword 
-        SqlServer        = $sql.server 
-
-    }
-    
-    Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs") 
-}
-Function Install-StacklaModule {
-    $stackla = $modules | Where-Object { $_.id -eq "stackla"}
-    if ($false -eq $stackla.install) {
-        return;
-    }
-
-    $stackla.fileName = $stackla.fileName.replace(".zip", ".scwdp.zip")
-    $params = @{
-        Path             = (Join-path $resourcePath 'HabitatHome\module-mastercore.json')
-        Package          = $stackla.fileName
-        SiteName         = $site.hostName
-        SqlDbPrefix      = $site.prefix 
-        SqlAdminUser     = $sql.adminUser 
-        SqlAdminPassword = $sql.adminPassword 
-        SqlServer        = $sql.server 
-
-    }
-    
-    Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs") 
-}
-
-
-Function Install-ExperienceGenerator {
-
-    # Install xGenerator
-
-    $xGen = $modules | Where-Object { $_.id -eq "xGen"}
-    if ($false -eq $xGen.install) {
-        return
-    }
-    $xGen.fileName = $xGen.fileName.replace(".zip", ".scwdp.zip")
-    $params = @{
-        Path             = (Join-path $resourcePath 'HabitatHome\module-core.json')
-        Package          = $xGen.fileName
-        SiteName         = $site.hostName
-        SqlDbPrefix      = $site.prefix 
-        SqlAdminUser     = $sql.adminUser 
-        SqlAdminPassword = $sql.adminPassword 
-        SqlServer        = $sql.server 
-
-    }
-    
-    Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs") 
-}
-
 
 Function Enable-ContainedDatabases {
     #Enable Contained Databases
@@ -622,15 +376,9 @@ Function Start-Services {
 
 Install-SitecoreInstallFramework
 Install-SitecoreAzureToolkit
-Get-OptionalModules
 Remove-DatabaseUsers
 Stop-Services
-Install-SitecorePowerShellExtensions
-Install-SitecoreExperienceAccelerator
-Install-DataExchangeFrameworkModules
-Install-SalesforceMarketingCloudModule
-Install-StacklaModule
-Install-ExperienceGenerator
+Start-ModuleInstallation
 Enable-ContainedDatabases
 Add-DatabaseUsers
 Start-Services
