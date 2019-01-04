@@ -82,7 +82,7 @@ Function Install-SitecoreAzureToolkit {
    
     $destination = $package.fileName
     
-    if (!(Test-Path $destination) -and $package.download -eq $true) {
+    if (!(Test-Path $destination) -and $package.install -eq $true) {
         if ($null -eq $credentials) {
             $credentials = Get-Credential -Message "Please provide dev.sitecore.com credentials"
         }
@@ -140,7 +140,7 @@ Function Get-Packages {
             New-Item -ItemType Directory -Force -Path $packagesFolder
         }
        
-        if ($true -eq $package.download) {
+        if ($true -eq $package.install) {
             Write-Host ("Downloading {0}  -  if required" -f $package.name )
             $destination = $package.fileName
             if ((Test-Path $destination)) {
