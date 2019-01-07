@@ -119,7 +119,7 @@ Function Install-SitecoreAzureToolkit {
 
 }
 
-Function Install-SiteModule {
+Function Install-SitecoreModule {
     param(
         $sitecoreModule
     )
