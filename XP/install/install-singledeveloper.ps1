@@ -84,7 +84,7 @@ Function Download-Assets {
         New-Item -ItemType Directory -Force -Path $downloadFolder
     }
     if ($null -eq $credentials) {
-        if ([string]::IsNullOrEmpty($devSitecoreUsername)){
+        if ([string]::IsNullOrEmpty($devSitecoreUsername)) {
             $credentials = Get-Credential -Message "Please provide dev.sitecore.com credentials"
         }
         elseif (![string]::IsNullOrEmpty($devSitecoreUsername) -and ![string]::IsNullOrEmpty($devSitecorePassword)) {
@@ -104,26 +104,25 @@ Function Download-Assets {
     Set-Alias sz 'C:\Program Files\7-Zip\7z.exe'
     $package = $modules | Where-Object {$_.id -eq "xp"}
     
-    if ($package.download -eq $true) {
-        Write-Host ("Downloading {0}  -  if required" -f $package.name )
+    Write-Host ("Downloading {0}  -  if required" -f $package.name )
         
-        $destination = $package.fileName
+    $destination = $package.fileName
             
-        if (!(Test-Path $destination)) {
-            $params = @{
-                Path         = $downloadJsonPath
-                LoginSession = $loginSession
-                Source       = $package.url
-                Destination  = $destination
-            }
-            $Global:ProgressPreference = 'SilentlyContinue'
-            Install-SitecoreConfiguration  @params  *>&1 | Tee-Object $LogFile -Append 
-            $Global:ProgressPreference = 'Continue'
+    if (!(Test-Path $destination)) {
+        $params = @{
+            Path         = $downloadJsonPath
+            LoginSession = $loginSession
+            Source       = $package.url
+            Destination  = $destination
         }
-        if ((Test-Path $destination) -and ( $package.extract -eq $true)) {
-            sz x -o"$DownloadFolder" $destination  -y -aoa
-        }
+        $Global:ProgressPreference = 'SilentlyContinue'
+        Install-SitecoreConfiguration  @params  *>&1 | Tee-Object $LogFile -Append 
+        $Global:ProgressPreference = 'Continue'
     }
+    if ((Test-Path $destination) -and ( $package.extract -eq $true)) {
+        sz x -o"$DownloadFolder" $destination  -y -aoa
+    }
+    
 }
 Function Confirm-Prerequisites {
     #Enable Contained Databases
@@ -196,47 +195,47 @@ Function Confirm-Prerequisites {
 }
 Function Install-SingleDeveloper {
     $singleDeveloperParams = @{
-        Path                            = $sitecore.singleDeveloperConfigurationPath
-        SqlServer                       = $sql.server
-        SqlAdminUser                    = $sql.adminUser
-        SqlAdminPassword                = $sql.adminPassword
-        SqlCollectionPassword           = $sql.collectionPassword
-        SqlReferenceDataPassword        = $sql.referenceDataPassword
-        SqlMarketingAutomationPassword  = $sql.marketingAutomationPassword
-        SqlMessagingPassword            = $sql.messagingPassword
-        SqlProcessingEnginePassword     = $sql.processingEnginePassword
-        SqlReportingPassword            = $sql.reportingPassword
-        SqlCorePassword                 = $sql.corePassword
-        SqlSecurityPassword             = $sql.securityPassword
-        SqlMasterPassword               = $sql.masterPassword
-        SqlWebPassword                  = $sql.webPassword
-        SqlProcessingTasksPassword      = $sql.processingTasksPassword
-        SqlFormsPassword                = $sql.formsPassword
-        SqlExmMasterPassword            = $sql.exmMasterPassword
-        SitecoreAdminPassword           = $sitecore.adminPassword
-        SolrUrl                         = $solr.url
-        SolrRoot                        = $solr.root
-        SolrService                     = $solr.serviceName
-        Prefix                          = $site.prefix
-        XConnectCertificateName         = $xconnect.siteName
-        IdentityServerCertificateName   = $identityServer.name
-        IdentityServerSiteName          = $identityServer.name
-        LicenseFile                     = $assets.licenseFilePath
-        XConnectPackage                 = $xConnect.packagePath
-        SitecorePackage                 = $sitecore.packagePath
-        IdentityServerPackage           = $identityServer.packagePath
-        XConnectSiteName                = $xConnect.siteName
-        SitecoreSitename                = $site.hostName
-        PasswordRecoveryUrl             = "https://" + $site.hostName
-        SitecoreIdentityAuthority       = "https://" + $identityServer.name
-        XConnectCollectionService       = "https://" + $xConnect.siteName
-        ClientSecret                    = $identityServer.clientSecret
-        AllowedCorsOrigins              = ("https://{0}|https://{1}" -f  $site.hostName, "habitathomebasic.dev.local") # Need to add to proper config
-        WebRoot                         = $site.webRoot
+        Path                           = $sitecore.singleDeveloperConfigurationPath
+        SqlServer                      = $sql.server
+        SqlAdminUser                   = $sql.adminUser
+        SqlAdminPassword               = $sql.adminPassword
+        SqlCollectionPassword          = $sql.collectionPassword
+        SqlReferenceDataPassword       = $sql.referenceDataPassword
+        SqlMarketingAutomationPassword = $sql.marketingAutomationPassword
+        SqlMessagingPassword           = $sql.messagingPassword
+        SqlProcessingEnginePassword    = $sql.processingEnginePassword
+        SqlReportingPassword           = $sql.reportingPassword
+        SqlCorePassword                = $sql.corePassword
+        SqlSecurityPassword            = $sql.securityPassword
+        SqlMasterPassword              = $sql.masterPassword
+        SqlWebPassword                 = $sql.webPassword
+        SqlProcessingTasksPassword     = $sql.processingTasksPassword
+        SqlFormsPassword               = $sql.formsPassword
+        SqlExmMasterPassword           = $sql.exmMasterPassword
+        SitecoreAdminPassword          = $sitecore.adminPassword
+        SolrUrl                        = $solr.url
+        SolrRoot                       = $solr.root
+        SolrService                    = $solr.serviceName
+        Prefix                         = $site.prefix
+        XConnectCertificateName        = $xconnect.siteName
+        IdentityServerCertificateName  = $identityServer.name
+        IdentityServerSiteName         = $identityServer.name
+        LicenseFile                    = $assets.licenseFilePath
+        XConnectPackage                = $xConnect.packagePath
+        SitecorePackage                = $sitecore.packagePath
+        IdentityServerPackage          = $identityServer.packagePath
+        XConnectSiteName               = $xConnect.siteName
+        SitecoreSitename               = $site.hostName
+        PasswordRecoveryUrl            = "https://" + $site.hostName
+        SitecoreIdentityAuthority      = "https://" + $identityServer.name
+        XConnectCollectionService      = "https://" + $xConnect.siteName
+        ClientSecret                   = $identityServer.clientSecret
+        AllowedCorsOrigins             = ("https://{0}|https://{1}" -f $site.hostName, "habitathomebasic.dev.local") # Need to add to proper config
+        WebRoot                        = $site.webRoot
     }
 
     Push-Location $resourcePath
-        Install-SitecoreConfiguration @singleDeveloperParams   *>&1 | Tee-Object XP0-SingleDeveloper.log
+    Install-SitecoreConfiguration @singleDeveloperParams   *>&1 | Tee-Object XP0-SingleDeveloper.log
     Pop-Location
 }
 Function Add-AppPoolMembership {
