@@ -163,16 +163,16 @@
             "source": "external",
             "databases": "master,core"
         },
-        {
-            "id": "xGen",
-            "name": "xGenerator",
-            "fileName": "ExperienceGenerator_91.zip",
-            "url": "https://github.com/Sitecore/xGenerator/releases/download/9.1.0.0/ExperienceGenerator_91.zip",
-            "install": false,
-            "convert": true,
-            "source": "external",
-            "databases": "core"
-        },
+      {
+        "id": "xGen",
+        "name": "xGenerator",
+        "fileName": "ExperienceGenerator_91.zip",
+        "url": "https://github.com/Sitecore/xGenerator/releases/download/9.1.0.0/ExperienceGenerator_91.zip",
+        "install": false,
+        "convert": true,
+        "source": "external",
+        "databases": "core"
+      },
         {
             "id": "stylelabs",
             "name": "StyleLabs Plugin",
