@@ -127,6 +127,21 @@ Function Get-HabitathomeAssetUrls {
     
 }
 
+Function Replace-Path {
+    param(
+        $module,
+        $root
+    )
+    if ($module.isGroup) {
+        foreach ($module in $module.modules) {
+            Replace-Path $module $root
+        }
+    }
+    else {
+        $module.fileName = (Join-Path $root ("\packages\{0}" -f $module.fileName))    
+    }
+}
+
 $modulesConfig = Get-Content -Raw .\assets.json -Encoding Ascii |  ConvertFrom-Json
 
 $modules = $json.modules
@@ -145,42 +160,23 @@ $config = @{
 $config = $config| ConvertTo-Json
 $modules += (ConvertFrom-Json -InputObject $config) 
 
-Function Replace-Path {
-    param(
-        $module,
-        $root
-    )
-    if ($module.isGroup) {
-        foreach ($module in $module.modules) {
-            Replace-Path $module $root
-        }
-    }
-    else {
-        $module.fileName = (Join-Path $root ("\packages\{0}" -f $module.fileName))    
-    }
+foreach ($module in $modulesConfig.modules) {
+    Replace-Path $module $assets.root
 }
+$modules += $modulesConfig.modules
 
+$json.modules = $modules
 $habitatHome = $modulesConfig.habitatHome
 
 $habitatHomeurls = Get-HabitathomeAssetUrls $habitatHome
 ($habitathome.modules | Where-Object {$_.id -eq "habitathome"}).url = $habitatHomeurls.habitatHomePackageUrl
 ($habitathome.modules | Where-Object {$_.id -eq "habitathome_xConnect"}).url = $habitatHomeurls.habitatHomexConnectPackageUrl
 
-
 foreach ($entry in $habitatHome.modules) {
     Replace-Path $entry $assets.root 
 }
 
 $modules += $modulesConfig.habitatHome
-
-$json.modules = $modules
-
-foreach ($module in $modulesConfig.modules) {
-    Replace-Path $module $assets.root
-}
-$modules += $modulesConfig.modules
-
-
 
 $json.modules = $modules
 
