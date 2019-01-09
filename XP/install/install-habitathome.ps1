@@ -143,24 +143,23 @@ Function Get-Packages {
         if ($true -eq $package.install) {
             Write-Host ("Downloading {0}  -  if required" -f $package.name )
             $destination = $package.fileName
-            if ((Test-Path $destination)) {
-                Remove-Item $destination # Ensure we always have the latest.
-            }
-            $user = ""# $credentials.GetNetworkCredential().UserName
-            $password = ""# $Credentials.GetNetworkCredential().Password
+            if (!(Test-Path $destination)) {
+        
+                $user = ""# $credentials.GetNetworkCredential().UserName
+                $password = ""# $Credentials.GetNetworkCredential().Password
 
-            $loginRequest = Invoke-RestMethod -Uri https://dev.sitecore.net/api/authorization -Method Post -ContentType "application/json" -Body "{username: '$user', password: '$password'}" -SessionVariable loginSession -UseBasicParsing 
+                Invoke-RestMethod -Uri https://dev.sitecore.net/api/authorization -Method Post -ContentType "application/json" -Body "{username: '$user', password: '$password'}" -SessionVariable loginSession -UseBasicParsing 
 
-            $params = @{
-                Path         = $downloadJsonPath
-                loginSession = $loginSession
-                Source       = $package.url
-                Destination  = $destination
+                $params = @{
+                    Path         = $downloadJsonPath
+                    loginSession = $loginSession
+                    Source       = $package.url
+                    Destination  = $destination
+                }
+                $Global:ProgressPreference = 'SilentlyContinue'
+                Install-SitecoreConfiguration  @params -WorkingDirectory $(Join-Path $PWD "logs")  
+                $Global:ProgressPreference = 'Continue'
             }
-            $Global:ProgressPreference = 'SilentlyContinue'
-            Install-SitecoreConfiguration  @params -WorkingDirectory $(Join-Path $PWD "logs")  
-            $Global:ProgressPreference = 'Continue'
-            
         }
     }
 }
