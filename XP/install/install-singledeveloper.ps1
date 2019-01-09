@@ -272,8 +272,32 @@ Function Add-AppPoolMembership {
     }
 }
 
+Function Add-AdditionalBindings {
+    foreach ($binding in $site.additionalBindings) {
+        $params = @{
+            Path            = $site.addSiteBindingWithSSLPath 
+            SiteName        = $site.hostName 
+            WebRoot         = $site.webRoot 
+            HostHeader      = $binding.hostName 
+            Port            = $binding.port
+            CertPath        = $assets.certificatesPath
+            CertificateName = $binding.hostName
+            Skip            = @()
+        }
+        if ($false -eq $binding.createCertificate) {
+            $params.Skip += "CreatePaths", "CreateRootCert", "ImportRootCertificate", "CreateSignedCert"
+        }
+        if ($binding.sslOnly) {
+            $params.Skip += "CreateBindings"
+        }
+
+        Install-SitecoreConfiguration  @params   -WorkingDirectory $(Join-Path $PWD "logs") -Verbose
+    }
+}
+
 Install-SitecoreInstallFramework
 Download-Assets
 Confirm-Prerequisites
 Install-SingleDeveloper
 Add-AppPoolMembership
+Add-AdditionalBindings
