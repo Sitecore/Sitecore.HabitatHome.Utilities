@@ -7,10 +7,10 @@ Param(
     [string]$demoType,
     [Parameter(Mandatory = $true)]
     [string] $version,
-    [string] $virtualMachineSize = "Standard_D4s_v3",
-    [Parameter(Mandatory = $true)]
-    [string] $sourceSnapshotSubscriptionId ,    
-    [string] $deploymentName = "habitathome",
+    [string] $virtualMachineSize = "Standard_D4s_v3", 
+	[Parameter(Mandatory = $true)]
+    [string] $sourceSnapshotSubscriptionId ,
+	[string] $deploymentName = "habitathome",
     [string] $sourceSnapshotPrefix = "habitathome",
     [switch] $DisableAutoShutdown
 )
@@ -183,6 +183,6 @@ $VirtualMachine = Add-AzureRmVMNetworkInterface -VM $VirtualMachine -Id $nic.Id
 Write-Host "Creating Virtual Machine" -ForegroundColor Green
 New-AzureRmVM -VM $VirtualMachine -ResourceGroupName $resourceGroupName -Location $location
 if (!$DisableAutoShutdown){
-Write-Host "Enabling Auto-Shutdown" -ForegroundColor Green
-Enable-AzureRMVmAutoShutdown -SubscriptionId $subscriptionId -ResourceGroupName $resourceGroupName -VirtualMachineName $virtualMachineName -TimeZone $timeZone
+	Write-Host "Enabling Auto-Shutdown" -ForegroundColor Green
+	Enable-AzureRMVmAutoShutdown -SubscriptionId $subscriptionId -ResourceGroupName $resourceGroupName -VirtualMachineName $virtualMachineName -TimeZone $timeZone
 }
