@@ -25,6 +25,23 @@ $site.suffix = "dev.local"
 $site.webroot = "C:\inetpub\wwwroot"
 $site.hostName = $json.settings.site.prefix + "." + $json.settings.site.suffix
 
+$habitathomebasicBinding = [ordered]@{
+    hostName            = "habitathomebasic.dev.local"
+    createCertificate   = $true
+    sslOnly             = $false
+    port                = 443
+
+}
+$habitathomebasicBinding = $habitathomebasicBinding | ConvertTo-Json
+$site.additionalBindings += (ConvertFrom-Json -InputObject $habitathomebasicBinding)  
+# #### EXAMPLE additional bindings
+# $otherAdditionalBinding = [ordered]@{
+#     hostName = "otherexample.dev.local"
+#     createCertificate = $false
+# }
+# $otherAdditionalBinding = $otherAdditionalBinding | ConvertTo-Json
+# $site.additionalBindings += (ConvertFrom-Json -InputObject $otherAdditionalBinding)
+
 # Sitecore Parameters
 $sitecore = $json.settings.sitecore
 $sitecore.adminPassword = "b"
