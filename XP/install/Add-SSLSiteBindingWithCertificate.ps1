@@ -28,9 +28,7 @@ if (!$config) {
 
 
 $site = $config.settings.site
-$sitecore = $config.sitecore
 $assets = $config.assets
-$resourcePath = Join-Path $PSScriptRoot "Sitecore.WDP.Resources"
 
 function Install-Assets {
     Write-Host "Installing Assets"
@@ -80,16 +78,6 @@ function Add-SSLSiteBindingWithCertificate {
         throw
     }
 }
-Function Set-ModulesPath {
-    Write-Host "Setting Modules Path" -ForegroundColor Green
-    $modulesPath = ( Join-Path -Path $resourcePath -ChildPath "Modules" )
-    if ($env:PSModulePath -notlike "*$modulesPath*") {
-        $p = $env:PSModulePath + ";" + $modulesPath
-        [Environment]::SetEnvironmentVariable("PSModulePath", $p)
-    }
     
-}
-
-Set-ModulesPath
 Install-Assets
 Add-SSLSiteBindingWithCertificate
