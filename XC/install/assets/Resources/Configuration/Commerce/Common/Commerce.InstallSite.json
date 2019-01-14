@@ -1,0 +1,211 @@
+﻿// -------------------------------------------------------------------------- //
+//         Sitecore Install Framework - Install Commerce website              //
+//                                                                            //
+//  Run this configuration to install Commerce website.                       //
+//                                                                            //
+//  NOTE: Only single line comments are accepted in configurations.           //
+// -------------------------------------------------------------------------- //
+{
+  "Parameters": {
+    "WebsiteHostName": { "Type": "string", "Description": "The host name of the new website." },
+    "CommerceInstallRoot": { "Type": "string", "Description": "The root path of commerce services." },
+    "WebsiteName": { "Type": "string", "Description": "The new website name." },
+    "WebsitePort": { "Type": "string", "Description": "The website port" },
+    "UserDomain": { "Type": "string", "DefaultValue": "$env:COMPUTERNAME" },
+    "UserName": { "Type": "string", "Description": "User Name for website App Pool" },
+    "UserPassword": { "Type": "string", "Description": "User Password for website App Pool" },
+    "MinionInstance": { "Type": "string", "DefaultValue": "false", "Description": "Specifies whether the instance is the minion." }
+  },
+  "Variables": {
+    "CommercePhysicalPath": "[joinpath(parameter('CommerceInstallRoot'), parameter('WebsiteName'))]",
+    // The certificate store for the root certificate.
+    "Client.Cert.Store": "cert:\\LocalMachine\\My",
+    "Security.CertificateThumbprint": "[GetCertificateThumbprint(parameter('WebsiteHostName'), variable('Client.Cert.Store'))]"
+  },
+  "Modules": [
+    "ManageCommerceService"
+  ],
+  "Tasks": {
+    "StopSite": {
+      "Type": "ManageWebsite",
+      "Params": {
+        "Name": "[parameter('WebsiteName')]",
+        "Action": "Stop",
+        "ErrorAction": "SilentlyContinue"
+      }
+    },
+    "RemoveSite": {
+      "Type": "ManageCommerceService",
+      "Params": {
+        "Name": "[parameter('WebsiteName')]",
+        "Action": "Remove-Website"
+      }
+    },
+    "StopOldAppPool": {
+      "Type": "ManageAppPool",
+      "Params": {
+        "Name": "[parameter('WebsiteName')]",
+        "Action": "Stop",
+        "ErrorAction": "SilentlyContinue"
+      }
+    },
+    "RemoveAppPool": {
+      "Type": "ManageCommerceService",
+      "Params": {
+        "Name": "[parameter('WebsiteName')]",
+        "Action": "Remove-WebAppPool"
+      }
+    },
+    "RemoveSiteFolder": {
+      "Type": "ManageCommerceService",
+      "Params": {
+        "Name": "Name",
+        "PhysicalPath": "[variable('CommercePhysicalPath')]",
+        "Action": "Remove-Item"
+      }
+    },
+    "CreatePaths": {
+      "Type": "EnsurePath",
+      "Params": {
+        "Exists": [
+          "[variable('CommercePhysicalPath')]"
+        ]
+      }
+    },
+    "CreateAppPool": {
+      "Skip": "[equal(parameter('MinionInstance'), 'true')]",
+      "Description": "Creates or updates the app pool for ops website.",
+      "Type": "AppPool",
+      "Params": {
+        "Name": "[parameter('WebsiteName')]",
+        "Properties": {
+          "ProcessModel": {
+            "identityType": "SpecificUser",
+            "userName": "[concat(parameter('UserDomain'), concat('\\', parameter('UserName')))]",
+            "password": "[parameter('UserPassword')]",
+            "idleTimeout": "00:20:00",
+            "idleTimeoutAction": "0"
+          },
+          "Recycling": {
+              "PeriodicRestart": {
+                "time": "29:00:00"
+              }
+          },
+          "ManagedPipelineMode": "Integrated",
+          "ManagedRuntimeVersion": "",
+          "startmode": "OnDemand",
+          "autostart": "true"
+        }
+      }
+    },
+    "CreateAppPoolForMinion": {
+      "Skip": "[equal(parameter('MinionInstance'), 'false')]",
+      "Description": "Creates or updates the app pool for ops website.",
+      "Type": "AppPool",
+      "Params": {
+        "Name": "[parameter('WebsiteName')]",
+        "Properties": {
+          "ProcessModel": {
+            "identityType": "SpecificUser",
+            "userName": "[concat(parameter('UserDomain'), concat('\\', parameter('UserName')))]",
+            "password": "[parameter('UserPassword')]",
+            "idleTimeout": "00:00:00",
+            "idleTimeoutAction": "1"
+          },
+          "Recycling": {
+              "PeriodicRestart": {
+                "time": "00:00:00"
+              }
+          },
+          "ManagedPipelineMode": "Integrated",
+          "ManagedRuntimeVersion": "",
+          "startmode": "AlwaysRunning",
+          "autostart": "true"
+        }
+      }
+    },
+    "CreateWebsite": {
+      "Skip": "[equal(parameter('MinionInstance'), 'true')]",
+      "Description": "Creates or updates the IIS ops website instance.",
+      "Type": "Website",
+      "Params": {
+        "Name": "[parameter('WebsiteName')]",
+        "ApplicationPool": "[parameter('WebsiteName')]",
+        "PhysicalPath": "[variable('CommercePhysicalPath')]",
+        "Properties": {
+          "ApplicationDefaults": {
+            "preloadEnabled": "false"
+          }
+        }
+      }
+    },
+    // Because of #296724 we have to use a workaround with two different tasks.
+    "CreateWebsiteForMinion": {
+      "Skip": "[equal(parameter('MinionInstance'), 'false')]",
+      "Description": "Creates or updates the IIS ops website instance.",
+      "Type": "Website",
+      "Params": {
+        "Name": "[parameter('WebsiteName')]",
+        "ApplicationPool": "[parameter('WebsiteName')]",
+        "PhysicalPath": "[variable('CommercePhysicalPath')]",
+        "Properties": {
+          "ApplicationDefaults": {
+            "preloadEnabled": "true"
+          }
+        }
+      }
+    },
+    "StopWebsite": {
+      "Description": "Stops ops website if it is running.",
+      "Type": "ManageWebsite",
+      "Params": {
+        "Name": "[parameter('WebsiteName')]",
+        "Action": "Stop"
+      }
+    },
+    "StopAppPool": {
+      "Description": "Stops the ops app pool if it is running.",
+      "Type": "ManageAppPool",
+      "Params": {
+        "Name": "[parameter('WebsiteName')]",
+        "Action": "Stop"
+      }
+    },
+    "SetBinding": {
+      "Description": "Removes the default *:80 web binding for ops website.",
+      "Type": "WebBinding",
+      "Params": {
+        "SiteName": "[parameter('WebsiteName')]",
+        "Remove": [
+          {
+            "Port": "80",
+            "IPAddress": "*"
+          }
+        ],
+        "Add": [
+          {
+            "HostHeader": "[parameter('WebsiteHostName')]",
+            "Port": "[parameter('WebsitePort')]",
+            "Protocol": "https",
+            "SSLFlags": 1,
+            "Thumbprint": "[variable('Security.CertificateThumbprint')]"
+          }
+        ]
+      }
+    },
+    "SetPermissions": {
+      "Description": "Sets permissions for the ops app pool user.",
+      "Type": "FilePermissions",
+      "Params": {
+        "Path": "[variable('CommercePhysicalPath')]",
+        "Rights": [
+          {
+            "User": "[concat('IIS AppPool\\', parameter('WebsiteName'))]",
+            "FileSystemRights": "FullControl",
+            "InheritanceFlags": [ "ContainerInherit", "ObjectInherit" ]
+          }
+        ]
+      }
+    }
+  }
+}

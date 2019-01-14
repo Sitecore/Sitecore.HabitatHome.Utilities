@@ -1,12 +1,12 @@
 ﻿{
   "Parameters": {
-	"WebRoot":{
-            "Type":"string",
-            "Description":"The physical path of the configured Web Root for the environment"
-        },
     "EngineConnectIncludeDir": {
       "Type": "string",
       "Description": "The path to the Engine Connect App_Confign directory"
+    },
+    "CommerceInstallRoot": {
+      "Type": "string",
+      "Description": "The root path of commerce services."
     },
     "CertificatePath": {
       "Type": "string",
@@ -26,10 +26,10 @@
     "CommerceShops": "[concat('CommerceShops_', parameter('CommerceServicesPostfix'))]",
     "CommerceAuthoring": "[concat('CommerceAuthoring_', parameter('CommerceServicesPostfix'))]",
     "CommerceMinions": "[concat('CommerceMinions_', parameter('CommerceServicesPostfix'))]",
-    "CommerceOpsPhysicalPath": "[joinpath(parameter('WebRoot'), variable('CommerceOps')))]",
-    "CommerceShopsPhysicalPath": "[joinpath(parameter('WebRoot'), variable('CommerceShops')))]",
-    "CommerceAuthoringPhysicalPath": "[joinpath(parameter('WebRoot'), variable('CommerceAuthoring')))]",
-    "CommerceMinionsPhysicalPath": "[joinpath(parameter('WebRoot'), variable('CommerceMinions')))]"
+    "CommerceOpsPhysicalPath": "[joinpath(parameter('CommerceInstallRoot'),  variable('CommerceOps'))]",
+    "CommerceShopsPhysicalPath": "[joinpath(parameter('CommerceInstallRoot'),  variable('CommerceShops'))]",
+    "CommerceAuthoringPhysicalPath": "[joinpath(parameter('CommerceInstallRoot'),  variable('CommerceAuthoring'))]",
+    "CommerceMinionsPhysicalPath": "[joinpath(parameter('CommerceInstallRoot'),  variable('CommerceMinions'))]"
   },
   "Modules": ["InitializeCommerce"],
   "Tasks": {
