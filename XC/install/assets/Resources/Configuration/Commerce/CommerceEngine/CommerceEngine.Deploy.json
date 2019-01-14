@@ -1,4 +1,11 @@
-﻿{
+﻿// -------------------------------------------------------------------------- //
+//         Sitecore Install Framework - Deploy Commerce Services              //
+//                                                                            //
+//  Run this configuration to deploy Commerce Engine Services.                //
+//                                                                            //
+//  NOTE: Only single line comments are accepted in configurations.           //
+// -------------------------------------------------------------------------- //
+{
   "Parameters": {
     "EngineHostName": {
       "Type": "string",
@@ -43,7 +50,7 @@
     },
     "SolrUrl": {
       "Type": "string",
-      "DefaultValue": "https://localhost:8721/solr",
+      "DefaultValue": "https://localhost:8992/solr",
       "Description": "The Solr instance url."
     },
     "SearchIndexPrefix": {
@@ -137,7 +144,9 @@
     "CommerceShopsPhysicalPath": "[joinpath(parameter('CommerceInstallRoot'),  variable('CommerceShops'))]",
     "CommerceAuthoringPhysicalPath": "[joinpath(parameter('CommerceInstallRoot'),  variable('CommerceAuthoring'))]",
     "CommerceMinionsPhysicalPath": "[joinpath(parameter('CommerceInstallRoot'),  variable('CommerceMinions'))]",
+    // The name dns name of the root certificate.
     "Root.Cert.DnsName": "[concat('DO_NOT_TRUST_', parameter('RootCertFileName'))]",
+    // The certificate store for the root certificate.
     "Root.Cert.Store": "cert:\\LocalMachine\\Root",
     "Client.Cert.Store": "cert:\\LocalMachine\\My",
     "Security.CertificateThumbprint": "[GetCertificateThumbprint(parameter('EngineHostName'), variable('Client.Cert.Store'))]",
@@ -152,6 +161,7 @@
   ],
   "Tasks": {
     "CreateSignedEngineCert": {
+      // When deployment scripts are updated to support custom hostnames, we should go back to NewSignedCertificate task type supported by SIF.
       "Type": "NewCommerceSignedCertificate",
       "Params": {
         "Signer": "[GetCertificate(variable('Root.Cert.DnsName'), variable('Root.Cert.Store'))]",
