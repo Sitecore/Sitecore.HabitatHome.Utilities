@@ -1,0 +1,649 @@
+// ------------------------------------------------------------------------------------------------------ //
+//         Sitecore Install Framework - Commerce Single Server Configuration                              //
+//                                                                                                        //
+//  Run this configuration to install a single instance of Commerce Engine and Sitecore Storefront Site.  //
+//                                                                                                        //
+//                                                                                                        //
+//  NOTE: Only single line comments are accepted in configurations.                                       //
+// ------------------------------------------------------------------------------------------------------ //
+
+
+{
+  "Parameters": {
+    // Parameters are values that may be passed when Install-SitecoreConfiguration is called.
+    // Parameters must declare a Type and may declare a DefaultValue and Description.
+    // Parameters with no DefaultValue are required when Install-SitecoreConfiguration is called.
+    "BaseConfigurationFolder": {
+      "Type": "string",
+      "Description": "The base folder for SIF configuration."
+    },
+    "SiteName": {
+      "Type": "string",
+      "Description": "The name of the site to be deployed."
+    },
+    "SiteHostHeaderName": {
+      "Type": "string",
+      "Description": "The host header name of the site to be deployed."
+    },
+    "EngineHostName": {
+      "Type": "string",
+      "DefaultValue": "localhost",
+      "Description": "The name of the site to be deployed."
+    },
+    "InstallDir": {
+      "Type": "string",
+      "Description": "The sitecore site content path."
+    },
+    "XConnectInstallDir": {
+      "Type": "string",
+      "Description": "The sitecore xConnect site content path."
+    },
+    "CommerceInstallRoot": {
+      "Type": "string",
+      "Description": "The root path of commerce services."
+    },
+    "CommerceServicesDbServer": {
+      "Type": "string",
+      "DefaultValue": ".\\SQLSERVER",
+      "Description": "The Commerce Engine database server name."
+    },
+    "CommerceServicesDbName": {
+      "Type": "string",
+      "DefaultValue": "SitecoreCommerce9_SharedEnvironments",
+      "Description": "The Commerce Engine database name."
+    },
+    "CommerceServicesGlobalDbName": {
+      "Type": "string",
+      "DefaultValue": "SitecoreCommerce9_Global",
+      "Description": "The Commerce Engine global database name"
+    },
+    "CommerceServicesPostfix": {
+      "Type": "string",
+      "Description": "The Commerce Engine postfix for services names"
+    },
+    "SitecoreDbServer": {
+      "Type": "string",
+      "DefaultValue": ".\\SQLSERVER",
+      "Description": "The Sitecore database server name."
+    },
+    "SitecoreCoreDbName": {
+      "Type": "string",
+      "Description": "The Sitecore Core database name."
+    },
+    "CommerceSearchProvider": {
+      "Type": "string",
+      "DefaultValue": "SOLR",
+      "Description": "The search provider used for the Commerce Engine - Accepted values are 'SOLR' and 'AZURE'"
+    },
+    "SolrUrl": {
+      "Type": "string",
+      "DefaultValue": "https://localhost:8992/solr",
+      "Description": "The Solr instance url."
+    },
+    "SolrRoot": {
+      "Type": "string",
+      "DefaultValue": "c:\\solr-7.2.1",
+      "Description": "The file path to the Solr instance."
+    },
+    "SolrService": {
+      "Type": "string",
+      "DefaultValue": "solr-7.2.1",
+      "Description": "The name of the Solr service."
+    },
+    "SolrSchemas": {
+      "Type": "string",
+      "DefaultValue": "",
+      "Description": "The path to Solr schemas."
+    },
+    "SearchIndexPrefix": {
+      "Type": "string",
+      "DefaultValue": "",
+      "Description": "The prefix for indexes or cores."
+    },
+    "EnvironmentsPrefix": {
+      "Type": "string",
+      "Description": "The prefix for the Commerce environments names."
+    },
+    "Environments": {
+      "Type": "string[]",
+      "Description": "List of environments to initialize."
+    },
+    "AzureSearchServiceName": {
+      "Type": "string",
+      "DefaultValue": "",
+      "Description": "The Azure search service name. Requires param CommerceSearchProvider to be set to 'AZURE'"
+    },
+    "AzureSearchAdminKey": {
+      "Type": "string",
+      "DefaultValue": "",
+      "Description": "The Azure search service admin key. Requires param CommerceSearchProvider to be set to 'AZURE'"
+    },
+    "AzureSearchQueryKey": {
+      "Type": "string",
+      "DefaultValue": "",
+      "Description": "The Azure search service query key. Requires param CommerceSearchProvider to be set to 'AZURE'"
+    },
+    "CommerceEngineDacPac": {
+      "Type": "string",
+      "Description": "Commerce Engine DacPac"
+    },
+    "CommerceOpsServicesPort": {
+      "Type": "string",
+      "Description": "Commerce Ops Services port"
+    },
+    "CommerceShopsServicesPort": {
+      "Type": "string",
+      "Description": "Commerce Shops Services port"
+    },
+    "CommerceAuthoringServicesPort": {
+      "Type": "string",
+      "Description": "Commerce Authoring Services port"
+    },
+    "CommerceMinionsServicesPort": {
+      "Type": "string",
+      "Description": "Commerce Minions Services port"
+    },
+    "SitecoreCommerceEnginePath": {
+      "Type": "string",
+      "Description": "Sitecore Commerce Engine Path"
+    },
+    "SitecoreBizFxServicesContentPath": {
+      "Type": "string",
+      "Description": "SitecoreBizFx Services Content Path"
+    },
+    "SitecoreBizFxServerName": {
+      "Type": "string",
+      "Description": "SitecoreBizFx Server name",
+      "DefaultValue": "SitecoreBizFx"
+    },
+    "SitecoreBizFxPort": {
+      "Type": "string",
+      "Description": "Sitecore BizFx Server port"
+    },
+    "SitecoreIdentityServerPath": {
+      "Type": "string",
+      "Description": "SitecoreIdentityServer Path"
+    },
+    "UserDomain": {
+      "Type": "string",
+      "Description": "User Domain for Commerce Services App Pool"
+    },
+    "UserName": {
+      "Type": "string",
+      "Description": "User Name for Commerce Services App Pool"
+    },
+    "UserPassword": {
+      "Type": "string",
+      "Description": "User Password for Commerce Services App Pool"
+    },
+    "BraintreeAccount": {
+      "Type": "psobject",
+      "Description": "Braintree sandbox account for Payment plugin"
+    },
+    "CommerceEngineCertificatePath": {
+      "Type": "string",
+      "Description": "Commerce Engile certificate full path"
+    },
+    "SiteUtilitiesSrc": {
+      "Type": "string",
+      "Description": "Site Utilities source path"
+    },
+    "HabitatImagesModuleFullPath": {
+      "Type": "string",
+      "Description": "Habitat Images module full path"
+    },
+    "AdvImagesModuleFullPath": {
+      "Type": "string",
+      "Description": "Adventure Works Images module full path"
+    },
+    "CommerceConnectModuleFullPath": {
+      "Type": "string",
+      "Description": "Commerce Connect module full path"
+    },
+    "CommercexProfilesModuleFullPath": {
+      "Type": "string",
+      "Description": "Commerce xProfiles module full path"
+    },
+    "CommercexAnalyticsModuleFullPath": {
+      "Type": "string",
+      "Description": "Commerce xAnalytics module full path"
+    },
+    "CommerceMAModuleFullPath": {
+      "Type": "string",
+      "Description": "Commerce Marketing Automation module full path"
+    },
+    "CommerceMAForAutomationEngineModuleFullPath": {
+      "Type": "string",
+      "Description": "Commerce Marketing Automation for AutomationEngine module full path"
+    },
+    "CEConnectModuleFullPath": {
+      "Type": "string",
+      "Description": "Commerce Engine Connect module full path"
+    },
+    "PowerShellExtensionsModuleFullPath": {
+      "Type": "string",
+      "Description": "PowerShell Extensions module full path"
+    },
+    "SXAModuleFullPath": {
+      "Type": "string",
+      "Description": "Sitecore Experience Accelerator module full path"
+    },
+    "SXACommerceModuleFullPath": {
+      "Type": "string",
+      "Description": "SXA Commerce module full path"
+    },
+    "SXAStorefrontModuleFullPath": {
+      "Type": "string",
+      "Description": "SXA Storefront module full path"
+    },
+    "SXAStorefrontThemeModuleFullPath": {
+      "Type": "string",
+      "Description": "SXA Storefront Themes module full path"
+    },
+    "SXAStorefrontCatalogModuleFullPath": {
+      "Type": "string",
+      "Description": "SXA Storefront Catalog module full path"
+    },
+    "MergeToolFullPath": {
+      "Type": "string",
+      "Description": "The Merge Tool full path"
+    },
+    "SitecoreIdentityServerName": {
+      "Type": "string",
+      "Description": "Sitecore Identity Server name",
+      "DefaultValue": "SitecoreIdentityServer"
+    },
+    "SitecoreUsername": {
+      "Type": "string",
+      "Description": "Sitecore Admin Username"
+    },
+    "SitecoreUserPassword": {
+      "Type": "string",
+      "Description": "Sitecore Admin Password"
+    }
+  },
+  "Variables": {
+    // Variables are values calculated in a configuration.
+    // They can reference Parameters, other Variables, and config functions.
+    "SiteUtilitiesDir": "[concat(parameter('InstallDir'), '\\SiteUtilityPages')]",
+    "ModulesDirDst": "[concat(parameter('InstallDir'), '\\App_Data\\packages')]",
+    "UtilitiesBaseUrl": "[concat('http://', concat(parameter('SiteHostHeaderName'), '/SiteUtilityPages'))]",
+    "PackagesDirDst": "[concat(parameter('InstallDir'), '\\sitecore\\admin\\Packages')]",
+    "CEMergeInputFile": "[concat(parameter('InstallDir'), '\\MergeFiles\\Sitecore.Commerce.Engine.Connectors.Merge.Config')]",
+    "SXAMergeInputFile": "[concat(parameter('InstallDir'), '\\MergeFiles\\Merge.SXA.Storefront.config')]",
+    "WebConfig": "[concat(parameter('InstallDir'), '\\Web.Config')]",
+    "EngineConnectIncludeDir": "[concat(parameter('InstallDir'), '\\App_Config\\Include\\Y.Commerce.Engine')]",
+    "MarketingConfigDir": "[concat(parameter('InstallDir'), '\\App_Config\\Sitecore\\Marketing.Operations.xMgmt')]",
+    "ContentSearchConfig": "[concat(parameter('InstallDir'), '\\App_Config\\Sitecore\\ContentSearch\\Sitecore.ContentSearch.config')]",
+    "ContentSearchEnabledXpath": "//configuration/sitecore/settings/setting[@name='ContentSearch.Enabled']",
+    "ConnectionString": "[concat('Data Source=.;Initial Catalog=', concat(parameter('SitecoreCoreDbName'), ';Integrated Security=True'))]",
+    "ProjectConfigIncludeDir": "[concat(parameter('InstallDir'), '\\App_Config\\Include\\Z.Foundation.Overrides')]",
+    "SiteRootUrl": "[concat('http://', concat(parameter('SiteHostHeaderName')))]"
+  },
+  "Modules": [ "InstallSitecoreConfiguration", "ManageCommerceService", "SitecoreUtilityTasks", "WindowsLocal" ],
+  "Tasks": {
+    // Tasks are separate units of work in a configuration.
+    // Each task is an action that will be completed when Install-SitecoreConfiguration is called.
+    // By default, tasks are applied in the order they are declared.
+    // Tasks may reference Parameters, Variables, and config functions.
+    "CheckRequirements": {
+      "Type": "CheckDotNetCoreInstalled"
+    },
+    "CreateBinding": {
+      "Type": "InstallSitecoreConfiguration",
+      "Params": {
+        "Path": "[concat(parameter('BaseConfigurationFolder'), '\\Commerce\\SXAStorefront\\SXAStorefront.CreateBinding.json')]",
+        "SiteName": "[parameter('SiteName')]",
+        "StorefrontHostName": "[parameter('SiteHostHeaderName')]"
+      }
+    },
+    "InstallSolrCores": {
+      "Type": "InstallSitecoreConfiguration",
+      "Params": {
+        "Path": "[concat(parameter('BaseConfigurationFolder'), '\\Commerce\\Solr\\sitecore-commerce-solr.json')]",
+        "SolrUrl": "[parameter('SolrUrl')]",
+        "SolrRoot": "[parameter('SolrRoot')]",
+        "SolrService": "[parameter('SolrService')]",
+        "SolrSchemas": "[parameter('SolrSchemas')]",
+        "CorePrefix": "[parameter('SearchIndexPrefix')]"
+      }
+    },
+    "DeployCommerceEngine": {
+      "Type": "InstallSitecoreConfiguration",
+      "Params": {
+        "Path": "[concat(parameter('BaseConfigurationFolder'), '\\Commerce\\CommerceEngine\\CommerceEngine.Deploy.json')]",
+        "EngineHostName": "[parameter('EngineHostName')]",
+        "CommerceServicesDbServer": "[parameter('CommerceServicesDbServer')]",
+        "CommerceServicesDbName": "[parameter('CommerceServicesDbName')]",
+        "CommerceServicesGlobalDbName": "[parameter('CommerceServicesGlobalDbName')]",
+        "CommerceServicesPostfix": "[parameter('CommerceServicesPostfix')]",
+        "SitecoreDbServer": "[parameter('SitecoreDbServer')]",
+        "SitecoreCoreDbName": "[parameter('SitecoreCoreDbName')]",
+        "CommerceSearchProvider": "[parameter('CommerceSearchProvider')]",
+        "SolrUrl": "[parameter('SolrUrl')]",
+        "SearchIndexPrefix": "[parameter('SearchIndexPrefix')]",
+        "EnvironmentsPrefix": "[parameter('EnvironmentsPrefix')]",
+        "AzureSearchServiceName": "[parameter('AzureSearchServiceName')]",
+        "AzureSearchAdminKey": "[parameter('AzureSearchAdminKey')]",
+        "AzureSearchQueryKey": "[parameter('AzureSearchQueryKey')]",
+        "CommerceInstallRoot": "[parameter('CommerceInstallRoot')]",
+        "CommerceEngineDacPac": "[parameter('CommerceEngineDacPac')]",
+        "SiteHostHeaderName": "[parameter('SiteHostHeaderName')]",
+        "CommerceOpsServicesPort": "[parameter('CommerceOpsServicesPort')]",
+        "CommerceShopsServicesPort": "[parameter('CommerceShopsServicesPort')]",
+        "CommerceAuthoringServicesPort": "[parameter('CommerceAuthoringServicesPort')]",
+        "CommerceMinionsServicesPort": "[parameter('CommerceMinionsServicesPort')]",
+        "SitecoreBizFxPort": "[parameter('SitecoreBizFxPort')]",
+        "SitecoreCommerceEnginePath": "[parameter('SitecoreCommerceEnginePath')]",
+        "UserDomain": "[parameter('UserDomain')]",
+        "UserName": "[parameter('UserName')]",
+        "UserPassword": "[parameter('UserPassword')]",
+        "BraintreeAccount": "[parameter('BraintreeAccount')]",
+        "BaseConfigurationFolder": "[parameter('BaseConfigurationFolder')]"
+      }
+    },
+    "DeploySitecoreBizFx": {
+      "Type": "InstallSitecoreConfiguration",
+      "Params": {
+        "Path": "[concat(parameter('BaseConfigurationFolder'), '\\Commerce\\SitecoreBizFx\\SitecoreBizFx.json')]",
+        "CommerceInstallRoot": "[parameter('CommerceInstallRoot')]",
+        "SitecoreBizFxServicesContentPath": "[parameter('SitecoreBizFxServicesContentPath')]",
+        "CommerceAuthoringServicesPort": "[parameter('CommerceAuthoringServicesPort')]",
+        "UserDomain": "[parameter('UserDomain')]",
+        "UserName": "[parameter('UserName')]",
+        "UserPassword": "[parameter('UserPassword')]",
+        "SitecoreBizFxServerName": "[parameter('SitecoreBizFxServerName')]",
+        "SitecoreBizFxHostname": "[parameter('EngineHostName')]",
+        "SitecoreBizFxPort": "[parameter('SitecoreBizFxPort')]",
+        "BaseConfigurationFolder": "[parameter('BaseConfigurationFolder')]"
+      }
+    },
+    "DeploySitecoreIdentityServer": {
+      "Type": "InstallSitecoreConfiguration",
+      "Params": {
+        "Path": "[concat(parameter('BaseConfigurationFolder'), '\\Commerce\\SitecoreIdentityServer\\SitecoreIdentityServer.json')]",
+        "CommerceInstallRoot": "[parameter('CommerceInstallRoot')]",
+        "SitecoreIdentityServerPath": "[parameter('SitecoreIdentityServerPath')]",
+        "SitecoreDbServer": "[parameter('SitecoreDbServer')]",
+        "SitecoreCoreDbName": "[parameter('SitecoreCoreDbName')]",
+        "UserDomain": "[parameter('UserDomain')]",
+        "UserName": "[parameter('UserName')]",
+        "UserPassword": "[parameter('UserPassword')]",
+        "SitecoreIdentityServerName": "[parameter('SitecoreIdentityServerName')]",
+        "SitecoreIdentityHostname": "[parameter('EngineHostName')]",
+        "SitecoreBizFxPort": "[parameter('SitecoreBizFxPort')]",
+        "BaseConfigurationFolder": "[parameter('BaseConfigurationFolder')]"
+      }
+    },
+    "CopySiteUtilityFolder": {
+      "Type": "Copy",
+      "Params": {
+        "Source": "[parameter('SiteUtilitiesSrc')]",
+        "Destination": "[parameter('InstallDir')]"
+      }
+    },
+    "DisableIndexUpdate": {
+      // Speed up deployment
+      "Type": "SetXml",
+      "Params": [
+        {
+          "FilePath": "[variable('ContentSearchConfig'))]",
+          "Xpath": "[variable('ContentSearchEnabledXpath')]",
+          "Attributes": {
+            "value": "false"
+          }
+        }
+      ]
+    },
+    "DisableConfigFiles": {
+      // Speed up deployment
+      "Type": "DisableConfigFiles",
+      "Params": {
+        "ConfigDir": "[variable('MarketingConfigDir')]",
+        "ConfigFileList": [ "Sitecore.Marketing.Search.config" ]
+      }
+    },
+    "InstallPowershellExtensions": {
+      "Type": "InstallSitecoreConfiguration",
+      "Params": {
+        "Path": "[concat(parameter('BaseConfigurationFolder'), '\\SitecoreUtilities\\InstallModule.json')]",
+        "ModuleFullPath": "[parameter('PowerShellExtensionsModuleFullPath')]",
+        "ModulesDirDst": "[variable('ModulesDirDst')]",
+        "BaseUrl": "[variable('UtilitiesBaseUrl')]"
+      }
+    },
+    "InstallSXAFrameworkModule": {
+      "Type": "InstallSitecoreConfiguration",
+      "Params": {
+        "Path": "[concat(parameter('BaseConfigurationFolder'), '\\Commerce\\SXAStorefront\\SXAStorefront.Framework.json')]",
+        "ModuleFullPath": "[parameter('SXAModuleFullPath')]",
+        "ModulesDirDst": "[variable('ModulesDirDst')]",
+        "BaseUrl": "[variable('UtilitiesBaseUrl')]"
+      }
+    },
+    "PublishExtensions": {
+      "Type": "InstallSitecoreConfiguration",
+      "Params": {
+        "Path": "[concat(parameter('BaseConfigurationFolder'), '\\SitecoreUtilities\\PublishToWeb.json')]",
+        "BaseUrl": "[variable('UtilitiesBaseUrl')]"
+      }
+    },
+    "InstallHabitatImagesModule": {
+      "Type": "InstallSitecoreConfiguration",
+      "Params": {
+        "Path": "[concat(parameter('BaseConfigurationFolder'), '\\Commerce\\HabitatImages\\HabitatImages.json')]",
+        "ModuleFullPath": "[parameter('HabitatImagesModuleFullPath')]",
+        "ModulesDirDst": "[variable('ModulesDirDst')]",
+        "BaseUrl": "[variable('UtilitiesBaseUrl')]"
+      }
+    },
+    "InstallAdventureWorksImagesModule": {
+      "Type": "InstallSitecoreConfiguration",
+      "Params": {
+        "Path": "[concat(parameter('BaseConfigurationFolder'), '\\Commerce\\AdvImages\\AdvImages.json')]",
+        "ModuleFullPath": "[parameter('AdvImagesModuleFullPath')]",
+        "ModulesDirDst": "[variable('ModulesDirDst')]",
+        "BaseUrl": "[variable('UtilitiesBaseUrl')]"
+      }
+    },
+    "InstallCommerceConnectModule": {
+      "Type": "InstallSitecoreConfiguration",
+      "Params": {
+        "Path": "[concat(parameter('BaseConfigurationFolder'), '\\Commerce\\Connect\\Connect.json')]",
+        "ModuleFullPath": "[parameter('CommerceConnectModuleFullPath')]",
+        "ModulesDirDst": "[variable('ModulesDirDst')]",
+        "BaseUrl": "[variable('UtilitiesBaseUrl')]"
+      }
+    },
+    "InstallCommercexProfilesModule": {
+      "Type": "InstallSitecoreConfiguration",
+      "Params": {
+        "Path": "[concat(parameter('BaseConfigurationFolder'), '\\Commerce\\Connect\\Connect_xProfiles.json')]",
+        "ModuleFullPath": "[parameter('CommercexProfilesModuleFullPath')]",
+        "ModulesDirDst": "[variable('ModulesDirDst')]",
+        "BaseUrl": "[variable('UtilitiesBaseUrl')]"
+      }
+    },
+    "InstallCommercexAnalyticsModule": {
+      "Type": "InstallSitecoreConfiguration",
+      "Params": {
+        "Path": "[concat(parameter('BaseConfigurationFolder'), '\\Commerce\\Connect\\Connect_xAnalytics.json')]",
+        "ModuleFullPath": "[parameter('CommercexAnalyticsModuleFullPath')]",
+        "ModulesDirDst": "[variable('ModulesDirDst')]",
+        "BaseUrl": "[variable('UtilitiesBaseUrl')]"
+      }
+    },
+    "InstallCommerceMAModule": {
+      "Type": "InstallSitecoreConfiguration",
+      "Params": {
+        "Path": "[concat(parameter('BaseConfigurationFolder'), '\\Commerce\\Connect\\Connect_MarketingAutomation.json')]",
+        "XConnectSitePath": "[parameter('XConnectInstallDir')]",
+        "ModuleFullPath": "[parameter('CommerceMAModuleFullPath')]",
+        "ModulesDirDst": "[variable('ModulesDirDst')]",
+        "AutomationEngineModule": "[parameter('CommerceMAForAutomationEngineModuleFullPath')]",
+        "BaseUrl": "[variable('UtilitiesBaseUrl')]"
+      }
+    },
+    "InstallCommerceEngineConnectModule": {
+      "Type": "InstallSitecoreConfiguration",
+      "Params": {
+        "Path": "[concat(parameter('BaseConfigurationFolder'), '\\Commerce\\CEConnect\\CEConnect.json')]",
+        "ModuleFullPath": "[parameter('CEConnectModuleFullPath')]",
+        "ModulesDirDst": "[variable('ModulesDirDst')]",
+        "BaseUrl": "[variable('UtilitiesBaseUrl')]",
+        "MergeTool": "[parameter('MergeToolFullPath')]",
+        "InputFile": "[variable('CEMergeInputFile')]",
+        "WebConfig": "[variable('WebConfig')]"
+      }
+    },
+    "CopyConnectModels": {
+      "Type": "InstallSitecoreConfiguration",
+      "Params": {
+        "Path": "[concat(parameter('BaseConfigurationFolder'), '\\Commerce\\Connect\\Connect.Copy.Models.json')]",
+        "InstallRootDst": "[parameter('InstallDir')]",
+        "XConnectInstallRootDst": "[parameter('XConnectInstallDir')]"
+      }
+    },
+    "InstallSXAStorefrontModule": {
+      "Type": "InstallSitecoreConfiguration",
+      "Params": {
+        "Path": "[concat(parameter('BaseConfigurationFolder'), '\\Commerce\\SXAStorefront\\SXAStorefront.Storefront.json')]",
+        "SXACommerceModuleFullPath": "[parameter('SXACommerceModuleFullPath')]",
+        "SXAStorefrontModuleFullPath": "[parameter('SXAStorefrontModuleFullPath')]",
+        "SXAStorefrontThemeModuleFullPath": "[parameter('SXAStorefrontThemeModuleFullPath')]",
+        "SXAStorefrontCatalogModuleFullPath": "[parameter('SXAStorefrontCatalogModuleFullPath')]",
+        "ModulesDirDst": "[variable('ModulesDirDst')]",
+        "BaseUrl": "[variable('UtilitiesBaseUrl')]",
+        "MergeTool": "[parameter('MergeToolFullPath')]",
+        "InputFile": "[variable('SXAMergeInputFile')]",
+        "WebConfig": "[variable('WebConfig')]"
+      }
+    },
+    "ImportRootCertificate": {
+      "Type": "ImportCertificate",
+      "Params": {
+        "CertStoreLocation": "cert:\\localmachine\\my",
+        "FilePath": "[parameter('CommerceEngineCertificatePath')]"
+      }
+    },
+    "InitializeCommerce": {
+      "Type": "InstallSitecoreConfiguration",
+      "Params": {
+        "Path": "[concat(parameter('BaseConfigurationFolder'), '\\Commerce\\CEConnect\\InitializeCommerce.json')]",
+        "CommerceInstallRoot": "[parameter('CommerceInstallRoot')]",
+        "EngineConnectIncludeDir": "[variable('EngineConnectIncludeDir')]",
+        "CertificatePath": "[parameter('CommerceEngineCertificatePath')]",
+        "CommerceServicesPostfix": "[parameter('CommerceServicesPostfix')]",
+        "CommerceAuthoringServicesPort": "[parameter('CommerceAuthoringServicesPort')]"
+      }
+    },
+    "InitializeCommerceEngine": {
+      "Type": "InstallSitecoreConfiguration",
+      "Params": {
+        "Path": "[concat(parameter('BaseConfigurationFolder'), '\\Commerce\\CommerceEngine\\CommerceEngine.Initialize.json')]",
+        "CommerceInstallRoot": "[parameter('CommerceInstallRoot')]",
+        "CommerceServicesPostfix": "[parameter('CommerceServicesPostfix')]",
+        "CommerceShopsServicesPort": "[parameter('CommerceShopsServicesPort')]",
+        "Environments": "[parameter('Environments')]",
+        "SitecoreAdminAccount": {
+          "UserName": "[parameter('SitecoreUsername')]",
+          "Password": "[parameter('SitecoreUserPassword')]"
+        }
+      }
+    },
+    "EnableCEConnectDataProvider": {
+      "Type": "InstallSitecoreConfiguration",
+      "Params": {
+        "Path": "[concat(parameter('BaseConfigurationFolder'), '\\Commerce\\CEConnect\\EnableCEConnectDataProvider.json')]",
+        "ConfigDir": "[variable('EngineConnectIncludeDir')]"
+      }
+    },
+    "GenerateCatalogTemplates": {
+      "Type": "InstallSitecoreConfiguration",
+      "Params": {
+        "Path": "[concat(parameter('BaseConfigurationFolder'), '\\Commerce\\CEConnect\\GenerateCatalogTemplates.json')]",
+        "BaseUrl": "[variable('UtilitiesBaseUrl')]"
+      }
+    },
+    //Create the default storefront tenant and site
+    "CreateDefaultTenantAndSite": {
+      "Type": "InstallSitecoreConfiguration",
+      "Params": {
+        "Path": "[concat(parameter('BaseConfigurationFolder'), '\\Commerce\\SXAStorefront\\SXAStorefront.CreateDefaultTenantAndSite.json')]",
+        "SiteName": "[parameter('SiteName')]",
+        "SiteRootUrl": "[variable('SiteRootUrl')]",
+        "SitecoreUsername": "[parameter('SitecoreUsername')]",
+        "SitecoreUserPassword": "[parameter('SitecoreUserPassword')]",
+        "ProjectConfigIncludeDir": "[variable('ProjectConfigIncludeDir')]"
+      }
+    },
+    "PublishCommerce": {
+      "Type": "InstallSitecoreConfiguration",
+      "Params": {
+        "Path": "[concat(parameter('BaseConfigurationFolder'), '\\SitecoreUtilities\\PublishToWeb.json')]",
+        "BaseUrl": "[variable('UtilitiesBaseUrl')]"
+      }
+    },
+    "EnableIndexUpdate": {
+      "Type": "SetXml",
+      "Params": [
+        {
+          "FilePath": "[variable('ContentSearchConfig'))]",
+          "Xpath": "[variable('ContentSearchEnabledXpath')]",
+          "Attributes": {
+            "value": "true"
+          }
+        }
+      ]
+    },
+    "EnableConfigFiles": {
+      "Type": "EnableConfigFiles",
+      "Params": {
+        "ConfigDir": "[variable('MarketingConfigDir')]",
+        "ConfigFileList": [ "Sitecore.Marketing.Search.config" ]
+      }
+    },
+    "EnableCEConnectIndexing": {
+      "Type": "InstallSitecoreConfiguration",
+      "Params": {
+        "Path": "[concat(parameter('BaseConfigurationFolder'), '\\Commerce\\CEConnect\\EnableCEConnectIndexing.json')]",
+        "ConfigDir": "[variable('EngineConnectIncludeDir')]"
+      }
+    },
+    "PopulateSXAIndexesSchema": {
+      "Type": "InstallSitecoreConfiguration",
+      "Params": {
+        "Path": "[concat(parameter('BaseConfigurationFolder'), '\\SitecoreUtilities\\PopulateIndexSchema.json')]",
+        "SiteRootUrl": "[variable('SiteRootUrl')]",
+        "SitecoreAdminPassword": "[parameter('SitecoreUserPassword')]",
+        "Indexes": "sitecore_sxa_master_index|sitecore_sxa_web_index"
+      }
+    },
+    "Reindex": {
+      "Type": "InstallSitecoreConfiguration",
+      "Params": {
+        "Path": "[concat(parameter('BaseConfigurationFolder'), '\\SitecoreUtilities\\RebuildIndexes.json')]",
+        "BaseUrl": "[variable('UtilitiesBaseUrl')]"
+      }
+    },
+    "RemoveSiteUtilityFolder": {
+      "Type": "ManageCommerceService",
+      "Params": {
+        "Name": "Name",
+        "PhysicalPath": "[variable('SiteUtilitiesDir')]",
+        "Action": "Remove-Item"
+      }
+    }
+  },
+  "UninstallTasks": {
+    "RemoveSolrCores": {
+      "Description": "Removes the SOLR cores and instance folders.",
+      "Type": "ManageSolrCore",
+      "Params": [
+        { "Action": "Unload", "Address": "[parameter('SolrUrl')]", "Arguments": { "core": "CatalogItemsScope", "deleteInstanceDir": "true" }, "ErrorAction": "SilentlyContinue" },
+        { "Action": "Unload", "Address": "[parameter('SolrUrl')]", "Arguments": { "core": "CustomersScope", "deleteInstanceDir": "true" }, "ErrorAction": "SilentlyContinue" },
+        { "Action": "Unload", "Address": "[parameter('SolrUrl')]", "Arguments": { "core": "OrdersScope", "deleteInstanceDir": "true" }, "ErrorAction": "SilentlyContinue" }
+      ]
+    }
+  }
+}
