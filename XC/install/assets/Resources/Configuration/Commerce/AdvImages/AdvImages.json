@@ -1,4 +1,11 @@
-﻿{
+﻿// ---------------------------------------------------------------------------- //
+//         Sitecore Install Framework - Install Adventure Works Images module   //
+//                                                                              //
+//  Run this configuration to install Adventure Works Images module.            //
+//                                                                              //
+//  NOTE: Only single line comments are accepted in configurations.             //
+// ---------------------------------------------------------------------------- //
+{
   "Parameters": {
     "ModuleFullPath": {
       "Type": "string",
