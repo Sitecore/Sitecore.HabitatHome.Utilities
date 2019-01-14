@@ -1,4 +1,12 @@
-﻿{
+﻿// -------------------------------------------------------------------------- //
+//         Sitecore Install Framework - Initialize Commerce Services          //
+//                                                                            //
+//  Run this configuration to initialize Commerce Services.                   //
+//                                                                            //
+//  NOTE: Only single line comments are accepted in configurations.           //
+// -------------------------------------------------------------------------- //
+
+{
   "Parameters": {
     "UrlIdentityServerGetToken": {
       "Type": "string",
