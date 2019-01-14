@@ -1,4 +1,11 @@
-﻿{
+﻿// ------------------------------------------------------------------------------ //
+//         Sitecore Install Framework - Apply Commerce Engine certificate         //
+//                                                                                //
+//  Run this configuration to apply the Commerce Engine certificate.              //
+//                                                                                //
+//  NOTE: Only single line comments are accepted in configurations.               //
+// ------------------------------------------------------------------------------ //
+{
   "Parameters": {
     "EngineConnectIncludeDir": {
       "Type": "string",
