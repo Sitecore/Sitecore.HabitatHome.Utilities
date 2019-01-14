@@ -1,12 +1,12 @@
 ﻿{
   "Parameters": {
-    "PackageFullPath": {
+    "ModuleFullPath": {
       "Type": "string",
       "Description": "The path to Commerce Engine Connect package zip."
     },
-    "PackagesDirDst": {
+    "ModulesDirDst": {
       "Type": "string",
-      "Description": "The path to packages directory."
+      "Description": "The path to modules directory."
     },
     "BaseUrl": {
       "Type": "string",
@@ -31,16 +31,16 @@
       "Type": "EnsurePath",
       "Params": {
         "Exists": [
-          "[parameter('PackageFullPath')]",
-          "[parameter('PackagesDirDst')]"
+          "[parameter('ModuleFullPath')]",
+          "[parameter('ModulesDirDst')]"
         ]
       }
     },
-    "InstallPackage": {
-      "Type": "InstallPackage",
+    "InstallModule": {
+      "Type": "InstallModule",
       "Params": {
-        "PackageFullPath": "[parameter('PackageFullPath')]",
-        "PackagesDirDst": "[parameter('PackagesDirDst')]",
+        "ModuleFullPath": "[parameter('ModuleFullPath')]",
+        "ModulesDirDst": "[parameter('ModulesDirDst')]",
         "BaseUrl": "[parameter('BaseUrl')]"
       }
     },

@@ -1,12 +1,19 @@
-﻿{
+﻿// -------------------------------------------------------------------------- //
+//         Sitecore Install Framework - Deploy Sitecore IdentityServer        //
+//                                                                            //
+//  Run this configuration to deploy Sitecore IdentityServer.                 //
+//                                                                            //
+//  NOTE: Only single line comments are accepted in configurations.           //
+// -------------------------------------------------------------------------- //
+{
   "Parameters": {
-    "WebRoot": {
-      "Type": "string",
-      "Description": "The physical path of the configured Web Root for the environment"
-    },
     "SitecoreIdentityServerPath": {
       "Type": "string",
-      "Description": "Sitecore IdentityServer Zip Path"
+      "Description": "Sitecore IdentityServer Path"
+    },
+    "CommerceInstallRoot": {
+      "Type": "string",
+      "Description": "The root path of commerce services."
     },
     "SitecoreDbServer": {
       "Type": "string",
@@ -16,136 +23,136 @@
       "Type": "string",
       "Description": "Sitecore Core database name"
     },
-    "UserAccount": {
-      "Type": "psobject",
-      "DefaultValue": {
-        "UserName": "",
-        "Domain": "$env:COMPUTERNAME",
-        "Password": ""
-      }
-    },
-    "RootCertFileName": {
+    "UserDomain": {
       "Type": "string",
-      "Description": "The file name of the root certificate to be created.",
+      "Description": "User Domain for Commerce Services App Pool"
+    },
+    "UserName": {
+      "Type": "string",
+      "Description": "User Name for Commerce Services App Pool"
+    },
+    "UserPassword": {
+      "Type": "string",
+      "Description": "User Password for Commerce Services App Pool"
+    },
+    "RootCertName": {
+      "Type": "string",
+      "Description": "The name of the root certificate.",
       "DefaultValue": "SitecoreRootCert"
     },
     "SitecoreIdentityServerName": {
       "Type": "string",
       "Description": "Sitecore Identity Server name"
+    },
+    "SitecoreIdentityHostname": {
+      "Type": "string",
+      "Description": "Sitecore Identity Server host header name"
+    },
+    "SitecoreBizFxPort": {
+      "Type": "string",
+      "Description": "Sitecore BizFx Server port"
+    },
+    "BaseConfigurationFolder": {
+      "Type": "string",
+      "Description": "The base folder for SIF configuration."
     }
   },
   "Variables": {
-    "SitecoreIdentityServerPhysicalPath": "[joinpath(parameter('WebRoot'), parameter('SitecoreIdentityServerName'))]",
-    "Root.Cert.DnsName": "[concat('DO_NOT_TRUST_', parameter('RootCertFileName'))]",
+    "SitecoreIdentityServerPhysicalPath": "[joinpath(parameter('CommerceInstallRoot'), parameter('SitecoreIdentityServerName'))]",
+    // The name dns name of the root certificate.
+    "Root.Cert.DnsName": "[concat('DO_NOT_TRUST_', parameter('RootCertName'))]",
+    // The certificate store for the root certificate.
     "Root.Cert.Store": "cert:\\LocalMachine\\Root",
-    "Security.CertificateName": "[parameter('SitecoreIdentityServerName')]",
-    "Security.CertificateStore": "cert:\\Localmachine\\My",
-    "Security.CertificateThumbprint": "[GetCertificateThumbprint(variable('Security.CertificateName'), variable('Security.CertificateStore'))]",
-    "Security.CertificatePath": "[joinpath(variable('Security.CertificateStore'), variable('Security.CertificateThumbprint'))]"
+    "Client.Cert.Store": "cert:\\Localmachine\\My",
+    "SitecoreIdentityServerPort": "5050"
+  },
+  "Register": {
+    "ConfigFunction": {
+      "ConvertToSecureString": "ConvertTo-SecureString"
+    }
   },
   "Modules": [
     "ManageCommerceService",
-    "DeployCommerceContent",
-    "WindowsLocalUser"
+    "DeployCommerceContent"
   ],
   "Tasks": {
-    "StopSite": {
-      "Type": "ManageWebsite",
+    "CreateIdentityServerClientCert": {
+      "Description": "Create a certificate signed by the root authority.",
+      "Type": "NewSignedCertificate",
       "Params": {
-        "Name": "[parameter('SitecoreIdentityServerName')]",
-        "Action": "Stop",
-        "ErrorAction": "SilentlyContinue"
+        "Signer": "[GetCertificate(variable('Root.Cert.DnsName'), variable('Root.Cert.Store'))]",
+        "Path": "c:\\certificates",
+        "CertStoreLocation": "[variable('Root.Cert.Store')]",
+        "FriendlyName": "IdentityServerClientCert",
+        "Name": "IdentityServerClientCert",
+        "DnsName": [
+          "[parameter('SitecoreIdentityServerName')]",
+          "[parameter('SitecoreIdentityHostname')]"
+        ],
+        "IncludePrivateKey": true,
+        "Password": "[ConvertToSecureString('sitecore',AsPlainText:true,Force:true)]"
       }
     },
-    "RemoveSite": {
-      "Type": "ManageCommerceService",
+    "SetIdentityServerClientCertPermissions": {
+      // Set permissions for the services to access the client certificate.
+      "Type": "SetPermissions",
       "Params": {
-        "Name": "[parameter('SitecoreIdentityServerName')]",
-        "Action": "Remove-Website"
+        "Path": "[ResolveCertificatePath(joinpath(variable('Client.Cert.Store'), GetCertificateThumbprint(parameter('SitecoreIdentityServerName'), variable('Client.Cert.Store'))))]",
+        "Rights": [
+          {
+            "User": "[concat(parameter('UserDomain'), concat('\\', parameter('UserName')))]",
+            "FileSystemRights": [ "Read" ],
+            "InheritanceFlags": [ "None" ]
+          }
+        ]
       }
     },
-    "StopAppPool": {
-      "Type": "ManageAppPool",
+    "PreconfigureIdentityServerInstance": {
+      "Type": "InstallSitecoreConfiguration",
       "Params": {
-        "Name": "[parameter('SitecoreIdentityServerName')]",
-        "Action": "Stop",
-        "ErrorAction": "SilentlyContinue"
-      }
-    },
-    "RemoveAppPool": {
-      "Type": "ManageCommerceService",
-      "Params": {
-        "Name": "[parameter('SitecoreIdentityServerName')]",
-        "Action": "Remove-WebAppPool"
-      }
-    },
-    "RemoveSiteFolder": {
-      "Type": "ManageCommerceService",
-      "Params": {
-        "Name": "Name",
-        "PhysicalPath": "[variable('SitecoreIdentityServerPhysicalPath')]",
-        "Action": "Remove-Item"
+        "Path": "[concat(parameter('BaseConfigurationFolder'), '\\Commerce\\Common\\Commerce.InstallSite.json')]",
+        "WebsiteHostName": "[parameter('SitecoreIdentityHostname')]",
+        "CommerceInstallRoot": "[parameter('CommerceInstallRoot')]",
+        "WebsiteName": "[parameter('SitecoreIdentityServerName')]",
+        "WebsitePort": "[variable('SitecoreIdentityServerPort')]",
+        "UserDomain": "[parameter('UserDomain')]",
+        "UserName": "[parameter('UserName')]",
+        "UserPassword": "[parameter('UserPassword')]"
       }
     },
     "DeployCommerceContent": {
       "Type": "DeployCommerceContent",
       "Params": {
-        "Name": "SitecoreIdentityServer",
+        "Name": "[parameter('SitecoreIdentityServerName']",
         "ServicesContentPath": "[parameter('SitecoreIdentityServerPath')]",
         "PhysicalPath": "[variable('SitecoreIdentityServerPhysicalPath')]",
         "SitecoreDbServer": "[parameter('SitecoreDbServer')]",
         "SitecoreCoreDbName": "[parameter('SitecoreCoreDbName')]",
-        "UserAccount": "[parameter('UserAccount')]"
+        "SitecoreBizFxPort": "[parameter('SitecoreBizFxPort')]",
+        "UserName": "[concat(parameter('UserDomain'), concat('\\', parameter('UserName')))]"
       }
     },
-    "CreatePaths": {
-      "Type": "EnsurePath",
+    "UpdateIdentityServerThumbprint": {
+      "Type": "UpdateIdentityServerThumbprint",
       "Params": {
-        "Exists": [
-          "[variable('SitecoreIdentityServerPhysicalPath')]"
-        ]
-      }
-    },
-    "CreateWebAppPool": {
-      "Type": "ManageCommerceService",
-      "Params": {
-        "Name": "[parameter('SitecoreIdentityServerName')]",
-        "Action": "Create-WebAppPool",
-        "UserAccount": "[parameter('UserAccount')]"
-      }
-    },
-    "CreateWebsite": {
-      "Type": "ManageCommerceService",
-      "Params": {
-        "Name": "[parameter('SitecoreIdentityServerName')]",
-        "Action": "Create-Website",
-        "AppPoolName": "[parameter('SitecoreIdentityServerName')]",
-        "PhysicalPath": "[variable('SitecoreIdentityServerPhysicalPath')]",
-        "Port": "5050",
-        "Signer": "[GetCertificate(variable('Root.Cert.DnsName'), variable('Root.Cert.Store'))]"
-      }
-    },
-    "IssuingCertificate": {
-      "Type": "IssuingCertificate",
-      "Params": {
-        "CertificateDnsName": "[variable('Security.CertificateName')]",
-        "CertificatePassword": "sitecore",
-        "CertificateStore": "[variable('Security.CertificateStore')]",
-        "CertificateFriendlyName": "[parameter('SitecoreIdentityServerName')]",
+        "Thumbprint": "[GetCertificateThumbprint(parameter('SitecoreIdentityServerName'), variable('Client.Cert.Store'))]",
         "IDServerPath": "[variable('SitecoreIdentityServerPhysicalPath')]"
       }
     },
-    "SetCertStorePermissions": {
-      "Type": "SetPermissions",
+    "StartAppPool": {
+      "Description": "Starts the app pool.",
+      "Type": "ManageAppPool",
       "Params": {
-        "Path": "[ResolveCertificatePath(variable('Security.CertificatePath'))]",
-        "Rights": [
-          {
-            "User": "[parameter('UserAccount'))]",
-            "FileSystemRights": [ "Read" ],
-            "InheritanceFlags": [ "None" ]
-          }
-        ]
+        "Name": "[parameter('SitecoreIdentityServerName')]",
+        "Action": "Start"
+      }
+    },
+    "StartWebsite": {
+      "Description": "Starts the website.",
+      "Type": "ManageWebsite",
+      "Params": {
+        "Name": "[parameter('SitecoreIdentityServerName')]",
+        "Action": "Start"
       }
     }
   }

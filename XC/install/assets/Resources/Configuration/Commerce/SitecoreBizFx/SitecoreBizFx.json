@@ -1,126 +1,109 @@
-﻿{
+﻿// -------------------------------------------------------------------------- //
+//         Sitecore Install Framework - Deploy Sitecore BizFx Services        //
+//                                                                            //
+//  Run this configuration to deploy Sitecore BizFx Services.                 //
+//                                                                            //
+//  NOTE: Only single line comments are accepted in configurations.           //
+// -------------------------------------------------------------------------- //
+{
   "Parameters": {
-    "WebRoot": {
-      "Type": "string",
-      "Description": "The physical path of the configured Web Root for the environment"
-    },
-    "SitecoreBizFxPostFix": {
-      "Type": "string",
-      "Description": "String to add at the end of 'SitecoreBizFx' to make it unique to the instance"
-    },
     "SitecoreBizFxServicesContentPath": {
       "Type": "string",
       "Description": "SitecoreBizFx Services Content Path"
     },
-    "UserAccount": {
-      "Type": "psobject",
-      "DefaultValue": {
-        "UserName": "",
-        "Domain": "$env:COMPUTERNAME",
-        "Password": ""
-      }
-    },
-    "RootCertFileName": {
+    "CommerceInstallRoot": {
       "Type": "string",
-      "Description": "The file name of the root certificate to be created.",
+      "Description": "The root path of commerce services."
+    },
+    "UserDomain": {
+      "Type": "string",
+      "Description": "User Domain for Commerce Services App Pool"
+    },
+    "UserName": {
+      "Type": "string",
+      "Description": "User Name for Commerce Services App Pool"
+    },
+    "UserPassword": {
+      "Type": "string",
+      "Description": "User Password for Commerce Services App Pool"
+    },
+    "RootCertName": {
+      "Type": "string",
+      "Description": "The name of the root certificate.",
       "DefaultValue": "SitecoreRootCert"
     },
     "CommerceAuthoringServicesPort": {
       "Type": "string",
       "Description": "Commerce Authoring Services port"
     },
-    "EnvironmentName": {
+    "SitecoreBizFxServerName": {
       "Type": "string",
-      "Description": "Name of the Authoring Environment"
+      "Description": "Sitecore BizFx Server name"
+    },
+    "SitecoreBizFxHostname": {
+      "Type": "string",
+      "Description": "Sitecore BizFx host header name"
+    },
+    "SitecoreBizFxPort": {
+      "Type": "string",
+      "Description": "Sitecore BizFx Server port"
+    },
+    "BaseConfigurationFolder": {
+      "Type": "string",
+      "Description": "The base folder for SIF configuration."
     }
   },
   "Variables": {
-		"SitecoreBizFxSiteName": "[concat('SitecoreBizFx_', parameter('SitecoreBizFxPostFix'))]",
-    "SitecoreBizFxPhysicalPath": "[joinpath(parameter('WebRoot'), concat('\\', variable('SitecoreBizFxSiteName')))]",
-    "Root.Cert.DnsName": "[concat('DO_NOT_TRUST_', parameter('RootCertFileName'))]",
-    "Root.Cert.Store": "cert:\\LocalMachine\\Root"
+    "SitecoreBizFxPhysicalPath": "[joinpath(parameter('CommerceInstallRoot'), parameter('SitecoreBizFxServerName'))]",
+    // The name dns name of the root certificate.
+    "Root.Cert.DnsName": "[concat('DO_NOT_TRUST_', parameter('RootCertName'))]",
+    "Root.Cert.Store": "cert:\\LocalMachine\\Root",
+    "Client.Cert.Store": "cert:\\LocalMachine\\My"
   },
-	"Modules": [
-		"ManageCommerceService",
-		"DeployCommerceContent",
-		"WindowsLocalUser"
-	],
-	"Tasks": {
-		"StopSite": {
-			"Type": "ManageWebsite",
-			"Params": {
-				"Name": "[variable('SitecoreBizFxSiteName')]",
-				"Action": "Stop",
-				"ErrorAction": "SilentlyContinue"
-			}
-		},
-		"RemoveSite": {
-			"Type": "ManageCommerceService",
-			"Params": {
-				"Name": "[variable('SitecoreBizFxSiteName')]",
-				"Action": "Remove-Website"
-			}
-		},
-		"StopAppPool": {
-			"Type": "ManageAppPool",
-			"Params": {
-				"Name": "[variable('SitecoreBizFxSiteName')]",
-				"Action": "Stop",
-				"ErrorAction": "SilentlyContinue"
-			}
-		},
-		"RemoveAppPool": {
-			"Type": "ManageCommerceService",
-			"Params": {
-				"Name": "[variable('SitecoreBizFxSiteName')]",
-				"Action": "Remove-WebAppPool"
-			}
-		},
-		"RemoveSiteFolder": {
-			"Type": "ManageCommerceService",
-			"Params": {
-				"Name": "Name",
-				"PhysicalPath": "[variable('SitecoreBizFxPhysicalPath')]",
-				"Action": "Remove-Item"
-			}
-		},
-		"DeployCommerceContent": {
-			"Type": "DeployCommerceContent",
+  "Modules": [
+    "ManageCommerceService",
+    "DeployCommerceContent"
+  ],
+  "Tasks": {
+    "PreconfigureBizFxInstance": {
+      "Type": "InstallSitecoreConfiguration",
       "Params": {
-        "Name": "SitecoreBizFx",
+        "Path": "[concat(parameter('BaseConfigurationFolder'), '\\Commerce\\Common\\Commerce.InstallSite.json')]",
+        "WebsiteHostName": "[parameter('SitecoreBizFxHostname')]",
+        "CommerceInstallRoot": "[parameter('CommerceInstallRoot')]",
+        "WebsiteName": "[parameter('SitecoreBizFxServerName')]",
+        "WebsitePort": "[parameter('SitecoreBizFxPort')]",
+        "UserDomain": "[parameter('UserDomain')]",
+        "UserName": "[parameter('UserName')]",
+        "UserPassword": "[parameter('UserPassword')]"
+      }
+    },
+    "DeployCommerceContent": {
+      "Type": "DeployCommerceContent",
+      "Params": {
+        "Name": "[parameter('SitecoreBizFxServerName')]",
         "ServicesContentPath": "[parameter('SitecoreBizFxServicesContentPath')]",
+        "SitecoreBizFxPort": "[parameter('SitecoreBizFxPort')]",
         "CommerceAuthoringServicesPort": "[parameter('CommerceAuthoringServicesPort')]",
         "PhysicalPath": "[variable('SitecoreBizFxPhysicalPath')]",
-        "UserAccount": "[parameter('UserAccount')]",
-        "EnvironmentName": "[parameter('EnvironmentName')]"
+        "UserName": "[concat(parameter('UserDomain'), concat('\\', parameter('UserName')))]"
       }
-		},
-		"CreatePaths": {
-			"Type": "EnsurePath",
-			"Params": {
-				"Exists": [
-					"[variable('SitecoreBizFxPhysicalPath')]"
-				]
-			}
-		},
-		"CreateWebAppPool": {
-			"Type": "ManageCommerceService",
-			"Params": {
-				"Name": "[variable('SitecoreBizFxSiteName')]",
-				"Action": "Create-WebAppPool",
-				"UserAccount": "[parameter('UserAccount')]"
-			}
-		},
-		"CreateWebsite": {
-			"Type": "ManageCommerceService",
-			"Params": {
-				"Name": "[variable('SitecoreBizFxSiteName')]",
-				"Action": "Create-Website",
-				"AppPoolName": "[variable('SitecoreBizFxSiteName')]",
-				"PhysicalPath": "[variable('SitecoreBizFxPhysicalPath')]",
-				"Port": "4200",
-				"Signer": "[GetCertificate(variable('Root.Cert.DnsName'), variable('Root.Cert.Store'))]"
-			}
-		}
-	}
+    },
+    "StartAppPool": {
+      "Description": "Starts the app pool.",
+      "Type": "ManageAppPool",
+      "Params": {
+        "Name": "[parameter('SitecoreBizFxServerName')]",
+        "Action": "Start"
+      }
+    },
+    "StartWebsite": {
+      "Description": "Starts the website.",
+      "Type": "ManageWebsite",
+      "Params": {
+        "Name": "[parameter('SitecoreBizFxServerName')]",
+        "Action": "Start"
+      }
+    }
+  }
 }

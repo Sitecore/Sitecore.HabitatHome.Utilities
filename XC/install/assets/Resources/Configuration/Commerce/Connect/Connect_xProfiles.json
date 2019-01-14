@@ -1,3 +1,10 @@
+// ------------------------------------------------------------------------------ //
+//         Sitecore Install Framework - Install Commerce xProfiles module         //
+//                                                                                //
+//  Run this configuration to install Commerce xProfiles module.                  //
+//                                                                                //
+//  NOTE: Only single line comments are accepted in configurations.               //
+// ------------------------------------------------------------------------------ //
 {
     "Parameters": {
       "ModuleFullPath": {

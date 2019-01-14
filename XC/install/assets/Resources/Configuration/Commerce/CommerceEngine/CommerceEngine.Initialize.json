@@ -1,13 +1,13 @@
 ﻿{
   "Parameters": {
-    "WebRoot": {
-      "Type": "string",
-      "Description": "The physical path of the configured Web Root for the environment"
-    },
     "UrlIdentityServerGetToken": {
       "Type": "string",
       "DefaultValue": "https://localhost:5050/connect/token",
       "Description": "Url IdentityServer GetToken"
+    },
+    "CommerceInstallRoot": {
+      "Type": "string",
+      "Description": "The root path of commerce services."
     },
     "CommerceShopsServicesPort": {
       "Type": "string",
@@ -17,9 +17,12 @@
       "Type": "psobject",
       "Description": "Sitecore Admin account."
     },
+    "Environments": {
+      "Type": "string[]",
+      "Description":  "List of environments to initialize." 
+    },
     "CommerceServicesPostfix": {
       "Type": "string",
-      "DefaultValue": "Sc9",
       "Description": "The Commerce Engine postfix for services names"
     }
   },
@@ -28,12 +31,12 @@
     "CommerceShops": "[concat('CommerceShops_', parameter('CommerceServicesPostfix'))]",
     "CommerceAuthoring": "[concat('CommerceAuthoring_', parameter('CommerceServicesPostfix'))]",
     "CommerceMinions": "[concat('CommerceMinions_', parameter('CommerceServicesPostfix'))]",
-    "CommerceOpsPhysicalPath": "[joinpath(parameter('WebRoot'),  variable('CommerceOps'))]",
-    "CommerceShopsPhysicalPath": "[joinpath(parameter('WebRoot'),  variable('CommerceShops'))]",
-    "CommerceAuthoringPhysicalPath": "[joinpath(parameter('WebRoot'),  variable('CommerceAuthoring'))]",
-    "CommerceMinionsPhysicalPath": "[joinpath(parameter('WebRoot'),  variable('CommerceMinions'))]",
+    "CommerceOpsPhysicalPath": "[joinpath(parameter('CommerceInstallRoot'),  variable('CommerceOps'))]",
+    "CommerceShopsPhysicalPath": "[joinpath(parameter('CommerceInstallRoot'),  variable('CommerceShops'))]",
+    "CommerceAuthoringPhysicalPath": "[joinpath(parameter('CommerceInstallRoot'),  variable('CommerceAuthoring'))]",
+    "CommerceMinionsPhysicalPath": "[joinpath(parameter('CommerceInstallRoot'),  variable('CommerceMinions'))]",
     "UrlCommerceShopsServicesBootstrap": "[concat('https://localhost:', concat(parameter('CommerceShopsServicesPort'), '/commerceops/Bootstrap()'))]",
-    "InitializeParam": "/commerceops/InitializeEnvironment(environment='envNameValue')",
+    "InitializeParam": "/commerceops/InitializeEnvironment()",
     "UrlInitializeEnvironment": "[concat('https://localhost:', concat(parameter('CommerceShopsServicesPort'), variable('InitializeParam')))]",
     "EnsureSyncDefaultContentPathsParam": "/commerceops/EnsureSyncDefaultContentPaths(environment='envNameValue',shopName='CommerceEngineDefaultStorefront')",
     "UrlEnsureSyncDefaultContentPaths": "[concat('https://localhost:', concat(parameter('CommerceShopsServicesPort'), variable('EnsureSyncDefaultContentPathsParam')))]",
@@ -67,22 +70,18 @@
     },
      "EnsureSyncDefaultContentPaths": {
        "Type": "EnsureSyncDefaultContentPaths",
-       "Params": {
-         "UrlEnsureSyncDefaultContentPaths": "[variable('UrlEnsureSyncDefaultContentPaths')]",
-         "UrlCheckCommandStatus": "[variable('UrlCheckCommandStatus')]",
-         "Environments": [
-           "HabitatAuthoring"
-         ]
-       }
+      "Params": {
+        "UrlEnsureSyncDefaultContentPaths": "[variable('UrlEnsureSyncDefaultContentPaths')]",
+        "UrlCheckCommandStatus": "[variable('UrlCheckCommandStatus')]",
+        "Environments": "[parameter('Environments')]"
+      }
      },
     "InitializeCommerceServices": {
       "Type": "InitializeCommerceServices",
       "Params": {
         "UrlInitializeEnvironment": "[variable('UrlInitializeEnvironment')]",
         "UrlCheckCommandStatus": "[variable('UrlCheckCommandStatus')]",
-        "Environments": [
-          "HabitatAuthoring"
-        ]
+        "Environments": "[parameter('Environments')]"
       }
     },
     "EnableCsrfValidation": {

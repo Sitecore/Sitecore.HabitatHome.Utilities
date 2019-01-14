@@ -1,4 +1,11 @@
-﻿{
+﻿// -------------------------------------------------------------------------- //
+//         Sitecore Install Framework - SXA Storefront                        //
+//                                                                            //
+//  Run this configuration to install a SXA Storefront Connect models.        //
+//                                                                            //
+//  NOTE: Only single line comments are accepted in configurations.           //
+// -------------------------------------------------------------------------- //
+{
   "Parameters": {
     "InstallRootDst": {
       "Type": "string",
