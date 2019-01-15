@@ -1,0 +1,44 @@
+{
+    "Parameters": {
+        "WebRoot": {
+            "Type": "string",
+            "DefaultValue": "XConnect",
+            "Description": "The name of the site to be deployed."
+        },
+        "SiteName": {
+            "Type": "string",
+            "DefaultValue": "SC9",
+            "Description": "The name of the site to be deployed."
+        },
+        "XConnectSiteName": {
+            "Type": "string",
+            "DefaultValue": "XConnect",
+            "Description": "The name of the site to be deployed."
+        },
+        "ModelName": {
+            "Type": "string",
+            "Description": "List of deta"
+        },
+        "Target": {
+            "Type": "string",
+            "DefaultValue": "App_Data\\Models",
+            "Description": "Destination where model should be deployed"
+        }
+    },
+    "Variables": {
+        "Site.PhysicalPath": "[joinpath(parameter('WebRoot'), parameter('SiteName'))]",
+        "Site.ModelsPath": "[joinpath(variable('Site.PhysicalPath'), 'App_Data\\Models')]",
+        "ModelPath": "[joinpath(variable('Site.ModelsPath'), parameter('ModelName'))]",
+        "XConnect.PhysicalPath":"[joinpath(parameter('WebRoot'), parameter('XConnectSiteName'))]",
+        "Destination": "[joinpath(variable('XConnect.PhysicalPath'), parameter('Target'))]"
+    },
+    "Tasks": {
+        "CopyModel": {
+            "Type": "Copy",
+            "Params": {
+                "Source": "[variable('ModelPath')]",
+                "Destination": "[variable('Destination')]"
+            }
+        }
+    }
+}
