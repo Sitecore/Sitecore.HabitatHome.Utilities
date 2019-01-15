@@ -42,73 +42,6 @@ Write-Host " xConnect: $($xConnect.siteName)" -ForegroundColor Green
 Write-Host "*******************************************************" -ForegroundColor Green
 
 
-function Install-Prerequisites {
-    #Verify SQL version
-
-    [reflection.assembly]::LoadWithPartialName("Microsoft.SqlServer.Smo") | out-null
-    $srv = New-Object "Microsoft.SqlServer.Management.Smo.Server" $sql.server
-    $minVersion = New-Object System.Version($sql.minimumVersion)
-    if ($srv.Version.CompareTo($minVersion) -lt 0) {
-        throw "Invalid SQL version. Expected SQL 2016 SP1 ($($sql.minimumVersion)) or above."
-    }
-
-    # Verify Web Deploy
-    $webDeployPath = ([IO.Path]::Combine($env:ProgramFiles, 'iis', 'Microsoft Web Deploy V3', 'msdeploy.exe'))
-    if (!(Test-Path $webDeployPath)) {
-        throw "Could not find WebDeploy in $webDeployPath"
-    }
-
-    # Verify Microsoft.SqlServer.TransactSql.ScriptDom.dll
-    try {
-        $assembly = [reflection.assembly]::LoadWithPartialName("Microsoft.SqlServer.TransactSql.ScriptDom")
-        if (-not $assembly) {
-            throw "error"
-        }
-    }
-    catch {
-        throw "Could load the Microsoft.SqlServer.TransactSql.ScriptDom assembly. Please make sure it is installed and registered in the GAC"
-    }
-
-
-    # Verify Solr
-    Write-Host "Verifying Solr connection" -ForegroundColor Green
-    if (-not $solr.url.ToLower().StartsWith("https")) {
-        throw "Solr URL ($SolrUrl) must be secured with https"
-    }
-    Write-Host "Solr URL: $($solr.url)"
-    $SolrRequest = [System.Net.WebRequest]::Create($solr.url)
-    $SolrResponse = $SolrRequest.GetResponse()
-    try {
-        If ($SolrResponse.StatusCode -ne 200) {
-            Write-Host "Could not contact Solr on '$($solr.url)'. Response status was '$SolrResponse.StatusCode'" -ForegroundColor Red
-
-        }
-    }
-    finally {
-        $SolrResponse.Close()
-    }
-
-    Write-Host "Verifying Solr directory" -ForegroundColor Green
-    if (-not (Test-Path "$($solr.root)\server")) {
-        throw "The Solr root path '$($solr.root)' appears invalid. A 'server' folder should be present in this path to be a valid Solr distributive."
-    }
-
-    Write-Host "Verifying Solr service" -ForegroundColor Green
-    try {
-        $null = Get-Service $solr.serviceName
-    }
-    catch {
-        throw "The Solr service '$($solr.serviceName)' does not exist. Perhaps it's incorrect in settings.ps1?"
-    }
-
-    #Verify .NET framework
-
-    $versionExists = Get-ChildItem "hklm:SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full\" | Get-ItemPropertyValue -Name Release | ForEach-Object { $_ -ge $assets.dotnetMinimumVersionValue }
-    if (-not $versionExists) {
-        throw "Please install .NET Framework $($assets.dotnetMinimumVersion) or newer"
-    }
-}
-
 function Install-RequiredInstallationAssets {
     #Register Assets PowerShell Repository
     if ((Get-PSRepository | Where-Object {$_.Name -eq $assets.psRepositoryName}).count -eq 0) {
@@ -134,7 +67,23 @@ function Install-RequiredInstallationAssets {
 function Install-CommerceAssets {
     Set-Location $PSScriptRoot
 
-    
+    if ($null -eq $global:credentials) {
+        if ([string]::IsNullOrEmpty($devSitecoreUsername)) {
+            $global:credentials = Get-Credential -Message "Please provide dev.sitecore.com credentials"
+        }
+        elseif (![string]::IsNullOrEmpty($devSitecoreUsername) -and ![string]::IsNullOrEmpty($devSitecorePassword)) {
+            $secpasswd = ConvertTo-SecureString $devSitecorePassword -AsPlainText -Force
+            $global:credentials = New-Object System.Management.Automation.PSCredential ($devSitecoreUsername, $secpasswd)
+        }
+        else {
+            throw "Credentials required for download"
+        }
+    }
+    $user = $global:credentials.GetNetworkCredential().UserName
+    $password = $global:credentials.GetNetworkCredential().Password
+
+    $loginRequest = Invoke-RestMethod -Uri https://dev.sitecore.net/api/authorization -Method Post -ContentType "application/json" -Body "{username: '$user', password: '$password'}" -SessionVariable loginSession -UseBasicParsing 
+
     
     $commercePackageDestination = Join-Path $assets.downloadFolder $assets.commerce.packageName
 
@@ -143,15 +92,16 @@ function Install-CommerceAssets {
         $credentials = Get-Credential -Message "Please provide dev.sitecore.com credentials"
 
         $params = @{
-            Path        = $([io.path]::combine($resourcePath, 'configuration', 'commerce', 'HabitatHome', 'download-assets.json'))
-            Credentials = $credentials
-            Source      = $assets.commerce.packageUrl
-            Destination = $commercePackageDestination
+            Path         = $([io.path]::combine($resourcePath, 'configuration', 'commerce', 'HabitatHome', 'download-assets.json'))
+            LoginSession = $loginSession
+            Source       = $assets.commerce.packageUrl
+            Destination  = $commercePackageDestination
         }
-            Install-SitecoreConfiguration  @params  -WorkingDirectory $(Join-Path $PWD "logs") -Verbose 
+        $Global:ProgressPreference = 'SilentlyContinue'
+        Install-SitecoreConfiguration  @params  -WorkingDirectory $(Join-Path $PWD "logs") -Verbose 
+        $Global:ProgressPreference = 'Continue'
+
     }
-	
-	
 
     $msbuildNuGetUrl = "https://www.nuget.org/api/v2/package/MSBuild.Microsoft.VisualStudio.Web.targets/14.0.0.3"
     $msbuildNuGetPackageFileName = "msbuild.microsoft.visualstudio.web.targets.14.0.0.3.nupkg"
@@ -160,9 +110,10 @@ function Install-CommerceAssets {
     if (!(Test-Path $msbuildNuGetPackageDestination)) {
         Write-Host "Saving $msbuildNuGetUrl to $msbuildNuGetPackageDestination" -ForegroundColor Green
         $params = @{
-            Path        = $([io.path]::combine($resourcePath, 'configuration', 'commerce', 'HabitatHome', 'download-assets.json'))
-            Source      = $msbuildNuGetUrl
-            Destination = $msbuildNuGetPackageDestination
+            Path         = $([io.path]::combine($resourcePath, 'configuration', 'commerce', 'HabitatHome', 'download-assets.json'))
+            LoginSession = $loginSession
+            Source       = $msbuildNuGetUrl
+            Destination  = $msbuildNuGetPackageDestination
         }
         Install-SitecoreConfiguration  @params  -WorkingDirectory $(Join-Path $PWD "logs") -Verbose 
     }
@@ -177,11 +128,15 @@ function Install-CommerceAssets {
     if (!(Test-Path $habitatHomeImagePackageDestination)) {
         Write-Host ("Saving '{0}' to '{1}'" -f $habitatHomeImagePackageFileName, $habitatHomeImagePackageDestination) -ForegroundColor Green
         $params = @{
-            Path        = $([io.path]::combine($resourcePath, 'configuration', 'commerce', 'HabitatHome', 'download-assets.json'))
-            Source      = $habitatHomeImagePackageUrl
-            Destination = $habitatHomeImagePackageDestination
+            Path         = $([io.path]::combine($resourcePath, 'configuration', 'commerce', 'HabitatHome', 'download-assets.json'))
+            LoginSession = $loginSession
+            Source       = $habitatHomeImagePackageUrl
+            Destination  = $habitatHomeImagePackageDestination
         }
+        $Global:ProgressPreference = 'SilentlyContinue'
         Install-SitecoreConfiguration  @params  -WorkingDirectory $(Join-Path $PWD "logs") -Verbose 
+        $Global:ProgressPreference = 'Continue'
+
     }
     Write-Host "Extracting to $($CommerceAssetFolder)"
     set-alias sz "$env:ProgramFiles\7-zip\7z.exe"
@@ -288,14 +243,14 @@ Function Install-Commerce {
     $params = @{
         Path                                        = $(Join-Path $resourcePath  'Commerce_SingleServer.json')
         BaseConfigurationFolder                     = $(Join-Path $resourcePath "Configuration")
-        webRoot                                     = $site.webRoot
-        SitePrefix                                  = $site.prefix
-        SolutionName                                = "HabitatHome"
+        CommerceInstallRoot                         = $site.webRoot
+        CommerceServicesPostfix                     = $site.prefix
+        Environments                                = @('Habitat_Authoring')
+        EnvironmentsPrefix                          = $site.prefix
         SiteName                                    = $site.hostName
         SiteHostHeaderName                          = $commerce.storefrontHostName
         InstallDir                                  = $(Join-Path $site.webRoot $site.hostName)
         XConnectInstallDir                          = $xConnect.siteRoot
-        CertificateName                             = $site.habitatHomeSslCertificateName
         RootCertFileName                            = $sitecore.rootCertificateName
         CommerceServicesDbServer                    = $sql.server
         CommerceServicesDbName                      = $($site.prefix + "_SharedEnvironments")
@@ -318,9 +273,9 @@ Function Install-Commerce {
         CommerceShopsServicesPort                   = "5005"
         CommerceAuthoringServicesPort               = "5000"
         CommerceMinionsServicesPort                 = "5010"
+        SitecoreBizFxPort                           = "4200"
         SitecoreCommerceEnginePath                  = $($publishPath + "\" + $site.prefix + ".Commerce.Engine")
         SitecoreBizFxServicesContentPath            = $($publishPath + "\" + $site.prefix + ".Commerce.BizFX")
-        SitecoreBizFxPostFix                        = $site.prefix
         SitecoreIdentityServerPath                  = $($publishPath + "\" + $site.prefix + ".Commerce.IdentityServer")
         CommerceEngineCertificatePath               = $(Join-Path -Path $assets.certificatesPath -ChildPath $($xConnect.CertificateName + ".crt") )
         SiteUtilitiesSrc                            = $(Join-Path -Path $assets.commerce.sifCommerceRoot -ChildPath "SiteUtilityPages")
@@ -329,18 +284,16 @@ Function Install-Commerce {
         CommercexAnalyticsModuleFullPath            = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include "Sitecore Commerce ExperienceAnalytics Core *.zip"	-Recurse)
         CommerceMAModuleFullPath                    = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include "Sitecore Commerce Marketing Automation Core *.zip"	-Recurse)
         CommerceMAForAutomationEngineModuleFullPath = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include "Sitecore Commerce Marketing Automation for AutomationEngine *.zip"	-Recurse)
-        CEConnectPackageFullPath                    = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include  "Sitecore.Commerce.Engine.Connect*.update" -Recurse)
-        SXACommerceModuleFullPath                   = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include  "Sitecore Commerce Experience Accelerator 1.*.zip" -Recurse)
-        SXAStorefrontModuleFullPath                 = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include  "Sitecore Commerce Experience Accelerator Storefront 1.*.zip"-Recurse )
+        CEConnectModuleFullPath                     = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include  "Sitecore Commerce Engine Connect*.zip" -Recurse)
+        SXACommerceModuleFullPath                   = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include  "Sitecore Commerce Experience Accelerator 2.*.zip" -Recurse)
+        SXAStorefrontModuleFullPath                 = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include  "Sitecore Commerce Experience Accelerator Storefront 2.*.zip"-Recurse )
         SXAStorefrontThemeModuleFullPath            = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include  "Sitecore Commerce Experience Accelerator Storefront Themes*.zip"-Recurse )
         SXAStorefrontCatalogModuleFullPath          = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include  "Sitecore Commerce Experience Accelerator Habitat Catalog*.zip" -Recurse)
         MergeToolFullPath                           = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include  "*Microsoft.Web.XmlTransform.dll" -Recurse | Select-Object -ExpandProperty FullName)
         HabitatImagesModuleFullPath                 = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include  "Habitat Home Product Images.zip" -Recurse)
-        UserAccount                                 = @{
-            Domain   = $commerce.serviceAccountDomain
-            UserName = $commerce.serviceAccountUserName
-            Password = $commerce.serviceAccountPassword
-        }
+        UserDomain                                  = $commerce.serviceAccountDomain
+        UserName                                    = $commerce.serviceAccountUserName
+        UserPassword                                = $commerce.serviceAccountPassword
         BraintreeAccount                            = @{
             MerchantId = $commerce.brainTreeAccountMerchandId
             PublicKey  = $commerce.brainTreeAccountPublicKey
@@ -348,15 +301,17 @@ Function Install-Commerce {
         }
         SitecoreIdentityServerName                  = $commerce.identityServerName
     }
-    If (!$SkipHabitatHomeInstall){
+    write-host @params
+    If (!$SkipHabitatHomeInstall) {
         Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs")
-    } Else {
-        Install-SitecoreConfiguration @params -Skip "InitializeCommerceEngine","GenerateCatalogTemplates","InstallHabitatImagesModule","Reindex" -WorkingDirectory $(Join-Path $PWD "logs")
+    }
+    Else {
+        Install-SitecoreConfiguration @params -Skip "InitializeCommerceEngine", "GenerateCatalogTemplates", "InstallHabitatImagesModule", "Reindex" -WorkingDirectory $(Join-Path $PWD "logs")
     }
 }
 
 
-Install-Prerequisites
+#Install-Prerequisites
 Install-RequiredInstallationAssets
 Set-ModulesPath
 Install-CommerceAssets
