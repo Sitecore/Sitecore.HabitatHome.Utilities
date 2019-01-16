@@ -292,8 +292,29 @@ Function Install-HabitatHomeXConnect {
     }
      
     Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs") 
+   
+   
 }
 
+Function Deploy-XConnectModels {
+    $modelDestinations = @("App_Data\Models", "App_Data\jobs\continuous\IndexWorker\App_data\Models")
+    $models = Get-ChildItem $([io.path]::combine($site.webRoot, $site.hostName, "App_Data\Models"))
+
+    foreach ($model in $models) {
+
+        foreach ($destination in $modelDestinations) {
+            $deployModelParams = @{
+                Path             = (Join-path $resourcePath 'HabitatHome\xconnect-models.json')
+                WebRoot          = $site.webRoot
+                SiteName         = $site.hostName
+                XConnectSiteName = $xConnect.siteName
+                ModelName        = $model.name
+                Target           = $destination
+            }
+            Install-SitecoreConfiguration @deployModelParams -WorkingDirectory $(Join-Path $PWD "logs") 
+        }
+    }
+}
 Function Enable-ContainedDatabases {
     #Enable Contained Databases
     Write-Host "Enable contained databases" -ForegroundColor Green
@@ -368,6 +389,7 @@ Stop-Services
 Install-Bootloader
 Install-HabitatHome
 Install-HabitatHomeXConnect
+Deploy-XConnectModels
 Enable-ContainedDatabases
 Add-DatabaseUsers
 Start-Services
