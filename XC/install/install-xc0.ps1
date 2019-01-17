@@ -274,6 +274,7 @@ Function Install-Commerce {
         CommerceAuthoringServicesPort               = "5000"
         CommerceMinionsServicesPort                 = "5010"
         SitecoreBizFxPort                           = "4200"
+        SitecoreBizFxServerName                     = $("SitecoreBizFX_" + $site.prefix)
         SitecoreCommerceEnginePath                  = $($publishPath + "\" + $site.prefix + ".Commerce.Engine")
         SitecoreBizFxServicesContentPath            = $($publishPath + "\" + $site.prefix + ".Commerce.BizFX")
         SitecoreIdentityServerPath                  = $($publishPath + "\" + $site.prefix + ".Commerce.IdentityServer")
