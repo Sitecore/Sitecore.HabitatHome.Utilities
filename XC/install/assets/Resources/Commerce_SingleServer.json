@@ -328,6 +328,7 @@
         "UserPassword": "[parameter('UserPassword')]",
         "SitecoreBizFxServerName": "[parameter('SitecoreBizFxServerName')]",
         "SitecoreBizFxHostname": "[parameter('EngineHostName')]",
+        "SitecoreBizFxPostFix"
         "SitecoreBizFxPort": "[parameter('SitecoreBizFxPort')]",
         "BaseConfigurationFolder": "[parameter('BaseConfigurationFolder')]"
       }
@@ -344,7 +345,6 @@
         "UserName": "[parameter('UserName')]",
         "UserPassword": "[parameter('UserPassword')]",
         "SitecoreIdentityServerName": "[parameter('SitecoreIdentityServerName')]",
-        "RootCertFileName": "[parameter('RootCertFileName')]",
         "SitecoreIdentityHostname": "[parameter('EngineHostName')]",
         "SitecoreBizFxPort": "[parameter('SitecoreBizFxPort')]",
         "BaseConfigurationFolder": "[parameter('BaseConfigurationFolder')]"
