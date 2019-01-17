@@ -74,37 +74,7 @@
     // The destination paths for the base configurations of each core.
     "Customers.Conf": "[joinpath(variable('Customers.Root'), 'conf')]",
     "Orders.Conf": "[joinpath(variable('Orders.Root'), 'conf')]",
-    "CatalogItems.Conf": "[joinpath(variable('CatalogItems.Root'), 'conf')]",
-	
-	// SXA custom cores variables
-	// Solr schema file to be modified.
-        "Solr.SchemaFileName": "managed-schema",
-
-        // Solr schema xpaths to be modified.
-        "Solr.Xpath.SchemaRoot": "//schema",
-        "Solr.Xpath.UniqueKey": "[concat(variable('Solr.Xpath.SchemaRoot'), '/uniqueKey')]",
-
-        // The solr unique field info.
-        "Solr.UniqueField": "_uniqueid",
-        "Solr.UniqueField.Attributes": {
-            "name": "[variable('Solr.UniqueField')]",
-            "type": "string",
-            "indexed": "true",
-            "required": "true",
-            "stored": "true"
-        },
-
-        // The names of the cores to create.
-        "SXA.Master.Name": "sitecore_sxa_master_index",
-        "SXA.Web.Name": "sitecore_sxa_web_index",
-
-        // The destination paths of the cores to create.
-        "Master.Root": "[joinpath(variable('Solr.Server'), variable('SXA.Master.Name'))]",
-        "Web.Root": "[joinpath(variable('Solr.Server'), variable('SXA.Web.Name'))]",
-
-        // The destination paths for the base configurations of each core.
-        "Master.Conf": "[joinpath(variable('Master.Root'), 'conf')]",
-        "Web.Conf": "[joinpath(variable('Web.Root'), 'conf')]"
+    "CatalogItems.Conf": "[joinpath(variable('CatalogItems.Root'), 'conf')]"
   },
   "Tasks": {
     // Tasks are separate units of work in a configuration.
@@ -128,9 +98,7 @@
         "Clean": [
           "[variable('Customers.Root')]",
           "[variable('Orders.Root')]",
-          "[variable('CatalogItems.Root')]",
-		      "[variable('Master.Root')]",
-		      "[variable('Web.Root')]"
+          "[variable('CatalogItems.Root')]"
         ]
       }
     },
@@ -140,9 +108,7 @@
       "Params": [
         { "Source": "[joinpath(variable('Solr.BaseConfigs'), '*')]", "Destination": "[variable('Customers.Root')]" },
         { "Source": "[joinpath(variable('Solr.BaseConfigs'), '*')]", "Destination": "[variable('Orders.Root')]" },
-        { "Source": "[joinpath(variable('Solr.BaseConfigs'), '*')]", "Destination": "[variable('CatalogItems.Root')]" },
-        { "Source": "[joinpath(variable('Solr.BaseConfigs'), '*')]","Destination": "[variable('Master.Root')]"},
-		    { "Source": "[joinpath(variable('Solr.BaseConfigs'), '*')]","Destination": "[variable('Web.Root')]"}
+        { "Source": "[joinpath(variable('Solr.BaseConfigs'), '*')]", "Destination": "[variable('CatalogItems.Root')]" }
       ]
     },
     "CopySchemaFiles": {
@@ -153,22 +119,6 @@
         { "Source": "[joinpath(variable('Solr.CatalogItemsSchema'), '*')]", "Destination": "[variable('CatalogItems.Conf')]" }
       ]
     },
-	"AddSchemaUniqueKeyField": {
-      // Amends the core managed schema uniqueKey element for SXA indexes
-      "Type": "SetXml",
-      "Params": [ 
-        { "FilePath": "[joinpath(variable('Master.Conf'), variable('Solr.SchemaFileName'))]", "Xpath": "[variable('Solr.Xpath.SchemaRoot')]", "Element": "field", "Attributes": "[variable('Solr.UniqueField.Attributes')]" },
-        { "FilePath": "[joinpath(variable('Web.Conf'), variable('Solr.SchemaFileName'))]", "Xpath": "[variable('Solr.Xpath.SchemaRoot')]", "Element": "field", "Attributes": "[variable('Solr.UniqueField.Attributes')]" }
-      ]
-    },
-    "UpdateSchemaUniqueKey": {
-	// Amends the core managed schema uniqueKey element for SXA indexes
-      "Type": "SetXml",
-      "Params": [
-        { "FilePath": "[joinpath(variable('Master.Conf'), 'managed-schema')]", "Xpath": "[variable('Solr.Xpath.UniqueKey')]", "Value": "[variable('Solr.UniqueField')]" },
-        { "FilePath": "[joinpath(variable('Web.Conf'), 'managed-schema')]", "Xpath": "[variable('Solr.Xpath.UniqueKey')]", "Value": "[variable('Solr.UniqueField')]" }
-      ]
-  	},
     "StartSolr": {
       // Starts the Solr service.
       "Type": "ManageService",
@@ -207,20 +157,6 @@
             "name": "[variable('CatalogItems.Name')]",
             "configset": "[parameter('BaseConfig')]",
             "property.update.autoCreateFields": "false"
-          }
-        },
-        {
-          "Action": "Create",
-          "Address": "[parameter('SolrUrl')]",
-          "Arguments": {
-            "name": "[variable('SXA.Master.Name')]"
-          }
-        },
-        {
-          "Action": "Create",
-          "Address": "[parameter('SolrUrl')]",
-          "Arguments": {
-            "name": "[variable('SXA.Web.Name')]"
           }
         }
       ]

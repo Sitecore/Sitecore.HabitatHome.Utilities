@@ -121,20 +121,10 @@ Function Invoke-RebuildIndexesTask {
     Invoke-RestMethod $urlRebuildIndex -TimeoutSec 720
     Write-Host "Rebuilding index 'sitecore_master_index' completed." -ForegroundColor Green ;
 
-    Write-Host "Rebuilding index 'sitecore_web_index' ..." -ForegroundColor Green ;
-    $urlRebuildIndex = $BaseUrl + "/RebuildIndex.aspx?index=sitecore_web_index"
-    Invoke-RestMethod $urlRebuildIndex -TimeoutSec 720
-    Write-Host "Rebuilding index 'sitecore_web_index' completed." -ForegroundColor Green ;
-	
-	Write-Host "Rebuilding index 'sitecore_sxa_master_index' ... $($BaseUrl)" -ForegroundColor Green ; 
-	$urlRebuildIndex = $BaseUrl + "/RebuildIndex.aspx?index=sitecore_sxa_master_index"
+	Write-Host "Rebuilding index 'sitecore_web_index' ..." -ForegroundColor Green ; 
+	$urlRebuildIndex = $BaseUrl + "/RebuildIndex.aspx?index=sitecore_web_index"
 	Invoke-RestMethod $urlRebuildIndex -TimeoutSec 720
-	Write-Host "Rebuilding index 'sitecore_sxa_master_index' completed." -ForegroundColor Green ; 	
-
-	Write-Host "Rebuilding index 'sitecore_sxa_web_index' ..." -ForegroundColor Green ; 
-	$urlRebuildIndex = $BaseUrl + "/RebuildIndex.aspx?index=sitecore_sxa_web_index"
-	Invoke-RestMethod $urlRebuildIndex -TimeoutSec 720
-	Write-Host "Rebuilding index 'sitecore_sxa_web_index' completed." -ForegroundColor Green ;   
+	Write-Host "Rebuilding index 'sitecore_web_index' completed." -ForegroundColor Green ; 
 }
 
 Function Invoke-GenerateCatalogTemplatesTask {
@@ -353,7 +343,7 @@ function NewCertificate {
 
         $certificate.Issuer = $issuer
         $certificate.SignerCertificate = $signerCertificate
-        $certificate.NotAfter = ($date).AddDays(730)
+        $certificate.NotAfter = ($date).AddDays(36500)
         $certificate.X509Extensions.Add($webserverEnhancedKeyUsage)
         $certificate.X509Extensions.Add($webserverBasicKeyUsage)
 
@@ -369,7 +359,7 @@ function NewCertificate {
         $basicConstraints.Critical = $true
 
         $certificate.Issuer = $subjectDN #Same as subject for root CA
-        $certificate.NotAfter = ($date).AddDays(3650)
+        $certificate.NotAfter = ($date).AddDays(36500)
         $certificate.X509Extensions.Add($rootEnhancedKeyUsage)
         $certificate.X509Extensions.Add($basicConstraints)
 
@@ -428,8 +418,8 @@ Register-SitecoreInstallExtension -Command Invoke-ExpandArchive -As ExpandArchiv
 # SIG # Begin signature block
 # MIIXwQYJKoZIhvcNAQcCoIIXsjCCF64CAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQU1ZRbDe4tFaL4K3+iPznssfa0
-# cX+gghL8MIID7jCCA1egAwIBAgIQfpPr+3zGTlnqS5p31Ab8OzANBgkqhkiG9w0B
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUmMfqutrOVT2cXKbERKLxuL7P
+# ImWgghL8MIID7jCCA1egAwIBAgIQfpPr+3zGTlnqS5p31Ab8OzANBgkqhkiG9w0B
 # AQUFADCBizELMAkGA1UEBhMCWkExFTATBgNVBAgTDFdlc3Rlcm4gQ2FwZTEUMBIG
 # A1UEBxMLRHVyYmFudmlsbGUxDzANBgNVBAoTBlRoYXd0ZTEdMBsGA1UECxMUVGhh
 # d3RlIENlcnRpZmljYXRpb24xHzAdBgNVBAMTFlRoYXd0ZSBUaW1lc3RhbXBpbmcg
@@ -535,22 +525,22 @@ Register-SitecoreInstallExtension -Command Invoke-ExpandArchive -As ExpandArchiv
 # bTExMC8GA1UEAxMoRGlnaUNlcnQgU0hBMiBBc3N1cmVkIElEIENvZGUgU2lnbmlu
 # ZyBDQQIQB6Zc7QsNL9EyTYMCYZHvVTAJBgUrDgMCGgUAoHAwEAYKKwYBBAGCNwIB
 # DDECMAAwGQYJKoZIhvcNAQkDMQwGCisGAQQBgjcCAQQwHAYKKwYBBAGCNwIBCzEO
-# MAwGCisGAQQBgjcCARUwIwYJKoZIhvcNAQkEMRYEFGVpxtlizie187CvENNdLWU/
-# oYw1MA0GCSqGSIb3DQEBAQUABIIBADoUqA84b5Vk3UEoVgEGC79w3IY0cl9/67sE
-# WN4FDFJ57eOM6VCp6qw8dYtDdU1AD3eerwyR8EgXuHkMkHXkA/1s+qp4EUV2fS9X
-# 0oyqqZAzyr2IqsX7qSXSuCyNbHlzoSy7gzZmrXIklG/pZ9ndZi2NIIqi58058R/7
-# +po1itu8k7C1rYvawEWoGM70udGYCNTfA+X0OsjYDsyWoFxQaQ1zVUAFAucQV42M
-# 5+NThv2TgcltOhJz0C0G2RhWZ9Gu7E2vSnrNM53MA6CBTzP9wGRGIKx9Q2bS818I
-# YrP0KchdRKUyay1oPp5MY400ivdAaO3mSPwTkLUqqRKSWXWU+J6hggILMIICBwYJ
+# MAwGCisGAQQBgjcCARUwIwYJKoZIhvcNAQkEMRYEFEW8OOiDKbJUm8QGSFcFgC30
+# IvokMA0GCSqGSIb3DQEBAQUABIIBAHX+VdOdQ6Yg3vv8Q07EfxglKKCgjqU5VhRq
+# ydry2dOUDihKpj4zIBBr6/tylCyXvnbtimZLFv27V32XUngrM4TFCavgDupYBYTT
+# nOyvkmjc5kiPZzNJjWCQFAfWMyhjubnMwbrM3CoLblEkjh0Zn8GcSedBxMrmbgRp
+# 3iqsPrin+EiTuz1MFM1y1WIQP0x8FCC35BTZAx26cBQJ0r7pssz0y3mFo5EaI/P9
+# AyCrLdHz6++V7ULUgJTgtcgtAkqsNMkYFPHL28PA4Zj4o5DDex2IMJflxcIqUVQs
+# dIjC2vFtZ07IOg1+quZiZaA237x41meqVHoX1d/gxcVjw6hZaW+hggILMIICBwYJ
 # KoZIhvcNAQkGMYIB+DCCAfQCAQEwcjBeMQswCQYDVQQGEwJVUzEdMBsGA1UEChMU
 # U3ltYW50ZWMgQ29ycG9yYXRpb24xMDAuBgNVBAMTJ1N5bWFudGVjIFRpbWUgU3Rh
 # bXBpbmcgU2VydmljZXMgQ0EgLSBHMgIQDs/0OMj+vzVuBNhqmBsaUDAJBgUrDgMC
 # GgUAoF0wGAYJKoZIhvcNAQkDMQsGCSqGSIb3DQEHATAcBgkqhkiG9w0BCQUxDxcN
-# MTkwMTA5MTYzNzA5WjAjBgkqhkiG9w0BCQQxFgQUwPzf2WQ90tWjHUOkqf6m+ldm
-# XmcwDQYJKoZIhvcNAQEBBQAEggEAULG/7RgosihdBv8enadeBBnKhSUPPsmZrcnM
-# 4uhwAuaNGK3t/zI8qCcJ8MFXWexL70gOqAMt8NfP1s0RlZj3FSvErSsiStzmMK+i
-# JMDgR4cM2FIz6KE6C+aZyRKDLFga4HVRsBAVZSC6t0wfVqmWuYV8cUrbRB1mOqgx
-# aNFagb3fq7JMjZwA+m9kxxCJWolzLSFiVHI+Kygr/1r2PE/yW5nCfqViwVt0kcdA
-# 4IY7o3Y6ZYb6ikMyYvZUTE3EsxJ5sLk7TugqUNpoi3QisZACJvVLCFNx+VqiiSqW
-# k18IX8SzFGOoOEltXH8GGMLd5TMmFaoZA2qdOiAOTddfMvyKKQ==
+# MTkwMTE1MTUzNTQzWjAjBgkqhkiG9w0BCQQxFgQUxOhMHFa92GGMjublvtYuzalm
+# qG0wDQYJKoZIhvcNAQEBBQAEggEASIF9/wP4fVtwa/xQZF9SLfvVi1PrP60zb23b
+# PkfTcjUynsXFaQI5/VLSMqNn6vktrS+QPAUJNadzqQq7011LsmyQc+GxI5kfCK+c
+# KBymKogm4cH/MFaY4sIHat7MweJCd6fhNqzTyH8dX8j/5X+wgMeHBd+i3ofZQR+o
+# T6xHLOU4Db8wRGmU9f29q0ya3LfJVCXDeJ499sLoXbR7vBaLdlHAr5n4N2rUDZ0P
+# XsAqsQzHi3GEf2nw0Xya3qMor5BanAsrXTG1kNsnfphmaxBAWKduNn6MTJuVXD8E
+# RvQxLequlKy22rYiHIoYUteBLWBugnBPASU9E/1PehkGSRU9XQ==
 # SIG # End signature block
