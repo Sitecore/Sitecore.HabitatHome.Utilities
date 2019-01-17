@@ -1,6 +1,6 @@
 Param(
-    [string]$solrVersion = "6.6.2",
-    [string]$installFolder = "c:\solr",
+    [string]$solrVersion = "7.2.1",
+    [string]$installFolder = "c:\",
     [string]$nssmVersion = "2.24",
     [string]$keystoreSecret = "secret",
 	[string]$KeystoreFile = 'solr-ssl.keystore.jks'
