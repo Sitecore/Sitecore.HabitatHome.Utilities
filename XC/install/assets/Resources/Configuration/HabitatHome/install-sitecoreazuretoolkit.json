@@ -1,0 +1,36 @@
+{
+    "Parameters": {
+        "SitecoreAzureToolkitUri": {
+            "Type": "string"
+        },
+        "SitecoreAzureToolkitFilename": {
+            "Type": "string"
+        },
+        "Destination": {
+            "Type": "string"
+        },
+        "LoginSession":{
+            "Type":"Microsoft.PowerShell.Commands.WebRequestSession"
+        },
+        "InstallationPath":{
+            "Type":"string"
+        }
+    },
+    "Tasks": {
+        "DownloadSitecoreAzureToolkit": {
+            "Type": "DownloadFile",
+            "Params": {
+                "SourceUri": "[parameter('SitecoreAzureToolkitUri')]",
+                "DestinationPath": "[parameter('Destination')]",
+                "LoginSession": "[parameter('LoginSession')]"
+            }
+        },
+        "ExtractSitecoreAzureToolkit": {
+            "Type":"Unpack",
+            "Params":{
+                "Source":"[parameter('Destination')]",
+                "Destination":"[parameter('InstallationPath')]"
+            }
+        }
+    }
+}
