@@ -45,6 +45,7 @@ $solr = $config.settings.solr
 $assets = $config.assets
 $modules = $config.modules
 $resourcePath = Join-Path $assets.root "configuration"
+$sharedResourcePath = Join-Path $assets.sharedUtilitiesRoot "assets\configuration"
 
 Write-Host "*******************************************************" -ForegroundColor Green
 Write-Host " Installing Sitecore" -ForegroundColor Green
@@ -100,7 +101,7 @@ Function Download-Assets {
 
     $loginRequest = Invoke-RestMethod -Uri https://dev.sitecore.net/api/authorization -Method Post -ContentType "application/json" -Body "{username: '$user', password: '$password'}" -SessionVariable loginSession -UseBasicParsing 
 
-    $downloadJsonPath = $([io.path]::combine($resourcePath, 'HabitatHome', 'download-assets.json'))
+    $downloadJsonPath = $([io.path]::combine($sharedResourcePath,  'download-assets.json'))
     Set-Alias sz 'C:\Program Files\7-Zip\7z.exe'
     $package = $modules | Where-Object {$_.id -eq "xp"}
     
@@ -127,16 +128,17 @@ Function Download-Assets {
 Function Confirm-Prerequisites {
     #Enable Contained Databases
     Write-Host "Enable contained databases" -ForegroundColor Green
-    try {
-        # This command can set the location to SQLSERVER:\
-        Invoke-Sqlcmd -ServerInstance $sql.server `
-            -Username $sql.adminUser `
-            -Password $sql.adminPassword `
-            -InputFile "$PSScriptRoot\database\containedauthentication.sql"
-    }
-    catch {
-        write-host "Set Enable contained databases failed" -ForegroundColor Red
-        throw
+   
+    Function Enable-ContainedDatabases {
+        #Enable Contained Databases
+        Write-Host "Enable contained databases" -ForegroundColor Green
+        $params = @{
+            Path             = (Join-Path $$sharedResourcePath "enable-contained-databases.json")
+            SqlServer        = $sql.server
+            SqlAdminUser     = $sql.adminUser 
+            SqlAdminPassword = $sql.adminPassword
+        }
+        Install-SitecoreConfiguration @params -Verbose -WorkingDirectory $(Join-Path $PWD "logs")
     }
 
     # Reset location to script root
