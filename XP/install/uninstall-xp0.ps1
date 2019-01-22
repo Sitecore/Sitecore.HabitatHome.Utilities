@@ -94,16 +94,16 @@ $singleDeveloperParams = @{
     PasswordRecoveryUrl           = $site.hostName
     SitecoreIdentityAuthority     = $identityServer.name
     XConnectCollectionService     = $xConnect.siteName
-    ClientSecret                  = $identityServer.clientSecret
+    ClientSecret   = $identityServer.clientSecret
     AllowedCorsOrigins            = $site.hostName
 }
 Push-Location $resourcePath
 Install-SitecoreConfiguration @singleDeveloperParams -Uninstall  *>&1 | Tee-Object XP0-SingleDeveloper.log
 
-$sxaSolrConfigPath = Join-Path $resourcePath 'HabitatHome\sxa-solr-config.json'
+$sxaSolrConfigPath = Join-Path $resourcePath 'sxa\sxa-solr-config.json'
 
 $sxaSolrUninstallParams = @{
-    Path                  = Join-path $resourcePath 'HabitatHome\sxa-solr.json'
+    Path                  = Join-path $resourcePath 'sxa\sxa-solr.json'
     SolrUrl               = $solr.url 
     SolrRoot              = $solr.root 
     SolrService           = $solr.serviceName 

@@ -29,7 +29,8 @@ else {
 $assets.psRepository = "https://sitecore.myget.org/F/sc-powershell/api/v2/"
 $assets.psRepositoryName = "SitecoreGallery"
 $assets.installerVersion = "2.0.0"
-
+$assets.sharedUtilitiesRoot = (Resolve-Path "..\..\Shared" | Select-Object -ExpandProperty Path)
+$assets.sitecoreazuretoolkit = Join-Path $assets.sharedUtilitiesRoot "sat"
 $assets.licenseFilePath = Join-Path $assets.root "license.xml"
 
 $assets.sitecoreVersion = "9.1.0 rev. 001564"
@@ -46,7 +47,7 @@ $site.prefix = "habitathome"
 $site.suffix = "dev.local"
 $site.webroot = "C:\inetpub\wwwroot"
 $site.hostName = $json.settings.site.prefix + "." + $json.settings.site.suffix
-$site.addSiteBindingWithSSLPath = (Get-ChildItem $assets.root -filter "add-new-binding-and-certificate.json" -Recurse).FullName
+$site.addSiteBindingWithSSLPath = (Get-ChildItem $assets.sharedUtilitiesRoot -filter "add-new-binding-and-certificate.json" -Recurse).FullName
 
 
 Write-Host "Setting default 'SQL' parameters"

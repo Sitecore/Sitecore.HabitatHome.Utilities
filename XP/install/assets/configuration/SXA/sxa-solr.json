@@ -171,6 +171,26 @@
         }
       ]
     },
+    "Warmup": {
+      "Type": "HttpRequest",
+      "Params": {
+        "Uri": "[concat('https://', parameter('SiteName'))]"
+      }
+    },
+    "Sleeping": {
+      "Description": "Print password if the user hasn't supplied their own.",
+      "Type": "WriteInformation",
+      "Params": {
+        "Messagedata": "Awaiting site startup",
+        "InformationAction": "Continue"
+      }
+    },
+    "Wait": {
+      "Type": "StartSleep",
+      "Params": {
+        "Seconds": 60
+      }
+    },
     "UpdateSolrSchema": {
       "Type": "SitecoreUrl",
       "Params": {
@@ -183,12 +203,31 @@
   },
   "UninstallTasks": {
     "RemoveCores": {
-        "Description": "Removes the cores and instance folders.",
-        "Type": "ManageSolrCore",
-        "Params": [
-            { "Action": "Unload", "Address": "[parameter('SolrUrl')]", "Arguments": { "core": "[variable('SXA.Master.Name')]", "deleteInstanceDir": "true" }, "ErrorAction": "SilentlyContinue" },
-            { "Action": "Unload", "Address": "[parameter('SolrUrl')]", "Arguments": { "core": "[variable('SXA.Web.Name')]", "deleteInstanceDir": "true" }, "ErrorAction": "SilentlyContinue" }
-        ]
+      "Description": "Removes the cores and instance folders.",
+      "Type": "ManageSolrCore",
+      "Params": [
+        {
+          "Action": "Unload",
+          "Address": "[parameter('SolrUrl')]",
+          "Arguments": {
+            "core": "[variable('SXA.Master.Name')]",
+            "deleteInstanceDir": "true"
+          },
+          "ErrorAction": "SilentlyContinue"
+        },
+        {
+          "Action": "Unload",
+          "Address": "[parameter('SolrUrl')]",
+          "Arguments": {
+            "core": "[variable('SXA.Web.Name')]",
+            "deleteInstanceDir": "true"
+          },
+          "ErrorAction": "SilentlyContinue"
+        }
+      ]
     }
- }
+  },
+  "Settings": {
+    "AutoRegisterExtensions": true
+  }
 }
