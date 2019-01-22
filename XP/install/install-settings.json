@@ -7,7 +7,9 @@
     "certificatesPath": "@@assets.certificatePath@@",
     "installerVersion": "@@assets.installerVersion@@",
     "sitecoreVersion": "@@assets.sitecoreVersion@@",
-    "identityServerVersion": "@@assets.identityServerVersion@@"
+    "identityServerVersion": "@@assets.identityServerVersion@@",
+    "sitecoreazuretoolkit": "@@assets.sitecoreazuretoolkit@@",
+    "sharedUtilitiesRoot":"@@assets.sharedUtilitiesRoot@@"
   },
   "settings": {
     "site": {
