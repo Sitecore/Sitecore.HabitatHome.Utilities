@@ -1,0 +1,271 @@
+{
+    "Parameters": {
+        "SqlServer": {
+            "Type": "string",
+            "Description": "Name of SQL Server"
+        },
+        "SqlAdminUser": {
+            "Type": "string",
+            "DefaultValue": "sa",
+            "Description": "SQL Admin user name"
+        },
+        "SqlAdminPassword": {
+            "Type": "string",
+            "Description": "SQL Admin user password"
+        },
+        "DatabasePrefix": {
+            "Type": "string",
+            "Description": "Sitecore database prefix (generally site prefix)"
+        },
+        "CoreUserName": {
+            "Type": "string",
+            "Description": "Sitecore database prefix (generally site prefix)"
+        },
+        "SecurityUserName": {
+            "Type": "string",
+            "Description": "Sitecore database prefix (generally site prefix)"
+        },
+        "MasterUserName": {
+            "Type": "string",
+            "Description": "Sitecore database prefix (generally site prefix)"
+        },
+        "LoginSession": {
+            "Type": "Microsoft.PowerShell.Commands.WebRequestSession",
+            "DefaultValue": ""
+        },
+        "SiteName": {
+            "Type": "string"
+        },
+        "XConnectSiteName": {
+            "Type": "string"
+        },
+        "BootloaderPackagePath": {
+            "Type": "string",
+            "DefaultValue": "",
+            "Description": "Path to the bootloader scwdp"
+        },
+        "BootloaderConfigurationOverride": {
+            "Type": "string",
+            "Description": "Optional configuration file override for bootloader"
+        },
+        "BootloaderInstallationPath": {
+            "Type": "string",
+            "Description": "Location of bootloader data folder"
+        },
+        "RemoveCoreUser:UserName": {
+            "Type": "string",
+            "Reference": "CoreUserName"
+        },
+        "RemoveCoreUser:SqlServer": {
+            "Type": "string",
+            "Reference": "SqlServer"
+        },
+        "RemoveCoreUser:SqlAdminUser": {
+            "Type": "string",
+            "Reference": "SqlAdminUser"
+        },
+        "RemoveCoreUser:SqlAdminPassword": {
+            "Type": "string",
+            "Reference": "SqlAdminPassword"
+        },
+        "RemoveCoreUser:DatabasePrefix": {
+            "Type": "string",
+            "Reference": "DatabasePrefix"
+        },
+        "RemoveSecurityUser:UserName": {
+            "Type": "string",
+            "Reference": "SecurityUserName"
+        },
+        "RemoveSecurityUser:SqlServer": {
+            "Type": "string",
+            "Reference": "SqlServer"
+        },
+        "RemoveSecurityUser:SqlAdminUser": {
+            "Type": "string",
+            "Reference": "SqlAdminUser"
+        },
+        "RemoveSecurityUser:SqlAdminPassword": {
+            "Type": "string",
+            "Reference": "SqlAdminPassword"
+        },
+        "RemoveSecurityUser:DatabasePrefix": {
+            "Type": "string",
+            "Reference": "DatabasePrefix"
+        },
+        "RemoveMasterUser:UserName": {
+            "Type": "string",
+            "Reference": "MasterUserName"
+        },
+        "RemoveMasterUser:SqlServer": {
+            "Type": "string",
+            "Reference": "SqlServer"
+        },
+        "RemoveMasterUser:SqlAdminUser": {
+            "Type": "string",
+            "Reference": "SqlAdminUser"
+        },
+        "RemoveMasterUser:SqlAdminPassword": {
+            "Type": "string",
+            "Reference": "SqlAdminPassword"
+        },
+        "RemoveMasterUser:DatabasePrefix": {
+            "Type": "string",
+            "Reference": "DatabasePrefix"
+        },
+        "RemoveCoreUser:DatabaseSuffix": {
+            "Type": "string",
+            "DefaultValue": "Core"
+        },
+        "RemoveSecurityUser:DatabaseSuffix": {
+            "Type": "string",
+            "DefaultValue": "Core"
+        },
+        "RemoveMasterUser:DatabaseSuffix": {
+            "Type": "string",
+            "DefaultValue": "Master"
+        },
+        "Bootloader:SiteName": {
+            "Type": "string",
+            "Reference": "SiteName"
+        },
+        "Bootloader:Package": {
+            "Type": "string",
+            "Reference": "BootloaderPackagePath"
+        },
+        "Bootloader:ConfigurationOverrideSource": {
+            "Type": "string",
+            "Reference": "BootloaderConfigurationOverride"
+        },
+        "Bootloader:ConfigurationOverrideDestination": {
+            "Type": "string",
+            "Reference": "BootloaderInstallationPath"
+        },
+        "AssetsJson": {
+            "Type": "string"
+        },
+        "InstallSitecorePowershellExtensions:SqlServer": {
+            "Type": "string",
+            "Reference": "SqlServer"
+        },
+        "InstallSitecorePowershellExtensions:SqlAdminUser": {
+            "Type": "string",
+            "Reference": "SqlAdminUser"
+        },
+        "InstallSitecorePowershellExtensions:SqlAdminPassword": {
+            "Type": "string",
+            "Reference": "SqlAdminPassword"
+        },
+        "InstallSitecorePowershellExtensions:DatabasePrefix": {
+            "Type": "string",
+            "Reference": "DatabasePrefix"
+        },
+        "InstallSitecorePowershellExtensions:LoginSession": {
+            "Type": "Microsoft.PowerShell.Commands.WebRequestSession",
+            "Reference": "LoginSession"
+        },
+        "InstallSitecorePowershellExtensions:SiteName": {
+            "Type": "string",
+            "Reference": "SiteName"
+        },
+        "InstallSitecoreExperienceAccelerator:SqlServer": {
+            "Type": "string",
+            "Reference": "SqlServer"
+        },
+        "InstallSitecoreExperienceAccelerator:SqlAdminUser": {
+            "Type": "string",
+            "Reference": "SqlAdminUser"
+        },
+        "InstallSitecoreExperienceAccelerator:SqlAdminPassword": {
+            "Type": "string",
+            "Reference": "SqlAdminPassword"
+        },
+        "InstallSitecoreExperienceAccelerator:DatabasePrefix": {
+            "Type": "string",
+            "Reference": "DatabasePrefix"
+        },
+        "InstallSitecoreExperienceAccelerator:LoginSession": {
+            "Type": "Microsoft.PowerShell.Commands.WebRequestSession",
+            "Reference": "LoginSession"
+        },
+        "InstallSitecoreExperienceAccelerator:SiteName": {
+            "Type": "string",
+            "Reference": "SiteName"
+        },
+        "EnableContainedDatabases:SqlServer": {
+            "Type": "string",
+            "Reference": "SqlServer"
+        },
+        "EnableContainedDatabases:SqlAdminUser": {
+            "Type": "string",
+            "Reference": "SqlAdminUser",
+            "Description": "SQL Admin user name"
+        },
+        "EnableContainedDatabases:SqlAdminPassword": {
+            "Type": "string",
+            "Reference": "SqlAdminPassword"
+        }
+    },
+    "Variables": {
+        "Modules": "[ReadJson(parameter('AssetsJson'))]",
+        "MarketingAutomationServiceName": "[concat(parameter('XConnectSiteName'),'-MarketingAutomationService')]",
+        "IndexWorkerServiceServiceName": "[concat(parameter('XConnectSiteName'),'-IndexWorkerService')]",
+        "ProcessingEngineServiceName": "[concat(parameter('XConnectSiteName'),'-ProcessingEngineService')]",
+        "StopMarketingAutomationService:Service.Name": "[variable('MarketingAutomationServiceName')]",
+        "StopIndexWorkerService:Service.Name": "[variable('IndexWorkerServiceServiceName')]",
+        "StopProcessingEngineService:Service.Name": "[variable('ProcessingEngineServiceName')]",
+        "StartMarketingAutomationService:Service.Name": "[variable('MarketingAutomationServiceName')]",
+        "StartIndexWorkerService:Service.Name": "[variable('IndexWorkerServiceServiceName')]",
+        "StartProcessingEngineService:Service.Name": "[variable('ProcessingEngineServiceName')]",
+        "StopIndexWorkerService:Service.Status": "Stopped",
+        "StopProcessingEngineService:Service.Status": "Stopped",
+        "StopMarketingAutomationService:Service.Status": "Stopped",
+        "StartMarketingAutomationService:Service.Status": "Running",
+        "StartIndexWorkerService:Service.Status": "Running",
+        "StartProcessingEngineService:Service.Status": "Running",
+        "SitecorePowershellExtensionsModule": "[GetSitecoreModuleDetails(variable('Modules'),'spe')]",
+        "SitecoreExperienceAcceleratorModule": "[GetSitecoreModuleDetails(variable('Modules'),'sxa')]",
+        "InstallSitecorePowershellExtensions:Module.Configuration": "[variable('SitecorePowershellExtensionsModule')]",
+        "InstallSitecoreExperienceAccelerator:Module.Configuration": "[variable('SitecoreExperienceAcceleratorModule')]"
+    },
+    "Includes": {
+        "RemoveCoreUser": {
+            "Source": ".\\remove-databaseuser.json"
+        },
+        "RemoveMasterUser": {
+            "Source": ".\\remove-databaseuser.json"
+        },
+        "RemoveSecurityUser": {
+            "Source": ".\\remove-databaseuser.json"
+        },
+        "StopMarketingAutomationService": {
+            "Source": ".\\manage-service.json"
+        },
+        "StopIndexWorkerService": {
+            "Source": ".\\manage-service.json"
+        },
+        "StopProcessingEngineService": {
+            "Source": ".\\manage-service.json"
+        },
+        "Bootloader": {
+            "Source": ".\\bootloader.json"
+        },
+        "InstallSitecorePowershellExtensions": {
+            "Source": ".\\install-module.json"
+        },
+        "InstallSitecoreExperienceAccelerator": {
+            "Source": ".\\install-module.json"
+        },
+        "StartMarketingAutomationService": {
+            "Source": ".\\manage-service.json"
+        },
+        "StartIndexWorkerService": {
+            "Source": ".\\manage-service.json"
+        },
+        "StartProcessingEngineService": {
+            "Source": ".\\manage-service.json"
+        },
+        "EnableContainedDatabases":{
+            "Source":".\\enable-contained-databases.json"
+        }
+    }
+}
