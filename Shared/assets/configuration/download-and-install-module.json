@@ -1,0 +1,117 @@
+{
+  "Parameters": {
+    "Module": {
+      "Type": "psobject",
+      "DefaultValue": "",
+      "Description": "The hashtable of the package to deploy."
+    },
+    "SiteName": {
+      "Type": "string",
+      "DefaultValue": "Sitecore",
+      "Description": "The name of the site to be deployed."
+    },
+    "DatabasePrefix": {
+      "Type": "string",
+      "DefaultValue": "",
+      "Description": "SQL DB Prefix"
+    },
+    "SqlAdminUser": {
+      "Type": "string",
+      "DefaultValue": "sa",
+      "Description": "The Sql admin user account to use when installing databases."
+    },
+    "SqlAdminPassword": {
+      "Type": "string",
+      "DefaultValue": "12345",
+      "Description": "The Sql admin password to use when installing databases."
+    },
+    "SqlServer": {
+      "Type": "string",
+      "DefaultValue": ".\\SQLSERVER",
+      "Description": "The Sql Server where databases will be installed."
+    },
+    "LoginSession": {
+      "Type": "Microsoft.PowerShell.Commands.WebRequestSession",
+      "DefaultValue": "",
+      "Description": "dev.sitecore.com login session"
+    }
+  },
+  "Variables": {
+    "Sql.Database.Core": "[concat(parameter('DatabasePrefix'), '_Core')]",
+    "Sql.Database.Master": "[concat(parameter('DatabasePrefix'), '_Master')]",
+    "Sql.Core.ConnectionString": "[SqlConnectionString(parameter('SqlServer'),variable('Sql.Database.Core'), parameter('SqlAdminUser'), parameter('SqlAdminPassword'))]",
+    "Sql.Master.ConnectionString": "[SqlConnectionString(parameter('SqlServer'),variable('Sql.Database.Master'), parameter('SqlAdminUser'), parameter('SqlAdminPassword'))]",
+    "Module.Configuration": "[parameter('Module')]",
+    "Module.Databases": "[SelectObject(ExpandProperty:'databases',InputObject:variable('Module.Configuration'))]",
+    "Module.Database": "[ReplaceString(variable('Module.Databases'),',','')]",
+    "Module.Url": "[SelectObject(ExpandProperty:'url',InputObject:variable('Module.Configuration'))]",
+    "Module.OriginalFileName": "[SelectObject(ExpandProperty:'fileName',InputObject:variable('Module.Configuration'))]",
+    "Module.FileName": "[if(variable('Module.test'),variable('Module.True'),variable('Module.False'))]",
+    "Module.Test": "[and(not(variable('Module.IsScwdp')), not(variable('Skip.Convert')))]",
+    "Module.True": "[ReplaceString(variable('Module.OriginalFileName'), 'zip','scwdp.zip')]",
+    "Module.False": "[variable('Module.OriginalFileName')]",
+    "Module.IsScwdp": "[ValidatePattern('scwdp.zip', variable('Module.OriginalFileName'))]",
+    "Module.DestinationPath": "[SplitPath(variable('Module.OriginalFileName'))]",
+    "Skip.Download": "[TestPath(variable('Module.OriginalFileName'))]",
+    "Skip.Convert": "[or(not(equal(SelectObject(ExpandProperty:'convert',InputObject:variable('Module.Configuration')),'True')),not(variable('Module.IsScwdp')))]",
+    "Skip.Master": "[not(equal(variable('Module.Database'), 'master'))]",
+    "Skip.MasterCore": "[not(equal(variable('Module.Database'), 'mastercore'))]",
+    "Skip.Core": "[not(equal(variable('Module.Database'), 'core'))]",
+    "ProgressPreferencePath": "[resolvepath('..\\modules\\Set-ProgressPreference.ps1')]"
+  },
+  "Register":{
+    "Tasks":{
+      "InstallSitecoreModule":"Install-SitecoreConfiguration"
+    }
+  },
+  "Settings": {
+    "AutoRegisterExtensions": true
+  },
+  "Tasks": {
+    "TurnOffProgress": {
+      "Type": "Command",
+      "Params": {
+        "Path": "[variable('ProgressPreferencePath')]",
+        "Arguments": "SilentlyContinue"
+      }
+    },
+    "DownloadModule": {
+      "Type": "DownloadFile",
+      "Params": {
+        "SourceUri": "[variable('Module.Url')]",
+        "DestinationPath": "[variable('Module.OriginalFileName')]",
+        "LoginSession": "[parameter('LoginSession')]"
+      },
+      "Skip": "[equal(variable('Skip.Download'),'True')]"
+    },
+    "TurnOnProgress": {
+      "Type": "Command",
+      "Params": {
+        "Path": "[variable('ProgressPreferencePath')]",
+        "Arguments": "Continue"
+      }
+    },
+    "ConvertModule": {
+      "Type": "ConvertToWDP",
+      "Params": {
+        "Path": "[variable('Module.OriginalFileName')]",
+        "Destination": "[variable('Module.DestinationPath')]",
+        "Force": true
+      },
+      "Skip": "[equal(variable('Skip.Convert'),'True')]"
+    },
+    "InstallModule": {
+      "Type": "InstallSitecoreModule",
+      "Params": {
+        "Path": "[resolvepath('.\\install-module.json')]",
+        "Package": "[resolvepath(variable('Module.FileName'))]",
+        "SiteName": "[parameter('SiteName')]",
+        "DatabasePrefix": "[parameter('DatabasePrefix')]",
+        "SqlAdminUser": "[parameter('SqlAdminUser')]",
+        "SqlAdminPassword": "[parameter('SqlAdminPassword')]",
+        "SqlServer": "[parameter('SqlServer')]",
+        "ModuleDatabase": "[variable('Module.Database')]"
+      }
+    }
+  }
+}

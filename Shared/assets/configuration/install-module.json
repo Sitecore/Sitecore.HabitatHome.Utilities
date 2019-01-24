@@ -1,9 +1,9 @@
 {
   "Parameters": {
-    "Module": {
-      "Type": "psobject",
+    "Package": {
+      "Type": "string",
       "DefaultValue": "",
-      "Description": "The hashtable of the package to deploy."
+      "Description": "The path to the SCWDP  to deploy."
     },
     "SiteName": {
       "Type": "string",
@@ -30,10 +30,10 @@
       "DefaultValue": ".\\SQLSERVER",
       "Description": "The Sql Server where databases will be installed."
     },
-    "LoginSession": {
-      "Type": "Microsoft.PowerShell.Commands.WebRequestSession",
+    "ModuleDatabase": {
+      "Type": "string",
       "DefaultValue": "",
-      "Description": "dev.sitecore.com login session"
+      "Description": "Databases required for module install: ('master','mastercore','core')"
     }
   },
   "Variables": {
@@ -41,85 +41,21 @@
     "Sql.Database.Master": "[concat(parameter('DatabasePrefix'), '_Master')]",
     "Sql.Core.ConnectionString": "[SqlConnectionString(parameter('SqlServer'),variable('Sql.Database.Core'), parameter('SqlAdminUser'), parameter('SqlAdminPassword'))]",
     "Sql.Master.ConnectionString": "[SqlConnectionString(parameter('SqlServer'),variable('Sql.Database.Master'), parameter('SqlAdminUser'), parameter('SqlAdminPassword'))]",
-    "Module.Configuration": "[parameter('Module')]",
-    "Module.Databases": "[SelectObject(ExpandProperty:'databases',InputObject:variable('Module.Configuration'))]",
-    "Module.Database": "[ReplaceString(variable('Module.Databases'),',','')]",
-    "Module.Url": "[SelectObject(ExpandProperty:'url',InputObject:variable('Module.Configuration'))]",
-    "Module.OriginalFileName": "[SelectObject(ExpandProperty:'fileName',InputObject:variable('Module.Configuration'))]",
-    "Module.FileName": "[if(variable('Module.test'),variable('Module.True'),variable('Module.False'))]",
-    "Module.Test": "[and(not(variable('Module.IsScwdp')), not(variable('Skip.Convert')))]",
-    "Module.True": "[ReplaceString(variable('Module.OriginalFileName'), 'zip','scwdp.zip')]",
-    "Module.False": "[variable('Module.OriginalFileName')]",
-    "Module.IsScwdp": "[ValidatePattern('scwdp.zip', variable('Module.OriginalFileName'))]",
-    "Module.DestinationPath": "[SplitPath(variable('Module.OriginalFileName'))]",
-    "Skip.Download": "[equal(TestPath(variable('Module.OriginalFileName')), 'True')]",
-    "Skip.Convert": "[or(not(equal(SelectObject(ExpandProperty:'convert',InputObject:variable('Module.Configuration')),'True')),not(variable('Module.IsScwdp')))]",
-    "Skip.Master": "[not(equal(variable('Module.Database'), 'master'))]",
-    "Skip.MasterCore": "[not(equal(variable('Module.Database'), 'mastercore'))]",
-    "Skip.Core": "[not(equal(variable('Module.Database'), 'core'))]",
-    "ProgressPreferencePath":"[resolvepath('..\\modules\\Set-ProgressPreference.ps1')]"
+    "Skip.Master": "[not(equal(parameter('ModuleDatabase'), 'master'))]",
+    "Skip.MasterCore": "[not(equal(parameter('ModuleDatabase'), 'mastercore'))]",
+    "Skip.Core": "[not(equal(parameter('ModuleDatabase'), 'core'))]"
   },
-  "Register": {
-    "Tasks": {
-      "ConvertToWDP": "ConvertTo-SCModuleWebDeployPackage",
-      "WriteInformation": "Write-Information"
-    },
-    "ConfigFunction": {
-      "TestPath": "Test-Path",
-      "SplitPath": "Split-Path",
-      "SelectObject": "Select-Object",
-      "ConvertToJson": "ConvertTo-Json"
-    }
+  "Settings": {
+    "AutoRegisterExtensions": true
   },
-  "Modules": [
-    "SharedInstallationUtilities"
-  ],
   "Tasks": {
-    "OutputModule": {
-      "Type": "WriteInformation",
-      "Params": {
-        "MessageData": "[concat('Test Value:', variable('ProgressPreferencePath'))]"
-      }
-    },
-    // "TurnOffProgress": {
-    //   "Type": "Command",
-    //   "Params": {
-    //     "Path": "[variable('ProgressPreferencePath')]",
-    //     "Arguments": "SilentlyContinue"
-    //   }
-    // },
-    "DownloadModule": {
-      "Type": "DownloadFile",
-      "Params": {
-        "SourceUri": "[variable('Module.Url')]",
-        "DestinationPath": "[variable('Module.OriginalFileName')]",
-        "LoginSession": "[parameter('LoginSession')]"
-      },
-      "Skip": "[equal(variable('Skip.Download'),'True')]"
-    },
-    // "TurnOnProgress": {
-    //   "Type": "Command",
-    //   "Params": {
-    //     "Path": "[variable('ProgressPreferencePath')]",
-    //     "Arguments": "Continue"
-    //   }
-    // },
-    "ConvertModule": {
-      "Type": "ConvertToWDP",
-      "Params": {
-        "Path": "[variable('Module.OriginalFileName')]",
-        "Destination": "[variable('Module.DestinationPath')]",
-        "Force": true
-      },
-      "Skip": "[equal(variable('Skip.Convert'),'True')]"
-    },
     "InstallWDPModuleMasterCore": {
       "Type": "WebDeploy",
       "Params": {
         "Verb": "Sync",
         "Arguments": {
           "Source": {
-            "Package": "[resolvepath(variable('Module.FileName'))]"
+            "Package": "[resolvepath(parameter('Package'))]"
           },
           "Dest": "Auto",
           "EnableRule": "DoNotDeleteRule",
@@ -147,7 +83,7 @@
         "Verb": "Sync",
         "Arguments": {
           "Source": {
-            "Package": "[resolvepath(variable('Module.FileName'))]"
+            "Package": "[resolvepath(parameter('Package'))]"
           },
           "Dest": "Auto",
           "EnableRule": "DoNotDeleteRule",
@@ -171,7 +107,7 @@
         "Verb": "Sync",
         "Arguments": {
           "Source": {
-            "Package": "[resolvepath(variable('Module.FileName'))]"
+            "Package": "[resolvepath(parameter('Package'))]"
           },
           "Dest": "Auto",
           "EnableRule": "DoNotDeleteRule",
