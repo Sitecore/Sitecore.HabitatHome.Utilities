@@ -5,19 +5,16 @@
             "DefaultValue": ""
         }
     },
-    "Register": {
-        "Tasks": {
-            "WriteInformation": "Write-Information",
-            "StartSleep": "Start-Sleep",
-            "WebRequest":"Invoke-WebRequest"
-        }
+    "Settings": {
+        "AutoRegisterExtensions": true
     },
     "Tasks": {
         "Warmup": {
-            "Type": "WebRequest",
+            "Type": "StartSitecoreSite",
             "Params": {
                 "Uri": "[concat('https://', parameter('SiteName'))]",
-                "TimeoutSec": 120
+                "TimeoutSec": 120,
+                "Verbose": true
             }
         },
         "Sleeping": {
