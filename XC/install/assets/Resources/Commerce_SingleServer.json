@@ -566,14 +566,14 @@
         "WebConfig": "[variable('WebConfig')]"
       }
     },
-    "ImportRootCertificate": {
-      "Type": "ImportPfxCertificate",
-      "Params": {
-        "CertStoreLocation": "cert:\\localmachine\\my",
-        "FilePath": "[parameter('CommerceEngineCertificatePath')]",
-        "Password":"[parameter('CommerceEngineCertificatePassword')]"
-      }
-    },
+    // "ImportRootCertificate": {
+    //   "Type": "ImportPfxCertificate",
+    //   "Params": {
+    //     "CertStoreLocation": "cert:\\localmachine\\my",
+    //     "FilePath": "[parameter('CommerceEngineCertificatePath')]",
+    //     "Password":"[parameter('CommerceEngineCertificatePassword')]"
+    //   }
+    // },
     "InstallHabitatImagesModule": {
       "Type": "InstallSitecoreConfiguration",
       "Params": {
