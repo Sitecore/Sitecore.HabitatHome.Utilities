@@ -91,7 +91,7 @@
         "Arguments": "Continue"
       }
     },
-    "ConvertModule": {
+    "ConvertModuleToScwdp": {
       "Type": "ConvertToWDP",
       "Params": {
         "Path": "[variable('Module.OriginalFileName')]",

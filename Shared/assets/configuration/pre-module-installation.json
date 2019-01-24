@@ -170,7 +170,7 @@
         "StopProcessingEngineService": {
             "Source": ".\\manage-service.json"
         },
-        "Bootloader": {
+        "InstallBootloader": {
             "Source": ".\\bootloader.json"
         }
     }
