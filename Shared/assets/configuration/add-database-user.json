@@ -45,7 +45,7 @@
         "Database.Suffix": "[parameter('DatabaseSuffix')]"
     },
     "Tasks": {
-        "AddUser": {
+        "AddDatabaseUser": {
             "Type": "AddDatabaseUser",
             "Params": {
                 "SqlServer": "[parameter('SqlServer')]",
