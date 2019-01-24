@@ -135,6 +135,22 @@
         "InstallBootloader:ConfigurationOverrideDestination": {
             "Type": "string",
             "Reference": "BootloaderConfigurationOverrideDestination"
+        },
+        "KillDatabaseConnections:SqlServer": {
+            "Type": "string",
+            "Reference": "SqlServer"
+        },
+        "KillDatabaseConnections:SqlAdminUser": {
+            "Type": "string",
+            "Reference": "SqlAdminUser"
+        },
+        "KillDatabaseConnections:SqlAdminPassword": {
+            "Type": "string",
+            "Reference": "SqlAdminPassword"
+        },
+        "KillDatabaseConnections:DatabasePrefix": {
+            "Type": "string",
+            "Reference": "DatabasePrefix"
         }
     },
     "Variables": {
@@ -172,6 +188,9 @@
         },
         "InstallBootloader": {
             "Source": ".\\bootloader.json"
+        },
+        "KillDatabaseConnections":{
+            "Source":".\\kill-database-connections.json"
         }
     }
 }
