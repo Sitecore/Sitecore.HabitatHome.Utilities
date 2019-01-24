@@ -1,0 +1,55 @@
+{
+    "Parameters": {
+        "SqlServer": {
+            "Type": "string",
+            "DefaultValue":"",
+            "Description": "Name of SQL Server"
+        },
+        "SqlAdminUser": {
+            "Type": "string",
+            "DefaultValue": "",
+            "Description": "SQL Admin user name"
+        },
+        "SqlAdminPassword": {
+            "Type": "string",
+            "DefaultValue":"",
+            "Description": "SQL Admin user password"
+        },
+        "DatabasePrefix": {
+            "Type": "string",
+            "DefaultValue":"",
+            "Description": "Sitecore database prefix (generally site prefix)"
+        },
+        "DatabaseSuffix": {
+            "Type": "string",
+            "DefaultValue":"",
+            "Description": "Sitecore database suffix (ie: Core, Master)"
+        },
+        "Script": {
+            "Type": "string",
+            "DefaultValue": "DROP USER IF EXISTS [$(UserName)];USE master",
+            "Description": "SQL Script to execute"
+        },
+        "UserName": {
+            "Type": "string",
+            "DefaultValue":"",
+            "Description": "Name of user to remove"
+        }
+    },
+    "Variables": {
+        "Sql.DatabaseName": "[concat(parameter('DatabasePrefix'), '_', parameter('DatabaseSuffix'))]",
+        "Sql.Variables": "[concat('Username=', parameter('UserName'))]"
+    },
+    "Tasks": {
+        "RemoveUser": {
+            "Type": "InvokeSqlcmd",
+            "Params": {
+                "UserName": "[parameter('SqlAdminUser')]",
+                "Password": "[parameter('SqlAdminPassword')]",
+                "Database": "[variable('Sql.DatabaseName')]",
+                "Query": "[parameter('Script')]",
+                "Variable": "[variable('Sql.Variables')]"
+            }
+        }
+    }
+}

@@ -7,7 +7,9 @@
     "certificatesPath": "@@assets.certificatePath@@",
     "installerVersion": "@@assets.installerVersion@@",
     "sitecoreVersion": "@@assets.sitecoreVersion@@",
-    "identityServerVersion": "@@assets.identityServerVersion@@"
+    "identityServerVersion": "@@assets.identityServerVersion@@",
+    "sitecoreazuretoolkit": "@@assets.sitecoreazuretoolkit@@",
+    "sharedUtilitiesRoot":"@@assets.sharedUtilitiesRoot@@"
   },
   "settings": {
     "site": {
@@ -60,7 +62,6 @@
       "solrConfigurationPath": "@@xConnect.solrConfigurationPath@@",
       "packagePath": "@@xConnect.packagePath@@",
       "siteName": "@@xConnect.siteName@@",
-      "certificateName": "@@xConnect.certificate@@",
       "siteRoot": "@@xConnect.siteRoot@@"
     },
     "sitecore": {

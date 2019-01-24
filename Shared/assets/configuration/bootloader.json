@@ -2,6 +2,7 @@
   "Parameters": {
     "Package": {
       "Type": "string",
+      "DefaultValue": "",
       "Description": "The path to the Web Deploy package to deploy."
     },
     "SiteName": {
@@ -11,6 +12,7 @@
     },
     "ConfigurationOverrideSource": {
       "Type": "string",
+      "DefaultValue": "",
       "Description": "Path of the new Bootloader configuration file"
     },
     "ConfigurationOverrideDestination": {
