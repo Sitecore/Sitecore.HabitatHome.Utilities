@@ -6,54 +6,74 @@
 //  NOTE: Only single line comments are accepted in configurations.                          //
 // ----------------------------------------------------------------------------------------- //
 {
-    "Parameters": {
-      "XConnectSitePath": {
-        "Type": "string",
-        "Description": "The path to the XConnect web site."
-      },
-      "ModuleFullPath": {
-        "Type": "string",
-        "Description": "The path to the Commerce Marketing Automation zip."
-      },
-      "AutomationEngineModule": {
-        "Type": "string",
-        "Description": "The path to the Commerce Automation Engine zip."
-      },
-      "ModulesDirDst": {
-        "Type": "string",
-        "Description": "The path to modules directory."
-      },
-      "BaseUrl": {
-        "Type": "string",
-        "Description": "The utility pages base url."
+  "Parameters": {
+    "XConnectSitePath": {
+      "Type": "string",
+      "Description": "The path to the XConnect web site."
+    },
+    "ModuleFullPath": {
+      "Type": "string",
+      "Description": "The path to the Commerce Marketing Automation scwdp."
+    },
+    "SharedConfigurationFolder": {
+      "Type": "string",
+      "Description": "The base folder where shared configurations are stored"
+    },
+    "AutomationEngineModule": {
+      "Type": "string",
+      "Description": "The path to the Commerce Automation Engine zip."
+    },
+    "SiteName": {
+      "Type": "string"
+    },
+    "SqlDbPrefix": {
+      "Type": "string"
+    },
+    "SqlAdminUser": {
+      "Type": "string"
+    },
+    "SqlAdminPassword": {
+      "Type": "string"
+    },
+    "SqlServer": {
+      "Type": "string"
+    }
+  },
+  "Register": {
+    "Tasks": {
+      "InstallSitecoreModule": "Install-SitecoreConfiguration",
+      "ExpandArchive": "Expand-Archive"
+    }
+  },
+  "Tasks": {
+    "CheckPaths": {
+      "Type": "EnsurePath",
+      "Params": {
+        "Exists": [
+          "[parameter('ModuleFullPath')]"
+        ]
       }
     },
-    "Modules": [ "SitecoreUtilityTasks" ],
-    "Tasks": {
-      "CheckPaths": {
-        "Type": "EnsurePath",
-        "Params": {
-          "Exists": [
-            "[parameter('ModuleFullPath')]",
-            "[parameter('ModulesDirDst')]"
-          ]
-        }
-      },
-      "InstallModule": {
-        "Type": "InstallModule",
-        "Params": {
-          "ModuleFullPath": "[parameter('ModuleFullPath')]",
-          "ModulesDirDst": "[parameter('ModulesDirDst')]",
-          "BaseUrl": "[parameter('BaseUrl')]"
-        }
-      },
-      "InstallAutomationEngineModule": {
-        "Type": "ExpandArchive",
-        "Params": {
-          "SourceZip": "[parameter('AutomationEngineModule')]",
-          "DestinationPath": "[parameter('XConnectSitePath')]"
-        }
+    "InstallCommerceMAModule": {
+      "Type": "InstallSitecoreModule",
+      "Params": {
+        "Path": "[concat(parameter('SharedConfigurationFolder'), '\\install-module.json')]",
+        "Package": "[parameter('ModuleFullPath')]",
+        "SiteName": "[parameter('SiteName')]",
+        "DatabasePrefix": "[parameter('SqlDbPrefix')]",
+        "SqlAdminUser": "[parameter('SqlAdminUser')]",
+        "SqlAdminPassword": "[parameter('SqlAdminPassword')]",
+        "SqlServer": "[parameter('SqlServer')]",
+        "ModuleDatabase": "master"
+      }
+    },
+    "InstallAutomationEngineModule": {
+      "Type": "ExpandArchive",
+      "Params": {
+        "Path": "[parameter('AutomationEngineModule')]",
+        "DestinationPath": "[parameter('XConnectSitePath')]",
+        "Force": true
       }
     }
   }
-  
+}

@@ -6,39 +6,57 @@
 //  NOTE: Only single line comments are accepted in configurations.               //
 // ------------------------------------------------------------------------------ //
 {
-    "Parameters": {
-      "ModuleFullPath": {
-        "Type": "string",
-        "Description": "The path to the Commerce xProfile zip."
-      },
-      "ModulesDirDst": {
-        "Type": "string",
-        "Description": "The path to modules directory."
-      },
-      "BaseUrl": {
-        "Type": "string",
-        "Description": "The utility pages base url."
+  "Parameters": {
+    "ModuleFullPath": {
+      "Type": "string",
+      "Description": "The path to the Commerce xProfile zip."
+    },
+    "SharedConfigurationFolder": {
+      "Type": "string",
+      "Description": "The base folder where shared configurations are stored"
+    },
+    "SiteName": {
+      "Type": "string"
+    },
+    "SqlDbPrefix": {
+      "Type": "string"
+    },
+    "SqlAdminUser": {
+      "Type": "string"
+    },
+    "SqlAdminPassword": {
+      "Type": "string"
+    },
+    "SqlServer": {
+      "Type": "string"
+    }
+  },
+  "Register":{
+    "Tasks":{
+      "InstallSitecoreModule": "Install-SitecoreConfiguration"
+    }
+  },
+  "Tasks": {
+    "CheckPaths": {
+      "Type": "EnsurePath",
+      "Params": {
+        "Exists": [
+          "[parameter('ModuleFullPath')]"
+        ]
       }
     },
-    "Modules": [ "SitecoreUtilityTasks" ],
-    "Tasks": {
-      "CheckPaths": {
-        "Type": "EnsurePath",
-        "Params": {
-          "Exists": [
-            "[parameter('ModuleFullPath')]",
-            "[parameter('ModulesDirDst')]"
-          ]
-        }
-      },
-      "InstallModule": {
-        "Type": "InstallModule",
-        "Params": {
-          "ModuleFullPath": "[parameter('ModuleFullPath')]",
-          "ModulesDirDst": "[parameter('ModulesDirDst')]",
-          "BaseUrl": "[parameter('BaseUrl')]"
-        }
+    "InstallCommercexProfilesModule": {
+      "Type": "InstallSitecoreModule",
+      "Params": {
+        "Path": "[concat(parameter('SharedConfigurationFolder'), '\\install-module.json')]",
+        "Package": "[parameter('ModuleFullPath')]",
+        "SiteName": "[parameter('SiteName')]",
+        "DatabasePrefix": "[parameter('SqlDbPrefix')]",
+        "SqlAdminUser": "[parameter('SqlAdminUser')]",
+        "SqlAdminPassword": "[parameter('SqlAdminPassword')]",
+        "SqlServer": "[parameter('SqlServer')]",
+        "ModuleDatabase": "core"
       }
     }
   }
-  
+}

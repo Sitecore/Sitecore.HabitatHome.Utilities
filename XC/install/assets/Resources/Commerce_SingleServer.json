@@ -4,6 +4,10 @@
       "Type": "string",
       "Description": "The base folder where configurations are stored"
     },
+    "SharedConfigurationFolder": {
+      "Type": "string",
+      "Description": "The base folder where shared configurations are stored"
+    },
     "SiteName": {
       "Type": "string",
       "Description": "The name of the site to be deployed."
@@ -20,6 +24,10 @@
     "InstallDir": {
       "Type": "string",
       "Description": "The sitecore site content path."
+    },
+    "XConnectSiteName": {
+      "Type": "string",
+      "Description": "The sitecore xConnect site name."
     },
     "XConnectInstallDir": {
       "Type": "string",
@@ -52,6 +60,15 @@
       "Type": "string",
       "DefaultValue": ".\\SQLSERVER",
       "Description": "The Sitecore database server name."
+    },
+    "SqlAdminUserName": {
+      "Type": "string",
+      "DefaultValue": "sa",
+      "Description": "The Sitecore database admin username."
+    },
+    "SqlAdminPassword": {
+      "Type": "string",
+      "Description": "The Sitecore database admin password"
     },
     "SitecoreCoreDbName": {
       "Type": "string",
@@ -239,7 +256,58 @@
     "RootCertFileName": {
       "Type": "string",
       "Description": "Name of Root certificate"
+    },
+    "BootloaderPackagePath": {
+      "Type": "string",
+      "DefaultValue": "",
+      "Description": "Path to the bootloader scwdp"
+    },
+    "BootloaderConfigurationOverride": {
+      "Type": "string",
+      "Description": "Optional configuration file override for bootloader"
+    },
+    "BootloaderInstallationPath": {
+      "Type": "string",
+      "Description": "Location of bootloader data folder"
+    },
+    "SecurityUserName": {
+      "Type": "string",
+      "DefaultValue": "",
+      "Description": "Empty"
+    },
+    "SecurityUserPassword": {
+      "Type": "string",
+      "DefaultValue": "",
+      "Description": "Empty"
+    },
+    "CoreUserName": {
+      "Type": "string",
+      "DefaultValue": "",
+      "Description": "Empty"
+    },
+    "CoreUserPassword": {
+      "Type": "string",
+      "DefaultValue": "",
+      "Description": "Empty"
+    },
+    "MasterUserName": {
+      "Type": "string",
+      "DefaultValue": "",
+      "Description": "Empty"
+    },
+    "MasterUserPassword": {
+      "Type": "string",
+      "DefaultValue": "",
+      "Description": "Empty"
+    },
+    "CommerceEngineCertificatePassword":{
+      "Type": "string",
+      "DefaultValue": "",
+      "Description": "Password to import the .pfx"
     }
+  },
+  "Settings": {
+    "AutoRegisterExtensions": true
   },
   "Variables": {
     "SiteUtilitiesDir": "[concat(parameter('InstallDir'), '\\SiteUtilityPages')]",
@@ -263,197 +331,288 @@
     "SitecoreUtilityTasks"
   ],
   "Tasks": {
-    "CreateBinding": {
+    // "CreateBinding": {
+    //   "Type": "InstallSitecoreConfiguration",
+    //   "Params": {
+    //     "Path": "[concat(parameter('BaseConfigurationFolder'), '\\Commerce\\SXAStorefront\\SXAStorefront.CreateBinding.json')]",
+    //     "SiteName": "[parameter('SiteName')]",
+    //     "StorefrontHostName": "[parameter('SiteHostHeaderName')]"
+    //   }
+    // },
+    // "InstallSolrCores": {
+    //   "Type": "InstallSitecoreConfiguration",
+    //   "Params": {
+    //     "Path": "[concat(parameter('BaseConfigurationFolder'), '\\Commerce\\Solr\\sitecore-commerce-solr.json')]",
+    //     "SolrUrl": "[parameter('SolrUrl')]",
+    //     "SolrRoot": "[parameter('SolrRoot')]",
+    //     "SolrService": "[parameter('SolrService')]",
+    //     "SolrSchemas": "[parameter('SolrSchemas')]",
+    //     "CorePrefix": "[parameter('SearchIndexPrefix')]"
+    //   }
+    // },
+    // "DeployCommerceEngine": {
+    //   "Type": "InstallSitecoreConfiguration",
+    //   "Params": {
+    //     "Path": "[concat(parameter('BaseConfigurationFolder'), '\\Commerce\\CommerceEngine\\CommerceEngine.Deploy.json')]",
+    //     "EngineHostName": "[parameter('EngineHostName')]",
+    //     "CommerceServicesDbServer": "[parameter('CommerceServicesDbServer')]",
+    //     "CommerceServicesDbName": "[parameter('CommerceServicesDbName')]",
+    //     "CommerceServicesGlobalDbName": "[parameter('CommerceServicesGlobalDbName')]",
+    //     "CommerceServicesPostfix": "[parameter('CommerceServicesPostfix')]",
+    //     "SitecoreDbServer": "[parameter('SitecoreDbServer')]",
+    //     "SitecoreCoreDbName": "[parameter('SitecoreCoreDbName')]",
+    //     "CommerceSearchProvider": "[parameter('CommerceSearchProvider')]",
+    //     "SolrUrl": "[parameter('SolrUrl')]",
+    //     "SearchIndexPrefix": "[parameter('SearchIndexPrefix')]",
+    //     "EnvironmentsPrefix": "[parameter('EnvironmentsPrefix')]",
+    //     "AzureSearchServiceName": "[parameter('AzureSearchServiceName')]",
+    //     "AzureSearchAdminKey": "[parameter('AzureSearchAdminKey')]",
+    //     "AzureSearchQueryKey": "[parameter('AzureSearchQueryKey')]",
+    //     "CommerceInstallRoot": "[parameter('CommerceInstallRoot')]",
+    //     "CommerceEngineDacPac": "[parameter('CommerceEngineDacPac')]",
+    //     "SiteHostHeaderName": "[parameter('SiteHostHeaderName')]",
+    //     "CommerceOpsServicesPort": "[parameter('CommerceOpsServicesPort')]",
+    //     "CommerceShopsServicesPort": "[parameter('CommerceShopsServicesPort')]",
+    //     "CommerceAuthoringServicesPort": "[parameter('CommerceAuthoringServicesPort')]",
+    //     "CommerceMinionsServicesPort": "[parameter('CommerceMinionsServicesPort')]",
+    //     "SitecoreBizFxPort": "[parameter('SitecoreBizFxPort')]",
+    //     "SitecoreCommerceEnginePath": "[parameter('SitecoreCommerceEnginePath')]",
+    //     "UserDomain": "[parameter('UserDomain')]",
+    //     "UserName": "[parameter('UserName')]",
+    //     "UserPassword": "[parameter('UserPassword')]",
+    //     "BraintreeAccount": "[parameter('BraintreeAccount')]",
+    //     "BaseConfigurationFolder": "[parameter('BaseConfigurationFolder')]"
+    //   }
+    // },
+    // "DeploySitecoreBizFx": {
+    //   "Type": "InstallSitecoreConfiguration",
+    //   "Params": {
+    //     "Path": "[concat(parameter('BaseConfigurationFolder'), '\\Commerce\\SitecoreBizFx\\SitecoreBizFx.json')]",
+    //     "CommerceInstallRoot": "[parameter('CommerceInstallRoot')]",
+    //     "SitecoreBizFxServicesContentPath": "[parameter('SitecoreBizFxServicesContentPath')]",
+    //     "CommerceAuthoringServicesPort": "[parameter('CommerceAuthoringServicesPort')]",
+    //     "UserDomain": "[parameter('UserDomain')]",
+    //     "UserName": "[parameter('UserName')]",
+    //     "UserPassword": "[parameter('UserPassword')]",
+    //     "SitecoreBizFxServerName": "[parameter('SitecoreBizFxServerName')]",
+    //     "SitecoreBizFxHostname": "[parameter('EngineHostName')]",
+    //     "SitecoreBizFxPort": "[parameter('SitecoreBizFxPort')]",
+    //     "BaseConfigurationFolder": "[parameter('BaseConfigurationFolder')]"
+    //   }
+    // },
+    // "DeploySitecoreIdentityServer": {
+    //   "Type": "InstallSitecoreConfiguration",
+    //   "Params": {
+    //     "Path": "[concat(parameter('BaseConfigurationFolder'), '\\Commerce\\SitecoreIdentityServer\\SitecoreIdentityServer.json')]",
+    //     "CommerceInstallRoot": "[parameter('CommerceInstallRoot')]",
+    //     "SitecoreIdentityServerPath": "[parameter('SitecoreIdentityServerPath')]",
+    //     "SitecoreDbServer": "[parameter('SitecoreDbServer')]",
+    //     "SitecoreCoreDbName": "[parameter('SitecoreCoreDbName')]",
+    //     "UserDomain": "[parameter('UserDomain')]",
+    //     "UserName": "[parameter('UserName')]",
+    //     "UserPassword": "[parameter('UserPassword')]",
+    //     "SitecoreIdentityServerName": "[parameter('SitecoreIdentityServerName')]",
+    //     "SitecoreIdentityHostname": "[parameter('EngineHostName')]",
+    //     "SitecoreBizFxPort": "[parameter('SitecoreBizFxPort')]",
+    //     "BaseConfigurationFolder": "[parameter('BaseConfigurationFolder')]"
+    //   }
+    // },
+    // "CopySiteUtilityFolder": {
+    //   "Type": "Copy",
+    //   "Params": {
+    //     "Source": "[parameter('SiteUtilitiesSrc')]",
+    //     "Destination": "[parameter('InstallDir')]"
+    //   }
+    // },
+    // "DisableIndexUpdate": {
+    //   "Type": "SetXml",
+    //   "Params": [
+    //     {
+    //       "FilePath": "[variable('ContentSearchConfig'))]",
+    //       "Xpath": "[variable('ContentSearchEnabledXpath')]",
+    //       "Attributes": {
+    //         "value": "false"
+    //       }
+    //     }
+    //   ]
+    // },
+    // "DisableConfigFiles": {
+    //   "Type": "DisableConfigFiles",
+    //   "Params": {
+    //     "ConfigDir": "[variable('MarketingConfigDir')]",
+    //     "ConfigFileList": [
+    //       "Sitecore.Marketing.Search.config"
+    //     ]
+    //   }
+    // },
+    // "SetDirectoryForPreModuleInstalation": {
+    //   "Type": "PushLocation",
+    //   "Params": {
+    //     "Path": "[parameter('SharedConfigurationFolder')]"
+    //   }
+    // },
+    // "PreModuleInstallation": {
+    //   "Type": "InstallSitecoreConfiguration",
+    //   "Params": {
+    //     "Path": "[concat(parameter('SharedConfigurationFolder'), '\\pre-module-installation.json')]",
+    //     "SiteName": "[parameter('SiteName')]",
+    //     "CoreUserName": "[parameter('CoreUserName')]",
+    //     "SecurityUserName": "[parameter('SecurityUserName')]",
+    //     "SqlServer": "[parameter('SitecoreDbServer')]",
+    //     "SqlAdminUser": "[parameter('SqlAdminUserName')]",
+    //     "SqlAdminPassword": "[parameter('SqlAdminPassword')]",
+    //     "DatabasePrefix": "[parameter('EnvironmentsPrefix')]",
+    //     "MasterUserName": "[parameter('MasterUserName')]",
+    //     "BootloaderPackage": "[parameter('BootLoaderPackagePath')]",
+    //     "BootloaderConfigurationOverrideSource": "[parameter('BootloaderConfigurationOverride')]",
+    //     "BootloaderConfigurationOverrideDestination": "[parameter('BootloaderInstallationPath')]",
+    //     "XConnectSiteName": "[parameter('XConnectSiteName')]"
+    //   }
+    // },
+    // "ResetDirectoryForPreModuleInstalation": {
+    //   "Type": "PopLocation"
+    // },
+    // "InstallCommerceConnectModule": {
+    //   "Type": "InstallSitecoreConfiguration",
+    //   "Params": {
+    //     "Path": "[concat(parameter('BaseConfigurationFolder'), '\\Commerce\\Connect\\Connect.json')]",
+    //     "SharedConfigurationFolder": "[parameter('SharedConfigurationFolder')]",
+    //     "ModuleFullPath": "[parameter('CommerceConnectModuleFullPath')]",
+    //     "SiteName": "[parameter('SiteName')]",
+    //     "SqlDbPrefix": "[parameter('EnvironmentsPrefix')]",
+    //     "SqlAdminUser": "[parameter('SqlAdminUserName')]",
+    //     "SqlAdminPassword": "[parameter('SqlAdminPassword')]",
+    //     "SqlServer": "[parameter('SitecoreDbServer')]"
+    //   }
+    // },
+    // "InstallCommercexProfilesModule": {
+    //   "Type": "InstallSitecoreConfiguration",
+    //   "Params": {
+    //     "Path": "[concat(parameter('BaseConfigurationFolder'), '\\Commerce\\Connect\\Connect_xProfiles.json')]",
+    //     "SharedConfigurationFolder": "[parameter('SharedConfigurationFolder')]",
+    //     "ModuleFullPath": "[parameter('CommercexProfilesModuleFullPath')]",
+    //     "SiteName": "[parameter('SiteName')]",
+    //     "SqlDbPrefix": "[parameter('EnvironmentsPrefix')]",
+    //     "SqlAdminUser": "[parameter('SqlAdminUserName')]",
+    //     "SqlAdminPassword": "[parameter('SqlAdminPassword')]",
+    //     "SqlServer": "[parameter('SitecoreDbServer')]"
+    //   }
+    // },
+    // "InstallCommercexAnalyticsModule": {
+    //   "Type": "InstallSitecoreConfiguration",
+    //   "Params": {
+    //     "Path": "[concat(parameter('BaseConfigurationFolder'), '\\Commerce\\Connect\\Connect_xAnalytics.json')]",
+    //     "SharedConfigurationFolder": "[parameter('SharedConfigurationFolder')]",
+    //     "ModuleFullPath": "[parameter('CommercexAnalyticsModuleFullPath')]",
+    //     "SiteName": "[parameter('SiteName')]",
+    //     "SqlDbPrefix": "[parameter('EnvironmentsPrefix')]",
+    //     "SqlAdminUser": "[parameter('SqlAdminUserName')]",
+    //     "SqlAdminPassword": "[parameter('SqlAdminPassword')]",
+    //     "SqlServer": "[parameter('SitecoreDbServer')]"
+    //   }
+    // },
+    // "InstallCommerceMAModule": {
+    //   "Type": "InstallSitecoreConfiguration",
+    //   "Params": {
+    //     "Path": "[concat(parameter('BaseConfigurationFolder'), '\\Commerce\\Connect\\Connect_MarketingAutomation.json')]",
+    //     "SharedConfigurationFolder": "[parameter('SharedConfigurationFolder')]",
+    //     "XConnectSitePath": "[parameter('XConnectInstallDir')]",
+    //     "ModuleFullPath": "[parameter('CommerceMAModuleFullPath')]",
+    //     "AutomationEngineModule": "[parameter('CommerceMAForAutomationEngineModuleFullPath')]",
+    //     "SiteName": "[parameter('SiteName')]",
+    //     "SqlDbPrefix": "[parameter('EnvironmentsPrefix')]",
+    //     "SqlAdminUser": "[parameter('SqlAdminUserName')]",
+    //     "SqlAdminPassword": "[parameter('SqlAdminPassword')]",
+    //     "SqlServer": "[parameter('SitecoreDbServer')]"
+    //   }
+    // },
+    // "InstallCommerceEngineConnectModule": {
+    //   "Type": "InstallSitecoreConfiguration",
+    //   "Params": {
+    //     "Path": "[concat(parameter('BaseConfigurationFolder'), '\\Commerce\\CEConnect\\CEConnect.json')]",
+    //     "ModuleFullPath": "[parameter('CEConnectModuleFullPath')]",
+    //     "SharedConfigurationFolder": "[parameter('SharedConfigurationFolder')]",
+    //     "SiteName": "[parameter('SiteName')]",
+    //     "SqlDbPrefix": "[parameter('EnvironmentsPrefix')]",
+    //     "SqlAdminUser": "[parameter('SqlAdminUserName')]",
+    //     "SqlAdminPassword": "[parameter('SqlAdminPassword')]",
+    //     "SqlServer": "[parameter('SitecoreDbServer')]",
+    //     "MergeTool": "[parameter('MergeToolFullPath')]",
+    //     "InputFile": "[variable('CEMergeInputFile')]",
+    //     "WebConfig": "[variable('WebConfig')]"
+    //   }
+    // },
+    // "CopyConnectModels": {
+    //   "Type": "InstallSitecoreConfiguration",
+    //   "Params": {
+    //     "Path": "[concat(parameter('BaseConfigurationFolder'), '\\Commerce\\Connect\\Connect.Copy.Models.json')]",
+    //     "InstallRootDst": "[parameter('InstallDir')]",
+    //     "XConnectInstallRootDst": "[parameter('XConnectInstallDir')]"
+    //   }
+    // },
+    // "InstallSXACommerceModule": {
+    //   "Type": "InstallSitecoreConfiguration",
+    //   "Params": {
+    //     "Path": "[concat(parameter('BaseConfigurationFolder'), '\\Commerce\\SXAStorefront\\SXACommerce.json')]",
+    //     "SharedConfigurationFolder": "[parameter('SharedConfigurationFolder')]",
+    //     "SXACommerceModuleFullPath": "[parameter('SXACommerceModuleFullPath')]",
+    //     "SiteName": "[parameter('SiteName')]",
+    //     "SqlDbPrefix": "[parameter('EnvironmentsPrefix')]",
+    //     "SqlAdminUser": "[parameter('SqlAdminUserName')]",
+    //     "SqlAdminPassword": "[parameter('SqlAdminPassword')]",
+    //     "SqlServer": "[parameter('SitecoreDbServer')]",
+    //     "MergeTool": "[parameter('MergeToolFullPath')]",
+    //     "InputFile": "[variable('SXAMergeInputFile')]",
+    //     "WebConfig": "[variable('WebConfig')]"
+    //   }
+    // },
+    // "ImportRootCertificate": {
+    //   "Type": "ImportPfxCertificate",
+    //   "Params": {
+    //     "CertStoreLocation": "cert:\\localmachine\\my",
+    //     "FilePath": "[parameter('CommerceEngineCertificatePath')]",
+    //     "Password":"[parameter('CommerceEngineCertificatePassword')]"
+    //   }
+    // },
+    // "InstallHabitatImagesModule": {
+    //   "Type": "InstallSitecoreConfiguration",
+    //   "Params": {
+    //     "Path": "[concat(parameter('BaseConfigurationFolder'), '\\Commerce\\HabitatImages\\HabitatImages.json')]",
+    //     "ModuleFullPath":"[parameter('HabitatImagesModuleFullPath')]",
+    //     "SharedConfigurationFolder": "[parameter('SharedConfigurationFolder')]",
+    //     "SiteName": "[parameter('SiteName')]",
+    //     "SqlDbPrefix": "[parameter('EnvironmentsPrefix')]",
+    //     "SqlAdminUser": "[parameter('SqlAdminUserName')]",
+    //     "SqlAdminPassword": "[parameter('SqlAdminPassword')]",
+    //     "SqlServer": "[parameter('SitecoreDbServer')]"
+    //   }
+    // },
+    "SetDirectoryForPreModuleInstalation": {
+      "Type": "PushLocation",
+      "Params": {
+        "Path": "[parameter('SharedConfigurationFolder')]"
+      }
+    },
+    "PostModuleInstallation": {
       "Type": "InstallSitecoreConfiguration",
       "Params": {
-        "Path": "[concat(parameter('BaseConfigurationFolder'), '\\Commerce\\SXAStorefront\\SXAStorefront.CreateBinding.json')]",
+        "Path": "[concat(parameter('SharedConfigurationFolder'), '\\post-module-installation.json')]",
         "SiteName": "[parameter('SiteName')]",
-        "StorefrontHostName": "[parameter('SiteHostHeaderName')]"
+        "CoreUserName": "[parameter('CoreUserName')]",
+        "CoreUserPassword": "[parameter('CoreUserPassword')]",
+        "SecurityUserName": "[parameter('SecurityUserName')]",
+        "SecurityUserPassword": "[parameter('SecurityUserPassword')]",
+        "MasterUserName": "[parameter('MasterUserName')]",
+        "MasterUserPassword": "[parameter('MasterUserPassword')]",
+        "SqlServer": "[parameter('SitecoreDbServer')]",
+        "SqlAdminUser": "[parameter('SqlAdminUserName')]",
+        "SqlAdminPassword": "[parameter('SqlAdminPassword')]",
+        "DatabasePrefix": "[parameter('EnvironmentsPrefix')]",
+        "XConnectSiteName": "[parameter('XConnectSiteName')]"
       }
     },
-    "InstallSolrCores": {
-      "Type": "InstallSitecoreConfiguration",
-      "Params": {
-        "Path": "[concat(parameter('BaseConfigurationFolder'), '\\Commerce\\Solr\\sitecore-commerce-solr.json')]",
-        "SolrUrl": "[parameter('SolrUrl')]",
-        "SolrRoot": "[parameter('SolrRoot')]",
-        "SolrService": "[parameter('SolrService')]",
-        "SolrSchemas": "[parameter('SolrSchemas')]",
-        "CorePrefix": "[parameter('SearchIndexPrefix')]"
-      }
-    },
-    "DeployCommerceEngine": {
-      "Type": "InstallSitecoreConfiguration",
-      "Params": {
-        "Path": "[concat(parameter('BaseConfigurationFolder'), '\\Commerce\\CommerceEngine\\CommerceEngine.Deploy.json')]",
-        "EngineHostName": "[parameter('EngineHostName')]",
-        "CommerceServicesDbServer": "[parameter('CommerceServicesDbServer')]",
-        "CommerceServicesDbName": "[parameter('CommerceServicesDbName')]",
-        "CommerceServicesGlobalDbName": "[parameter('CommerceServicesGlobalDbName')]",
-        "CommerceServicesPostfix": "[parameter('CommerceServicesPostfix')]",
-        "SitecoreDbServer": "[parameter('SitecoreDbServer')]",
-        "SitecoreCoreDbName": "[parameter('SitecoreCoreDbName')]",
-        "CommerceSearchProvider": "[parameter('CommerceSearchProvider')]",
-        "SolrUrl": "[parameter('SolrUrl')]",
-        "SearchIndexPrefix": "[parameter('SearchIndexPrefix')]",
-        "EnvironmentsPrefix": "[parameter('EnvironmentsPrefix')]",
-        "AzureSearchServiceName": "[parameter('AzureSearchServiceName')]",
-        "AzureSearchAdminKey": "[parameter('AzureSearchAdminKey')]",
-        "AzureSearchQueryKey": "[parameter('AzureSearchQueryKey')]",
-        "CommerceInstallRoot": "[parameter('CommerceInstallRoot')]",
-        "CommerceEngineDacPac": "[parameter('CommerceEngineDacPac')]",
-        "SiteHostHeaderName": "[parameter('SiteHostHeaderName')]",
-        "CommerceOpsServicesPort": "[parameter('CommerceOpsServicesPort')]",
-        "CommerceShopsServicesPort": "[parameter('CommerceShopsServicesPort')]",
-        "CommerceAuthoringServicesPort": "[parameter('CommerceAuthoringServicesPort')]",
-        "CommerceMinionsServicesPort": "[parameter('CommerceMinionsServicesPort')]",
-        "SitecoreBizFxPort": "[parameter('SitecoreBizFxPort')]",
-        "SitecoreCommerceEnginePath": "[parameter('SitecoreCommerceEnginePath')]",
-        "UserDomain": "[parameter('UserDomain')]",
-        "UserName": "[parameter('UserName')]",
-        "UserPassword": "[parameter('UserPassword')]",
-        "BraintreeAccount": "[parameter('BraintreeAccount')]",
-        "BaseConfigurationFolder": "[parameter('BaseConfigurationFolder')]"
-      }
-    },
-    "DeploySitecoreBizFx": {
-      "Type": "InstallSitecoreConfiguration",
-      "Params": {
-        "Path": "[concat(parameter('BaseConfigurationFolder'), '\\Commerce\\SitecoreBizFx\\SitecoreBizFx.json')]",
-        "CommerceInstallRoot": "[parameter('CommerceInstallRoot')]",
-        "SitecoreBizFxServicesContentPath": "[parameter('SitecoreBizFxServicesContentPath')]",
-        "CommerceAuthoringServicesPort": "[parameter('CommerceAuthoringServicesPort')]",
-        "UserDomain": "[parameter('UserDomain')]",
-        "UserName": "[parameter('UserName')]",
-        "UserPassword": "[parameter('UserPassword')]",
-        "SitecoreBizFxServerName": "[parameter('SitecoreBizFxServerName')]",
-        "SitecoreBizFxHostname": "[parameter('EngineHostName')]",
-        "SitecoreBizFxPostFix"
-        "SitecoreBizFxPort": "[parameter('SitecoreBizFxPort')]",
-        "BaseConfigurationFolder": "[parameter('BaseConfigurationFolder')]"
-      }
-    },
-    "DeploySitecoreIdentityServer": {
-      "Type": "InstallSitecoreConfiguration",
-      "Params": {
-        "Path": "[concat(parameter('BaseConfigurationFolder'), '\\Commerce\\SitecoreIdentityServer\\SitecoreIdentityServer.json')]",
-        "CommerceInstallRoot": "[parameter('CommerceInstallRoot')]",
-        "SitecoreIdentityServerPath": "[parameter('SitecoreIdentityServerPath')]",
-        "SitecoreDbServer": "[parameter('SitecoreDbServer')]",
-        "SitecoreCoreDbName": "[parameter('SitecoreCoreDbName')]",
-        "UserDomain": "[parameter('UserDomain')]",
-        "UserName": "[parameter('UserName')]",
-        "UserPassword": "[parameter('UserPassword')]",
-        "SitecoreIdentityServerName": "[parameter('SitecoreIdentityServerName')]",
-        "SitecoreIdentityHostname": "[parameter('EngineHostName')]",
-        "SitecoreBizFxPort": "[parameter('SitecoreBizFxPort')]",
-        "BaseConfigurationFolder": "[parameter('BaseConfigurationFolder')]"
-      }
-    },
-    "CopySiteUtilityFolder": {
-      "Type": "Copy",
-      "Params": {
-        "Source": "[parameter('SiteUtilitiesSrc')]",
-        "Destination": "[parameter('InstallDir')]"
-      }
-    },
-    "DisableIndexUpdate": {
-      "Type": "SetXml",
-      "Params": [
-        {
-          "FilePath": "[variable('ContentSearchConfig'))]",
-          "Xpath": "[variable('ContentSearchEnabledXpath')]",
-          "Attributes": {
-            "value": "false"
-          }
-        }
-      ]
-    },
-    "DisableConfigFiles": {
-      "Type": "DisableConfigFiles",
-      "Params": {
-        "ConfigDir": "[variable('MarketingConfigDir')]",
-        "ConfigFileList": [
-          "Sitecore.Marketing.Search.config"
-        ]
-      }
-    },
-    "InstallCommerceConnectModule": {
-      "Type": "InstallSitecoreConfiguration",
-      "Params": {
-        "Path": "[concat(parameter('BaseConfigurationFolder'), '\\Commerce\\Connect\\Connect.json')]",
-        "ModuleFullPath": "[parameter('CommerceConnectModuleFullPath')]",
-        "ModulesDirDst": "[variable('ModulesDirDst')]",
-        "BaseUrl": "[variable('UtilitiesBaseUrl')]"
-      }
-    },
-    "InstallCommercexProfilesModule": {
-      "Type": "InstallSitecoreConfiguration",
-      "Params": {
-        "Path": "[concat(parameter('BaseConfigurationFolder'), '\\Commerce\\Connect\\Connect_xProfiles.json')]",
-        "ModuleFullPath": "[parameter('CommercexProfilesModuleFullPath')]",
-        "ModulesDirDst": "[variable('ModulesDirDst')]",
-        "BaseUrl": "[variable('UtilitiesBaseUrl')]"
-      }
-    },
-    "InstallCommercexAnalyticsModule": {
-      "Type": "InstallSitecoreConfiguration",
-      "Params": {
-        "Path": "[concat(parameter('BaseConfigurationFolder'), '\\Commerce\\Connect\\Connect_xAnalytics.json')]",
-        "ModuleFullPath": "[parameter('CommercexAnalyticsModuleFullPath')]",
-        "ModulesDirDst": "[variable('ModulesDirDst')]",
-        "BaseUrl": "[variable('UtilitiesBaseUrl')]"
-      }
-    },
-    "InstallCommerceMAModule": {
-      "Type": "InstallSitecoreConfiguration",
-      "Params": {
-        "Path": "[concat(parameter('BaseConfigurationFolder'), '\\Commerce\\Connect\\Connect_MarketingAutomation.json')]",
-        "XConnectSitePath": "[parameter('XConnectInstallDir')]",
-        "ModuleFullPath": "[parameter('CommerceMAModuleFullPath')]",
-        "ModulesDirDst": "[variable('ModulesDirDst')]",
-        "AutomationEngineModule": "[parameter('CommerceMAForAutomationEngineModuleFullPath')]",
-        "BaseUrl": "[variable('UtilitiesBaseUrl')]"
-      }
-    },
-    "InstallCommerceEngineConnectModule": {
-      "Type": "InstallSitecoreConfiguration",
-      "Params": {
-        "Path": "[concat(parameter('BaseConfigurationFolder'), '\\Commerce\\CEConnect\\CEConnect.json')]",
-        "ModuleFullPath": "[parameter('CEConnectModuleFullPath')]",
-        "ModulesDirDst": "[variable('ModulesDirDst')]",
-        "BaseUrl": "[variable('UtilitiesBaseUrl')]",
-        "MergeTool": "[parameter('MergeToolFullPath')]",
-        "InputFile": "[variable('CEMergeInputFile')]",
-        "WebConfig": "[variable('WebConfig')]"
-      }
-    },
-    "CopyConnectModels": {
-      "Type": "InstallSitecoreConfiguration",
-      "Params": {
-        "Path": "[concat(parameter('BaseConfigurationFolder'), '\\Commerce\\Connect\\Connect.Copy.Models.json')]",
-        "InstallRootDst": "[parameter('InstallDir')]",
-        "XConnectInstallRootDst": "[parameter('XConnectInstallDir')]"
-      }
-    },
-    "InstallSXACommerceModule": {
-      "Type": "InstallSitecoreConfiguration",
-      "Params": {
-        "Path": "[concat(parameter('BaseConfigurationFolder'), '\\Commerce\\SXAStorefront\\SXACommerce.json')]",
-        "SXACommerceModuleFullPath": "[parameter('SXACommerceModuleFullPath')]",
-        "ModulesDirDst": "[variable('ModulesDirDst')]",
-        "BaseUrl": "[variable('UtilitiesBaseUrl')]",
-        "MergeTool": "[parameter('MergeToolFullPath')]",
-        "InputFile": "[variable('SXAMergeInputFile')]",
-        "WebConfig": "[variable('WebConfig')]"
-      }
-    },
-    "ImportRootCertificate": {
-      "Type": "ImportCertificate",
-      "Params": {
-        "CertStoreLocation": "cert:\\localmachine\\my",
-        "FilePath": "[parameter('CommerceEngineCertificatePath')]"
-      }
+    "ResetDirectoryForPreModuleInstalation": {
+      "Type": "PopLocation"
     },
     "InitializeCommerce": {
       "Type": "InstallSitecoreConfiguration",
@@ -522,13 +681,16 @@
         "ConfigDir": "[variable('EngineConnectIncludeDir')]"
       }
     },
-    "InstallHabitatImagesModule": {
-      "Type": "InstallSitecoreConfiguration",
+    "Warmup": {
+      "Type": "HttpRequest",
       "Params": {
-        "Path": "[concat(parameter('BaseConfigurationFolder'), '\\Commerce\\HabitatImages\\HabitatImages.json')]",
-        "ModuleFullPath": "[parameter('HabitatImagesModuleFullPath')]",
-        "ModulesDirDst": "[variable('ModulesDirDst')]",
-        "BaseUrl": "[variable('UtilitiesBaseUrl')]"
+        "Uri": "[concat('https://', parameter('SiteName'))]"
+      }
+    },
+    "Wait": {
+      "Type": "StartSleep",
+      "Params": {
+        "Seconds": 60
       }
     },
     "PopulateSXAIndexesSchema": {
