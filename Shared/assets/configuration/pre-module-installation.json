@@ -120,19 +120,19 @@
             "Type": "string",
             "DefaultValue": "Master"
         },
-        "Bootloader:SiteName": {
+        "InstallBootloader:SiteName": {
             "Type": "string",
             "Reference": "SiteName"
         },
-        "Bootloader:Package": {
+        "InstallBootloader:Package": {
             "Type": "string",
             "Reference": "BootloaderPackage"
         },
-        "Bootloader:ConfigurationOverrideSource": {
+        "InstallBootloader:ConfigurationOverrideSource": {
             "Type": "string",
             "Reference": "BootloaderConfigurationOverrideSource"
         },
-        "Bootloader:ConfigurationOverrideDestination": {
+        "InstallBootloader:ConfigurationOverrideDestination": {
             "Type": "string",
             "Reference": "BootloaderConfigurationOverrideDestination"
         }

@@ -3,7 +3,7 @@ Param(
     [string] $LogFolder = ".\logs\",
     [string] $LogFileName = "install-modules.log",
     [string] $devSitecoreUsername,
-    [string] $devSitecorePassword
+    [securestring] $devSitecorePassword
 )
 
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
@@ -70,7 +70,6 @@ Function Install-SitecoreInstallFramework {
         Import-Module SitecoreInstallFramework -Force
     }
 }
-
 Function Install-SitecoreAzureToolkit {
 
     # Download Sitecore Azure Toolkit (used for converting modules)
@@ -87,8 +86,8 @@ Function Install-SitecoreAzureToolkit {
                 $global:credentials = Get-Credential -Message "Please provide dev.sitecore.com credentials"
             }
             elseif (![string]::IsNullOrEmpty($devSitecoreUsername) -and ![string]::IsNullOrEmpty($devSitecorePassword)) {
-                $secpasswd = ConvertTo-SecureString $devSitecorePassword -AsPlainText -Force
-                $global:credentials = New-Object System.Management.Automation.PSCredential ($devSitecoreUsername, $secpasswd)
+               
+                $global:credentials = New-Object System.Management.Automation.PSCredential ($devSitecoreUsername, $devSitecorePassword)
             }
             else {
                 throw "Credentials required for download"
@@ -97,7 +96,7 @@ Function Install-SitecoreAzureToolkit {
         $user = $global:credentials.GetNetworkCredential().UserName
         $password = $global:credentials.GetNetworkCredential().Password
 
-        $loginRequest = Invoke-RestMethod -Uri https://dev.sitecore.net/api/authorization -Method Post -ContentType "application/json" -Body "{username: '$user', password: '$password'}" -SessionVariable loginSession -UseBasicParsing 
+        Invoke-RestMethod -Uri https://dev.sitecore.net/api/authorization -Method Post -ContentType "application/json" -Body "{username: '$user', password: '$password'}" -SessionVariable loginSession -UseBasicParsing 
         
 
         $params = @{
@@ -116,21 +115,19 @@ Function Install-SitecoreAzureToolkit {
     Import-Module (Join-Path $assets.sitecoreazuretoolkit "tools\Sitecore.Cloud.CmdLets.dll") -Force 
 
 }
-
 Function Install-Modules {
 
     $bootLoaderPackagePath = [IO.Path]::Combine( $assets.sitecoreazuretoolkit, "resources\9.1.0\Addons\Sitecore.Cloud.Integration.Bootload.wdp.zip")
     $bootloaderConfigurationOverride = $([io.path]::combine($assets.sharedUtilitiesRoot, "assets", 'Sitecore.Cloud.Integration.Bootload.InstallJob.exe.config'))
     $bootloaderInstallationPath = $([io.path]::combine($site.webRoot, $site.hostName, "App_Data\tools\InstallJob"))
-    $assetsJson = (Resolve-Path $ConfigurationFile) # (Resolve-Path ".\assets.json")
+    $assetsJson = (Resolve-Path $ConfigurationFile) 
 
     if ($null -eq $global:credentials) {
         if ([string]::IsNullOrEmpty($devSitecoreUsername)) {
             $global:credentials = Get-Credential -Message "Please provide dev.sitecore.com credentials"
         }
         elseif (![string]::IsNullOrEmpty($devSitecoreUsername) -and ![string]::IsNullOrEmpty($devSitecorePassword)) {
-            $secpasswd = ConvertTo-SecureString $devSitecorePassword -AsPlainText -Force
-            $global:credentials = New-Object System.Management.Automation.PSCredential ($devSitecoreUsername, $secpasswd)
+            $global:credentials = New-Object System.Management.Automation.PSCredential ($devSitecoreUsername, $devSitecorePassword)
         }
         else {
             throw "Credentials required for download"
@@ -174,15 +171,6 @@ Function Install-Modules {
    
 }
 
-
-
-Function Start-Services {
-    IISRESET /START
-    Start-Service "$($xConnect.siteName)-MarketingAutomationService"
-    Start-Service "$($xConnect.siteName)-IndexWorker"
-    Start-Service "$($xConnect.siteName)-ProcessingEngineService"
-   
-}
 Import-Module (Join-Path $assets.sharedUtilitiesRoot "assets\modules\SharedInstallationUtilities\SharedInstallationUtilities.psm1") -Verbose -Force
 Install-SitecoreInstallFramework
 Install-SitecoreAzureToolkit
