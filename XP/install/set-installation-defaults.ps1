@@ -37,7 +37,7 @@ $assets.sitecoreVersion = "9.1.0 rev. 001564"
 $assets.identityServerVersion = "2.0.0 rev. 00157"
 
 
-$assets.certificatesPath = Join-Path $assets.root "Certificates"
+$assets.certificatesPath = Join-Path $assets.sharedUtilitiesRoot "Certificates"
 
 # Settings
 Write-Host "Setting default 'Site' parameters"
@@ -98,7 +98,6 @@ $xConnect.certificateConfigurationPath = (Get-ChildItem $assets.root -filter "cr
 $xConnect.solrConfigurationPath = (Get-ChildItem $assets.root -filter "xconnect-solr.json" -Recurse).FullName
 $xConnect.packagePath = Join-Path $assets.root $("Sitecore " + $assets.sitecoreVersion + " (OnPrem)_xp0xconnect.scwdp.zip")
 $xConnect.siteName = $site.prefix + "_xconnect." + $site.suffix
-$xConnect.certificateName = [string]::Join(".", @($site.prefix, $site.suffix, ".Client"))
 $xConnect.siteRoot = Join-Path $site.webRoot -ChildPath $xConnect.siteName
 
 Write-Host "Setting default 'Sitecore' parameters"

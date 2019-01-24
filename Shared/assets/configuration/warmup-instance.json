@@ -1,0 +1,37 @@
+{
+    "Parameters": {
+        "SiteName": {
+            "Type": "string",
+            "DefaultValue": ""
+        }
+    },
+    "Register": {
+        "Tasks": {
+            "WriteInformation": "Write-Information",
+            "StartSleep": "Start-Sleep",
+            "WebRequest":"Invoke-WebRequest"
+        }
+    },
+    "Tasks": {
+        "Warmup": {
+            "Type": "WebRequest",
+            "Params": {
+                "Uri": "[concat('https://', parameter('SiteName'))]",
+                "TimeoutSec": 120
+            }
+        },
+        "Sleeping": {
+            "Type": "WriteInformation",
+            "Params": {
+                "Messagedata": "Awaiting site startup",
+                "InformationAction": "Continue"
+            }
+        },
+        "Wait": {
+            "Type": "StartSleep",
+            "Params": {
+                "Seconds": 60
+            }
+        }
+    }
+}
