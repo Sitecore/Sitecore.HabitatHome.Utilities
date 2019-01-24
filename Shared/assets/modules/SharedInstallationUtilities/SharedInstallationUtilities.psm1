@@ -93,6 +93,28 @@ Function Add-DatabaseUser {
   
 }
 
+Function Kill-DatabaseConnections {
+    param(
+        [Parameter(Mandatory)]
+        [string] $SqlServer,
+        [Parameter(Mandatory)]
+        [string] $SqlAdminUser,
+        [Parameter(Mandatory)]
+        [string] $SqlAdminPassword,
+        [Parameter(Mandatory)]
+        [string] $DatabasePrefix,
+        [Parameter(Mandatory)]
+        [string] $DatabaseSuffix
+    )
+   
+    #Write-Host ("Adding {0} to {1}_{2} with password {3}" -f $UserName, $DatabasePrefix, $DatabaseSuffix, $UserPassword   ) 
+    $sqlVariables = "DatabasePrefix = $DatabasePrefix", "DatabaseSuffix = $DatabaseSuffix"
+    $sqlFile = Join-Path (Resolve-Path "..\..") "\database\killdatabaseconnections.sql"
+   
+    #Write-Host "Sql File: $sqlFile"
+    Invoke-Sqlcmd -Variable $sqlVariables -Username $SqlAdminUser -Password $SqlAdminPassword -ServerInstance $SqlServer -InputFile $sqlFile 
+  
+}
 
 Function Start-SitecoreSite {
     [CmdletBinding(SupportsShouldProcess = $true)]
