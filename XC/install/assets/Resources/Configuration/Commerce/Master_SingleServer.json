@@ -610,6 +610,15 @@
         "ConfigDir": "[variable('EngineConnectIncludeDir')]"
       }
     },
+    "PopulateSXAIndexesSchema": {
+      "Type": "InstallSitecoreConfiguration",
+      "Params": {
+        "Path": "[concat(parameter('BaseConfigurationFolder'), '\\SitecoreUtilities\\PopulateIndexSchema.json')]",
+        "SiteRootUrl": "[variable('SiteRootUrl')]",
+        "SitecoreAdminPassword": "[parameter('SitecoreUserPassword')]",
+        "Indexes": "sitecore_sxa_master_index|sitecore_sxa_web_index"
+      }
+    },
     "Reindex": {
       "Type": "InstallSitecoreConfiguration",
       "Params": {

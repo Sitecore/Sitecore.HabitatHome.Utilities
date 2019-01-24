@@ -11,6 +11,7 @@ Param(
 $ErrorActionPreference = 'Stop'
 #Set-Location $PSScriptRoot
 
+
 if (!(Test-Path $ConfigurationFile)) {
     Write-Host 'Configuration file '$($ConfigurationFile)' not found.' -ForegroundColor Red
     Write-Host  'Please use 'set-installation...ps1' files to generate a configuration file.' -ForegroundColor Red
@@ -33,6 +34,8 @@ $assets = $config.assets
 $commerce = $config.settings.commerce
 $resourcePath = Join-Path $assets.root "Resources"
 $publishPath = Join-Path $resourcePath "Publish"
+$sharedResourcePath = Join-Path $assets.sharedUtilitiesRoot "assets"
+
 
 Write-Host "*******************************************************" -ForegroundColor Green
 Write-Host " Installing Commerce $($assets.commerce.packageVersion)" -ForegroundColor Green
@@ -92,7 +95,7 @@ function Install-CommerceAssets {
         $credentials = Get-Credential -Message "Please provide dev.sitecore.com credentials"
 
         $params = @{
-            Path         = $([io.path]::combine($resourcePath, 'configuration', 'commerce', 'HabitatHome', 'download-assets.json'))
+            Path         = $([io.path]::combine($sharedResourcePath, 'download-assets.json'))
             LoginSession = $loginSession
             Source       = $assets.commerce.packageUrl
             Destination  = $commercePackageDestination
@@ -110,7 +113,7 @@ function Install-CommerceAssets {
     if (!(Test-Path $msbuildNuGetPackageDestination)) {
         Write-Host "Saving $msbuildNuGetUrl to $msbuildNuGetPackageDestination" -ForegroundColor Green
         $params = @{
-            Path         = $([io.path]::combine($resourcePath, 'configuration', 'commerce', 'HabitatHome', 'download-assets.json'))
+            Path         = $([io.path]::combine($sharedResourcePath, 'download-assets.json'))
             LoginSession = $loginSession
             Source       = $msbuildNuGetUrl
             Destination  = $msbuildNuGetPackageDestination
@@ -128,7 +131,7 @@ function Install-CommerceAssets {
     if (!(Test-Path $habitatHomeImagePackageDestination)) {
         Write-Host ("Saving '{0}' to '{1}'" -f $habitatHomeImagePackageFileName, $habitatHomeImagePackageDestination) -ForegroundColor Green
         $params = @{
-            Path         = $([io.path]::combine($resourcePath, 'configuration', 'commerce', 'HabitatHome', 'download-assets.json'))
+            Path         = $([io.path]::combine($sharedResourcePath, 'download-assets.json'))
             LoginSession = $loginSession
             Source       = $habitatHomeImagePackageUrl
             Destination  = $habitatHomeImagePackageDestination
@@ -163,20 +166,7 @@ function Install-CommerceAssets {
     $output = $(Join-Path $assets.commerce.installationFolder "msbuild.microsoft.visualstudio.web.targets.14.0.0.3")
     sz x -o"$($output)" $extract -r -y -aoa
 }
-Function Stop-XConnect {
-    $params = @{
-        Path     = $(Join-Path $resourcePath "stop-site.json")
-        SiteName = $xConnect.siteName
-    }
-    Install-SitecoreConfiguration  @params -WorkingDirectory $(Join-Path $PWD "logs")
-}
-Function Start-XConnect {
-    $params = @{
-        Path     = $(Join-Path $resourcePath "start-site.json")
-        SiteName = $xConnect.siteName
-    }
-    Install-SitecoreConfiguration  @params -WorkingDirectory $(Join-Path $PWD "logs")
-}
+
 Function Start-Site {
     $Hostname = "$($site.hostName)"
 
@@ -238,11 +228,54 @@ Function Publish-BizFx {
     }
     Copy-Item -Path $bizFxSource -Destination $PublishLocation  -Force -Recurse
 }
+Function Convert-Modules{
+    $sat = Join-Path $assets.sitecoreazuretoolkit "tools\Sitecore.Cloud.Cmdlets.dll"
+    Import-Module $sat -Force
+
+  $modules = @{  
+    CommerceConnectModuleFullPath               = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include "Sitecore Commerce Connect*.zip" -Exclude "*.scwdp.zip" -Recurse  )
+    CommercexProfilesModuleFullPath             = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include "Sitecore Commerce ExperienceProfile Core *.zip" -Exclude "*.scwdp.zip" -Recurse)
+    CommercexAnalyticsModuleFullPath            = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include "Sitecore Commerce ExperienceAnalytics Core *.zip"	-Exclude "*.scwdp.zip" -Recurse)
+    CommerceMAModuleFullPath                    = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include "Sitecore Commerce Marketing Automation Core *.zip"	-Exclude "*.scwdp.zip" -Recurse)
+    CEConnectModuleFullPath                     = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include  "Sitecore Commerce Engine Connect*.zip" -Exclude "*.scwdp.zip" -Recurse)
+    SXACommerceModuleFullPath                   = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include  "Sitecore Commerce Experience Accelerator 2.*.zip" -Exclude "*.scwdp.zip" -Recurse)
+    SXAStorefrontModuleFullPath                 = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include  "Sitecore Commerce Experience Accelerator Storefront 2.*.zip"-Exclude "*.scwdp.zip" -Recurse )
+    SXAStorefrontThemeModuleFullPath            = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include  "Sitecore Commerce Experience Accelerator Storefront Themes*.zip"-Exclude "*.scwdp.zip" -Recurse )
+    SXAStorefrontCatalogModuleFullPath          = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include  "Sitecore Commerce Experience Accelerator Habitat Catalog*.zip" -Exclude "*.scwdp.zip" -Recurse)
+    HabitatImagesModuleFullPath                 = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include  "Habitat Home Product Images.zip" -Exclude "*.scwdp.zip" -Recurse)
+  }
+  foreach ($key in $modules.Keys){
+      Write-Host $modules[$key]
+    ConvertTo-SCModuleWebDeployPackage -Path $modules[$key] -Destination $assets.commerce.installationFolder -Verbose -Force
+  }
+}
+Function Install-Bootloader {
+    $bootLoaderPackagePath = [IO.Path]::Combine( $assets.sitecoreazuretoolkit, "resources\9.1.0\Addons\Sitecore.Cloud.Integration.Bootload.wdp.zip")
+    $bootloaderConfigurationOverride = $([io.path]::combine($sharedResourcePath, 'Sitecore.Cloud.Integration.Bootload.InstallJob.exe.config'))
+    $bootloaderInstallationPath = $([io.path]::combine($site.webRoot, $site.hostName, "App_Data\tools\InstallJob"))
+    
+    $params = @{
+        Path                             = (Join-path $sharedResourcePath 'bootloader.json')
+        Package                          = $bootLoaderPackagePath
+        SiteName                         = $site.hostName
+        ConfigurationOverrideSource      = $bootloaderConfigurationOverride
+        ConfigurationOverrideDestination = $bootloaderInstallationPath
+    }
+    
+    Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs")
+
+}
 Function Install-Commerce {
     Write-Host "Installing Commerce" -ForegroundColor Green
+    
+	$bootLoaderPackagePath = [IO.Path]::Combine( $assets.sitecoreazuretoolkit, "resources\9.1.0\Addons\Sitecore.Cloud.Integration.Bootload.wdp.zip")
+    $bootloaderConfigurationOverride = $([io.path]::combine($sharedResourcePath, 'Sitecore.Cloud.Integration.Bootload.InstallJob.exe.config'))
+    $bootloaderInstallationPath = $([io.path]::combine($site.webRoot, $site.hostName, "App_Data\tools\InstallJob"))
+	
     $params = @{
         Path                                        = $(Join-Path $resourcePath  'Commerce_SingleServer.json')
         BaseConfigurationFolder                     = $(Join-Path $resourcePath "Configuration")
+        SharedConfigurationFolder                   = $(Join-Path $sharedResourcePath "Configuration")
         CommerceInstallRoot                         = $site.webRoot
         CommerceServicesPostfix                     = $site.prefix
         Environments                                = @('Habitat_Authoring')
@@ -250,12 +283,15 @@ Function Install-Commerce {
         SiteName                                    = $site.hostName
         SiteHostHeaderName                          = $commerce.storefrontHostName
         InstallDir                                  = $(Join-Path $site.webRoot $site.hostName)
+        XConnectSiteName                            = $xConnect.siteName
         XConnectInstallDir                          = $xConnect.siteRoot
         RootCertFileName                            = $sitecore.rootCertificateName
         CommerceServicesDbServer                    = $sql.server
         CommerceServicesDbName                      = $($site.prefix + "_SharedEnvironments")
         CommerceServicesGlobalDbName                = $($site.prefix + "_Global")
         SitecoreDbServer                            = $sql.server
+        SqlAdminUserName                            = $sql.adminUser
+        SqlAdminPassword                            = $sql.adminPassword
         SitecoreCoreDbName                          = $($site.prefix + "_Core")
         SitecoreUsername                            = "sitecore\admin"
         SitecoreUserPassword                        = $sitecore.adminPassword
@@ -278,20 +314,21 @@ Function Install-Commerce {
         SitecoreCommerceEnginePath                  = $($publishPath + "\" + $site.prefix + ".Commerce.Engine")
         SitecoreBizFxServicesContentPath            = $($publishPath + "\" + $site.prefix + ".Commerce.BizFX")
         SitecoreIdentityServerPath                  = $($publishPath + "\" + $site.prefix + ".Commerce.IdentityServer")
-        CommerceEngineCertificatePath               = $(Join-Path -Path $assets.certificatesPath -ChildPath $($xConnect.CertificateName + ".crt") )
+        CommerceEngineCertificatePath               = $(Join-Path -Path $assets.certificatesPath -ChildPath $($xConnect.siteName + ".pfx") )
+        CommerceEngineCertificatePassword           = $sql.adminPassword
         SiteUtilitiesSrc                            = $(Join-Path -Path $assets.commerce.sifCommerceRoot -ChildPath "SiteUtilityPages")
-        CommerceConnectModuleFullPath               = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include "Sitecore Commerce Connect*.zip" -Recurse  )
-        CommercexProfilesModuleFullPath             = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include "Sitecore Commerce ExperienceProfile Core *.zip" -Recurse)
-        CommercexAnalyticsModuleFullPath            = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include "Sitecore Commerce ExperienceAnalytics Core *.zip"	-Recurse)
-        CommerceMAModuleFullPath                    = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include "Sitecore Commerce Marketing Automation Core *.zip"	-Recurse)
+        CommerceConnectModuleFullPath               = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include "Sitecore Commerce Connect Core*.scwdp.zip" -Recurse  )
+        CommercexProfilesModuleFullPath             = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include "Sitecore Commerce ExperienceProfile Core *.scwdp.zip" -Recurse)
+        CommercexAnalyticsModuleFullPath            = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include "Sitecore Commerce ExperienceAnalytics Core *.scwdp.zip"	-Recurse)
+        CommerceMAModuleFullPath                    = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include "Sitecore Commerce Marketing Automation Core *.scwdp.zip"	-Recurse)
         CommerceMAForAutomationEngineModuleFullPath = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include "Sitecore Commerce Marketing Automation for AutomationEngine *.zip"	-Recurse)
-        CEConnectModuleFullPath                     = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include  "Sitecore Commerce Engine Connect*.zip" -Recurse)
-        SXACommerceModuleFullPath                   = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include  "Sitecore Commerce Experience Accelerator 2.*.zip" -Recurse)
-        SXAStorefrontModuleFullPath                 = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include  "Sitecore Commerce Experience Accelerator Storefront 2.*.zip"-Recurse )
-        SXAStorefrontThemeModuleFullPath            = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include  "Sitecore Commerce Experience Accelerator Storefront Themes*.zip"-Recurse )
-        SXAStorefrontCatalogModuleFullPath          = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include  "Sitecore Commerce Experience Accelerator Habitat Catalog*.zip" -Recurse)
+        CEConnectModuleFullPath                     = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include  "Sitecore Commerce Engine Connect*.scwdp.zip" -Recurse)
+        SXACommerceModuleFullPath                   = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include  "Sitecore Commerce Experience Accelerator 2.*.scwdp.zip" -Recurse)
+        SXAStorefrontModuleFullPath                 = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include  "Sitecore Commerce Experience Accelerator Storefront 2.*.scwdp.zip"-Recurse )
+        SXAStorefrontThemeModuleFullPath            = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include  "Sitecore Commerce Experience Accelerator Storefront Themes*.scwdp.zip"-Recurse )
+        SXAStorefrontCatalogModuleFullPath          = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include  "Sitecore Commerce Experience Accelerator Habitat Catalog*.scwdp.zip" -Recurse)
         MergeToolFullPath                           = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include  "*Microsoft.Web.XmlTransform.dll" -Recurse | Select-Object -ExpandProperty FullName)
-        HabitatImagesModuleFullPath                 = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include  "Habitat Home Product Images.zip" -Recurse)
+        HabitatImagesModuleFullPath                 = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include  "Habitat Home Product Images.scwdp.zip" -Recurse)
         UserDomain                                  = $commerce.serviceAccountDomain
         UserName                                    = $commerce.serviceAccountUserName
         UserPassword                                = $commerce.serviceAccountPassword
@@ -301,25 +338,42 @@ Function Install-Commerce {
             PrivateKey = $commerce.brainTreeAccountPrivateKey
         }
         SitecoreIdentityServerName                  = $commerce.identityServerName
+		  SecurityUserName                = $sql.securityUser
+        SecurityUserPassword            = $sql.SecurityPassword
+        CoreUserName                    = $sql.coreUser
+        CoreUserPassword                = $sql.corePassword
+        MasterUserName                  = $sql.masterUser
+        MasterUserPassword              = $sql.MasterPassword
+        BootLoaderPackagePath           = $bootLoaderPackagePath
+        BootloaderConfigurationOverride = $bootloaderConfigurationOverride
+        BootloaderInstallationPath      = $bootloaderInstallationPath
     }
-    write-host @params
+    
+    Import-Module (Join-Path $assets.sharedUtilitiesRoot "assets\modules\SharedInstallationUtilities\SharedInstallationUtilities.psm1") -Verbose -Force
+
+    
     If (!$SkipHabitatHomeInstall) {
-        Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs")
+        Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs") -Verbose
     }
     Else {
-        Install-SitecoreConfiguration @params -Skip "InitializeCommerceEngine", "GenerateCatalogTemplates", "InstallHabitatImagesModule", "Reindex" -WorkingDirectory $(Join-Path $PWD "logs")
+        Install-SitecoreConfiguration @params -Skip "InitializeCommerceEngine", "GenerateCatalogTemplates", "InstallHabitatImagesModule", "Reindex" -WorkingDirectory $(Join-Path $PWD "logs") -Verbose
     }
 }
 
 
-#Install-Prerequisites
+$StopWatch = New-Object -TypeName System.Diagnostics.Stopwatch 
+$StopWatch.Start()
+
 Install-RequiredInstallationAssets
 Set-ModulesPath
-Install-CommerceAssets
-#Stop-XConnect - Should no longer do this as of 9.0.2
-Publish-CommerceEngine
-Publish-IdentityServer
-Publish-BizFx
+#Install-CommerceAssets
+#Publish-CommerceEngine
+#Publish-IdentityServer
+#Publish-BizFx
+#Convert-Modules
+#Install-Bootloader
 Install-Commerce
 Start-Site
-# Start-XConnect No longer required as of 9.0.2
+
+$StopWatch.Stop()
+$StopWatch

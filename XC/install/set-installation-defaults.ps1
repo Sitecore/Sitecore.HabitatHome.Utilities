@@ -64,7 +64,7 @@ $site = $json.settings.site
 
 # Sitecore Parameters
 $sitecore = $json.settings.sitecore
-$json.modules = ""
+
 
 # Solr Parameters
 $solr = $json.settings.solr

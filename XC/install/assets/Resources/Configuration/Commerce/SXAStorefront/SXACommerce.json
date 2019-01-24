@@ -2,15 +2,26 @@
   "Parameters": {
     "SXACommerceModuleFullPath": {
       "Type": "string",
-      "Description": "The path to the SXA Commerce module zip."
+      "Description": "The path to the SXA Commerce module scwdp."
     },
-    "ModulesDirDst": {
+    "SharedConfigurationFolder": {
       "Type": "string",
-      "Description": "The path to modules directory."
+      "Description": "The base folder where shared configurations are stored"
     },
-    "BaseUrl": {
-      "Type": "string",
-      "Description": "The utility pages base url."
+     "SiteName": {
+      "Type": "string"
+    },
+    "SqlDbPrefix": {
+      "Type": "string"
+    },
+    "SqlAdminUser": {
+      "Type": "string"
+    },
+    "SqlAdminPassword": {
+      "Type": "string"
+    },
+    "SqlServer": {
+      "Type": "string"
     },
     "MergeTool": {
       "Type": "string",
@@ -25,23 +36,34 @@
       "Description": "The path to the web config file."
     }
   },
-  "Modules": ["SitecoreUtilityTasks", "MergeWebConfig"],
+  "Modules": [
+    "MergeWebConfig"
+  ],
+  "Register": {
+    "Tasks": {
+      "InstallSitecoreModule": "Install-SitecoreConfiguration"
+    }
+  },
   "Tasks": {
     "CheckSXAPaths": {
       "Type": "EnsurePath",
       "Params": {
         "Exists": [
-          "[parameter('SXACommerceModuleFullPath')]",
-          "[parameter('ModulesDirDst')]"
+          "[parameter('SXACommerceModuleFullPath')]"
         ]
       }
     },
     "InstallSXAModule": {
-      "Type": "InstallModule",
+      "Type": "InstallSitecoreConfiguration",
       "Params": {
-        "ModuleFullPath": "[parameter('SXACommerceModuleFullPath')]",
-        "ModulesDirDst": "[parameter('ModulesDirDst')]",
-        "BaseUrl": "[parameter('BaseUrl')]"
+        "Path": "[concat(parameter('SharedConfigurationFolder'), '\\install-module.json')]",
+        "Package": "[parameter('SXACommerceModuleFullPath')]",
+        "SiteName": "[parameter('SiteName')]",
+        "DatabasePrefix": "[parameter('SqlDbPrefix')]",
+        "SqlAdminUser": "[parameter('SqlAdminUser')]",
+        "SqlAdminPassword": "[parameter('SqlAdminPassword')]",
+        "SqlServer": "[parameter('SqlServer')]",
+        "ModuleDatabase": "master"
       }
     },
     "MergeWebConfig": {
