@@ -1,5 +1,5 @@
 
-Function Invoke-StringReplaceConfigFunction {
+Function Replace-String {
     param(
         [Parameter(Mandatory = $true)]
         [string]$source,
@@ -23,7 +23,7 @@ Function Invoke-StringReplaceConfigFunction {
     return $result
 }
 
-Function Invoke-GetSitecoreModuleDetailsConfigFunction {
+Function Get-SitecoreModuleDetails {
     param(
         [Parameter(Mandatory = $true)]
         [psobject]$assets,
@@ -42,8 +42,8 @@ Function Invoke-GetSitecoreModuleDetailsConfigFunction {
     return $result
 }
 
-Function Invoke-GetObjectPropertyConfigFunction {
-    param(
+Function Get-ObjectProperty {
+      param(
         [Parameter(Mandatory = $true)]
         [psobject]$module,
         [Parameter(Mandatory = $true)]
@@ -59,10 +59,36 @@ Function Invoke-GetObjectPropertyConfigFunction {
     Write-Verbose "Result: $result"
     return $result
 }
-
-
-Register-SitecoreInstallExtension -Command Invoke-GetFilePathConfigFunction -As GetFilePath -Type ConfigFunction -Force
-Register-SitecoreInstallExtension -Command Invoke-GetSitecoreModuleDetailsConfigFunction -As GetSitecoreModuleDetails -Type ConfigFunction -Force
-Register-SitecoreInstallExtension -Command Invoke-GetObjectPropertyConfigFunction -As GetObjectProperty -Type ConfigFunction -Force
-Register-SitecoreInstallExtension -Command Invoke-StringReplaceConfigFunction -As ReplaceString -Type ConfigFunction -Force
-
+Function Add-DatabaseUser {
+     param(
+        [Parameter(Mandatory)]
+        [string] $SqlServer,
+        [Parameter(Mandatory)]
+        [string] $SqlAdminUser,
+        [Parameter(Mandatory)]
+        [string] $SqlAdminPassword,
+        [Parameter(Mandatory)]
+        [string] $Username,
+        [Parameter(Mandatory)]
+        [string] $UserPassword,
+        [Parameter(Mandatory)]
+        [string] $DatabasePrefix,
+        [Parameter(Mandatory)]
+        [string] $DatabaseSuffix,
+        [Parameter(Mandatory)]
+        [bool] $IsCoreUser
+    )
+   
+    #Write-Host ("Adding {0} to {1}_{2} with password {3}" -f $UserName, $DatabasePrefix, $DatabaseSuffix, $UserPassword   ) 
+    $sqlVariables = "DatabasePrefix = $DatabasePrefix", "DatabaseSuffix = $DatabaseSuffix", "UserName = $UserName", "Password = $UserPassword"
+    $sqlFile = ""
+    if ($IsCoreUser ) {
+      $sqlFile =   Join-Path (Resolve-Path "..\..") "\database\addcoredatabaseuser.sql"
+    }
+    else {
+        $sqlFile =Join-Path (Resolve-Path "..\..") "\database\adddatabaseuser.sql"
+    }
+    #Write-Host "Sql File: $sqlFile"
+    Invoke-Sqlcmd -Variable $sqlVariables -Username $SqlAdminUser -Password $SqlAdminPassword -ServerInstance $SqlServer -InputFile $sqlFile 
+  
+}

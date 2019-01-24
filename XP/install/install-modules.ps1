@@ -49,12 +49,12 @@ $downloadFolder = $assets.root
 $packagesFolder = (Join-Path $downloadFolder "packages")
 
 
-    Write-Host "Setting Modules Path" -ForegroundColor Green
-    $modulesPath = ( Join-Path -Path $assets.sharedUtilitiesRoot -ChildPath "assets\Modules" )
-    if ($env:PSModulePath -notlike "*$modulesPath*") {
-        $p = $env:PSModulePath + ";" + $modulesPath
-        [Environment]::SetEnvironmentVariable("PSModulePath", $p)
-    }
+# Write-Host "Setting Modules Path" -ForegroundColor Green
+# $modulesPath = ( Join-Path -Path $assets.sharedUtilitiesRoot -ChildPath "assets\Modules" )
+# if ($env:PSModulePath -notlike "*$modulesPath*") {
+#     $p = $env:PSModulePath + ";" + $modulesPath
+#     [Environment]::SetEnvironmentVariable("PSModulePath", $p)
+# }
 
 
 $loginSession = $null
@@ -130,7 +130,7 @@ Function Install-SitecoreAzureToolkit {
 Function Install-Modules {
 
     $bootLoaderPackagePath = [IO.Path]::Combine( $assets.sitecoreazuretoolkit, "resources\9.1.0\Addons\Sitecore.Cloud.Integration.Bootload.wdp.zip")
-    $bootloaderConfigurationOverride = $([io.path]::combine($sharedResourcePath, 'Sitecore.Cloud.Integration.Bootload.InstallJob.exe.config'))
+    $bootloaderConfigurationOverride = $([io.path]::combine($assets.sharedUtilitiesRoot, "assets", 'Sitecore.Cloud.Integration.Bootload.InstallJob.exe.config'))
     $bootloaderInstallationPath = $([io.path]::combine($site.webRoot, $site.hostName, "App_Data\tools\InstallJob"))
     $assetsJson = (Resolve-Path $ConfigurationFile) # (Resolve-Path ".\assets.json")
 
@@ -153,23 +153,33 @@ Function Install-Modules {
 
     $params = @{
         Path                            = (Join-Path $sharedResourcePath "module-master-install.json")
+        SharedConfigurationPath         = $sharedResourcePath
         SiteName                        = $site.hostName
-        XCOnnectSiteName                = $xConnect.siteName
-        BootLoaderPackagePath           = $bootLoaderPackagePath
-        BootloaderConfigurationOverride = $bootloaderConfigurationOverride
-        BootloaderInstallationPath      = $bootloaderInstallationPath
+        WebRoot                         = $site.webRoot
+        XConnectSiteName                = $xConnect.siteName
         SqlServer                       = $sql.server
         SqlAdminUser                    = $sql.adminUser 
         SqlAdminPassword                = $sql.adminPassword
         DatabasePrefix                  = $site.prefix
         SecurityUserName                = $sql.securityUser
+        SecurityUserPassword            = $sql.SecurityPassword
         CoreUserName                    = $sql.coreUser
+        CoreUserPassword                = $sql.corePassword
         MasterUserName                  = $sql.masterUser
+        MasterUserPassword              = $sql.MasterPassword
+        BootLoaderPackagePath           = $bootLoaderPackagePath
+        BootloaderConfigurationOverride = $bootloaderConfigurationOverride
+        BootloaderInstallationPath      = $bootloaderInstallationPath
         AssetsJson                      = $assetsJson
         LoginSession                    = $loginSession
+        SolrUrl                         = $solr.url
+        SolrRoot                        = $solr.root
+        SolrService                     = $solr.serviceName
+        CorePrefix                      = $site.prefix
+        SitecoreAdminPassword           = $sitecore.adminPassword
     }
     Push-Location $sharedResourcePath
-    Install-SitecoreConfiguration @params -Verbose  
+    Install-SitecoreConfiguration @params -Verbose *>&1 | Tee-Object "C:\projects\Demo.Utilities.VSTS\XP\Install\output.log"
     Pop-Location
    
 }
@@ -281,12 +291,12 @@ Function Start-Services {
     Start-Service "$($xConnect.siteName)-ProcessingEngineService"
    
 }
-
+Import-Module (Join-Path $assets.sharedUtilitiesRoot "assets\modules\SharedInstallationUtilities\SharedInstallationUtilities.psm1") -Verbose -Force
 Install-SitecoreInstallFramework
-Install-SitecoreAzureToolkit
+#Install-SitecoreAzureToolkit
 Install-Modules
-Add-DatabaseUsers
-Start-Services
-Update-SXASolrCores
+#Add-DatabaseUsers
+#Start-Services
+#Update-SXASolrCores
 $StopWatch.Stop()
 $StopWatch

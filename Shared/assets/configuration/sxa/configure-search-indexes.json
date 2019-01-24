@@ -1,0 +1,42 @@
+{
+    "Parameters": {
+        "PhysicalPath": {
+            "Type": "string",
+            "DefaultValue": "",
+            "Description": "The sitecore site content path."
+        },
+        "SitePrefix": {
+            "Type": "string",
+            "DefaultValue": "",
+            "Description": "Site Prefix"
+        }
+    },
+    "Variables": {
+        "SolrSearchMasterIndexCoreNameXpath": "//configuration/sitecore/contentSearch/configuration/indexes/index[@id='sitecore_sxa_master_index']/param[@desc='core']",
+        "SolrSearchWebIndexCoreNameXpath": "//configuration/sitecore/contentSearch/configuration/indexes/index[@id='sitecore_sxa_web_index']/param[@desc='core']",
+        "Site.PhysicalPath": "[parameter('PhysicalPath')]",
+        "SolrSearchConfig": "[concat(variable('Site.PhysicalPath'), '\\App_Config\\Modules\\SXA\\Z.Foundation.Overrides\\Sitecore.XA.Foundation.Search.Solr.config')]"
+    },
+    "Tasks": {
+        "UpdateMasterSXAIndex": {
+            "Type": "SetXml",
+            "Params": [
+                {
+                    "FilePath": "[variable('SolrSearchConfig'))]",
+                    "Xpath": "[variable('SolrSearchMasterIndexCoreNameXpath')]",
+                    "Value": "[concat(parameter('SitePrefix'), '_sxa_master_index')]"
+                }
+            ]
+        },
+        "UpdateWebSXAIndex": {
+            "Type": "SetXml",
+            "Params": [
+                {
+                    "FilePath": "[variable('SolrSearchConfig'))]",
+                    "Xpath": "[variable('SolrSearchWebIndexCoreNameXpath')]",
+                    "Value": "[concat(parameter('SitePrefix'), '_sxa_web_index')]"
+                }
+            ]
+        }
+    }
+}
