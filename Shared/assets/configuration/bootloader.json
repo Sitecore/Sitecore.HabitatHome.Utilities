@@ -22,7 +22,7 @@
     }
   },
   "Tasks": {
-    "InstallWDP": {
+    "InstallBootloaderWDP": {
       "Type": "WebDeploy",
       "Params": {
         "Verb": "Sync",
