@@ -11,32 +11,51 @@
       "Type": "string",
       "Description": "The path to the Habitat images zip."
     },
-    "ModulesDirDst": {
+    "SharedConfigurationFolder": {
       "Type": "string",
-      "Description": "The path to modules directory."
+      "Description": "The base folder where shared configurations are stored"
     },
-    "BaseUrl": {
-      "Type": "string",
-      "Description": "The utility pages base url."
+    "SiteName": {
+      "Type": "string"
+    },
+    "SqlDbPrefix": {
+      "Type": "string"
+    },
+    "SqlAdminUser": {
+      "Type": "string"
+    },
+    "SqlAdminPassword": {
+      "Type": "string"
+    },
+    "SqlServer": {
+      "Type": "string"
     }
   },
-  "Modules": [ "SitecoreUtilityTasks" ],
+  "Register":{
+    "Tasks":{
+      "InstallSitecoreModule": "Install-SitecoreConfiguration"
+    }
+  },
   "Tasks": {
     "CheckPaths": {
       "Type": "EnsurePath",
       "Params": {
         "Exists": [
-          "[parameter('ModuleFullPath')]",
-          "[parameter('ModulesDirDst')]"
+          "[parameter('ModuleFullPath')]"
         ]
       }
     },
-    "InstallModule": {
-      "Type": "InstallModule",
+    "InstallHabitatHomeImagesModule": {
+      "Type": "InstallSitecoreModule",
       "Params": {
-        "ModuleFullPath": "[parameter('ModuleFullPath')]",
-        "ModulesDirDst": "[parameter('ModulesDirDst')]",
-        "BaseUrl": "[parameter('BaseUrl')]"
+        "Path": "[concat(parameter('SharedConfigurationFolder'), '\\install-module.json')]",
+        "Package": "[parameter('ModuleFullPath')]",
+        "SiteName": "[parameter('SiteName')]",
+        "DatabasePrefix": "[parameter('SqlDbPrefix')]",
+        "SqlAdminUser": "[parameter('SqlAdminUser')]",
+        "SqlAdminPassword": "[parameter('SqlAdminPassword')]",
+        "SqlServer": "[parameter('SqlServer')]",
+        "ModuleDatabase": "master"
       }
     }
   }

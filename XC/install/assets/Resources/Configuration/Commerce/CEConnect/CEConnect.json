@@ -8,16 +8,26 @@
 {
   "Parameters": {
     "ModuleFullPath": {
-      "Type": "string",
-      "Description": "The path to Commerce Engine Connect package zip."
+      "Type": "string"
     },
-    "ModulesDirDst": {
+    "SharedConfigurationFolder": {
       "Type": "string",
-      "Description": "The path to modules directory."
+      "Description": "The base folder where shared configurations are stored"
     },
-    "BaseUrl": {
-      "Type": "string",
-      "Description": "The utility pages base url."
+    "SiteName": {
+      "Type": "string"
+    },
+    "SqlDbPrefix": {
+      "Type": "string"
+    },
+    "SqlAdminUser": {
+      "Type": "string"
+    },
+    "SqlAdminPassword": {
+      "Type": "string"
+    },
+    "SqlServer": {
+      "Type": "string"
     },
     "MergeTool": {
       "Type": "string",
@@ -32,23 +42,32 @@
       "Description": "The path to the web config file."
     }
   },
-  "Modules": [ "SitecoreUtilityTasks", "MergeWebConfig" ],
+  "Register":{
+    "Tasks":{
+      "InstallSitecoreModule": "Install-SitecoreConfiguration"
+    }
+  },
+  "Modules": [  "MergeWebConfig"],
   "Tasks": {
     "CheckPaths": {
       "Type": "EnsurePath",
       "Params": {
         "Exists": [
-          "[parameter('ModuleFullPath')]",
-          "[parameter('ModulesDirDst')]"
+          "[parameter('ModuleFullPath')]"
         ]
       }
     },
-    "InstallModule": {
-      "Type": "InstallModule",
+    "InstallCEConnectModule": {
+      "Type": "InstallSitecoreModule",
       "Params": {
-        "ModuleFullPath": "[parameter('ModuleFullPath')]",
-        "ModulesDirDst": "[parameter('ModulesDirDst')]",
-        "BaseUrl": "[parameter('BaseUrl')]"
+        "Path": "[concat(parameter('SharedConfigurationFolder'), '\\install-module.json')]",
+        "Package": "[parameter('ModuleFullPath')]",
+        "SiteName":"[parameter('SiteName')]",
+        "DatabasePrefix":"[parameter('SqlDbPrefix')]",
+        "SqlAdminUser":"[parameter('SqlAdminUser')]",
+        "SqlAdminPassword":"[parameter('SqlAdminPassword')]",
+        "SqlServer":"[parameter('SqlServer')]",
+        "ModuleDatabase":"mastercore"
       }
     },
     "MergeWebConfig": {
