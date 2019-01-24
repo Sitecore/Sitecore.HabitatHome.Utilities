@@ -2,6 +2,7 @@
     "Parameters": {
         "SqlServer": {
             "Type": "string",
+            "DefaultValue": "",
             "Description": "Name of SQL Server"
         },
         "SqlAdminUser": {
@@ -11,6 +12,7 @@
         },
         "SqlAdminPassword": {
             "Type": "string",
+            "DefaultValue": "",
             "Description": "SQL Admin user password"
         },
         "Script": {

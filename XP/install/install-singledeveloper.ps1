@@ -15,6 +15,9 @@ $ErrorActionPreference = 'Stop'
 
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
+$StopWatch = New-Object -TypeName System.Diagnostics.Stopwatch 
+$StopWatch.Start()
+
 
 Set-Location $PSScriptRoot
 $LogFolder = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($LogFolder) 
@@ -198,6 +201,7 @@ Function Confirm-Prerequisites {
 Function Install-SingleDeveloper {
     $singleDeveloperParams = @{
         Path                           = $sitecore.singleDeveloperConfigurationPath
+        CertificatePath                = $assets.certificatesPath
         SqlServer                      = $sql.server
         SqlAdminUser                   = $sql.adminUser
         SqlAdminPassword               = $sql.adminPassword
@@ -220,6 +224,7 @@ Function Install-SingleDeveloper {
         SolrService                    = $solr.serviceName
         Prefix                         = $site.prefix
         XConnectCertificateName        = $xconnect.siteName
+        XConnectCertificatePassword    = $sql.adminPassword
         IdentityServerCertificateName  = $identityServer.name
         IdentityServerSiteName         = $identityServer.name
         LicenseFile                    = $assets.licenseFilePath
@@ -303,3 +308,6 @@ Confirm-Prerequisites
 Install-SingleDeveloper
 Add-AppPoolMembership
 Add-AdditionalBindings
+
+$StopWatch.Stop()
+$StopWatch
