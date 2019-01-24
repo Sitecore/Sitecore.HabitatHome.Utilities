@@ -154,7 +154,7 @@
             "name": "StyleLabs Plugin",
             "fileName": "Stylelabs M Content Hub Plugin-1.0.0.zip",
             "url": "https://dev.sitecore.net/~/media/9A683955F98249769E8D5CB7AFC2525C.ashx",
-            "install": true,
+            "install": false,
             "convert": true,
             "source": "sitecore",
             "databases": "master,core"
