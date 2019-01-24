@@ -171,7 +171,7 @@ Function Install-Modules {
    
 }
 
-Import-Module (Join-Path $assets.sharedUtilitiesRoot "assets\modules\SharedInstallationUtilities\SharedInstallationUtilities.psm1") -Verbose -Force
+Import-Module (Join-Path $assets.sharedUtilitiesRoot "assets\modules\SharedInstallationUtilities\SharedInstallationUtilities.psm1") -Force
 Install-SitecoreInstallFramework
 Install-SitecoreAzureToolkit
 Install-Modules
