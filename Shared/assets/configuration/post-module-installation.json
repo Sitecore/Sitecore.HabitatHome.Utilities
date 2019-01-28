@@ -140,7 +140,7 @@
     },
     "Variables": {
         "MarketingAutomationServiceName": "[concat(parameter('XConnectSiteName'),'-MarketingAutomationService')]",
-        "IndexWorkerServiceServiceName": "[concat(parameter('XConnectSiteName'),'-IndexWorkerService')]",
+        "IndexWorkerServiceServiceName": "[concat(parameter('XConnectSiteName'),'-IndexWorker')]",
         "ProcessingEngineServiceName": "[concat(parameter('XConnectSiteName'),'-ProcessingEngineService')]",
         "StartMarketingAutomationService:Service.Name": "[variable('MarketingAutomationServiceName')]",
         "StartIndexWorkerService:Service.Name": "[variable('IndexWorkerServiceServiceName')]",
@@ -159,7 +159,7 @@
         "EnableContainedDatabases": {
             "Source": ".\\enable-contained-databases.json"
         },
-         "AddCoreUser": {
+        "AddCoreUser": {
             "Source": ".\\add-database-user.json"
         },
         "AddMasterUser": {
@@ -168,10 +168,10 @@
         "AddSecurityUser": {
             "Source": ".\\add-database-user.json"
         },
-        "StartMarketingAutomationService": {
+        "StartIndexWorkerService": {
             "Source": ".\\manage-service.json"
         },
-        "StartIndexWorkerService": {
+        "StartMarketingAutomationService": {
             "Source": ".\\manage-service.json"
         },
         "StartProcessingEngineService": {

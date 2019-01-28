@@ -133,6 +133,10 @@
     "BaseConfigurationFolder": {
       "Type": "string",
       "Description": "The base folder for SIF configuration."
+    },
+    "SitecoreIdentityServerUrl": {
+      "Type": "string",
+      "Description": "Sitecore Identity Server Url."
     }
   },
   "Variables": {
@@ -231,7 +235,8 @@
         "BraintreeAccount": "[parameter('BraintreeAccount')]",
         "AzureSearchServiceName": "[parameter('AzureSearchServiceName')]",
         "AzureSearchAdminKey": "[parameter('AzureSearchAdminKey')]",
-        "AzureSearchQueryKey": "[parameter('AzureSearchQueryKey')]"
+        "AzureSearchQueryKey": "[parameter('AzureSearchQueryKey')]",
+        "SitecoreIdentityServerUrl": "[parameter('SitecoreIdentityServerUrl')]"
       }
     },
     "StartOpsAppPool": {
@@ -271,7 +276,8 @@
         "PhysicalPath": "[variable('CommerceShopsPhysicalPath')]",
         "EnvironmentsPrefix": "[parameter('EnvironmentsPrefix')]",
         "UserName": "[concat(parameter('UserDomain'), concat('\\', parameter('UserName')))]",
-        "CommerceSearchProvider": "[parameter('CommerceSearchProvider')]"
+        "CommerceSearchProvider": "[parameter('CommerceSearchProvider')]",
+        "SitecoreIdentityServerUrl": "[parameter('SitecoreIdentityServerUrl')]"
       }
     },
     "StartShopsAppPool": {
@@ -311,7 +317,8 @@
         "PhysicalPath": "[variable('CommerceAuthoringPhysicalPath')]",
         "EnvironmentsPrefix": "[parameter('EnvironmentsPrefix')]",
         "UserName": "[concat(parameter('UserDomain'), concat('\\', parameter('UserName')))]",
-        "CommerceSearchProvider": "[parameter('CommerceSearchProvider')]"
+        "CommerceSearchProvider": "[parameter('CommerceSearchProvider')]",
+        "SitecoreIdentityServerUrl": "[parameter('SitecoreIdentityServerUrl')]"
       }
     },
     "StartAuthoringAppPool": {
@@ -352,7 +359,8 @@
         "PhysicalPath": "[variable('CommerceMinionsPhysicalPath')]",
         "EnvironmentsPrefix": "[parameter('EnvironmentsPrefix')]",
         "UserName": "[concat(parameter('UserDomain'), concat('\\', parameter('UserName')))]",
-        "CommerceSearchProvider": "[parameter('CommerceSearchProvider')]"
+        "CommerceSearchProvider": "[parameter('CommerceSearchProvider')]",
+        "SitecoreIdentityServerUrl": "[parameter('SitecoreIdentityServerUrl')]"
       }
     },
     "StartMinionsAppPool": {

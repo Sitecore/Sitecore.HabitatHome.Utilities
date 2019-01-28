@@ -51,6 +51,10 @@
     "BaseConfigurationFolder": {
       "Type": "string",
       "Description": "The base folder for SIF configuration."
+    },
+    "SitecoreIdentityServerUrl": { 
+      "Type": "string", 
+      "Description": "Sitecore Identity Server Url." 
     }
   },
   "Variables": {
@@ -86,7 +90,8 @@
         "SitecoreBizFxPort": "[parameter('SitecoreBizFxPort')]",
         "CommerceAuthoringServicesPort": "[parameter('CommerceAuthoringServicesPort')]",
         "PhysicalPath": "[variable('SitecoreBizFxPhysicalPath')]",
-        "UserName": "[concat(parameter('UserDomain'), concat('\\', parameter('UserName')))]"
+        "UserName": "[concat(parameter('UserDomain'), concat('\\', parameter('UserName')))]",
+        "SitecoreIdentityServerUrl": "[parameter('SitecoreIdentityServerUrl')]"
       }
     },
     "StartAppPool": {
