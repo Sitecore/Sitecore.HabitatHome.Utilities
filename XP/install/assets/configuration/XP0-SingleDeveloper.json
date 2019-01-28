@@ -389,7 +389,7 @@
             "Type": "String",
             "Reference": "CertificatePath"
         },
-        "XConnectCertificate:ExportPassword":{
+        "XConnectCertificates:ExportPassword":{
             "Type": "String",
             "Reference": "XConnectCertificatePassword"
         },

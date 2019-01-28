@@ -19,6 +19,10 @@
       "Type": "string",
       "Description": "The full path to the Commerce Engine certificate file."
     },
+    "CertificatePassword":{
+      "Type":"securestring",
+      "Description":"Password for the PFX certificate"
+    },
     "CommerceServicesPostfix": {
       "Type": "string",
       "Description": "The Commerce Engine postfix for services names"
@@ -45,6 +49,7 @@
       "Params": {
         "EngineConnectIncludeDir": "[parameter('EngineConnectIncludeDir')]",
         "CertificatePath": "[parameter('CertificatePath')]",
+        "CertificatePassword":"[parameter('CertificatePassword')]",
         "CommerceServicesPathCollection": [
           "[variable('CommerceOpsPhysicalPath')]",
           "[variable('CommerceShopsPhysicalPath')]",
