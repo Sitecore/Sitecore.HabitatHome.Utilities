@@ -31,6 +31,7 @@ $commerceAssets = $config.assets.commerce
 $sql = $config.settings.sql
 $xConnect = $config.settings.xConnect
 $sitecore = $config.settings.sitecore
+$identityServer = $config.settings.identityServer
 $solr = $config.settings.solr
 $assets = $config.assets
 $commerce = $config.settings.commerce
@@ -208,17 +209,7 @@ Function Publish-CommerceEngine {
     }
 }
 
-Function Publish-IdentityServer {
-    Write-Host "Publishing IdentityServer" -ForegroundColor Green
-    $identityServer = $assets.commerce.filesToExtract | Where-Object { $_.name -eq "Sitecore.IdentityServer"} 
-    $identityServerSource = Join-Path $commerceAssets.installationFolder $($identityServer.name + "." + $identityServer.version + "/")
-    $PublishLocation = Join-Path $publishPath $($site.prefix + ".Commerce.IdentityServer")
 
-    if (Test-Path $PublishLocation) {
-        Remove-Item $PublishLocation -Force -Recurse
-    }
-    Copy-Item -Path $identityServerSource -Destination $PublishLocation  -Force -Recurse
-}
 Function Publish-BizFx {
     Write-Host "Publishing BizFx" -ForegroundColor Green
     $bizFx = $assets.commerce.filesToExtract | Where-Object { $_.name -eq "Sitecore.BizFX"}
@@ -316,7 +307,6 @@ Function Install-Commerce {
         SitecoreBizFxServerName                     = $("SitecoreBizFX_" + $site.prefix)
         SitecoreCommerceEnginePath                  = $($publishPath + "\" + $site.prefix + ".Commerce.Engine")
         SitecoreBizFxServicesContentPath            = $($publishPath + "\" + $site.prefix + ".Commerce.BizFX")
-        SitecoreIdentityServerPath                  = $($publishPath + "\" + $site.prefix + ".Commerce.IdentityServer")
         CommerceEngineCertificatePath               = $(Join-Path -Path $assets.certificatesPath -ChildPath $($xConnect.siteName + ".pfx") )
         CommerceEngineCertificatePassword           = $secureCertificatePassword
         SiteUtilitiesSrc                            = $(Join-Path -Path $assets.commerce.sifCommerceRoot -ChildPath "SiteUtilityPages")
@@ -340,26 +330,28 @@ Function Install-Commerce {
             PublicKey  = $commerce.brainTreeAccountPublicKey
             PrivateKey = $commerce.brainTreeAccountPrivateKey
         }
-        SitecoreIdentityServerName                  = $commerce.identityServerName
-		  SecurityUserName                = $sql.securityUser
-        SecurityUserPassword            = $sql.SecurityPassword
-        CoreUserName                    = $sql.coreUser
-        CoreUserPassword                = $sql.corePassword
-        MasterUserName                  = $sql.masterUser
-        MasterUserPassword              = $sql.MasterPassword
-        BootLoaderPackagePath           = $bootLoaderPackagePath
-        BootloaderConfigurationOverride = $bootloaderConfigurationOverride
-        BootloaderInstallationPath      = $bootloaderInstallationPath
+        
+        SitecoreIdentityServerApplicationName       = $identityServer.name
+        SitecoreIdentityServerHostName              = $identityServer.url
+		SecurityUserName                            = $sql.securityUser
+        SecurityUserPassword                        = $sql.SecurityPassword
+        CoreUserName                                = $sql.coreUser
+        CoreUserPassword                            = $sql.corePassword
+        MasterUserName                              = $sql.masterUser
+        MasterUserPassword                          = $sql.MasterPassword
+        BootLoaderPackagePath                       = $bootLoaderPackagePath
+        BootloaderConfigurationOverride             = $bootloaderConfigurationOverride
+        BootloaderInstallationPath                  = $bootloaderInstallationPath
     }
     
     Import-Module (Join-Path $assets.sharedUtilitiesRoot "assets\modules\SharedInstallationUtilities\SharedInstallationUtilities.psm1") -Verbose -Force
 
     
     If (!$SkipHabitatHomeInstall) {
-        Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs") -Verbose
+        Install-SitecoreConfiguration @params  -Verbose *>&1 | Tee-Object "C:\projects\Demo.Utilities.VSTS\Xc\Install\output.log"
     }
     Else {
-        Install-SitecoreConfiguration @params -Skip "InitializeCommerceEngine", "GenerateCatalogTemplates", "InstallHabitatImagesModule", "Reindex" -WorkingDirectory $(Join-Path $PWD "logs") -Verbose
+        Install-SitecoreConfiguration @params -Skip "InitializeCommerceEngine", "GenerateCatalogTemplates", "InstallHabitatImagesModule", "Reindex" -Verbose *>&1 | Tee-Object "C:\projects\Demo.Utilities.VSTS\Xc\Install\output.log"
     }
 }
 
@@ -367,14 +359,12 @@ Function Install-Commerce {
 $StopWatch = New-Object -TypeName System.Diagnostics.Stopwatch 
 $StopWatch.Start()
 
-Install-RequiredInstallationAssets
-Set-ModulesPath
-# Install-CommerceAssets
-# Publish-CommerceEngine
-# Publish-IdentityServer
-# Publish-BizFx
-# Convert-Modules
-#Install-Bootloader
+ Install-RequiredInstallationAssets
+ Set-ModulesPath
+ Install-CommerceAssets
+ Publish-CommerceEngine
+ Publish-BizFx
+ Convert-Modules
 Install-Commerce
 Start-Site
 

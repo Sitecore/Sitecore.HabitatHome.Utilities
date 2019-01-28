@@ -8,10 +8,10 @@
 
 {
   "Parameters": {
-    "UrlIdentityServerGetToken": {
+    "SitecoreIdentityServerGetTokenUrl": {
       "Type": "string",
-      "DefaultValue": "https://localhost:5050/connect/token",
-      "Description": "Url IdentityServer GetToken"
+      "Description": "The Sitecore Identity Server GetToken url action.",
+      "DefaultValue": "https://sxastorefront-identityserver/connect/token"
     },
     "CommerceInstallRoot": {
       "Type": "string",
@@ -67,7 +67,7 @@
       "Type": "GetIdServerToken",
       "Params": {
         "SitecoreAdminAccount": "[parameter('SitecoreAdminAccount')]",
-        "UrlIdentityServerGetToken": "[parameter('UrlIdentityServerGetToken')]"
+        "UrlIdentityServerGetToken": "[parameter('SitecoreIdentityServerGetTokenUrl')]"
       }
     },
     "BootStrapCommerceServices": {

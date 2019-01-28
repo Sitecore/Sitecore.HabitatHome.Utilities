@@ -160,10 +160,6 @@
       "Type": "string",
       "Description": "Sitecore BizFx Server port"
     },
-    "SitecoreIdentityServerPath": {
-      "Type": "string",
-      "Description": "SitecoreIdentityServer Path"
-    },
     "UserDomain": {
       "Type": "string",
       "Description": "User Domain for Commerce Services App Pool"
@@ -248,11 +244,6 @@
       "Type": "string",
       "Description": "The Merge Tool full path"
     },
-    "SitecoreIdentityServerName": {
-      "Type": "string",
-      "Description": "Sitecore Identity Server name",
-      "DefaultValue": "SitecoreIdentityServer"
-    },
     "SitecoreUsername": {
       "Type": "string",
       "Description": "Sitecore Admin Username"
@@ -260,6 +251,14 @@
     "SitecoreUserPassword": {
       "Type": "string",
       "Description": "Sitecore Admin Password"
+    },
+    "SitecoreIdentityServerApplicationName" :{
+      "Type": "string",
+      "Description": "Application name of Sitecore Identity Server in the IIS"
+    },
+    "SitecoreIdentityServerHostName" :{
+      "Type": "string",
+      "Description": "Hostname of Sitecore Identity Server."
     }
   },
   "Variables": {
@@ -278,7 +277,9 @@
     "ContentSearchEnabledXpath": "//configuration/sitecore/settings/setting[@name='ContentSearch.Enabled']",
     "ConnectionString": "[concat('Data Source=.;Initial Catalog=', concat(parameter('SitecoreCoreDbName'), ';Integrated Security=True'))]",
     "ProjectConfigIncludeDir": "[concat(parameter('InstallDir'), '\\App_Config\\Include\\Z.Foundation.Overrides')]",
-    "SiteRootUrl": "[concat('http://', concat(parameter('SiteHostHeaderName')))]"
+    "SiteRootUrl": "[concat('http://', concat(parameter('SiteHostHeaderName')))]",
+    "SitecoreIdentityServerUrl": "[concat('https://', parameter('SitecoreIdentityServerHostName'))]",
+    "ImagesJsonPath": "[concat(parameter('BaseConfigurationFolder'), '\\Commerce\\images.json')]"
   },
   "Modules": [ "InstallSitecoreConfiguration", "ManageCommerceService", "SitecoreUtilityTasks", "WindowsLocal" ],
   "Tasks": {
@@ -295,6 +296,13 @@
         "Path": "[concat(parameter('BaseConfigurationFolder'), '\\Commerce\\SXAStorefront\\SXAStorefront.CreateBinding.json')]",
         "SiteName": "[parameter('SiteName')]",
         "StorefrontHostName": "[parameter('SiteHostHeaderName')]"
+      }
+    },
+    "CopyIdentityServerCommerceConfiguration": {
+      "Type": "Copy",
+      "Params": {
+        "Source": ".\\IdentityServer\\Sitecore.Commerce.IdentityServer.Host.xml",
+        "Destination": "[concat('C:\\inetpub\\wwwroot\\', concat(parameter('SitecoreIdentityServerApplicationName'), '\\Config\\production\\Sitecore.Commerce.IdentityServer.Host.xml'))]"
       }
     },
     "InstallSolrCores": {
@@ -339,7 +347,8 @@
         "UserName": "[parameter('UserName')]",
         "UserPassword": "[parameter('UserPassword')]",
         "BraintreeAccount": "[parameter('BraintreeAccount')]",
-        "BaseConfigurationFolder": "[parameter('BaseConfigurationFolder')]"
+        "BaseConfigurationFolder": "[parameter('BaseConfigurationFolder')]",
+        "SitecoreIdentityServerUrl": "[variable('SitecoreIdentityServerUrl')]"
       }
     },
     "DeploySitecoreBizFx": {
@@ -355,24 +364,8 @@
         "SitecoreBizFxServerName": "[parameter('SitecoreBizFxServerName')]",
         "SitecoreBizFxHostname": "[parameter('EngineHostName')]",
         "SitecoreBizFxPort": "[parameter('SitecoreBizFxPort')]",
-        "BaseConfigurationFolder": "[parameter('BaseConfigurationFolder')]"
-      }
-    },
-    "DeploySitecoreIdentityServer": {
-      "Type": "InstallSitecoreConfiguration",
-      "Params": {
-        "Path": "[concat(parameter('BaseConfigurationFolder'), '\\Commerce\\SitecoreIdentityServer\\SitecoreIdentityServer.json')]",
-        "CommerceInstallRoot": "[parameter('CommerceInstallRoot')]",
-        "SitecoreIdentityServerPath": "[parameter('SitecoreIdentityServerPath')]",
-        "SitecoreDbServer": "[parameter('SitecoreDbServer')]",
-        "SitecoreCoreDbName": "[parameter('SitecoreCoreDbName')]",
-        "UserDomain": "[parameter('UserDomain')]",
-        "UserName": "[parameter('UserName')]",
-        "UserPassword": "[parameter('UserPassword')]",
-        "SitecoreIdentityServerName": "[parameter('SitecoreIdentityServerName')]",
-        "SitecoreIdentityHostname": "[parameter('EngineHostName')]",
-        "SitecoreBizFxPort": "[parameter('SitecoreBizFxPort')]",
-        "BaseConfigurationFolder": "[parameter('BaseConfigurationFolder')]"
+        "BaseConfigurationFolder": "[parameter('BaseConfigurationFolder')]",
+        "SitecoreIdentityServerUrl": "[variable('SitecoreIdentityServerUrl')]"
       }
     },
     "CopySiteUtilityFolder": {
@@ -431,7 +424,7 @@
     "InstallHabitatImagesModule": {
       "Type": "InstallSitecoreConfiguration",
       "Params": {
-        "Path": "[concat(parameter('BaseConfigurationFolder'), '\\Commerce\\HabitatImages\\HabitatImages.json')]",
+        "Path": "[variable('ImagesJsonPath')]",
         "ModuleFullPath": "[parameter('HabitatImagesModuleFullPath')]",
         "ModulesDirDst": "[variable('ModulesDirDst')]",
         "BaseUrl": "[variable('UtilitiesBaseUrl')]"
@@ -440,7 +433,7 @@
     "InstallAdventureWorksImagesModule": {
       "Type": "InstallSitecoreConfiguration",
       "Params": {
-        "Path": "[concat(parameter('BaseConfigurationFolder'), '\\Commerce\\AdvImages\\AdvImages.json')]",
+        "Path": "[variable('ImagesJsonPath')]",
         "ModuleFullPath": "[parameter('AdvImagesModuleFullPath')]",
         "ModulesDirDst": "[variable('ModulesDirDst')]",
         "BaseUrl": "[variable('UtilitiesBaseUrl')]"
@@ -548,7 +541,8 @@
         "SitecoreAdminAccount": {
           "UserName": "[parameter('SitecoreUsername')]",
           "Password": "[parameter('SitecoreUserPassword')]"
-        }
+        },
+        "SitecoreIdentityServerGetTokenUrl": "[concat(variable('SitecoreIdentityServerUrl'), '/connect/token')]"
       }
     },
     "EnableCEConnectDataProvider": {
