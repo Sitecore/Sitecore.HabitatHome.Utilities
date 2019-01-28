@@ -156,7 +156,10 @@
         "AddSecurityUser:Database.Suffix": "Core"
     },
     "Includes": {
-        "AddCoreUser": {
+        "EnableContainedDatabases": {
+            "Source": ".\\enable-contained-databases.json"
+        },
+         "AddCoreUser": {
             "Source": ".\\add-database-user.json"
         },
         "AddMasterUser": {
@@ -173,9 +176,6 @@
         },
         "StartProcessingEngineService": {
             "Source": ".\\manage-service.json"
-        },
-        "EnableContainedDatabases": {
-            "Source": ".\\enable-contained-databases.json"
         },
         "WarmUpSite": {
             "Source": ".\\warmup-instance.json"

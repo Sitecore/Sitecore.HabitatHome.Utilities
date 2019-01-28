@@ -3,6 +3,8 @@ Param(
     [switch] $SkipHabitatHomeInstall
 )
 
+[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+
 #####################################################
 #
 #  Install Sitecore
@@ -95,7 +97,7 @@ function Install-CommerceAssets {
         $credentials = Get-Credential -Message "Please provide dev.sitecore.com credentials"
 
         $params = @{
-            Path         = $([io.path]::combine($sharedResourcePath, 'download-assets.json'))
+            Path         = $([io.path]::combine($sharedResourcePath, 'configuration\download-assets.json'))
             LoginSession = $loginSession
             Source       = $assets.commerce.packageUrl
             Destination  = $commercePackageDestination
@@ -113,7 +115,7 @@ function Install-CommerceAssets {
     if (!(Test-Path $msbuildNuGetPackageDestination)) {
         Write-Host "Saving $msbuildNuGetUrl to $msbuildNuGetPackageDestination" -ForegroundColor Green
         $params = @{
-            Path         = $([io.path]::combine($sharedResourcePath, 'download-assets.json'))
+            Path         = $([io.path]::combine($sharedResourcePath, 'configuration\download-assets.json'))
             LoginSession = $loginSession
             Source       = $msbuildNuGetUrl
             Destination  = $msbuildNuGetPackageDestination
@@ -131,7 +133,7 @@ function Install-CommerceAssets {
     if (!(Test-Path $habitatHomeImagePackageDestination)) {
         Write-Host ("Saving '{0}' to '{1}'" -f $habitatHomeImagePackageFileName, $habitatHomeImagePackageDestination) -ForegroundColor Green
         $params = @{
-            Path         = $([io.path]::combine($sharedResourcePath, 'download-assets.json'))
+            Path         = $([io.path]::combine($sharedResourcePath, 'configuration\download-assets.json'))
             LoginSession = $loginSession
             Source       = $habitatHomeImagePackageUrl
             Destination  = $habitatHomeImagePackageDestination
@@ -255,7 +257,7 @@ Function Install-Bootloader {
     $bootloaderInstallationPath = $([io.path]::combine($site.webRoot, $site.hostName, "App_Data\tools\InstallJob"))
     
     $params = @{
-        Path                             = (Join-path $sharedResourcePath 'bootloader.json')
+        Path                             = (Join-path $sharedResourcePath 'configuration\bootloader.json')
         Package                          = $bootLoaderPackagePath
         SiteName                         = $site.hostName
         ConfigurationOverrideSource      = $bootloaderConfigurationOverride
@@ -271,7 +273,8 @@ Function Install-Commerce {
 	$bootLoaderPackagePath = [IO.Path]::Combine( $assets.sitecoreazuretoolkit, "resources\9.1.0\Addons\Sitecore.Cloud.Integration.Bootload.wdp.zip")
     $bootloaderConfigurationOverride = $([io.path]::combine($sharedResourcePath, 'Sitecore.Cloud.Integration.Bootload.InstallJob.exe.config'))
     $bootloaderInstallationPath = $([io.path]::combine($site.webRoot, $site.hostName, "App_Data\tools\InstallJob"))
-	
+    $secureCertificatePassword = ConvertTo-SecureString $sql.adminPassword -AsPlainText -Force
+
     $params = @{
         Path                                        = $(Join-Path $resourcePath  'Commerce_SingleServer.json')
         BaseConfigurationFolder                     = $(Join-Path $resourcePath "Configuration")
@@ -315,13 +318,13 @@ Function Install-Commerce {
         SitecoreBizFxServicesContentPath            = $($publishPath + "\" + $site.prefix + ".Commerce.BizFX")
         SitecoreIdentityServerPath                  = $($publishPath + "\" + $site.prefix + ".Commerce.IdentityServer")
         CommerceEngineCertificatePath               = $(Join-Path -Path $assets.certificatesPath -ChildPath $($xConnect.siteName + ".pfx") )
-        CommerceEngineCertificatePassword           = $sql.adminPassword
+        CommerceEngineCertificatePassword           = $secureCertificatePassword
         SiteUtilitiesSrc                            = $(Join-Path -Path $assets.commerce.sifCommerceRoot -ChildPath "SiteUtilityPages")
         CommerceConnectModuleFullPath               = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include "Sitecore Commerce Connect Core*.scwdp.zip" -Recurse  )
         CommercexProfilesModuleFullPath             = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include "Sitecore Commerce ExperienceProfile Core *.scwdp.zip" -Recurse)
         CommercexAnalyticsModuleFullPath            = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include "Sitecore Commerce ExperienceAnalytics Core *.scwdp.zip"	-Recurse)
         CommerceMAModuleFullPath                    = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include "Sitecore Commerce Marketing Automation Core *.scwdp.zip"	-Recurse)
-        CommerceMAForAutomationEngineModuleFullPath = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include "Sitecore Commerce Marketing Automation for AutomationEngine *.zip"	-Recurse)
+        CommerceMAForAutomationEngineModuleFullPath = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include "Sitecore Commerce Marketing Automation for AutomationEngine JF*.zip"	-Recurse)
         CEConnectModuleFullPath                     = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include  "Sitecore Commerce Engine Connect*.scwdp.zip" -Recurse)
         SXACommerceModuleFullPath                   = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include  "Sitecore Commerce Experience Accelerator 2.*.scwdp.zip" -Recurse)
         SXAStorefrontModuleFullPath                 = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include  "Sitecore Commerce Experience Accelerator Storefront 2.*.scwdp.zip"-Recurse )
@@ -366,11 +369,11 @@ $StopWatch.Start()
 
 Install-RequiredInstallationAssets
 Set-ModulesPath
-#Install-CommerceAssets
-#Publish-CommerceEngine
-#Publish-IdentityServer
-#Publish-BizFx
-#Convert-Modules
+# Install-CommerceAssets
+# Publish-CommerceEngine
+# Publish-IdentityServer
+# Publish-BizFx
+# Convert-Modules
 #Install-Bootloader
 Install-Commerce
 Start-Site

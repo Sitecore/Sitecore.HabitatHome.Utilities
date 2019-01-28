@@ -24,12 +24,25 @@ Function Invoke-ApplyCertificateTask {
         [string]$EngineConnectIncludeDir,
         [Parameter(Mandatory = $true)]
         [string]$CertificatePath,
+        [securestring]$CertificatePassword,
         [Parameter(Mandatory = $true)]
         [string[]]$CommerceServicesPathCollection
     )      
-
+    [securestring] $secPassword = $null
+    
     $cert = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2
-    $cert.Import($CertificatePath)
+
+    if ($null -ne $CertificatePassword) {
+        $cert.Import($CertificatePath, $CertificatePassword, 0)
+    
+    }
+    else {
+        $cert.Import($CertificatePath)
+
+    }
+    
+
+    
 
     Write-Host "Applying certificate: $($cert.Thumbprint)" -ForegroundColor Green
 
@@ -108,7 +121,7 @@ Function Invoke-InitializeCommerceServicesTask {
         $initializeUrl = $UrlInitializeEnvironment
 
         $payload = @{
-            "environment"=$env;
+            "environment" = $env;
         }
 
         $result = Invoke-RestMethod $initializeUrl -TimeoutSec 1200 -Method POST -Body ($payload|ConvertTo-Json) -Headers $headers -ContentType "application/json"
