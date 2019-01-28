@@ -164,10 +164,6 @@
       "Type": "string",
       "Description": "Sitecore BizFx Server port"
     },
-    "SitecoreIdentityServerPath": {
-      "Type": "string",
-      "Description": "SitecoreIdentityServer Path"
-    },
     "UserDomain": {
       "Type": "string",
       "Description": "User Domain for Commerce Services App Pool"
@@ -236,11 +232,6 @@
       "Type": "string",
       "Description": "The Merge Tool full path"
     },
-    "SitecoreIdentityServerName": {
-      "Type": "string",
-      "Description": "Sitecore Identity Server name",
-      "DefaultValue": "SitecoreIdentityServer"
-    },
     "SitecoreUsername": {
       "Type": "string",
       "Description": "Sitecore Admin Username"
@@ -300,10 +291,18 @@
       "DefaultValue": "",
       "Description": "Empty"
     },
-    "CommerceEngineCertificatePassword":{
+    "CommerceEngineCertificatePassword": {
       "Type": "securestring",
       "DefaultValue": "",
       "Description": "Password to import the .pfx"
+    },
+    "SitecoreIdentityServerApplicationName": {
+      "Type": "string",
+      "Description": "Application name of Sitecore Identity Server in the IIS"
+    },
+    "SitecoreIdentityServerHostName": {
+      "Type": "string",
+      "Description": "Hostname of Sitecore Identity Server."
     }
   },
   "Settings": {
@@ -323,13 +322,21 @@
     "ContentSearchEnabledXpath": "//configuration/sitecore/settings/setting[@name='ContentSearch.Enabled']",
     "ConnectionString": "[concat('Data Source=.;Initial Catalog=', concat(parameter('SitecoreCoreDbName'), ';Integrated Security=True'))]",
     "ProjectConfigIncludeDir": "[concat(parameter('InstallDir'), '\\App_Config\\Include\\Project\\Commerce')]",
-    "SiteRootUrl": "[concat('https://', concat(parameter('SiteHostHeaderName')))]"
+    "SiteRootUrl": "[concat('https://', concat(parameter('SiteHostHeaderName')))]",
+    "SitecoreIdentityServerUrl": "[parameter('SitecoreIdentityServerHostName')]"
   },
   "Modules": [
     "InstallSitecoreConfiguration",
     "ManageCommerceService",
-    "SitecoreUtilityTasks"
+    "SitecoreUtilityTasks",
+    "MergeWebConfig"
   ],
+  "Register": {
+    "Tasks": {
+      "WriteInformation": "Write-Information",
+      "ExpandArchive": "Expand-Archive"
+    }
+  },
   "Tasks": {
     "CreateBinding": {
       "Type": "InstallSitecoreConfiguration",
@@ -337,6 +344,13 @@
         "Path": "[concat(parameter('BaseConfigurationFolder'), '\\Commerce\\SXAStorefront\\SXAStorefront.CreateBinding.json')]",
         "SiteName": "[parameter('SiteName')]",
         "StorefrontHostName": "[parameter('SiteHostHeaderName')]"
+      }
+    },
+    "CopyIdentityServerCommerceConfiguration": {
+      "Type": "Copy",
+      "Params": {
+        "Source": "[concat(parameter('BaseConfigurationFolder'), '\\IdentityServer\\Sitecore.Commerce.IdentityServer.Host.xml')]",
+        "Destination": "[joinpath(parameter('CommerceInstallRoot'), joinpath(parameter('SitecoreIdentityServerApplicationName'), '\\Config\\production\\Sitecore.Commerce.IdentityServer.Host.xml'))]"
       }
     },
     "InstallSolrCores": {
@@ -381,7 +395,8 @@
         "UserName": "[parameter('UserName')]",
         "UserPassword": "[parameter('UserPassword')]",
         "BraintreeAccount": "[parameter('BraintreeAccount')]",
-        "BaseConfigurationFolder": "[parameter('BaseConfigurationFolder')]"
+        "BaseConfigurationFolder": "[parameter('BaseConfigurationFolder')]",
+        "SitecoreIdentityServerUrl": "[variable('SitecoreIdentityServerUrl')]"
       }
     },
     "DeploySitecoreBizFx": {
@@ -397,24 +412,8 @@
         "SitecoreBizFxServerName": "[parameter('SitecoreBizFxServerName')]",
         "SitecoreBizFxHostname": "[parameter('EngineHostName')]",
         "SitecoreBizFxPort": "[parameter('SitecoreBizFxPort')]",
-        "BaseConfigurationFolder": "[parameter('BaseConfigurationFolder')]"
-      }
-    },
-    "DeploySitecoreIdentityServer": {
-      "Type": "InstallSitecoreConfiguration",
-      "Params": {
-        "Path": "[concat(parameter('BaseConfigurationFolder'), '\\Commerce\\SitecoreIdentityServer\\SitecoreIdentityServer.json')]",
-        "CommerceInstallRoot": "[parameter('CommerceInstallRoot')]",
-        "SitecoreIdentityServerPath": "[parameter('SitecoreIdentityServerPath')]",
-        "SitecoreDbServer": "[parameter('SitecoreDbServer')]",
-        "SitecoreCoreDbName": "[parameter('SitecoreCoreDbName')]",
-        "UserDomain": "[parameter('UserDomain')]",
-        "UserName": "[parameter('UserName')]",
-        "UserPassword": "[parameter('UserPassword')]",
-        "SitecoreIdentityServerName": "[parameter('SitecoreIdentityServerName')]",
-        "SitecoreIdentityHostname": "[parameter('EngineHostName')]",
-        "SitecoreBizFxPort": "[parameter('SitecoreBizFxPort')]",
-        "BaseConfigurationFolder": "[parameter('BaseConfigurationFolder')]"
+        "BaseConfigurationFolder": "[parameter('BaseConfigurationFolder')]",
+        "SitecoreIdentityServerUrl": "[variable('SitecoreIdentityServerUrl')]"
       }
     },
     "CopySiteUtilityFolder": {
@@ -475,68 +474,86 @@
     "InstallCommerceConnectModule": {
       "Type": "InstallSitecoreConfiguration",
       "Params": {
-        "Path": "[concat(parameter('BaseConfigurationFolder'), '\\Commerce\\Connect\\Connect.json')]",
-        "SharedConfigurationFolder": "[parameter('SharedConfigurationFolder')]",
-        "ModuleFullPath": "[parameter('CommerceConnectModuleFullPath')]",
+        "Path": "[concat(parameter('SharedConfigurationFolder'), '\\install-module.json')]",
+        "Package": "[parameter('CommerceConnectModuleFullPath')]",
         "SiteName": "[parameter('SiteName')]",
-        "SqlDbPrefix": "[parameter('EnvironmentsPrefix')]",
+        "DatabasePrefix": "[parameter('EnvironmentsPrefix')]",
         "SqlAdminUser": "[parameter('SqlAdminUserName')]",
         "SqlAdminPassword": "[parameter('SqlAdminPassword')]",
-        "SqlServer": "[parameter('SitecoreDbServer')]"
+        "SqlServer": "[parameter('SitecoreDbServer')]",
+        "ModuleDatabase": "mastercore"
       }
     },
     "InstallCommercexProfilesModule": {
       "Type": "InstallSitecoreConfiguration",
       "Params": {
-        "Path": "[concat(parameter('BaseConfigurationFolder'), '\\Commerce\\Connect\\Connect_xProfiles.json')]",
-        "SharedConfigurationFolder": "[parameter('SharedConfigurationFolder')]",
-        "ModuleFullPath": "[parameter('CommercexProfilesModuleFullPath')]",
+        "Path": "[concat(parameter('SharedConfigurationFolder'), '\\install-module.json')]",
+        "Package": "[parameter('CommercexProfilesModuleFullPath')]",
         "SiteName": "[parameter('SiteName')]",
-        "SqlDbPrefix": "[parameter('EnvironmentsPrefix')]",
+        "DatabasePrefix": "[parameter('EnvironmentsPrefix')]",
         "SqlAdminUser": "[parameter('SqlAdminUserName')]",
         "SqlAdminPassword": "[parameter('SqlAdminPassword')]",
-        "SqlServer": "[parameter('SitecoreDbServer')]"
+        "SqlServer": "[parameter('SitecoreDbServer')]",
+        "ModuleDatabase": "core"
       }
     },
     "InstallCommercexAnalyticsModule": {
       "Type": "InstallSitecoreConfiguration",
       "Params": {
-        "Path": "[concat(parameter('BaseConfigurationFolder'), '\\Commerce\\Connect\\Connect_xAnalytics.json')]",
-        "SharedConfigurationFolder": "[parameter('SharedConfigurationFolder')]",
-        "ModuleFullPath": "[parameter('CommercexAnalyticsModuleFullPath')]",
+        "Path": "[concat(parameter('SharedConfigurationFolder'), '\\install-module.json')]",
+        "Package": "[parameter('CommercexAnalyticsModuleFullPath')]",
         "SiteName": "[parameter('SiteName')]",
-        "SqlDbPrefix": "[parameter('EnvironmentsPrefix')]",
+        "DatabasePrefix": "[parameter('EnvironmentsPrefix')]",
         "SqlAdminUser": "[parameter('SqlAdminUserName')]",
         "SqlAdminPassword": "[parameter('SqlAdminPassword')]",
-        "SqlServer": "[parameter('SitecoreDbServer')]"
+        "SqlServer": "[parameter('SitecoreDbServer')]",
+        "ModuleDatabase": "mastercore"
       }
     },
     "InstallCommerceMAModule": {
       "Type": "InstallSitecoreConfiguration",
       "Params": {
-        "Path": "[concat(parameter('BaseConfigurationFolder'), '\\Commerce\\Connect\\Connect_MarketingAutomation.json')]",
-        "SharedConfigurationFolder": "[parameter('SharedConfigurationFolder')]",
-        "XConnectSitePath": "[parameter('XConnectInstallDir')]",
-        "ModuleFullPath": "[parameter('CommerceMAModuleFullPath')]",
-        "AutomationEngineModule": "[parameter('CommerceMAForAutomationEngineModuleFullPath')]",
+        "Path": "[concat(parameter('SharedConfigurationFolder'), '\\install-module.json')]",
+        "Package": "[parameter('CommerceMAModuleFullPath')]",
         "SiteName": "[parameter('SiteName')]",
-        "SqlDbPrefix": "[parameter('EnvironmentsPrefix')]",
+        "DatabasePrefix": "[parameter('EnvironmentsPrefix')]",
         "SqlAdminUser": "[parameter('SqlAdminUserName')]",
         "SqlAdminPassword": "[parameter('SqlAdminPassword')]",
-        "SqlServer": "[parameter('SitecoreDbServer')]"
+        "SqlServer": "[parameter('SitecoreDbServer')]",
+        "ModuleDatabase": "master"
+      }
+    },
+    "OuptutPath": {
+      "Type": "WriteInformation",
+      "Params": {
+        "MessageData":"[concat(variable('SitecoreIdentityServerUrl'), '/connect/token')]"
+      }
+    },
+    "InstallAutomationEngineModule": {
+      "Type": "ExpandArchive",
+      "Params": {
+        "Path": "[parameter('CommerceMAForAutomationEngineModuleFullPath')]",
+        "DestinationPath": "[parameter('XConnectInstallDir')]",
+        "Force": true
       }
     },
     "InstallCommerceEngineConnectModule": {
       "Type": "InstallSitecoreConfiguration",
       "Params": {
-        "Path": "[concat(parameter('BaseConfigurationFolder'), '\\Commerce\\CEConnect\\CEConnect.json')]",
-        "ModuleFullPath": "[parameter('CEConnectModuleFullPath')]",
-        "SharedConfigurationFolder": "[parameter('SharedConfigurationFolder')]",
+        "Path": "[concat(parameter('SharedConfigurationFolder'), '\\install-module.json')]",
+        "Package": "[parameter('CEConnectModuleFullPath')]",
         "SiteName": "[parameter('SiteName')]",
-        "SqlDbPrefix": "[parameter('EnvironmentsPrefix')]",
+        "DatabasePrefix": "[parameter('EnvironmentsPrefix')]",
         "SqlAdminUser": "[parameter('SqlAdminUserName')]",
         "SqlAdminPassword": "[parameter('SqlAdminPassword')]",
         "SqlServer": "[parameter('SitecoreDbServer')]",
+        "ModuleDatabase": "mastercore"
+      }
+    },
+    "MergeCommerceEngineConnectWebConfig": {
+      "Type": "InstallSitecoreConfiguration",
+      "Params": {
+        "Path": "[concat(parameter('BaseConfigurationFolder'), '\\merge-webconfig.json')]",
         "MergeTool": "[parameter('MergeToolFullPath')]",
         "InputFile": "[variable('CEMergeInputFile')]",
         "WebConfig": "[variable('WebConfig')]"
@@ -553,14 +570,19 @@
     "InstallSXACommerceModule": {
       "Type": "InstallSitecoreConfiguration",
       "Params": {
-        "Path": "[concat(parameter('BaseConfigurationFolder'), '\\Commerce\\SXAStorefront\\SXACommerce.json')]",
-        "SharedConfigurationFolder": "[parameter('SharedConfigurationFolder')]",
-        "SXACommerceModuleFullPath": "[parameter('SXACommerceModuleFullPath')]",
+        "Path": "[concat(parameter('SharedConfigurationFolder'), '\\install-module.json')]",
+        "Package": "[parameter('SXACommerceModuleFullPath')]",
         "SiteName": "[parameter('SiteName')]",
-        "SqlDbPrefix": "[parameter('EnvironmentsPrefix')]",
+        "DatabasePrefix": "[parameter('EnvironmentsPrefix')]",
         "SqlAdminUser": "[parameter('SqlAdminUserName')]",
         "SqlAdminPassword": "[parameter('SqlAdminPassword')]",
         "SqlServer": "[parameter('SitecoreDbServer')]",
+        "ModuleDatabase": "master"
+      }
+    },
+    "MergeSXACommerceWebConfig": {
+      "Type": "MergeWebConfig",
+      "Params": {
         "MergeTool": "[parameter('MergeToolFullPath')]",
         "InputFile": "[variable('SXAMergeInputFile')]",
         "WebConfig": "[variable('WebConfig')]"
@@ -571,20 +593,20 @@
       "Params": {
         "CertStoreLocation": "cert:\\localmachine\\my",
         "FilePath": "[parameter('CommerceEngineCertificatePath')]",
-        "Password":"[parameter('CommerceEngineCertificatePassword')]"
+        "Password": "[parameter('CommerceEngineCertificatePassword')]"
       }
     },
     "InstallHabitatImagesModule": {
       "Type": "InstallSitecoreConfiguration",
       "Params": {
-        "Path": "[concat(parameter('BaseConfigurationFolder'), '\\Commerce\\HabitatImages\\HabitatImages.json')]",
-        "ModuleFullPath":"[parameter('HabitatImagesModuleFullPath')]",
-        "SharedConfigurationFolder": "[parameter('SharedConfigurationFolder')]",
+        "Path": "[concat(parameter('SharedConfigurationFolder'), '\\install-module.json')]",
+        "Package": "[parameter('HabitatImagesModuleFullPath')]",
         "SiteName": "[parameter('SiteName')]",
-        "SqlDbPrefix": "[parameter('EnvironmentsPrefix')]",
+        "DatabasePrefix": "[parameter('EnvironmentsPrefix')]",
         "SqlAdminUser": "[parameter('SqlAdminUserName')]",
         "SqlAdminPassword": "[parameter('SqlAdminPassword')]",
-        "SqlServer": "[parameter('SitecoreDbServer')]"
+        "SqlServer": "[parameter('SitecoreDbServer')]",
+        "ModuleDatabase": "master"
       }
     },
     "SetDirectoryForPostModuleInstalation": {
@@ -621,7 +643,7 @@
         "CommerceInstallRoot": "[parameter('CommerceInstallRoot')]",
         "EngineConnectIncludeDir": "[variable('EngineConnectIncludeDir')]",
         "CertificatePath": "[parameter('CommerceEngineCertificatePath')]",
-        "CertificatePassword":"[parameter('CommerceEngineCertificatePassword')]",
+        "CertificatePassword": "[parameter('CommerceEngineCertificatePassword')]",
         "CommerceServicesPostfix": "[parameter('CommerceServicesPostfix')]",
         "CommerceAuthoringServicesPort": "[parameter('CommerceAuthoringServicesPort')]"
       }
@@ -637,7 +659,8 @@
         "SitecoreAdminAccount": {
           "UserName": "[parameter('SitecoreUsername')]",
           "Password": "[parameter('SitecoreUserPassword')]"
-        }
+        },
+        "SitecoreIdentityServerGetTokenUrl": "[concat(variable('SitecoreIdentityServerUrl'), '/connect/token')]"
       }
     },
     "EnableCEConnectDataProvider": {

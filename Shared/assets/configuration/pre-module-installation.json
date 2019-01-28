@@ -155,7 +155,7 @@
     },
     "Variables": {
         "MarketingAutomationServiceName": "[concat(parameter('XConnectSiteName'),'-MarketingAutomationService')]",
-        "IndexWorkerServiceServiceName": "[concat(parameter('XConnectSiteName'),'-IndexWorkerService')]",
+        "IndexWorkerServiceServiceName": "[concat(parameter('XConnectSiteName'),'-IndexWorker')]",
         "ProcessingEngineServiceName": "[concat(parameter('XConnectSiteName'),'-ProcessingEngineService')]",
         "StopMarketingAutomationService:Service.Name": "[variable('MarketingAutomationServiceName')]",
         "StopIndexWorkerService:Service.Name": "[variable('IndexWorkerServiceServiceName')]",
