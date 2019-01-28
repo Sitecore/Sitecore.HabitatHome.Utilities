@@ -301,7 +301,7 @@
       "Description": "Empty"
     },
     "CommerceEngineCertificatePassword":{
-      "Type": "string",
+      "Type": "securestring",
       "DefaultValue": "",
       "Description": "Password to import the .pfx"
     }
@@ -566,14 +566,14 @@
         "WebConfig": "[variable('WebConfig')]"
       }
     },
-    // "ImportRootCertificate": {
-    //   "Type": "ImportPfxCertificate",
-    //   "Params": {
-    //     "CertStoreLocation": "cert:\\localmachine\\my",
-    //     "FilePath": "[parameter('CommerceEngineCertificatePath')]",
-    //     "Password":"[parameter('CommerceEngineCertificatePassword')]"
-    //   }
-    // },
+    "ImportRootCertificate": {
+      "Type": "ImportPfxCertificate",
+      "Params": {
+        "CertStoreLocation": "cert:\\localmachine\\my",
+        "FilePath": "[parameter('CommerceEngineCertificatePath')]",
+        "Password":"[parameter('CommerceEngineCertificatePassword')]"
+      }
+    },
     "InstallHabitatImagesModule": {
       "Type": "InstallSitecoreConfiguration",
       "Params": {
@@ -621,6 +621,7 @@
         "CommerceInstallRoot": "[parameter('CommerceInstallRoot')]",
         "EngineConnectIncludeDir": "[variable('EngineConnectIncludeDir')]",
         "CertificatePath": "[parameter('CommerceEngineCertificatePath')]",
+        "CertificatePassword":"[parameter('CommerceEngineCertificatePassword')]",
         "CommerceServicesPostfix": "[parameter('CommerceServicesPostfix')]",
         "CommerceAuthoringServicesPort": "[parameter('CommerceAuthoringServicesPort')]"
       }
@@ -691,15 +692,6 @@
       "Type": "StartSleep",
       "Params": {
         "Seconds": 60
-      }
-    },
-    "PopulateSXAIndexesSchema": {
-      "Type": "InstallSitecoreConfiguration",
-      "Params": {
-        "Path": "[concat(parameter('BaseConfigurationFolder'), '\\SitecoreUtilities\\PopulateIndexSchema.json')]",
-        "SiteRootUrl": "[variable('SiteRootUrl')]",
-        "SitecoreAdminPassword": "[parameter('SitecoreUserPassword')]",
-        "Indexes": "sitecore_sxa_master_index|sitecore_sxa_web_index"
       }
     },
     "Reindex": {
