@@ -16,12 +16,14 @@
     "Modules": [
         "MergeWebConfig"
     ],
-    "MergeWebConfig": {
-        "Type": "MergeWebConfig",
-        "Params": {
+    "Tasks": {
+        "MergeWebConfig": {
+          "Type": "MergeWebConfig",
+          "Params": {
             "MergeTool": "[parameter('MergeTool')]",
             "InputFile": "[parameter('InputFile')]",
             "WebConfig": "[parameter('WebConfig')]"
+          }
         }
     }
 }
