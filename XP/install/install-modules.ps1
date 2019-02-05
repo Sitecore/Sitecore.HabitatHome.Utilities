@@ -166,7 +166,7 @@ Function Install-Modules {
         SitecoreAdminPassword           = $sitecore.adminPassword
     }
     Push-Location $sharedResourcePath
-    Install-SitecoreConfiguration @params  *>&1 | Tee-Object "C:\projects\Demo.Utilities.VSTS\XP\Install\output.log"
+    Install-SitecoreConfiguration @params  *>&1 | Tee-Object "C:\projects\Sitecore.Installation.Utilities\XP\Install\output.log"
     Pop-Location
    
 }
