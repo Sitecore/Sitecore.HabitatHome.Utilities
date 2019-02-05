@@ -272,7 +272,7 @@ Function Install-Commerce {
         SharedConfigurationFolder                   = $(Join-Path $sharedResourcePath "Configuration")
         CommerceInstallRoot                         = $site.webRoot
         CommerceServicesPostfix                     = $site.prefix
-        Environments                                = @('Habitat_Authoring')
+        Environments                                = @('HabitatAuthoring')
         EnvironmentsPrefix                          = $site.prefix
         SiteName                                    = $site.hostName
         SiteHostHeaderName                          = $commerce.storefrontHostName
@@ -314,7 +314,7 @@ Function Install-Commerce {
         CommercexProfilesModuleFullPath             = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include "Sitecore Commerce ExperienceProfile Core *.scwdp.zip" -Recurse)
         CommercexAnalyticsModuleFullPath            = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include "Sitecore Commerce ExperienceAnalytics Core *.scwdp.zip"	-Recurse)
         CommerceMAModuleFullPath                    = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include "Sitecore Commerce Marketing Automation Core *.scwdp.zip"	-Recurse)
-        CommerceMAForAutomationEngineModuleFullPath = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include "Sitecore Commerce Marketing Automation for AutomationEngine JF*.zip"	-Recurse)
+        CommerceMAForAutomationEngineModuleFullPath = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include "Sitecore Commerce Marketing Automation for AutomationEngine *.zip"	-Recurse)
         CEConnectModuleFullPath                     = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include  "Sitecore Commerce Engine Connect*.scwdp.zip" -Recurse)
         SXACommerceModuleFullPath                   = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include  "Sitecore Commerce Experience Accelerator 2.*.scwdp.zip" -Recurse)
         SXAStorefrontModuleFullPath                 = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include  "Sitecore Commerce Experience Accelerator Storefront 2.*.scwdp.zip"-Recurse )
@@ -348,7 +348,7 @@ Function Install-Commerce {
 
     
     If (!$SkipHabitatHomeInstall) {
-        Install-SitecoreConfiguration @params  -Verbose *>&1 | Tee-Object "C:\projects\Demo.Utilities.VSTS\Xc\Install\output.log"
+        Install-SitecoreConfiguration @params  -Verbose *>&1 | Tee-Object "C:\projects\Sitecore.Installation.Utilities\Xc\Install\output.log"
     }
     Else {
         Install-SitecoreConfiguration @params -Skip "InitializeCommerceEngine", "GenerateCatalogTemplates", "InstallHabitatImagesModule", "Reindex" -Verbose *>&1 | Tee-Object "C:\projects\Demo.Utilities.VSTS\Xc\Install\output.log"
@@ -362,6 +362,7 @@ $StopWatch.Start()
  Install-RequiredInstallationAssets
  Set-ModulesPath
  Install-CommerceAssets
+ 
  Publish-CommerceEngine
  Publish-BizFx
  Convert-Modules
