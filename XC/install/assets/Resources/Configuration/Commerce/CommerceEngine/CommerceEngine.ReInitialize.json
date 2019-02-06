@@ -1,6 +1,6 @@
 ﻿{
   "Parameters": {
-    "WebRoot": {
+    "CommerceInstallRoot": {
       "Type": "string",
       "Description": "The physical path of the configured Web Root for the environment"
     },
@@ -32,10 +32,10 @@
     "CommerceShops": "[concat('CommerceShops_', parameter('CommerceServicesPostfix'))]",
     "CommerceAuthoring": "[concat('CommerceAuthoring_', parameter('CommerceServicesPostfix'))]",
     "CommerceMinions": "[concat('CommerceMinions_', parameter('CommerceServicesPostfix'))]",
-    "CommerceOpsPhysicalPath": "[joinpath(parameter('WebRoot'),  variable('CommerceOps'))]",
-    "CommerceShopsPhysicalPath": "[joinpath(parameter('WebRoot'),  variable('CommerceShops'))]",
-    "CommerceAuthoringPhysicalPath": "[joinpath(parameter('WebRoot'),  variable('CommerceAuthoring'))]",
-    "CommerceMinionsPhysicalPath": "[joinpath(parameter('WebRoot'),  variable('CommerceMinions'))]",
+    "CommerceOpsPhysicalPath": "[joinpath(parameter('CommerceInstallRoot'),  variable('CommerceOps'))]",
+    "CommerceShopsPhysicalPath": "[joinpath(parameter('CommerceInstallRoot'),  variable('CommerceShops'))]",
+    "CommerceAuthoringPhysicalPath": "[joinpath(parameter('CommerceInstallRoot'),  variable('CommerceAuthoring'))]",
+    "CommerceMinionsPhysicalPath": "[joinpath(parameter('CommerceInstallRoot'),  variable('CommerceMinions'))]",
     "UrlCommerceShopsServicesCleanEnvironment": "[concat('https://localhost:', concat(parameter('CommerceShopsServicesPort'), '/commerceops/CleanEnvironment()'))]",
     "UrlCommerceShopsServicesBootstrap": "[concat('https://localhost:', concat(parameter('CommerceShopsServicesPort'), '/commerceops/Bootstrap()'))]",
     "InitializeParam": "/commerceops/InitializeEnvironment(environment='envNameValue')",

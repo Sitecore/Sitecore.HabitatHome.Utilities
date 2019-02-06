@@ -132,10 +132,6 @@ Remove-Website -siteName $bizfx -ErrorAction SilentlyContinue
 Remove-AppPool -appPoolName $bizfx
 Remove-Item ("$($site.webRoot)\{0}" -f $bizfx) -recurse -force -ErrorAction SilentlyContinue
 
-Write-Host ("Deleting Website {0}" -f $commerce.identityServerName)
-Remove-Website -siteName $commerce.identityServerName -ErrorAction SilentlyContinue
-Remove-AppPool -appPoolName $commerce.identityServerName
-Remove-Item ("$($site.webRoot)\{0}" -f $commerce.identityServerName) -recurse -force -ErrorAction SilentlyContinue
 
 Write-TaskHeader -TaskName "SQL Server" -TaskType "Drop Databases"
 #Drop databases from SQL

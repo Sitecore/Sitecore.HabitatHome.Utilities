@@ -1,0 +1,27 @@
+{
+  "Parameters": {    
+    "SiteRootUrl": { 
+	"Type": "string" 
+	},
+	"SitecoreAdminPassword" : {
+	"Type": "string" ,
+	"DefaultValue" : "b"
+	},
+	"Indexes": { 
+	"Type": "string",
+	"Description": "pipe separated list of the indexes names"
+	}
+  },
+  "Modules": [ "SitecoreUtilityTasks" ],
+  "Tasks": {    
+    "PopulateSXAIndexesSchema": {
+      "Type": "SitecoreUrl",
+      "Params": {
+                "SitecoreInstanceRoot": "[parameter('SiteRootUrl')]",
+                "SitecoreActionPath": "[concat('sitecore/admin/PopulateManagedSchema.aspx?indexes=',parameter('Indexes'))]",
+                "UserName": "admin",
+                "Password": "[parameter('SitecoreAdminPassword')]"
+        }
+    }
+  }     
+} 
