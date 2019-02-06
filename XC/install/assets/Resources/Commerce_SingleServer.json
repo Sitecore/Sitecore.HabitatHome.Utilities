@@ -510,6 +510,14 @@
         "ModuleDatabase": "mastercore"
       }
     },
+    "CopyConnectModels": {
+      "Type": "InstallSitecoreConfiguration",
+      "Params": {
+        "Path": "[concat(parameter('BaseConfigurationFolder'), '\\Commerce\\Connect\\Connect.Copy.Models.json')]",
+        "InstallRootDst": "[parameter('InstallDir')]",
+        "XConnectInstallRootDst": "[parameter('XConnectInstallDir')]"
+      }
+    },
     "InstallCommerceMAModule": {
       "Type": "InstallSitecoreConfiguration",
       "Params": {
@@ -523,12 +531,7 @@
         "ModuleDatabase": "master"
       }
     },
-    "OuptutPath": {
-      "Type": "WriteInformation",
-      "Params": {
-        "MessageData":"[concat(variable('SitecoreIdentityServerUrl'), '/connect/token')]"
-      }
-    },
+    
     "InstallAutomationEngineModule": {
       "Type": "ExpandArchive",
       "Params": {
@@ -557,14 +560,6 @@
         "MergeTool": "[parameter('MergeToolFullPath')]",
         "InputFile": "[variable('CEMergeInputFile')]",
         "WebConfig": "[variable('WebConfig')]"
-      }
-    },
-    "CopyConnectModels": {
-      "Type": "InstallSitecoreConfiguration",
-      "Params": {
-        "Path": "[concat(parameter('BaseConfigurationFolder'), '\\Commerce\\Connect\\Connect.Copy.Models.json')]",
-        "InstallRootDst": "[parameter('InstallDir')]",
-        "XConnectInstallRootDst": "[parameter('XConnectInstallDir')]"
       }
     },
     "InstallSXACommerceModule": {
