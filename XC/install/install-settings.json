@@ -22,11 +22,7 @@
                 {
                     "name": "Sitecore.Commerce.Engine.SDK",
                     "version": "@@Sitecore.Commerce.Engine.SDK.version@@"
-                },
-				{
-					"name": "Sitecore.IdentityServer",
-					"version":"@@Sitecore.IdentityServer.version@@"
-				}
+                }
             ]
         }
     },
@@ -35,7 +31,6 @@
             "engineConfigurationPath":"@@settings.commerce.engineConfigurationPath@@",
             "storefrontHostName": "@@settings.commerce.storefrontHostName@@",
             "storefrontPrefix": "@@settings.commerce.storefrontPrefix@@",
-            "identityServerName": "@@settings.commerce.identityServerName@@",
             "serviceAccountDomain": "@@settings.commerce.serviceAccountDomain@@",
             "serviceAccountUserName": "@@settings.commerce.serviceAccountUserName@@",
             "serviceAccountPassword": "@@settings.commerce.serviceAccountPassword@@",
