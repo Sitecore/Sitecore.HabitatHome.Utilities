@@ -1,18 +1,23 @@
 {
   "Parameters": {
+    "SharedConfigurationPath": {
+      "Type": "string",
+      "DefaultValue": "",
+      "Description": "Path to the Shared Confirugration Resources 'Shared\\assets\\configuration'"
+    },
     "SolrUrl": {
       "Type": "string",
-      "DefaultValue": "https://localhost:8983/solr",
+      "DefaultValue": "",
       "Description": "The Solr instance url."
     },
     "SolrRoot": {
       "Type": "string",
-      "DefaultValue": "c:\\solr-6.6.1",
+      "DefaultValue": "",
       "Description": "The file path to the Solr instance."
     },
     "SolrService": {
       "Type": "string",
-      "DefaultValue": "Solr-6.6.1",
+      "DefaultValue": "",
       "Description": "The name of the Solr service."
     },
     "BaseConfig": {
@@ -22,19 +27,17 @@
     },
     "CorePrefix": {
       "Type": "string",
-      "DefaultValue": "sitecore",
+      "DefaultValue": "",
       "Description": "The prefix for each of the created indexes."
-    },
-    "SXASolrConfigPath": {
-      "Type": "string",
-      "Description": "The solr configuration which needs to be added to the Solr Core"
     },
     "SiteName": {
       "Type": "string",
+      "DefaultValue": "",
       "Description": "Name of Sitecore Site"
     },
     "SitecoreAdminPassword": {
       "Type": "string",
+      "DefaultValue": "",
       "Description": "Sitecore Admin password"
     }
   },
@@ -59,7 +62,8 @@
     "SXA.Web.Root": "[joinpath(variable('Solr.Server'), variable('SXA.Web.Name'))]",
     "SXA.Master.Conf": "[joinpath(variable('SXA.Master.Root'), 'conf')]",
     "SXA.Web.Conf": "[joinpath(variable('SXA.Web.Root'), 'conf')]",
-    "SXA.Solr.Config": "[ReadJson(parameter('SXASolrConfigPath'))]"
+    "SXA.Solr.ConfigPath": "[joinpath(parameter('SharedConfigurationPath'),'sxa\\sxa-solr-config.json')]",
+    "SXA.Solr.Config": "[ReadJson(variable('SXA.Solr.ConfigPath'))]"
   },
   "Tasks": {
     "StopSolr": {
@@ -183,12 +187,28 @@
   },
   "UninstallTasks": {
     "RemoveCores": {
-        "Description": "Removes the cores and instance folders.",
-        "Type": "ManageSolrCore",
-        "Params": [
-            { "Action": "Unload", "Address": "[parameter('SolrUrl')]", "Arguments": { "core": "[variable('SXA.Master.Name')]", "deleteInstanceDir": "true" }, "ErrorAction": "SilentlyContinue" },
-            { "Action": "Unload", "Address": "[parameter('SolrUrl')]", "Arguments": { "core": "[variable('SXA.Web.Name')]", "deleteInstanceDir": "true" }, "ErrorAction": "SilentlyContinue" }
-        ]
+      "Description": "Removes the cores and instance folders.",
+      "Type": "ManageSolrCore",
+      "Params": [
+        {
+          "Action": "Unload",
+          "Address": "[parameter('SolrUrl')]",
+          "Arguments": {
+            "core": "[variable('SXA.Master.Name')]",
+            "deleteInstanceDir": "true"
+          },
+          "ErrorAction": "SilentlyContinue"
+        },
+        {
+          "Action": "Unload",
+          "Address": "[parameter('SolrUrl')]",
+          "Arguments": {
+            "core": "[variable('SXA.Web.Name')]",
+            "deleteInstanceDir": "true"
+          },
+          "ErrorAction": "SilentlyContinue"
+        }
+      ]
     }
- }
+  }
 }

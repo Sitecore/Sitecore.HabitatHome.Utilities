@@ -1,0 +1,196 @@
+{
+    "Parameters": {
+        "SiteName": {
+            "Type": "string",
+            "DefaultValue": ""
+        },
+        "CoreUserName": {
+            "Type": "string",
+            "DefaultValue": ""
+        },
+        "SecurityUserName": {
+            "Type": "string",
+            "DefaultValue": ""
+        },
+        "SqlServer": {
+            "Type": "string",
+            "DefaultValue": ""
+        },
+        "SqlAdminUser": {
+            "Type": "string",
+            "DefaultValue": ""
+        },
+        "SqlAdminPassword": {
+            "Type": "string",
+            "DefaultValue": ""
+        },
+        "DatabasePrefix": {
+            "Type": "string",
+            "DefaultValue": ""
+        },
+        "MasterUserName": {
+            "Type": "string",
+            "DefaultValue": ""
+        },
+        "BootloaderPackage": {
+            "Type": "string",
+            "DefaultValue": ""
+        },
+        "BootloaderConfigurationOverrideSource": {
+            "Type": "string",
+            "DefaultValue": ""
+        },
+        "BootloaderConfigurationOverrideDestination": {
+            "Type": "string",
+            "DefaultValue": ""
+        },
+        "XConnectSiteName": {
+            "Type": "string",
+            "DefaultValue": ""
+        },
+        "RemoveCoreUser:UserName": {
+            "Type": "string",
+            "Reference": "CoreUserName"
+        },
+        "RemoveCoreUser:SqlServer": {
+            "Type": "string",
+            "Reference": "SqlServer"
+        },
+        "RemoveCoreUser:SqlAdminUser": {
+            "Type": "string",
+            "Reference": "SqlAdminUser"
+        },
+        "RemoveCoreUser:SqlAdminPassword": {
+            "Type": "string",
+            "Reference": "SqlAdminPassword"
+        },
+        "RemoveCoreUser:DatabasePrefix": {
+            "Type": "string",
+            "Reference": "DatabasePrefix"
+        },
+        "RemoveSecurityUser:UserName": {
+            "Type": "string",
+            "Reference": "SecurityUserName"
+        },
+        "RemoveSecurityUser:SqlServer": {
+            "Type": "string",
+            "Reference": "SqlServer"
+        },
+        "RemoveSecurityUser:SqlAdminUser": {
+            "Type": "string",
+            "Reference": "SqlAdminUser"
+        },
+        "RemoveSecurityUser:SqlAdminPassword": {
+            "Type": "string",
+            "Reference": "SqlAdminPassword"
+        },
+        "RemoveSecurityUser:DatabasePrefix": {
+            "Type": "string",
+            "Reference": "DatabasePrefix"
+        },
+        "RemoveMasterUser:UserName": {
+            "Type": "string",
+            "Reference": "MasterUserName"
+        },
+        "RemoveMasterUser:SqlServer": {
+            "Type": "string",
+            "Reference": "SqlServer"
+        },
+        "RemoveMasterUser:SqlAdminUser": {
+            "Type": "string",
+            "Reference": "SqlAdminUser"
+        },
+        "RemoveMasterUser:SqlAdminPassword": {
+            "Type": "string",
+            "Reference": "SqlAdminPassword"
+        },
+        "RemoveMasterUser:DatabasePrefix": {
+            "Type": "string",
+            "Reference": "DatabasePrefix"
+        },
+        "RemoveCoreUser:DatabaseSuffix": {
+            "Type": "string",
+            "DefaultValue": "Core"
+        },
+        "RemoveSecurityUser:DatabaseSuffix": {
+            "Type": "string",
+            "DefaultValue": "Core"
+        },
+        "RemoveMasterUser:DatabaseSuffix": {
+            "Type": "string",
+            "DefaultValue": "Master"
+        },
+        "InstallBootloader:SiteName": {
+            "Type": "string",
+            "Reference": "SiteName"
+        },
+        "InstallBootloader:Package": {
+            "Type": "string",
+            "Reference": "BootloaderPackage"
+        },
+        "InstallBootloader:ConfigurationOverrideSource": {
+            "Type": "string",
+            "Reference": "BootloaderConfigurationOverrideSource"
+        },
+        "InstallBootloader:ConfigurationOverrideDestination": {
+            "Type": "string",
+            "Reference": "BootloaderConfigurationOverrideDestination"
+        },
+        "KillDatabaseConnections:SqlServer": {
+            "Type": "string",
+            "Reference": "SqlServer"
+        },
+        "KillDatabaseConnections:SqlAdminUser": {
+            "Type": "string",
+            "Reference": "SqlAdminUser"
+        },
+        "KillDatabaseConnections:SqlAdminPassword": {
+            "Type": "string",
+            "Reference": "SqlAdminPassword"
+        },
+        "KillDatabaseConnections:DatabasePrefix": {
+            "Type": "string",
+            "Reference": "DatabasePrefix"
+        }
+    },
+    "Variables": {
+        "MarketingAutomationServiceName": "[concat(parameter('XConnectSiteName'),'-MarketingAutomationService')]",
+        "IndexWorkerServiceServiceName": "[concat(parameter('XConnectSiteName'),'-IndexWorker')]",
+        "ProcessingEngineServiceName": "[concat(parameter('XConnectSiteName'),'-ProcessingEngineService')]",
+        "StopMarketingAutomationService:Service.Name": "[variable('MarketingAutomationServiceName')]",
+        "StopIndexWorkerService:Service.Name": "[variable('IndexWorkerServiceServiceName')]",
+        "StopProcessingEngineService:Service.Name": "[variable('ProcessingEngineServiceName')]",
+        "StopIndexWorkerService:Service.Status": "Stopped",
+        "StopProcessingEngineService:Service.Status": "Stopped",
+        "StopMarketingAutomationService:Service.Status": "Stopped",
+        "StartMarketingAutomationService:Service.Status": "Running",
+        "StartIndexWorkerService:Service.Status": "Running",
+        "StartProcessingEngineService:Service.Status": "Running"
+    },
+    "Includes": {
+        "RemoveCoreUser": {
+            "Source": ".\\remove-databaseuser.json"
+        },
+        "RemoveMasterUser": {
+            "Source": ".\\remove-databaseuser.json"
+        },
+        "RemoveSecurityUser": {
+            "Source": ".\\remove-databaseuser.json"
+        },
+        "StopMarketingAutomationService": {
+            "Source": ".\\manage-service.json"
+        },
+        "StopIndexWorkerService": {
+            "Source": ".\\manage-service.json"
+        },
+        "StopProcessingEngineService": {
+            "Source": ".\\manage-service.json"
+        },
+        "InstallBootloader": {
+            "Source": ".\\bootloader.json"
+        },
+        "KillDatabaseConnections":{
+            "Source":".\\kill-database-connections.json"
+        }
+    }
+}

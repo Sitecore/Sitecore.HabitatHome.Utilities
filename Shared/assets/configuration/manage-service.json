@@ -1,0 +1,26 @@
+{
+    "Parameters": {
+        "ServiceName": {
+            "Type": "string",
+            "DefaultValue":"",
+            "Description": "Name of SQL Server"
+        },
+        "Status":{
+            "Type":"string",
+            "DefaultValue":""
+        }
+    },
+    "Variables":{
+        "Service.Name":"[parameter('ServiceName')]",
+        "Service.Status":"[parameter('Service.Status')]"
+    },
+    "Tasks": {
+        "ManageService": {
+            "Type": "ManageService",
+            "Params": {
+                "Name": "[variable('Service.Name')]",
+                "Status": "[variable('Service.Status')]"
+            }
+        }
+    }
+}

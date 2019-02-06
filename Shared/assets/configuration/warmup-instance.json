@@ -1,0 +1,34 @@
+{
+    "Parameters": {
+        "SiteName": {
+            "Type": "string",
+            "DefaultValue": ""
+        }
+    },
+    "Settings": {
+        "AutoRegisterExtensions": true
+    },
+    "Tasks": {
+        "Warmup": {
+            "Type": "StartSitecoreSite",
+            "Params": {
+                "Uri": "[concat('https://', parameter('SiteName'))]",
+                "TimeoutSec": 120,
+                "Verbose": true
+            }
+        },
+        "Sleeping": {
+            "Type": "WriteInformation",
+            "Params": {
+                "Messagedata": "Awaiting site startup",
+                "InformationAction": "Continue"
+            }
+        },
+        "Wait": {
+            "Type": "StartSleep",
+            "Params": {
+                "Seconds": 60
+            }
+        }
+    }
+}
