@@ -1,16 +1,27 @@
-﻿{
+﻿// ------------------------------------------------------------------------------ //
+//         Sitecore Install Framework - Apply Commerce Engine certificate         //
+//                                                                                //
+//  Run this configuration to apply the Commerce Engine certificate.              //
+//                                                                                //
+//  NOTE: Only single line comments are accepted in configurations.               //
+// ------------------------------------------------------------------------------ //
+{
   "Parameters": {
-	"WebRoot":{
-            "Type":"string",
-            "Description":"The physical path of the configured Web Root for the environment"
-        },
     "EngineConnectIncludeDir": {
       "Type": "string",
       "Description": "The path to the Engine Connect App_Confign directory"
     },
+    "CommerceInstallRoot": {
+      "Type": "string",
+      "Description": "The root path of commerce services."
+    },
     "CertificatePath": {
       "Type": "string",
       "Description": "The full path to the Commerce Engine certificate file."
+    },
+    "CertificatePassword":{
+      "Type":"securestring",
+      "Description":"Password for the PFX certificate"
     },
     "CommerceServicesPostfix": {
       "Type": "string",
@@ -26,10 +37,10 @@
     "CommerceShops": "[concat('CommerceShops_', parameter('CommerceServicesPostfix'))]",
     "CommerceAuthoring": "[concat('CommerceAuthoring_', parameter('CommerceServicesPostfix'))]",
     "CommerceMinions": "[concat('CommerceMinions_', parameter('CommerceServicesPostfix'))]",
-    "CommerceOpsPhysicalPath": "[joinpath(parameter('WebRoot'), variable('CommerceOps')))]",
-    "CommerceShopsPhysicalPath": "[joinpath(parameter('WebRoot'), variable('CommerceShops')))]",
-    "CommerceAuthoringPhysicalPath": "[joinpath(parameter('WebRoot'), variable('CommerceAuthoring')))]",
-    "CommerceMinionsPhysicalPath": "[joinpath(parameter('WebRoot'), variable('CommerceMinions')))]"
+    "CommerceOpsPhysicalPath": "[joinpath(parameter('CommerceInstallRoot'),  variable('CommerceOps'))]",
+    "CommerceShopsPhysicalPath": "[joinpath(parameter('CommerceInstallRoot'),  variable('CommerceShops'))]",
+    "CommerceAuthoringPhysicalPath": "[joinpath(parameter('CommerceInstallRoot'),  variable('CommerceAuthoring'))]",
+    "CommerceMinionsPhysicalPath": "[joinpath(parameter('CommerceInstallRoot'),  variable('CommerceMinions'))]"
   },
   "Modules": ["InitializeCommerce"],
   "Tasks": {
@@ -38,6 +49,7 @@
       "Params": {
         "EngineConnectIncludeDir": "[parameter('EngineConnectIncludeDir')]",
         "CertificatePath": "[parameter('CertificatePath')]",
+        "CertificatePassword":"[parameter('CertificatePassword')]",
         "CommerceServicesPathCollection": [
           "[variable('CommerceOpsPhysicalPath')]",
           "[variable('CommerceShopsPhysicalPath')]",

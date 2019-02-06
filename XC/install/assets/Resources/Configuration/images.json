@@ -1,15 +1,8 @@
-﻿// ---------------------------------------------------------------------------- //
-//         Sitecore Install Framework - Install Commerce Connect module         //
-//                                                                              //
-//  Run this configuration to install Commerce Connect module.                  //
-//                                                                              //
-//  NOTE: Only single line comments are accepted in configurations.             //
-// ---------------------------------------------------------------------------- //
-{
+﻿{
   "Parameters": {
     "ModuleFullPath": {
       "Type": "string",
-      "Description": "The path to the Commerce Connect zip."
+      "Description": "The path to the Adventure Works images zip."
     },
     "ModulesDirDst": {
       "Type": "string",

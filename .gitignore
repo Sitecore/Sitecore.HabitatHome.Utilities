@@ -68,4 +68,4 @@ publishTemp
 Publish
 dev.creds.xml
 *.pfx
-/XP/install/assets/sat
+shared/sat
