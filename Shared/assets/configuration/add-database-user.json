@@ -1,0 +1,65 @@
+{
+    "Parameters": {
+        "SqlServer": {
+            "Type": "string",
+            "DefaultValue": "",
+            "Description": "Name of SQL Server"
+        },
+        "SqlAdminUser": {
+            "Type": "string",
+            "DefaultValue": "sa",
+            "Description": "SQL Admin user name"
+        },
+        "SqlAdminPassword": {
+            "Type": "string",
+            "DefaultValue": "",
+            "Description": "SQL Admin user password"
+        },
+        "Username": {
+            "Type": "string",
+            "DefaultValue": "",
+            "Description": "SQL Admin user password"
+        },
+        "UserPassword": {
+            "Type": "string",
+            "DefaultValue": "",
+            "Description": "SQL Admin user password"
+        },
+        "DatabasePrefix": {
+            "Type": "string",
+            "DefaultValue": "",
+            "Description": "SQL Admin user password"
+        },
+        "DatabaseSuffix": {
+            "Type": "string",
+            "DefaultValue": "",
+            "Description": "SQL Admin user password"
+        },
+        "IsCoreUser": {
+            "Type": "boolean",
+            "DefaultValue": false
+        }
+    },
+    "Variables": {
+        "Check.IsCoreUser": "[parameter('IsCoreUser')]",
+        "Database.Suffix": "[parameter('DatabaseSuffix')]"
+    },
+    "Tasks": {
+        "AddDatabaseUser": {
+            "Type": "AddDatabaseUser",
+            "Params": {
+                "SqlServer": "[parameter('SqlServer')]",
+                "SqlAdminUser": "[parameter('SqlAdminUser')]",
+                "SqlAdminPassword": "[parameter('SqlAdminPassword')]",
+                "Username": "[parameter('Username')]",
+                "UserPassword": "[parameter('UserPassword')]",
+                "DatabasePrefix": "[parameter('DatabasePrefix')]",
+                "DatabaseSuffix": "[variable('Database.Suffix')]",
+                "IsCoreUser": "[variable('Check.IsCoreUser')]"
+            }
+        }
+    },
+    "Settings":{
+        "AutoRegisterExtensions":true
+    }
+}

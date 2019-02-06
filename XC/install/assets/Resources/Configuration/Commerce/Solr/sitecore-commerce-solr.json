@@ -1,18 +1,31 @@
+// -------------------------------------------------------------------------- //
+//         Sitecore Install Framework - Sitecore Commerce Solr Configuration  //
+//                                                                            //
+//  Run this configuration on your Solr instance to configure the cores for   //
+//  an Commerce deployment. If the cores exist, they will be overwritten.     //
+//                                                                            //
+//  NOTE: Only single line comments are accepted in configurations.           //
+// -------------------------------------------------------------------------- //
+
 {
   "Parameters": {
+    // Parameters are values that may be passed when Install-SitecoreConfiguration is called.
+    // Parameters must declare a Type and may declare a DefaultValue and Description.
+    // Parameters with no DefaultValue are required when Install-SitecoreConfiguration is called.
+
     "SolrUrl": {
       "Type": "string",
-      "DefaultValue": "https://localhost:8983/solr",
+      "DefaultValue": "https://localhost:8992/solr",
       "Description": "The Solr instance url."
     },
     "SolrRoot": {
       "Type": "string",
-      "DefaultValue": "c:\\solr-6.6.2",
+      "DefaultValue": "c:\\solr-7.2.1",
       "Description": "The file path to the Solr instance."
     },
     "SolrService": {
       "Type": "string",
-      "DefaultValue": "Solr-6.6.2",
+      "DefaultValue": "solr-7.2.1",
       "Description": "The name of the Solr service."
     },
     "SolrSchemas": {
@@ -21,7 +34,7 @@
     },
     "BaseConfig": {
       "Type": "string",
-      "DefaultValue": "basic_configs",
+      "DefaultValue": "sample_techproducts_configs",
       "Description": "The configset to copy as a base for each core."
     },
     "CorePrefix": {
@@ -31,24 +44,46 @@
     }
   },
   "Variables": {
+    // Variables are values calculated in a configuration.
+    // They can reference Parameters, other Variables, and config functions.
+
+    // Resolves the full path to Solr on disk in case a relative path was passed.
     "Solr.FullRoot": "[resolvepath(parameter('SolrRoot'))]",
+
+    // Resolves the full solr folder path on disk.
     "Solr.Server": "[joinpath(variable('Solr.FullRoot'), 'server', 'solr')]",
+
+    // Resolves the full path for the base configset to use for each core.
     "Solr.BaseConfigs": "[joinpath(variable('Solr.Server'), 'configsets', parameter('BaseConfig'))]",
+
+    // Resolves the full path for the schemas to use for each core.
     "Solr.CustomersSchema": "[concat(parameter('SolrSchemas'), '\\Customers')]",
     "Solr.OrdersSchema": "[concat(parameter('SolrSchemas'), '\\Orders')]",
     "Solr.CatalogItemsSchema": "[concat(parameter('SolrSchemas'), '\\CatalogItems')]",
+
+    // The names of the cores to create.
     "Customers.Name": "[concat(parameter('CorePrefix'), 'CustomersScope')]",
     "Orders.Name": "[concat(parameter('CorePrefix'), 'OrdersScope')]",
     "CatalogItems.Name": "[concat(parameter('CorePrefix'), 'CatalogItemsScope')]",
+
+    // The destination paths of the cores to create.
     "Customers.Root": "[joinpath(variable('Solr.Server'), variable('Customers.Name'))]",
     "Orders.Root": "[joinpath(variable('Solr.Server'), variable('Orders.Name'))]",
     "CatalogItems.Root": "[joinpath(variable('Solr.Server'), variable('CatalogItems.Name'))]",
+
+    // The destination paths for the base configurations of each core.
     "Customers.Conf": "[joinpath(variable('Customers.Root'), 'conf')]",
     "Orders.Conf": "[joinpath(variable('Orders.Root'), 'conf')]",
     "CatalogItems.Conf": "[joinpath(variable('CatalogItems.Root'), 'conf')]"
   },
   "Tasks": {
+    // Tasks are separate units of work in a configuration.
+    // Each task is an action that will be completed when Install-SitecoreConfiguration is called.
+    // By default, tasks are applied in the order they are declared.
+    // Tasks may reference Parameters, Variables, and config functions.
+
     "StopSolr": {
+      // Stops the Solr service if it is running.
       "Type": "ManageService",
       "Params": {
         "Name": "[parameter('SolrService')]",
@@ -57,6 +92,7 @@
       }
     },
     "CleanCores": {
+      // Creates/clears core paths.
       "Type": "EnsurePath",
       "Params": {
         "Clean": [
@@ -67,6 +103,7 @@
       }
     },
     "PrepareCores": {
+      // Copies base configs into the core paths.
       "Type": "Copy",
       "Params": [
         { "Source": "[joinpath(variable('Solr.BaseConfigs'), '*')]", "Destination": "[variable('Customers.Root')]" },
@@ -83,6 +120,7 @@
       ]
     },
     "StartSolr": {
+      // Starts the Solr service.
       "Type": "ManageService",
       "Params": {
         "Name": "[parameter('SolrService')]",
@@ -91,30 +129,34 @@
       }
     },
     "CreateCores": {
+      // Tells Solr to create the new cores.
       "Type": "ManageSolrCore",
       "Params": [
         {
           "Action": "Create",
           "Address": "[parameter('SolrUrl')]",
           "Arguments": {
-            "Name": "[variable('Customers.Name')]",
-            "Configset": "[parameter('BaseConfig')]"
+            "name": "[variable('Customers.Name')]",
+            "configset": "[parameter('BaseConfig')]",
+            "property.update.autoCreateFields": "false"
           }
         },
         {
           "Action": "Create",
           "Address": "[parameter('SolrUrl')]",
           "Arguments": {
-            "Name": "[variable('Orders.Name')]",
-            "Configset": "[parameter('BaseConfig')]"
+            "name": "[variable('Orders.Name')]",
+            "configset": "[parameter('BaseConfig')]",
+            "property.update.autoCreateFields": "false"
           }
         },
         {
           "Action": "Create",
           "Address": "[parameter('SolrUrl')]",
           "Arguments": {
-            "Name": "[variable('CatalogItems.Name')]",
-            "Configset": "[parameter('BaseConfig')]"
+            "name": "[variable('CatalogItems.Name')]",
+            "configset": "[parameter('BaseConfig')]",
+            "property.update.autoCreateFields": "false"
           }
         }
       ]

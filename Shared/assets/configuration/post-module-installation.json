@@ -1,0 +1,184 @@
+{
+    "Parameters": {
+        "SiteName": {
+            "Type": "string",
+            "DefaultValue": ""
+        },
+        "DatabasePrefix": {
+            "Type": "string",
+            "DefaultValue": ""
+        },
+        "SqlServer": {
+            "Type": "string",
+            "DefaultValue": ""
+        },
+        "SqlAdminUser": {
+            "Type": "string",
+            "DefaultValue": ""
+        },
+        "SqlAdminPassword": {
+            "Type": "string",
+            "DefaultValue": ""
+        },
+        "XConnectSiteName": {
+            "Type": "string",
+            "DefaultValue": ""
+        },
+        "CoreUserName": {
+            "Type": "string",
+            "DefaultValue": ""
+        },
+        "CoreUserPassword": {
+            "Type": "string",
+            "DefaultValue": ""
+        },
+        "SecurityUserName": {
+            "Type": "string",
+            "DefaultValue": ""
+        },
+        "SecurityUserPassword": {
+            "Type": "string",
+            "DefaultValue": ""
+        },
+        "MasterUserName": {
+            "Type": "string",
+            "DefaultValue": ""
+        },
+        "MasterUserPassword": {
+            "Type": "string",
+            "DefaultValue": ""
+        },
+        "EnableContainedDatabases:SqlServer": {
+            "Type": "string",
+            "Reference": "SqlServer"
+        },
+        "EnableContainedDatabases:SqlAdminUser": {
+            "Type": "string",
+            "Reference": "SqlAdminUser",
+            "Description": "SQL Admin user name"
+        },
+        "EnableContainedDatabases:SqlAdminPassword": {
+            "Type": "string",
+            "Reference": "SqlAdminPassword"
+        },
+        "AddCoreUser:SqlServer": {
+            "Type": "string",
+            "Reference": "SqlServer"
+        },
+        "AddCoreUser:SqlAdminUser": {
+            "Type": "string",
+            "Reference": "SqlAdminUser"
+        },
+        "AddCoreUser:SqlAdminPassword": {
+            "Type": "string",
+            "Reference": "SqlAdminPassword"
+        },
+        "AddCoreUser:Username": {
+            "Type": "string",
+            "Reference": "CoreUserName"
+        },
+        "AddCoreUser:UserPassword": {
+            "Type": "string",
+            "Reference": "CoreUserPassword"
+        },
+        "AddCoreUser:DatabasePrefix": {
+            "Type": "string",
+            "Reference": "DatabasePrefix"
+        },
+        "AddMasterUser:SqlServer": {
+            "Type": "string",
+            "Reference": "SqlServer"
+        },
+        "AddMasterUser:SqlAdminUser": {
+            "Type": "string",
+            "Reference": "SqlAdminUser"
+        },
+        "AddMasterUser:SqlAdminPassword": {
+            "Type": "string",
+            "Reference": "SqlAdminPassword"
+        },
+        "AddMasterUser:Username": {
+            "Type": "string",
+            "Reference": "MasterUserName"
+        },
+        "AddMasterUser:UserPassword": {
+            "Type": "string",
+            "Reference": "MasterUserPassword"
+        },
+        "AddMasterUser:DatabasePrefix": {
+            "Type": "string",
+            "Reference": "DatabasePrefix"
+        },
+        "AddSecurityUser:SqlServer": {
+            "Type": "string",
+            "Reference": "SqlServer"
+        },
+        "AddSecurityUser:SqlAdminUser": {
+            "Type": "string",
+            "Reference": "SqlAdminUser"
+        },
+        "AddSecurityUser:SqlAdminPassword": {
+            "Type": "string",
+            "Reference": "SqlAdminPassword"
+        },
+        "AddSecurityUser:Username": {
+            "Type": "string",
+            "Reference": "SecurityUserName"
+        },
+        "AddSecurityUser:UserPassword": {
+            "Type": "string",
+            "Reference": "SecurityUserPassword"
+        },
+        "AddSecurityUser:DatabasePrefix": {
+            "Type": "string",
+            "Reference": "DatabasePrefix"
+        },
+        "WarmupSite:SiteName": {
+            "Type": "string",
+            "Reference": "SiteName"
+        }
+    },
+    "Variables": {
+        "MarketingAutomationServiceName": "[concat(parameter('XConnectSiteName'),'-MarketingAutomationService')]",
+        "IndexWorkerServiceServiceName": "[concat(parameter('XConnectSiteName'),'-IndexWorker')]",
+        "ProcessingEngineServiceName": "[concat(parameter('XConnectSiteName'),'-ProcessingEngineService')]",
+        "StartMarketingAutomationService:Service.Name": "[variable('MarketingAutomationServiceName')]",
+        "StartIndexWorkerService:Service.Name": "[variable('IndexWorkerServiceServiceName')]",
+        "StartProcessingEngineService:Service.Name": "[variable('ProcessingEngineServiceName')]",
+        "StartMarketingAutomationService:Service.Status": "Running",
+        "StartIndexWorkerService:Service.Status": "Running",
+        "StartProcessingEngineService:Service.Status": "Running",
+        "AddCoreUser:Check.IsCoreUser": true,
+        "AddCoreUser:Database.Suffix": "Core",
+        "AddMasterUser:Check.IsCoreUser": false,
+        "AddMasterUser:Database.Suffix": "Master",
+        "AddSecurityUser:Check.IsCoreUser": false,
+        "AddSecurityUser:Database.Suffix": "Core"
+    },
+    "Includes": {
+        "EnableContainedDatabases": {
+            "Source": ".\\enable-contained-databases.json"
+        },
+        "AddCoreUser": {
+            "Source": ".\\add-database-user.json"
+        },
+        "AddMasterUser": {
+            "Source": ".\\add-database-user.json"
+        },
+        "AddSecurityUser": {
+            "Source": ".\\add-database-user.json"
+        },
+        "StartIndexWorkerService": {
+            "Source": ".\\manage-service.json"
+        },
+        "StartMarketingAutomationService": {
+            "Source": ".\\manage-service.json"
+        },
+        "StartProcessingEngineService": {
+            "Source": ".\\manage-service.json"
+        },
+        "WarmUpSite": {
+            "Source": ".\\warmup-instance.json"
+        }
+    }
+}
