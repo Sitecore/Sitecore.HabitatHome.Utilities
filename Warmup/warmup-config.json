@@ -9,7 +9,24 @@
             {
                 "url": "/sitecore/shell/Applications/Content%20Editor.aspx?sc_bw=1"
             },
-
+            {
+                "url": "/sitecore/client/Applications/ControlPanel.aspx?sc_bw=1"
+            },
+            {
+                "url": "/sitecore/client/Applications/FormsBuilder/Pages/Forms"
+            },
+            {
+                "url": "/sitecore/client/Applications/ExperienceProfile/search?text=*"
+            },
+            {
+                "url": "/sitecore/client/Applications/ExperienceAnalytics/Dashboard"
+            },
+            {
+                "url": "/sitecore/shell/client/Applications/MarketingAutomation/automationcampaigns/all"
+            },
+            {
+                "url": "/sitecore/client/Applications/ECM/Pages/Dashboard"
+            },
             {
                 "url": "/sitecore/client/Applications/ExperienceAnalytics/Dashboard"
             },
