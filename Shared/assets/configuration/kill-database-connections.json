@@ -1,0 +1,59 @@
+{
+    "Parameters": {
+        "SqlServer": {
+            "Type": "string",
+            "DefaultValue": "",
+            "Description": "Name of SQL Server"
+        },
+        "SqlAdminUser": {
+            "Type": "string",
+            "DefaultValue": "sa",
+            "Description": "SQL Admin user name"
+        },
+        "SqlAdminPassword": {
+            "Type": "string",
+            "DefaultValue": "",
+            "Description": "SQL Admin user password"
+        },
+        "DatabasePrefix": {
+            "Type": "string",
+            "DefaultValue": "",
+            "Description": "SQL Admin user password"
+        }
+    },
+    "Variables": {
+        "Core.Database.Suffix": "Core",
+        "Master.Database.Suffix": "Master"
+    },
+    "Tasks": {
+        "Write-Output":{
+            "Type":"WriteInformation",
+            "Params":{
+                "MessageData":"[parameter('SqlServer')]"
+            }
+        },
+        "KillCoreDatabaseConnections": {
+            "Type": "KillDatabaseConnections",
+            "Params": {
+                "SqlServer": "[parameter('SqlServer')]",
+                "SqlAdminUser": "[parameter('SqlAdminUser')]",
+                "SqlAdminPassword": "[parameter('SqlAdminPassword')]",
+                "DatabasePrefix": "[parameter('DatabasePrefix')]",
+                "DatabaseSuffix": "[variable('Core.Database.Suffix')]"
+            }
+        },
+        "KillMasterDatabaseConnections": {
+            "Type": "KillDatabaseConnections",
+            "Params": {
+                "SqlServer": "[parameter('SqlServer')]",
+                "SqlAdminUser": "[parameter('SqlAdminUser')]",
+                "SqlAdminPassword": "[parameter('SqlAdminPassword')]",
+                "DatabasePrefix": "[parameter('DatabasePrefix')]",
+                "DatabaseSuffix": "[variable('Master.Database.Suffix')]"
+            }
+        }
+    },
+    "Settings": {
+        "AutoRegisterExtensions": true
+    }
+}

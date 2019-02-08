@@ -5,6 +5,11 @@
             "Description": "The name of the certificate to be created for the xconnect server.",
             "DefaultValue": ""
         },
+        "CertificatePath":{
+            "Type":"string",
+            "Description":"Path on filesystem where generated certificates are stored",
+            "DefaultValue":"c:\\certificates"
+        },
         "IdentityServerCertificateName": {
             "Type": "String",
             "Description": "The name of the certificate to be created for the identity server.",
@@ -220,6 +225,11 @@
             "DefaultValue": "",
             "Description": "Desired WebRoot"
         },
+        "XConnectCertificatePassword":{
+            "Type":"string",
+            "DefaultValue":"Password",
+            "Description":"Password for the Exported XConnect Certificate"
+        },
         "XConnectXP0:Package": {
             "Type": "String",
             "Reference": "XConnectPackage",
@@ -374,6 +384,14 @@
             "Type": "String",
             "Reference": "XConnectCertificateName",
             "Description": "Override to pass XConnectCertificateName value to XConnectCertificates config."
+        },
+        "XConnectCertificates:CertPath":{
+            "Type": "String",
+            "Reference": "CertificatePath"
+        },
+        "XConnectCertificates:ExportPassword":{
+            "Type": "String",
+            "Reference": "XConnectCertificatePassword"
         },
         "IdentityServerCertificates:CertificateName": {
             "Type": "String",

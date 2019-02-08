@@ -94,7 +94,6 @@ $sql.securityPassword = $SqlStrongPassword
 # XConnect Parameters
 $xConnect = $json.settings.xConnect
 $xConnect.siteName = $site.prefix + "_xconnect." + $site.suffix
-$xConnect.certificateName = [string]::Join(".", @($site.prefix, $site.suffix, "xConnect.Client"))
 $xConnect.siteRoot = Join-Path $site.webRoot -ChildPath $xConnect.siteName
 
 # IdentityServer Parameters
@@ -149,14 +148,7 @@ Function Replace-Path {
         $module,
         $root
     )
-    if ($module.isGroup) {
-        foreach ($module in $module.modules) {
-            Replace-Path $module $root
-        }
-    }
-    else {
-        $module.fileName = (Join-Path $root ("\packages\{0}" -f $module.fileName))    
-    }
+    $module.fileName = (Join-Path $root ("\packages\{0}" -f $module.fileName))    
 }
 
 $modulesConfig = Get-Content -Raw .\assets.json -Encoding Ascii |  ConvertFrom-Json

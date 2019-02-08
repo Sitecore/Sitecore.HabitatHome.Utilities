@@ -19,7 +19,7 @@
           }
     },
     "Tasks":{
-        "DownloadSitecore":{
+        "DownloadModule":{
             "Type":"DownloadFile",
             "Params":{
                 "SourceUri":"[parameter('Source')]",
