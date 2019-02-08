@@ -3,7 +3,7 @@ Param(
     [string] $LogFolder = ".\logs\",
     [string] $LogFileName = "install-modules.log",
     [string] $devSitecoreUsername,
-    [string] $devSitecorePassword
+    [securestring] $devSitecorePassword
 )
 
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
@@ -43,11 +43,9 @@ $sitecore = $config.settings.sitecore
 $solr = $config.settings.solr
 $sql = $config.settings.sql
 $xConnect = $config.settings.xConnect
-$resourcePath = Join-Path $assets.root "configuration"
-
+$sharedResourcePath = Join-Path $assets.sharedUtilitiesRoot "assets\configuration"
 $downloadFolder = $assets.root
 $packagesFolder = (Join-Path $downloadFolder "packages")
-
 
 $loginSession = $null
 
@@ -72,7 +70,6 @@ Function Install-SitecoreInstallFramework {
         Import-Module SitecoreInstallFramework -Force
     }
 }
-
 Function Install-SitecoreAzureToolkit {
 
     # Download Sitecore Azure Toolkit (used for converting modules)
@@ -89,8 +86,8 @@ Function Install-SitecoreAzureToolkit {
                 $global:credentials = Get-Credential -Message "Please provide dev.sitecore.com credentials"
             }
             elseif (![string]::IsNullOrEmpty($devSitecoreUsername) -and ![string]::IsNullOrEmpty($devSitecorePassword)) {
-                $secpasswd = ConvertTo-SecureString $devSitecorePassword -AsPlainText -Force
-                $global:credentials = New-Object System.Management.Automation.PSCredential ($devSitecoreUsername, $secpasswd)
+               
+                $global:credentials = New-Object System.Management.Automation.PSCredential ($devSitecoreUsername, $devSitecorePassword)
             }
             else {
                 throw "Credentials required for download"
@@ -99,11 +96,11 @@ Function Install-SitecoreAzureToolkit {
         $user = $global:credentials.GetNetworkCredential().UserName
         $password = $global:credentials.GetNetworkCredential().Password
 
-        $loginRequest = Invoke-RestMethod -Uri https://dev.sitecore.net/api/authorization -Method Post -ContentType "application/json" -Body "{username: '$user', password: '$password'}" -SessionVariable loginSession -UseBasicParsing 
+        Invoke-RestMethod -Uri https://dev.sitecore.net/api/authorization -Method Post -ContentType "application/json" -Body "{username: '$user', password: '$password'}" -SessionVariable loginSession -UseBasicParsing 
         
 
         $params = @{
-            Path         = $([io.path]::combine($resourcePath, 'HabitatHome', 'download-assets.json'))
+            Path         = $([io.path]::combine($sharedResourcePath, 'download-assets.json'))
             LoginSession = $loginSession
             Source       = $package.url
             Destination  = $destination
@@ -113,276 +110,70 @@ Function Install-SitecoreAzureToolkit {
         $Global:ProgressPreference = 'Continue'
     }
     if ((Test-Path $destination) -and ( $package.install -eq $true)) {
-        sz x -o"$DownloadFolder\sat" $destination  -y -aoa
+        sz x -o"$($assets.sitecoreazuretoolkit)" $destination  -y -aoa
     }
-    Import-Module (Join-Path $assets.root "SAT\tools\Sitecore.Cloud.CmdLets.dll") -Force 
+    Import-Module (Join-Path $assets.sitecoreazuretoolkit "tools\Sitecore.Cloud.CmdLets.dll") -Force 
 
-}
-
-Function Install-SitecoreModule {
-    param(
-        $sitecoreModule
-    )
-    $baseConfigurationPath = Join-Path $resourcePath 'HabitatHome'
-    $configuration = ("module-{0}.json" -f $sitecoreModule.databases.replace(",", ""))
-    $configurationPath = Join-Path $baseConfigurationPath $configuration
-    if ($true -eq $sitecoreModule.convert) {
-        $sitecoreModule.filename = $sitecoreModule.filename.replace(".zip", ".scwdp.zip")
-    }
-
-    $params = @{
-        Path             = $configurationPath
-        Package          = $sitecoreModule.fileName
-        SiteName         = $site.hostName
-        SqlDbPrefix      = $site.prefix 
-        SqlAdminUser     = $sql.adminUser 
-        SqlAdminPassword = $sql.adminPassword 
-        SqlServer        = $sql.server 
-    }
-    
-    Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs") 
 }
 Function Install-Modules {
-    param(
-        [PSCustomObject] $Packages,
-        $Credentials
-    )
-    foreach ($package in $packages) {
-        if ($package.isGroup -and  $true -eq $package.install) {
-            $submodules = $package.modules
-            $args = @{
-                Packages    = $submodules
-                Credentials = $Credentials
-            }
-            Install-Modules @args
-        }
-        elseif (!($package.PSObject.Properties.name -match "isGroup") -and $true -eq $package.install ) {
-            Write-Host ("Downloading {0}  -  if required" -f $package.name )
-            $destination = $package.fileName
-            if (!(Test-Path $destination)) {
-                if ($null -eq $credentials) {
-                    if ([string]::IsNullOrEmpty($devSitecoreUsername)) {
-                        $credentials = Get-Credential -Message "Please provide dev.sitecore.com credentials"
-                    }
-                    elseif (![string]::IsNullOrEmpty($devSitecoreUsername) -and ![string]::IsNullOrEmpty($devSitecorePassword)) {
-                        $secpasswd = ConvertTo-SecureString $devSitecorePassword -AsPlainText -Force
-                        $Credentials = New-Object System.Management.Automation.PSCredential ($devSitecoreUsername, $secpasswd)
-                    }
-                    else {
-                        throw "Credentials required for download"
-                    }
-                }
-                $user = $credentials.GetNetworkCredential().UserName
-                $password = $credentials.GetNetworkCredential().Password
 
-                Invoke-RestMethod -Uri https://dev.sitecore.net/api/authorization -Method Post -ContentType "application/json" -Body "{username: '$user', password: '$password'}" -SessionVariable loginSession -UseBasicParsing 
-                $params = @{
-                    Path         = $([io.path]::combine($resourcePath, 'HabitatHome', 'download-assets.json'))
-                    LoginSession = $loginSession
-                    Source       = $package.url
-                    Destination  = $destination
-                }
-                $Global:ProgressPreference = 'SilentlyContinue'
-                Install-SitecoreConfiguration  @params -WorkingDirectory $(Join-Path $PWD "logs")  
-                $Global:ProgressPreference = 'Continue'
-            }
-            
-            if ($package.convert) {
-                Write-Host ("Converting {0} to SCWDP" -f $package.name) -ForegroundColor Green
-                ConvertTo-SCModuleWebDeployPackage  -Path $destination -Destination $PackagesFolder -Force
-            }
-            Install-SitecoreModule $package
-        }
-    }
-}
-Function Start-ModuleInstallation {
-    $excluded = @("xp", "sat", "si", "habitatHome")
-    $installableModules = $modules | Where-Object { $_.id -notin $excluded }  #  if ($package.id -eq "xp" -or $package.id -eq "sat" -or $package.id -eq "si" -or $package.id -eq "habitatHome") {
-   
-    if (!(Test-Path $downloadFolder)) {
-        New-Item -ItemType Directory -Force -Path $downloadFolder
-    }
-      
-    # Download modules
-    $args = @{
-        Packages    = $installableModules
-        Credentials = $global:credentials
-    }
-    Install-Modules @args
-}
-Function Remove-DatabaseUsers {
-    # Delete master and core database users
-    Write-Host ("Removing {0}" -f $sql.coreUser) -ForegroundColor Green
-    try {
-        $sqlVariables = "DatabasePrefix = $($site.prefix)", "DatabaseSuffix = Core", "UserName = $($sql.coreUser)"
-        Invoke-Sqlcmd -ServerInstance $sql.server `
-            -Username $sql.adminUser `
-            -Password $sql.adminPassword `
-            -InputFile "$PSScriptRoot\database\removedatabaseuser.sql" `
-            -Variable $sqlVariables
-    }
-    catch {
-        write-host ("Removing Core user failed") -ForegroundColor Red
-        throw
-    }
-    Write-Host ("Removing {0}" -f $sql.securityUser) -ForegroundColor Green
-    try {
-        $sqlVariables = "DatabasePrefix = $($site.prefix)", "DatabaseSuffix = Core", "UserName = $($sql.securityUser)"
-        Invoke-Sqlcmd -ServerInstance $sql.server `
-            -Username $sql.adminUser `
-            -Password $sql.adminPassword `
-            -InputFile "$PSScriptRoot\database\removedatabaseuser.sql" `
-            -Variable $sqlVariables
-    }
-    catch {
-        write-host ("Removing Core user failed") -ForegroundColor Red
-        throw
-    }
-    Write-Host ("Removing {0}" -f $sql.masterUser) -ForegroundColor Green
-    try {
-        $sqlVariables = "DatabasePrefix = $($site.prefix)", "DatabaseSuffix = Master", "UserName = $($sql.masterUser)"
-        Invoke-Sqlcmd -ServerInstance $sql.server `
-            -Username $sql.adminUser `
-            -Password $sql.adminPassword `
-            -InputFile "$PSScriptRoot\database\removedatabaseuser.sql" `
-            -Variable $sqlVariables
-    }
-    catch {
-        write-host ("Removing Master user failed") -ForegroundColor Red        throw
-    }
-}
+    $bootLoaderPackagePath = [IO.Path]::Combine( $assets.sitecoreazuretoolkit, "resources\9.1.0\Addons\Sitecore.Cloud.Integration.Bootload.wdp.zip")
+    $bootloaderConfigurationOverride = $([io.path]::combine($assets.sharedUtilitiesRoot, "assets", 'Sitecore.Cloud.Integration.Bootload.InstallJob.exe.config'))
+    $bootloaderInstallationPath = $([io.path]::combine($site.webRoot, $site.hostName, "App_Data\tools\InstallJob"))
+    $assetsJson = (Resolve-Path $ConfigurationFile) 
 
-Function Stop-Services {
-    IISRESET /STOP
-    Stop-Service "$($xConnect.siteName)-MarketingAutomationService"
-    Stop-Service "$($xConnect.siteName)-IndexWorker"
-    Stop-Service "$($xConnect.siteName)-ProcessingEngineService"
-    $mssqlService = Get-Service *SQL* | Where-Object {$_.Status -eq 'Running' -and $_.DisplayName -like 'SQL Server (*'} | Select-Object -First 1 -ExpandProperty Name
-    try {
-        Write-Host "Restarting SQL Server"
-        restart-service -force $mssqlService
+    if ($null -eq $global:credentials) {
+        if ([string]::IsNullOrEmpty($devSitecoreUsername)) {
+            $global:credentials = Get-Credential -Message "Please provide dev.sitecore.com credentials"
+        }
+        elseif (![string]::IsNullOrEmpty($devSitecoreUsername) -and ![string]::IsNullOrEmpty($devSitecorePassword)) {
+            $global:credentials = New-Object System.Management.Automation.PSCredential ($devSitecoreUsername, $devSitecorePassword)
+        }
+        else {
+            throw "Credentials required for download"
+        }
     }
-    catch {
-        Write-Host "Something went wrong restarting SQL server again"
-        restart-service -force $mssqlService
-    }
-}
+    $user = $global:credentials.GetNetworkCredential().UserName
+    $password = $global:credentials.GetNetworkCredential().Password
 
-Function Enable-ContainedDatabases {
-    #Enable Contained Databases
-    Write-Host "Enable contained databases" -ForegroundColor Green
-    try {
-        # This command can set the location to SQLSERVER:\
-        Invoke-Sqlcmd -ServerInstance $sql.server `
-            -Username $sql.adminUser `
-            -Password $sql.adminPassword `
-            -InputFile "$PSScriptRoot\database\containedauthentication.sql"
-    }
-    catch {
-        write-host "Set Enable contained databases failed" -ForegroundColor Red
-        throw
-    }
-}
-Function Add-DatabaseUsers {
-    Write-Host ("Adding {0}" -f $sql.coreUser) -ForegroundColor Green
-    try {
-        $sqlVariables = "DatabasePrefix = $($site.prefix)", "DatabaseSuffix = Core", "UserName = $($sql.coreUser)", "Password = $($sql.corePassword)"
-        Invoke-Sqlcmd -ServerInstance $sql.server `
-            -Username $sql.adminUser `
-            -Password $sql.adminPassword `
-            -InputFile "$PSScriptRoot\database\addcoredatabaseuser.sql" `
-            -Variable $sqlVariables
-    }
-    catch {
-        write-host "Set Collection User rights failed" -ForegroundColor Red
-        throw
-    }
-    
-    Write-Host ("Adding {0}" -f $sql.securityuser) -ForegroundColor Green
-    try {
-        $sqlVariables = "DatabasePrefix = $($site.prefix)", "DatabaseSuffix = Core", "UserName = $($sql.securityUser)", "Password = $($sql.securityPassword)"
-        Invoke-Sqlcmd -ServerInstance $sql.server `
-            -Username $sql.adminUser `
-            -Password $sql.adminPassword `
-            -InputFile "$PSScriptRoot\database\addcoredatabaseuser.sql" `
-            -Variable $sqlVariables
-    }
-    catch {
-        write-host "Set Collection User rights failed" -ForegroundColor Red
-        throw
-    }
-    Write-Host ("Adding {0}" -f $sql.masterUser) -ForegroundColor Green
-    try {
-        $sqlVariables = "DatabasePrefix = $($site.prefix)", "DatabaseSuffix = Master", "UserName = $($sql.masterUser)", "Password = $($sql.masterPassword)"
-        Invoke-Sqlcmd -ServerInstance $sql.server `
-            -Username $sql.adminUser `
-            -Password $sql.adminPassword `
-            -InputFile "$PSScriptRoot\database\adddatabaseuser.sql" `
-            -Variable $sqlVariables
-    }
-    catch {
-        write-host "Set Collection User rights failed" -ForegroundColor Red
-        throw
-    }
-}
-function Update-SXASolrCores {
-    try {
-        $sxa = $modules | Where-Object { $_.id -eq "sxa"}
-        if ($false -eq $sxa.install) {
-            return
-        }
-        $params = @{
-            Path        = Join-Path $resourcePath "HabitatHome\configure-search-indexes.json"
-            InstallDir  = Join-Path $site.webRoot $site.hostName
-            ResourceDir = $($assets.root + "\\configuration")
-            SitePrefix  = $site.prefix
-        }
-        Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs")
-    }
-    catch {
-        write-host "$site.hostName Failed to updated search index configuration" -ForegroundColor Red
-        throw
-    }
-    # Install SXA Solr Cores
-    
-    $sxaSolrConfigPath = Join-Path $resourcePath 'HabitatHome\sxa-solr-config.json'
-    
-    try {
-        $params = @{
-            Path                  = Join-path $resourcePath 'HabitatHome\sxa-solr.json'
-            SolrUrl               = $solr.url 
-            SolrRoot              = $solr.root 
-            SolrService           = $solr.serviceName 
-            CorePrefix            = $site.prefix
-            SXASolrConfigPath     = $sxaSolrConfigPath
-            SiteName              = $site.hostName
-            SitecoreAdminPassword = $sitecore.adminPassword
- 
-        }
-        Install-SitecoreConfiguration @params -WorkingDirectory $(Join-Path $PWD "logs")
-    }
-    catch {
-        write-host "SXA SOLR Failed" -ForegroundColor Red
-        throw
-    }
-}
+    Invoke-RestMethod -Uri https://dev.sitecore.net/api/authorization -Method Post -ContentType "application/json" -Body "{username: '$user', password: '$password'}" -SessionVariable loginSession -UseBasicParsing 
 
-Function Start-Services {
-    IISRESET /START
-    Start-Service "$($xConnect.siteName)-MarketingAutomationService"
-    Start-Service "$($xConnect.siteName)-IndexWorker"
-    Start-Service "$($xConnect.siteName)-ProcessingEngineService"
+    $params = @{
+        Path                            = (Join-Path $sharedResourcePath "module-master-install.json")
+        SharedConfigurationPath         = $sharedResourcePath
+        SiteName                        = $site.hostName
+        WebRoot                         = $site.webRoot
+        XConnectSiteName                = $xConnect.siteName
+        SqlServer                       = $sql.server
+        SqlAdminUser                    = $sql.adminUser 
+        SqlAdminPassword                = $sql.adminPassword
+        DatabasePrefix                  = $site.prefix
+        SecurityUserName                = $sql.securityUser
+        SecurityUserPassword            = $sql.SecurityPassword
+        CoreUserName                    = $sql.coreUser
+        CoreUserPassword                = $sql.corePassword
+        MasterUserName                  = $sql.masterUser
+        MasterUserPassword              = $sql.MasterPassword
+        BootLoaderPackagePath           = $bootLoaderPackagePath
+        BootloaderConfigurationOverride = $bootloaderConfigurationOverride
+        BootloaderInstallationPath      = $bootloaderInstallationPath
+        AssetsJson                      = $assetsJson
+        LoginSession                    = $loginSession
+        SolrUrl                         = $solr.url
+        SolrRoot                        = $solr.root
+        SolrService                     = $solr.serviceName
+        CorePrefix                      = $site.prefix
+        SitecoreAdminPassword           = $sitecore.adminPassword
+    }
+    Push-Location $sharedResourcePath
+    Install-SitecoreConfiguration @params  *>&1 | Tee-Object "C:\projects\Demo.Utilities.VSTS\XP\Install\output.log"
+    Pop-Location
    
 }
 
+Import-Module (Join-Path $assets.sharedUtilitiesRoot "assets\modules\SharedInstallationUtilities\SharedInstallationUtilities.psm1") -Force
 Install-SitecoreInstallFramework
 Install-SitecoreAzureToolkit
-Remove-DatabaseUsers
-Stop-Services
-Start-ModuleInstallation
-Enable-ContainedDatabases
-Add-DatabaseUsers
-Start-Services
-Update-SXASolrCores
+Install-Modules
 $StopWatch.Stop()
 $StopWatch

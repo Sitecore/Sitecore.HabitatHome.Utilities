@@ -43,8 +43,9 @@ $site = $config.settings.site
 $sql = $config.settings.sql
 $xConnect = $config.settings.xConnect
 $resourcePath = Join-Path $assets.root "configuration"
+$sharedResourcePath = Join-Path $assets.sharedUtilitiesPath "configuration"
 $habitatHomeSettings = $config.settings.habitatHome
-$downloadJsonPath = $([io.path]::combine($resourcePath, 'HabitatHome', 'download-assets.json'))
+$downloadJsonPath = $([io.path]::combine($sharedResourcePath, 'download-assets.json'))
 $downloadFolder = $assets.root
 $packagesFolder = (Join-Path $downloadFolder "packages")
 
@@ -167,44 +168,48 @@ Function Get-Packages {
 
 Function Remove-DatabaseUsers {
     # Delete master and core database users
+
     Write-Host ("Removing {0}" -f $sql.coreUser) -ForegroundColor Green
-    try {
-        $sqlVariables = "DatabasePrefix = $($site.prefix)", "DatabaseSuffix = Core", "UserName = $($sql.coreUser)"
-        Invoke-Sqlcmd -ServerInstance $sql.server `
-            -Username $sql.adminUser `
-            -Password $sql.adminPassword `
-            -InputFile "$PSScriptRoot\database\removedatabaseuser.sql" `
-            -Variable $sqlVariables
+
+    $params = @{
+        Path             = (Join-Path $sharedResourcePath "remove-databaseuser.json")
+        SqlServer        = $sql.server
+        SqlAdminUser     = $sql.adminUser 
+        SqlAdminPassword = $sql.adminPassword
+        DatabasePrefix   = $site.prefix
+        DatabaseSuffix   = "Core"
+        UserName         = $sql.coreUser
     }
-    catch {
-        write-host ("Removing Core user failed") -ForegroundColor Red
-        throw
-    }
+    
+    Install-SitecoreConfiguration @params  -WorkingDirectory $(Join-Path $PWD "logs")
+   
     Write-Host ("Removing {0}" -f $sql.securityUser) -ForegroundColor Green
-    try {
-        $sqlVariables = "DatabasePrefix = $($site.prefix)", "DatabaseSuffix = Core", "UserName = $($sql.securityUser)"
-        Invoke-Sqlcmd -ServerInstance $sql.server `
-            -Username $sql.adminUser `
-            -Password $sql.adminPassword `
-            -InputFile "$PSScriptRoot\database\removedatabaseuser.sql" `
-            -Variable $sqlVariables
+
+    $params = @{
+        Path             = (Join-Path $sharedResourcePath "remove-databaseuser.json")
+        SqlServer        = $sql.server
+        SqlAdminUser     = $sql.adminUser 
+        SqlAdminPassword = $sql.adminPassword
+        DatabasePrefix   = $site.prefix
+        DatabaseSuffix   = "Core"
+        UserName         = $sql.securityUser
     }
-    catch {
-        write-host ("Removing Core user failed") -ForegroundColor Red
-        throw
-    }
+    
+    Install-SitecoreConfiguration @params  -WorkingDirectory $(Join-Path $PWD "logs")
+    
     Write-Host ("Removing {0}" -f $sql.masterUser) -ForegroundColor Green
-    try {
-        $sqlVariables = "DatabasePrefix = $($site.prefix)", "DatabaseSuffix = Master", "UserName = $($sql.masterUser)"
-        Invoke-Sqlcmd -ServerInstance $sql.server `
-            -Username $sql.adminUser `
-            -Password $sql.adminPassword `
-            -InputFile "$PSScriptRoot\database\removedatabaseuser.sql" `
-            -Variable $sqlVariables
+
+    $params = @{
+        Path             = (Join-Path $sharedResourcePath "remove-databaseuser.json")
+        SqlServer        = $sql.server
+        SqlAdminUser     = $sql.adminUser 
+        SqlAdminPassword = $sql.adminPassword
+        DatabasePrefix   = $site.prefix
+        DatabaseSuffix   = "Master"
+        UserName         = $sql.masterUser
     }
-    catch {
-        write-host ("Removing Master user failed") -ForegroundColor Red        throw
-    }
+    
+    Install-SitecoreConfiguration @params  -WorkingDirectory $(Join-Path $PWD "logs")
 }
 
 Function Stop-Services {
@@ -224,11 +229,11 @@ Function Stop-Services {
 }
 Function Install-Bootloader {
     $bootLoaderPackagePath = [IO.Path]::Combine( $assets.root, "SAT\resources\9.1.0\Addons\Sitecore.Cloud.Integration.Bootload.wdp.zip")
-    $bootloaderConfigurationOverride = $([io.path]::combine($resourcePath, 'Sitecore.Cloud.Integration.Bootload.InstallJob.exe.config'))
+    $bootloaderConfigurationOverride = $([io.path]::combine($sharedResourcePath, 'Sitecore.Cloud.Integration.Bootload.InstallJob.exe.config'))
     $bootloaderInstallationPath = $([io.path]::combine($site.webRoot, $site.hostName, "App_Data\tools\InstallJob"))
     
     $params = @{
-        Path                             = (Join-path $resourcePath 'HabitatHome\bootloader.json')
+        Path                             = (Join-path $sharedResourcePath 'bootloader.json')
         Package                          = $bootLoaderPackagePath
         SiteName                         = $site.hostName
         ConfigurationOverrideSource      = $bootloaderConfigurationOverride
@@ -282,7 +287,7 @@ Function Install-HabitatHomeXConnect {
     }
      
     $params = @{
-        Path             = (Join-path $resourcePath 'HabitatHome\module-mastercore.json')
+        Path             = (Join-path $sharedResourcePath 'module-mastercore.json')
         Package          = $xc.fileName
         SiteName         = $site.hostName
         SqlDbPrefix      = $site.prefix 
@@ -304,7 +309,7 @@ Function Deploy-XConnectModels {
 
         foreach ($destination in $modelDestinations) {
             $deployModelParams = @{
-                Path             = (Join-path $resourcePath 'HabitatHome\xconnect-models.json')
+                Path             = (Join-path $resourcePath 'xConnect\xconnect-models.json')
                 WebRoot          = $site.webRoot
                 SiteName         = $site.hostName
                 XConnectSiteName = $xConnect.siteName
@@ -318,59 +323,59 @@ Function Deploy-XConnectModels {
 Function Enable-ContainedDatabases {
     #Enable Contained Databases
     Write-Host "Enable contained databases" -ForegroundColor Green
-    try {
-        # This command can set the location to SQLSERVER:\
-        Invoke-Sqlcmd -ServerInstance $sql.server `
-            -Username $sql.adminUser `
-            -Password $sql.adminPassword `
-            -InputFile "$PSScriptRoot\database\containedauthentication.sql"
+    $params = @{
+        Path             = (Join-Path $sharedResourcePath "enable-contained-databases.json")
+        SqlServer        = $sql.server
+        SqlAdminUser     = $sql.adminUser 
+        SqlAdminPassword = $sql.adminPassword
     }
-    catch {
-        write-host "Set Enable contained databases failed" -ForegroundColor Red
-        throw
-    }
+    Install-SitecoreConfiguration @params  -WorkingDirectory $(Join-Path $PWD "logs")
 }
+
 Function Add-DatabaseUsers {
     Write-Host ("Adding {0}" -f $sql.coreUser) -ForegroundColor Green
-    try {
-        $sqlVariables = "DatabasePrefix = $($site.prefix)", "DatabaseSuffix = Core", "UserName = $($sql.coreUser)", "Password = $($sql.corePassword)"
-        Invoke-Sqlcmd -ServerInstance $sql.server `
-            -Username $sql.adminUser `
-            -Password $sql.adminPassword `
-            -InputFile "$PSScriptRoot\database\addcoredatabaseuser.sql" `
-            -Variable $sqlVariables
+    $sqlVariables = "DatabasePrefix = $($site.prefix)", "DatabaseSuffix = Core", "UserName = $($sql.coreUser)", "Password = $($sql.corePassword)"
+
+    $params = @{
+        Path             = (Join-Path $sharedResourcePath "execute-sql-script.json")
+        SqlServer        = $sql.server
+        SqlAdminUser     = $sql.adminUser 
+        SqlAdminPassword = $sql.adminPassword
+        ScriptFile       = Join-Path $assets.sharedUtilitiesPath "\database\addcoredatabaseuser.sql"
+        SqlVariables     = $sqlVariables
     }
-    catch {
-        write-host "Set Collection User rights failed" -ForegroundColor Red
-        throw
-    }
+
+    Install-SitecoreConfiguration @params  -WorkingDirectory $(Join-Path $PWD "logs")
+  
     
     Write-Host ("Adding {0}" -f $sql.securityuser) -ForegroundColor Green
-    try {
-        $sqlVariables = "DatabasePrefix = $($site.prefix)", "DatabaseSuffix = Core", "UserName = $($sql.securityUser)", "Password = $($sql.securityPassword)"
-        Invoke-Sqlcmd -ServerInstance $sql.server `
-            -Username $sql.adminUser `
-            -Password $sql.adminPassword `
-            -InputFile "$PSScriptRoot\database\addcoredatabaseuser.sql" `
-            -Variable $sqlVariables
+    $sqlVariables = "DatabasePrefix = $($site.prefix)", "DatabaseSuffix = Core", "UserName = $($sql.securityUser)", "Password = $($sql.securityPassword)"
+
+    $params = @{
+        Path             = (Join-Path $sharedResourcePath "execute-sql-script.json")
+        SqlServer        = $sql.server
+        SqlAdminUser     = $sql.adminUser 
+        SqlAdminPassword = $sql.adminPassword
+        ScriptFile       = Join-Path $assets.sharedUtilitiesPath "\database\addcoredatabaseuser.sql" 
+        SqlVariables     = $sqlVariables
     }
-    catch {
-        write-host "Set Collection User rights failed" -ForegroundColor Red
-        throw
-    }
+    
+    Install-SitecoreConfiguration @params  -WorkingDirectory $(Join-Path $PWD "logs")
+      
+   
     Write-Host ("Adding {0}" -f $sql.masterUser) -ForegroundColor Green
-    try {
-        $sqlVariables = "DatabasePrefix = $($site.prefix)", "DatabaseSuffix = Master", "UserName = $($sql.masterUser)", "Password = $($sql.masterPassword)"
-        Invoke-Sqlcmd -ServerInstance $sql.server `
-            -Username $sql.adminUser `
-            -Password $sql.adminPassword `
-            -InputFile "$PSScriptRoot\database\adddatabaseuser.sql" `
-            -Variable $sqlVariables
+    
+    $sqlVariables = "DatabasePrefix = $($site.prefix)", "DatabaseSuffix = Master", "UserName = $($sql.masterUser)", "Password = $($sql.masterPassword)"
+    $params = @{
+        Path             = (Join-Path $sharedResourcePath "execute-sql-script.json")
+        SqlServer        = $sql.server
+        SqlAdminUser     = $sql.adminUser 
+        SqlAdminPassword = $sql.adminPassword
+        ScriptFile       = Join-Path $assets.sharedUtilitiesPath "database\adddatabaseuser.sql" 
+        SqlVariables     = $sqlVariables
     }
-    catch {
-        write-host "Set Collection User rights failed" -ForegroundColor Red
-        throw
-    }
+        
+    Install-SitecoreConfiguration @params  -WorkingDirectory $(Join-Path $PWD "logs")
 }
 
 Function Start-Services {
