@@ -1,6 +1,6 @@
 ## Installation helpers for Sitecore Experience Commerce (XC)
 
-> These steps assume you have all of the prerequisites installed or have followed the instructions at [Prerequisites README.md](../../Prerequisits/README.md) and [XP Installation README.md](..\..\XP\install\README.md)
+> These steps assume you have all of the prerequisites installed or have followed the instructions at [Prerequisites README.md](../../Prerequisites/README.md) and [XP Installation README.md](../../XP/install/README.md)
 
 Still in an elevated PowerShell session
 
