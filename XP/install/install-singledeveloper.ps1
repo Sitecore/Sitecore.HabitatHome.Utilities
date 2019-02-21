@@ -224,7 +224,6 @@ Function Install-SingleDeveloper {
         SolrService                    = $solr.serviceName
         Prefix                         = $site.prefix
         XConnectCertificateName        = $xconnect.siteName
-        XConnectCertificatePassword    = $sql.adminPassword
         IdentityServerCertificateName  = $identityServer.name
         IdentityServerSiteName         = $identityServer.name
         LicenseFile                    = $assets.licenseFilePath
