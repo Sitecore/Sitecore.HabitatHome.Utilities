@@ -1,13 +1,7 @@
-﻿// -------------------------------------------------------------------------- //
-//         Sitecore Install Framework - Install Commerce website              //
-//                                                                            //
-//  Run this configuration to install Commerce website.                       //
-//                                                                            //
-//  NOTE: Only single line comments are accepted in configurations.           //
-// -------------------------------------------------------------------------- //
-{
+﻿{
   "Parameters": {
-    "WebsiteHostName": { "Type": "string", "Description": "The host name of the new website." },
+    "CommerceServicesHostPostfix": { "Type": "string", "DefaultValue": "", "Description": "The postfix for Commerce Engine services host names." },
+    "HostPrefix": { "Type": "string", "Description": "The prefix to the host name." },
     "CommerceInstallRoot": { "Type": "string", "Description": "The root path of commerce services." },
     "WebsiteName": { "Type": "string", "Description": "The new website name." },
     "WebsitePort": { "Type": "string", "Description": "The website port" },
@@ -20,7 +14,11 @@
     "CommercePhysicalPath": "[joinpath(parameter('CommerceInstallRoot'), parameter('WebsiteName'))]",
     // The certificate store for the root certificate.
     "Client.Cert.Store": "cert:\\LocalMachine\\My",
-    "Security.CertificateThumbprint": "[GetCertificateThumbprint(parameter('WebsiteHostName'), variable('Client.Cert.Store'))]"
+    "DnsName": "[concat('*.', parameter('CommerceServicesHostPostfix'))]",
+    "Security.Dns.CertificateThumbprint": "[GetCertificateThumbprint(variable('DnsName'), variable('Client.Cert.Store'))]",
+    "Security.Localhost.CertificateThumbprint": "[GetCertificateThumbprint('localhost', variable('Client.Cert.Store'))]",
+    "WebsiteHostName": "[concat(parameter('HostPrefix'), concat('.', parameter('CommerceServicesHostPostfix')))]"
+
   },
   "Modules": [
     "ManageCommerceService"
@@ -87,9 +85,9 @@
             "idleTimeoutAction": "0"
           },
           "Recycling": {
-              "PeriodicRestart": {
-                "time": "29:00:00"
-              }
+            "PeriodicRestart": {
+              "time": "29:00:00"
+            }
           },
           "ManagedPipelineMode": "Integrated",
           "ManagedRuntimeVersion": "",
@@ -113,9 +111,9 @@
             "idleTimeoutAction": "1"
           },
           "Recycling": {
-              "PeriodicRestart": {
-                "time": "00:00:00"
-              }
+            "PeriodicRestart": {
+              "time": "00:00:00"
+            }
           },
           "ManagedPipelineMode": "Integrated",
           "ManagedRuntimeVersion": "",
@@ -172,7 +170,6 @@
       }
     },
     "SetBinding": {
-      "Description": "Removes the default *:80 web binding for ops website.",
       "Type": "WebBinding",
       "Params": {
         "SiteName": "[parameter('WebsiteName')]",
@@ -184,13 +181,36 @@
         ],
         "Add": [
           {
-            "HostHeader": "[parameter('WebsiteHostName')]",
+            "HostHeader": "localhost",
             "Port": "[parameter('WebsitePort')]",
             "Protocol": "https",
             "SSLFlags": 1,
-            "Thumbprint": "[variable('Security.CertificateThumbprint')]"
+            "Thumbprint": "[variable('Security.Localhost.CertificateThumbprint')]"
           }
         ]
+      }
+    },
+    "SetHostBinding": {
+      "Skip": "[not(parameter('CommerceServicesHostPostfix'))]",
+      "Type": "WebBinding",
+      "Params": {
+        "SiteName": "[parameter('WebsiteName')]",
+        "Add": [
+          {
+            "HostHeader": "[variable('WebsiteHostName')]",
+            "Port": "443",
+            "Protocol": "https",
+            "SSLFlags": 1,
+            "Thumbprint": "[variable('Security.Dns.CertificateThumbprint')]"
+          }
+        ]
+      }
+    },
+    "CreateHostHeader": {
+      "Skip": "[not(parameter('CommerceServicesHostPostfix'))]",
+      "Type": "HostHeader",
+      "Params": {
+        "HostName": "[variable('WebsiteHostName')]"
       }
     },
     "SetPermissions": {

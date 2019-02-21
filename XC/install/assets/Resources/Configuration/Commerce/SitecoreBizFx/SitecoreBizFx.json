@@ -1,11 +1,4 @@
-﻿// -------------------------------------------------------------------------- //
-//         Sitecore Install Framework - Deploy Sitecore BizFx Services        //
-//                                                                            //
-//  Run this configuration to deploy Sitecore BizFx Services.                 //
-//                                                                            //
-//  NOTE: Only single line comments are accepted in configurations.           //
-// -------------------------------------------------------------------------- //
-{
+﻿{
   "Parameters": {
     "SitecoreBizFxServicesContentPath": {
       "Type": "string",
@@ -32,17 +25,18 @@
       "Description": "The name of the root certificate.",
       "DefaultValue": "SitecoreRootCert"
     },
-    "CommerceAuthoringServicesPort": {
-      "Type": "string",
-      "Description": "Commerce Authoring Services port"
-    },
     "SitecoreBizFxServerName": {
       "Type": "string",
       "Description": "Sitecore BizFx Server name"
     },
-    "SitecoreBizFxHostname": {
+    "CommerceServicesHostPostfix": {
       "Type": "string",
-      "Description": "Sitecore BizFx host header name"
+      "DefaultValue": "",
+      "Description": "The postfix for Commerce Engine services host names"
+    },
+    "CommerceAuthoringServicesPort": {
+      "Type": "string",
+      "Description": "Commerce Authoring Services port"
     },
     "SitecoreBizFxPort": {
       "Type": "string",
@@ -52,9 +46,9 @@
       "Type": "string",
       "Description": "The base folder for SIF configuration."
     },
-    "SitecoreIdentityServerUrl": { 
-      "Type": "string", 
-      "Description": "Sitecore Identity Server Url." 
+    "SitecoreIdentityServerUrl": {
+      "Type": "string",
+      "Description": "Sitecore Identity Server Url."
     }
   },
   "Variables": {
@@ -73,8 +67,9 @@
       "Type": "InstallSitecoreConfiguration",
       "Params": {
         "Path": "[concat(parameter('BaseConfigurationFolder'), '\\Commerce\\Common\\Commerce.InstallSite.json')]",
-        "WebsiteHostName": "[parameter('SitecoreBizFxHostname')]",
+        "CommerceServicesHostPostfix": "[parameter('CommerceServicesHostPostfix')]",
         "CommerceInstallRoot": "[parameter('CommerceInstallRoot')]",
+        "HostPrefix": "bizfx",
         "WebsiteName": "[parameter('SitecoreBizFxServerName')]",
         "WebsitePort": "[parameter('SitecoreBizFxPort')]",
         "UserDomain": "[parameter('UserDomain')]",
@@ -91,6 +86,7 @@
         "CommerceAuthoringServicesPort": "[parameter('CommerceAuthoringServicesPort')]",
         "PhysicalPath": "[variable('SitecoreBizFxPhysicalPath')]",
         "UserName": "[concat(parameter('UserDomain'), concat('\\', parameter('UserName')))]",
+        "CommerceServicesHostPostfix": "[parameter('CommerceServicesHostPostfix')]",
         "SitecoreIdentityServerUrl": "[parameter('SitecoreIdentityServerUrl')]"
       }
     },
