@@ -1,0 +1,46 @@
+{
+  "Parameters": {    
+    "CommerceInstallRoot": {
+      "Type": "string",
+      "Description": "The root path of commerce services."
+    },
+    "SitecoreIdentityServerApplicationName": {
+      "Type": "string",
+      "Description": "Application name of Sitecore Identity Server in the IIS"
+    },
+    "CommerceServicesHostPostfix": {
+      "Type": "string",
+      "DefaultValue": "",
+      "Description": "The postfix for Commerce Engine services host names"
+    }
+  },
+  "Variables": {
+    "ShopsUrl": "[concat('https://commerceshops.', parameter('CommerceServicesHostPostfix'))]",
+    "BizfxUrl": "[concat('https://bizfx.', parameter('CommerceServicesHostPostfix'))]",
+    "Group2": "[concat(variable('BizfxUrl'),concat('|', variable('ShopsUrl')))]"
+  },
+  "Tasks": {
+    // Tasks are separate units of work in a configuration.
+    // Each task is an action that will be completed when Install-SitecoreConfiguration is called.
+    // By default, tasks are applied in the order they are declared.
+    // Tasks may reference Parameters, Variables, and config functions.
+
+    "UpdateIdentityServerCommerceConfiguration": {
+      "Skip": "[not(parameter('CommerceServicesHostPostfix'))]",
+      "Type": "SetXml",
+      "Params": {
+        "FilePath": ".\\IdentityServer\\Sitecore.Commerce.IdentityServer.Host.xml",
+        "XPath": "//Settings/Sitecore/IdentityServer/Clients/CommerceClient/AllowedCorsOrigins",
+        "Element": "AllowedCorsOriginsGroup2",
+        "Value": "[variable('Group2')]"
+      }
+    },
+    "CopyIdentityServerCommerceConfiguration": {
+      "Type": "Copy",
+      "Params": {
+        "Source": ".\\IdentityServer\\Sitecore.Commerce.IdentityServer.Host.xml",
+        "Destination": "[joinpath(parameter('CommerceInstallRoot'),  concat(parameter('SitecoreIdentityServerApplicationName'), '\\Config\\production\\Sitecore.Commerce.IdentityServer.Host.xml'))]"
+      }
+    }
+  }
+}

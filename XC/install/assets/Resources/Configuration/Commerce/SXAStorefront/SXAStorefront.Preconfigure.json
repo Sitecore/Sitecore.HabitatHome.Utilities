@@ -1,0 +1,158 @@
+{
+  "Parameters": {
+    "SiteName": {
+      "Type": "string",
+      "Description": "The name of the site."
+    },
+    "CertPath": {
+      "Type": "string",
+      "Description": "The physical path on disk where certificates will be stored.",
+      "DefaultValue": "c:\\certificates"
+    },
+    "RootCertName": {
+      "Type": "string",
+      "Description": "The name of the root certificate.",
+      "DefaultValue": "SitecoreRootCert"
+    },
+    "StorefrontHostName": {
+      "Type": "string",
+      "Description": "The host name of the storefront."
+    },
+    "InstallDir": {
+      "Type": "string",
+      "Description": "The sitecore site content path."
+    },
+    "SiteUtilitiesSrc": {
+      "Type": "string",
+      "Description": "Site Utilities source path"
+    }
+  },
+  "Variables": {
+    // The name dns name of the root certificate.
+    "Root.Cert.DnsName": "[concat('DO_NOT_TRUST_', parameter('RootCertName'))]",
+    // The certificate store for the root certificate.
+    "Root.Cert.Store": "cert:\\LocalMachine\\Root",
+    // The certificate store for the client certificate.
+    "Client.Cert.Store": "cert:\\LocalMachine\\My",
+    "Security.SSL.CertificateThumbprint": "[GetCertificateThumbprint(parameter('StorefrontHostName'), variable('Client.Cert.Store'))]",
+    "ContentSearchConfig": "[concat(parameter('InstallDir'), '\\App_Config\\Sitecore\\ContentSearch\\Sitecore.ContentSearch.config')]",
+    "ContentSearchEnabledXpath": "//configuration/sitecore/settings/setting[@name='ContentSearch.Enabled']",
+    "MarketingConfigDir": "[concat(parameter('InstallDir'), '\\App_Config\\Sitecore\\Marketing.Operations.xMgmt')]"
+  },
+  "Modules": [ "SitecoreUtilityTasks" ],
+  "Tasks": {
+    "CreatePaths": {
+      // Create the physical disk path.
+      "Type": "EnsurePath",
+      "Params": {
+        "Exists": [
+          "[parameter('CertPath')]"
+        ]
+      }
+    },
+    "CreateSignedCert": {
+      // Create a certificate signed by the root authority.
+      "Type": "NewSignedCertificate",
+      "Params": {
+        "Signer": "[GetCertificate(variable('Root.Cert.DnsName'), variable('Root.Cert.Store'))]",
+        "Path": "[parameter('CertPath')]",
+        "CertStoreLocation": "[variable('Client.Cert.Store')]",
+        "Name": "[parameter('StorefrontHostName')]",
+        "DnsName": "[parameter('StorefrontHostName')]"
+      }
+    },
+    "StopWebsite": {
+      // Stops the website if it is running.
+      "Type": "ManageWebsite",
+      "Params": {
+        "Name": "[parameter('SiteName')]",
+        "Action": "Stop"
+      }
+    },
+    "StopAppPool": {
+      // Stops the app pool if it is running.
+      "Type": "ManageAppPool",
+      "Params": {
+        "Name": "[parameter('SiteName')]",
+        "Action": "Stop"
+      }
+    },
+    "CreateBindingsWithThumprint": {
+      "Description": "Creates SSL binding, removes the default *:80 web binding.",
+      "Type": "WebBinding",
+      "Params": {
+        "SiteName": "[parameter('SiteName')]",
+        "Remove": [
+          {
+            "Port": "80",
+            "IPAddress": "*"
+          }
+        ],
+        "Add": [
+          {
+            "HostHeader": "[parameter('StorefrontHostName')]",
+            "Protocol": "https",
+            "SSLFlags": 1,
+            "Thumbprint": "[variable('Security.SSL.CertificateThumbprint')]"
+          },
+          {
+            "HostHeader": "[parameter('StorefrontHostName')]",
+            "Protocol": "http",
+            "Port": "80"
+          }
+        ]
+      }
+    },
+    "CreateHostHeader": {
+      // Sets a hostheader for the website.
+      "Type": "HostHeader",
+      "Params": {
+        "HostName": "[parameter('StorefrontHostName')]"
+      }
+    },
+    "StartAppPool": {
+      // Starts the app pool.
+      "Type": "ManageAppPool",
+      "Params": {
+        "Name": "[parameter('SiteName')]",
+        "Action": "Start"
+      }
+    },
+    "StartWebsite": {
+      // Starts the website.
+      "Type": "ManageWebsite",
+      "Params": {
+        "Name": "[parameter('SiteName')]",
+        "Action": "Start"
+      }
+    },
+    "CopySiteUtilityFolder": {
+      "Type": "Copy",
+      "Params": {
+        "Source": "[parameter('SiteUtilitiesSrc')]",
+        "Destination": "[parameter('InstallDir')]"
+      }
+    },
+    "DisableIndexUpdate": {
+      // Speed up deployment
+      "Type": "SetXml",
+      "Params": [
+        {
+          "FilePath": "[variable('ContentSearchConfig'))]",
+          "Xpath": "[variable('ContentSearchEnabledXpath')]",
+          "Attributes": {
+            "value": "false"
+          }
+        }
+      ]
+    },
+    "DisableConfigFiles": {
+      // Speed up deployment
+      "Type": "DisableConfigFiles",
+      "Params": {
+        "ConfigDir": "[variable('MarketingConfigDir')]",
+        "ConfigFileList": [ "Sitecore.Marketing.Search.config" ]
+      }
+    }
+  }
+}
