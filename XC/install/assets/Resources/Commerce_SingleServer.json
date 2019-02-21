@@ -558,14 +558,6 @@
         "WebConfig": "[variable('WebConfig')]"
       }
     },
-    "ImportRootCertificate": {
-      "Type": "ImportPfxCertificate",
-      "Params": {
-        "CertStoreLocation": "cert:\\localmachine\\my",
-        "FilePath": "[parameter('CommerceEngineCertificatePath')]",
-        "Password": "[parameter('CommerceEngineCertificatePassword')]"
-      }
-    },
     "InstallHabitatImagesModule": {
       "Type": "InstallSitecoreConfiguration",
       "Params": {
@@ -613,7 +605,6 @@
         "CommerceInstallRoot": "[parameter('CommerceInstallRoot')]",
         "EngineConnectIncludeDir": "[variable('EngineConnectIncludeDir')]",
         "CommerceEngineCertificateName": "[parameter('CommerceEngineCertificateName')]",
-        "CertificatePassword": "[parameter('CommerceEngineCertificatePassword')]",
         "CommerceServicesPostfix": "[parameter('CommerceServicesPostfix')]",
         "CommerceServicesHostPostfix": "[parameter('CommerceServicesHostPostfix')]",
         "CommerceAuthoringServicesPort": "[parameter('CommerceAuthoringServicesPort')]"
