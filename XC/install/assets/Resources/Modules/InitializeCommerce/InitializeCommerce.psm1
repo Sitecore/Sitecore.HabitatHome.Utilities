@@ -1,4 +1,22 @@
 
+Function Invoke-UpdateShopsHostnameTask {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$EngineConnectIncludeDir,
+        [Parameter(Mandatory = $true)]
+        [string]$CommerceServicesHostPostfix                   
+    )      
+
+    $pathToConfig = $(Join-Path -Path $EngineConnectIncludeDir -ChildPath "\Sitecore.Commerce.Engine.Connect.config") 
+    $xml = [xml](Get-Content $pathToConfig)
+
+    $node = $xml.configuration.sitecore.commerceEngineConfiguration
+    $node.shopsServiceUrl = $node.shopsServiceUrl -replace "localhost:5000", "commerceauthoring.$CommerceServicesHostPostfix"
+    $node.commerceOpsServiceUrl = $node.commerceOpsServiceUrl -replace "localhost:5000", "commerceauthoring.$CommerceServicesHostPostfix"
+    $xml.Save($pathToConfig)      
+}
+
 Function Invoke-UpdateShopsPortTask {
     [CmdletBinding()]
     param(
@@ -7,10 +25,8 @@ Function Invoke-UpdateShopsPortTask {
         [Parameter(Mandatory = $true)]
         [string]$CommerceAuthoringServicesPort                  
     )      
-
     $pathToConfig = $(Join-Path -Path $EngineConnectIncludeDir -ChildPath "\Sitecore.Commerce.Engine.Connect.config") 
     $xml = [xml](Get-Content $pathToConfig)
-
     $node = $xml.configuration.sitecore.commerceEngineConfiguration
     $node.shopsServiceUrl = $node.shopsServiceUrl -replace "5000", $CommerceAuthoringServicesPort
     $node.commerceOpsServiceUrl = $node.commerceOpsServiceUrl -replace "5000", $CommerceAuthoringServicesPort
@@ -23,40 +39,24 @@ Function Invoke-ApplyCertificateTask {
         [Parameter(Mandatory = $true)]
         [string]$EngineConnectIncludeDir,
         [Parameter(Mandatory = $true)]
-        [string]$CertificatePath,
-        [securestring]$CertificatePassword,
+        [string]$CertificateThumbprint,
         [Parameter(Mandatory = $true)]
         [string[]]$CommerceServicesPathCollection
     )      
-    [securestring] $secPassword = $null
-    
-    $cert = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2
 
-    if ($null -ne $CertificatePassword) {
-        $cert.Import($CertificatePath, $CertificatePassword, 0)
-    
-    }
-    else {
-        $cert.Import($CertificatePath)
-
-    }
-    
-
-    
-
-    Write-Host "Applying certificate: $($cert.Thumbprint)" -ForegroundColor Green
+    Write-Host "Applying certificate: $($CertificateThumbprint)" -ForegroundColor Green
 
     $pathToConfig = $(Join-Path -Path $EngineConnectIncludeDir -ChildPath "\Sitecore.Commerce.Engine.Connect.config") 
     $xml = [xml](Get-Content $pathToConfig)
     $node = $xml.configuration.sitecore.commerceEngineConfiguration
-    $node.certificateThumbprint = $cert.Thumbprint
+    $node.certificateThumbprint = $CertificateThumbprint
     $xml.Save($pathToConfig)  
 
     foreach ($path in $CommerceServicesPathCollection) {
         $pathToJson = $(Join-Path -Path $path -ChildPath "wwwroot\config.json") 
         $originalJson = Get-Content $pathToJson -Raw | ConvertFrom-Json
         $certificateNode = $originalJson.Certificates.Certificates[0]
-        $certificateNode.Thumbprint = $cert.Thumbprint       
+        $certificateNode.Thumbprint = $CertificateThumbprint      
         $originalJson | ConvertTo-Json -Depth 100 -Compress | set-content $pathToJson
     } 
 }
@@ -94,7 +94,6 @@ Function Invoke-BootStrapCommerceServicesTask {
         [Parameter(Mandatory = $true)]
         [string]$UrlCommerceShopsServicesBootstrap        
     )
-	
     Write-Host "BootStrapping Commerce Services: $($urlCommerceShopsServicesBootstrap)" -ForegroundColor Yellow
     $headers = New-Object "System.Collections.Generic.Dictionary[[String],[String]]"
     $headers.Add("Authorization", $global:sitecoreIdToken)
@@ -213,6 +212,8 @@ Function Invoke-EnsureSyncDefaultContentPathsTask {
     Write-Host "Ensure/Sync default content paths completed ..." -ForegroundColor Green
 }
 
+Register-SitecoreInstallExtension -Command Invoke-UpdateShopsHostnameTask -As UpdateShopsHostname -Type Task -Force
+
 Register-SitecoreInstallExtension -Command Invoke-UpdateShopsPortTask -As UpdateShopsPort -Type Task -Force
 
 Register-SitecoreInstallExtension -Command Invoke-ApplyCertificateTask -As ApplyCertificate -Type Task -Force
@@ -231,8 +232,8 @@ Register-SitecoreInstallExtension -Command Invoke-EnsureSyncDefaultContentPathsT
 # SIG # Begin signature block
 # MIIXwQYJKoZIhvcNAQcCoIIXsjCCF64CAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUPd0Uvwb04BHiXR23fvN10F+Q
-# RgWgghL8MIID7jCCA1egAwIBAgIQfpPr+3zGTlnqS5p31Ab8OzANBgkqhkiG9w0B
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUJOI9P7jicTBcPxRQOnzVezDY
+# oQugghL8MIID7jCCA1egAwIBAgIQfpPr+3zGTlnqS5p31Ab8OzANBgkqhkiG9w0B
 # AQUFADCBizELMAkGA1UEBhMCWkExFTATBgNVBAgTDFdlc3Rlcm4gQ2FwZTEUMBIG
 # A1UEBxMLRHVyYmFudmlsbGUxDzANBgNVBAoTBlRoYXd0ZTEdMBsGA1UECxMUVGhh
 # d3RlIENlcnRpZmljYXRpb24xHzAdBgNVBAMTFlRoYXd0ZSBUaW1lc3RhbXBpbmcg
@@ -338,22 +339,22 @@ Register-SitecoreInstallExtension -Command Invoke-EnsureSyncDefaultContentPathsT
 # bTExMC8GA1UEAxMoRGlnaUNlcnQgU0hBMiBBc3N1cmVkIElEIENvZGUgU2lnbmlu
 # ZyBDQQIQB6Zc7QsNL9EyTYMCYZHvVTAJBgUrDgMCGgUAoHAwEAYKKwYBBAGCNwIB
 # DDECMAAwGQYJKoZIhvcNAQkDMQwGCisGAQQBgjcCAQQwHAYKKwYBBAGCNwIBCzEO
-# MAwGCisGAQQBgjcCARUwIwYJKoZIhvcNAQkEMRYEFJ9jnrgXcAGE0jd6gnZmkUCN
-# j+mrMA0GCSqGSIb3DQEBAQUABIIBAHGrE/TVrOTPUwMkSaqH2APcoIdzq9zooS9K
-# MgMNT56olGmRxKTpTzpCBhYZyQ+q7HQKerseF1kceh9SKP/qeiUGY4bU+oofXhSM
-# d1uYz6sF4ZVYmRb4ZKiu1OVxSJeT+JwL/RzPR/bwv0zOB/nzguDKX6ZqUKx1fYdg
-# +oGQH/G4fy1EWMeMsKyF7/vTvOWFGtabFvfIfRBKc03w6QyKNWQRPnUkCp68lUNA
-# HiqMxUSIKjQVD9KqctCLfQlqlqdW3IOA4djalgGXUv9b7LxURj52otdTHNSXeM33
-# BuKIIC/1dX60GrQJPV7dBk+m2NWE5Qf5Nzh4UeTbVz18j5rfBcGhggILMIICBwYJ
+# MAwGCisGAQQBgjcCARUwIwYJKoZIhvcNAQkEMRYEFO0d55eHp9H6TVIygOkiJE+7
+# i5F9MA0GCSqGSIb3DQEBAQUABIIBADGmlzbglXBVCahZCP6peNnot9nxfVswbwXW
+# pfdIk4qLKvPCNWUV8Ke1aV7rmwo8NXU3keRCxFCCcM9PtACOGYZBqe+y4LyFWZnG
+# 9hhKTx0tSS0wA190xBpJMIGIMYTbN2RHUev+Rjb2fwEQlmk/L8WjjgFx8yO5B+5d
+# /9bAON/JEr4wSE7nnEuxa4/6kURtlASm5R4zQ2HUrIBjV0w5lN4TojsMymh12DMM
+# lcEb/Arexgzjuq5xg26z/VwTPwr1VnCmByd9MUL9f4+InM9B5nef9W/o3mxSUiAM
+# xYmUSYP9I6S8kGr0sfisSZxbIUNMkUOKOp0jEwIGH/akVvhTWXWhggILMIICBwYJ
 # KoZIhvcNAQkGMYIB+DCCAfQCAQEwcjBeMQswCQYDVQQGEwJVUzEdMBsGA1UEChMU
 # U3ltYW50ZWMgQ29ycG9yYXRpb24xMDAuBgNVBAMTJ1N5bWFudGVjIFRpbWUgU3Rh
 # bXBpbmcgU2VydmljZXMgQ0EgLSBHMgIQDs/0OMj+vzVuBNhqmBsaUDAJBgUrDgMC
 # GgUAoF0wGAYJKoZIhvcNAQkDMQsGCSqGSIb3DQEHATAcBgkqhkiG9w0BCQUxDxcN
-# MTkwMTA5MTYzNjU4WjAjBgkqhkiG9w0BCQQxFgQUyHiGSfKwIrbeupz4s3XRkdnW
-# OwUwDQYJKoZIhvcNAQEBBQAEggEAZa5urK9QC6dkCebEUjo5gR5HCrv/fmjKb+Re
-# W4cmIXOO0pbqYZ30DZ1QIEyf4dsl2XhlMAW0N2SVZzowVXHKiYzeYK1Io5wGDuTs
-# SMeAohxgcfRO85A8+a2z+UVcQ3PtQSNpnBe26HxLcECyVblr3voR1ELlIYW+qriT
-# Z4hgiaSxIWfMEVqC0FJR1c9tTe2Cm48HHslVjuk1IYehqc5DWOLw7jfSi2G0mMSw
-# +xyNA6ourN+bRqQRQD+w6fmL5F+B0zgGxFlqLZhbXb126XnDwwRZHiw2t6hScbsk
-# NX8ytUNOFVKrrS8gHceNkZT/wy1X7j6kbPfYa81GP6Ixan4vQQ==
+# MTkwMjE4MjEwODA1WjAjBgkqhkiG9w0BCQQxFgQUhptUrmVJW9qWxzrfSrYyYhyi
+# tYowDQYJKoZIhvcNAQEBBQAEggEAJq0WTOqlvvlcHu028kgordcmzt0kijbipFj+
+# QoyyADt8UISKcSdKNftNpHyniMzi3TJbxo6HODp60uKfx4ykh6ZnMM+QKkjDFx9A
+# UbP0B84DndNuPGzC2vOHN5r1Y0mxMCfRcPhuFDGgllgv2lLNyl0a096n/4w7j2Ia
+# lT4sXk0xDZ8+wk6mxJzuSoI3exH7l0ZXmMhWyi+A1X5Jm7qVryILnifCC+JXeV6Q
+# nQrSltdmlXFkVSSIamr06zje8nvH2D5ZV8uOOmsYoYkg0+12JQEEq0rc5c/oufIF
+# +hMe/i3vcByOIqdjqzyefybawWwjCN38lvRFO4hfr3HfG0zPhg==
 # SIG # End signature block

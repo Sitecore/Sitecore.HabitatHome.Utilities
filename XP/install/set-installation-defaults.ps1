@@ -33,8 +33,8 @@ $assets.sharedUtilitiesRoot = (Resolve-Path "..\..\Shared" | Select-Object -Expa
 $assets.sitecoreazuretoolkit = Join-Path $assets.sharedUtilitiesRoot "sat"
 $assets.licenseFilePath = Join-Path $assets.root "license.xml"
 
-$assets.sitecoreVersion = "9.1.0 rev. 001564"
-$assets.identityServerVersion = "2.0.0 rev. 00157"
+$assets.sitecoreVersion = "9.1.1 rev. 002225"
+$assets.identityServerVersion = "2.0.1 rev. 00166"
 
 
 $assets.certificatesPath = Join-Path $assets.sharedUtilitiesRoot "Certificates"

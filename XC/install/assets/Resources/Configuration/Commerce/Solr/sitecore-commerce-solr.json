@@ -1,18 +1,5 @@
-// -------------------------------------------------------------------------- //
-//         Sitecore Install Framework - Sitecore Commerce Solr Configuration  //
-//                                                                            //
-//  Run this configuration on your Solr instance to configure the cores for   //
-//  an Commerce deployment. If the cores exist, they will be overwritten.     //
-//                                                                            //
-//  NOTE: Only single line comments are accepted in configurations.           //
-// -------------------------------------------------------------------------- //
-
 {
-  "Parameters": {
-    // Parameters are values that may be passed when Install-SitecoreConfiguration is called.
-    // Parameters must declare a Type and may declare a DefaultValue and Description.
-    // Parameters with no DefaultValue are required when Install-SitecoreConfiguration is called.
-
+  "Parameters": {  
     "SolrUrl": {
       "Type": "string",
       "DefaultValue": "https://localhost:8992/solr",

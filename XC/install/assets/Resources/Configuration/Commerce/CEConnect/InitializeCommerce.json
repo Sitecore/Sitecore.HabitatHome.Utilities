@@ -1,11 +1,4 @@
-﻿// ------------------------------------------------------------------------------ //
-//         Sitecore Install Framework - Apply Commerce Engine certificate         //
-//                                                                                //
-//  Run this configuration to apply the Commerce Engine certificate.              //
-//                                                                                //
-//  NOTE: Only single line comments are accepted in configurations.               //
-// ------------------------------------------------------------------------------ //
-{
+﻿{
   "Parameters": {
     "EngineConnectIncludeDir": {
       "Type": "string",
@@ -15,13 +8,9 @@
       "Type": "string",
       "Description": "The root path of commerce services."
     },
-    "CertificatePath": {
+    "CommerceEngineCertificateName": {
       "Type": "string",
-      "Description": "The full path to the Commerce Engine certificate file."
-    },
-    "CertificatePassword":{
-      "Type":"securestring",
-      "Description":"Password for the PFX certificate"
+      "Description": "The Commerce Engine certificate name for communication between Engine and Storefront."
     },
     "CommerceServicesPostfix": {
       "Type": "string",
@@ -30,6 +19,11 @@
     "CommerceAuthoringServicesPort": {
       "Type": "string",
       "Description": "Commerce Authoring Services port"
+    },
+    "CommerceServicesHostPostfix": {
+      "Type": "string",
+      "DefaultValue": "",
+      "Description": "The postfix for Commerce Engine services host names"
     }
   },
   "Variables": {
@@ -40,7 +34,9 @@
     "CommerceOpsPhysicalPath": "[joinpath(parameter('CommerceInstallRoot'),  variable('CommerceOps'))]",
     "CommerceShopsPhysicalPath": "[joinpath(parameter('CommerceInstallRoot'),  variable('CommerceShops'))]",
     "CommerceAuthoringPhysicalPath": "[joinpath(parameter('CommerceInstallRoot'),  variable('CommerceAuthoring'))]",
-    "CommerceMinionsPhysicalPath": "[joinpath(parameter('CommerceInstallRoot'),  variable('CommerceMinions'))]"
+    "CommerceMinionsPhysicalPath": "[joinpath(parameter('CommerceInstallRoot'),  variable('CommerceMinions'))]",
+    "Client.Cert.Store": "cert:\\LocalMachine\\My",
+    "Security.CertificateThumbprint": "[GetCertificateThumbprint(parameter('CommerceEngineCertificateName'), variable('Client.Cert.Store'))]"
   },
   "Modules": ["InitializeCommerce"],
   "Tasks": {
@@ -48,8 +44,7 @@
       "Type": "ApplyCertificate",
       "Params": {
         "EngineConnectIncludeDir": "[parameter('EngineConnectIncludeDir')]",
-        "CertificatePath": "[parameter('CertificatePath')]",
-        "CertificatePassword":"[parameter('CertificatePassword')]",
+        "CertificateThumbprint": "[variable('Security.CertificateThumbprint')]",
         "CommerceServicesPathCollection": [
           "[variable('CommerceOpsPhysicalPath')]",
           "[variable('CommerceShopsPhysicalPath')]",
@@ -58,7 +53,16 @@
         ]
       }
     },
+    "UpdateShopsHostname": {
+      "Skip": "[not(parameter('CommerceServicesHostPostfix'))]",
+      "Type": "UpdateShopsHostname",
+      "Params": {
+        "EngineConnectIncludeDir": "[parameter('EngineConnectIncludeDir')]",
+        "CommerceServicesHostPostfix": "[parameter('CommerceServicesHostPostfix')]"
+      }
+    },
     "UpdateShopsPort": {
+      "Skip": "[parameter('CommerceServicesHostPostfix')]",
       "Type": "UpdateShopsPort",
       "Params": {
         "EngineConnectIncludeDir": "[parameter('EngineConnectIncludeDir')]",

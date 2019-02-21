@@ -1,20 +1,18 @@
-﻿// -------------------------------------------------------------------------- //
-//         Sitecore Install Framework - Deploy Commerce Services              //
-//                                                                            //
-//  Run this configuration to deploy Commerce Engine Services.                //
-//                                                                            //
-//  NOTE: Only single line comments are accepted in configurations.           //
-// -------------------------------------------------------------------------- //
-{
+﻿{
   "Parameters": {
-    "EngineHostName": {
+    "CommerceEngineCertificateName": {
       "Type": "string",
-      "Description": "The host name of the engine websites to be used."
+      "Description": "The Commerce Engine certificate name for communication between Engine and Storefront."
     },
     "RootCertFileName": {
       "Type": "string",
       "Description": "The file name of the root certificate to be created.",
       "DefaultValue": "SitecoreRootCert"
+    },
+    "CertPath": {
+      "Type": "string",
+      "Description": "The physical path on disk where certificates will be stored.",
+      "DefaultValue": "c:\\certificates"
     },
     "CommerceInstallRoot": {
       "Type": "string",
@@ -35,6 +33,11 @@
     "CommerceServicesPostfix": {
       "Type": "string",
       "Description": "The Commerce Engine postfix for services names"
+    },
+    "CommerceServicesHostPostfix": {
+      "Type": "string",
+      "DefaultValue": "",
+      "Description": "The postfix for Commerce Engine services host names"
     },
     "SitecoreDbServer": {
       "Type": "string",
@@ -153,7 +156,7 @@
     // The certificate store for the root certificate.
     "Root.Cert.Store": "cert:\\LocalMachine\\Root",
     "Client.Cert.Store": "cert:\\LocalMachine\\My",
-    "Security.CertificateThumbprint": "[GetCertificateThumbprint(parameter('EngineHostName'), variable('Client.Cert.Store'))]",
+    "Security.CertificateThumbprint": "[GetCertificateThumbprint(parameter('CommerceEngineCertificateName'), variable('Client.Cert.Store'))]",
     "InstallSiteConfigurationFilePath": "[concat(parameter('BaseConfigurationFolder'), '\\Commerce\\Common\\Commerce.InstallSite.json')]"
   },
   "Modules": [
@@ -165,15 +168,38 @@
   ],
   "Tasks": {
     "CreateSignedEngineCert": {
-      // When deployment scripts are updated to support custom hostnames, we should go back to NewSignedCertificate task type supported by SIF.
+      "Type": "NewSignedCertificate",
+      "Params": {
+        "Signer": "[GetCertificate(variable('Root.Cert.DnsName'), variable('Root.Cert.Store'))]",
+        "Path": "[parameter('CertPath')]",
+        "CertStoreLocation": "[variable('Client.Cert.Store')]",
+        "Name": "[parameter('CommerceEngineCertificateName')]",
+        "DnsName": "[parameter('CommerceEngineCertificateName')]",
+        "IncludePrivateKey": true
+      }
+    },
+    "CreateSignedCert": {
+      "Skip": "[not(parameter('CommerceServicesHostPostfix'))]",
+      "Type": "NewSignedCertificate",
+      "Params": {
+        "Signer": "[GetCertificate(variable('Root.Cert.DnsName'), variable('Root.Cert.Store'))]",
+        "Path": "[parameter('CertPath')]",
+        "FriendlyName": "Commerce Engine SSL Certificate",
+        "CertStoreLocation": "[variable('Client.Cert.Store')]",
+        "Name": "Commerce Engine SSL Certificate",
+        "DnsName": "[concat('*.', parameter('CommerceServicesHostPostfix'))]",
+        "IncludePrivateKey": true
+      }
+    },
+    "CreateLocalhostSignedCert": {
       "Type": "NewCommerceSignedCertificate",
       "Params": {
         "Signer": "[GetCertificate(variable('Root.Cert.DnsName'), variable('Root.Cert.Store'))]",
-        "Path": "c:\\certificates",
-        "FriendlyName": "Commerce engine SSL Certificate",
+        "Path": "[parameter('CertPath')]",
+        "FriendlyName": "Commerce Engine SSL Localhost Certificate",
         "CertStoreLocation": "[variable('Client.Cert.Store')]",
-        "Name": "[parameter('EngineHostName')]",
-        "DnsName": "[parameter('EngineHostName')]"
+        "Name": "localhost",
+        "DnsName": "localhost"
       }
     },
     "EnsureLocalUser": {
@@ -206,8 +232,9 @@
       "Type": "InstallSitecoreConfiguration",
       "Params": {
         "Path": "[variable('InstallSiteConfigurationFilePath')]",
-        "WebsiteHostName": "[parameter('EngineHostName')]",
+        "CommerceServicesHostPostfix": "[parameter('CommerceServicesHostPostfix')]",
         "CommerceInstallRoot": "[parameter('CommerceInstallRoot')]",
+        "HostPrefix": "commerceops",
         "WebsiteName": "[variable('CommerceOps')]",
         "WebsitePort": "[parameter('CommerceOpsServicesPort')]",
         "UserDomain": "[parameter('UserDomain')]",
@@ -225,8 +252,10 @@
         "CommerceServicesDbName": "[parameter('CommerceServicesDbName')]",
         "CommerceServicesGlobalDbName": "[parameter('CommerceServicesGlobalDbName')]",
         "SiteHostHeaderName": "[parameter('SiteHostHeaderName')]",
-        "CommerceAuthoringServicesPort": "[parameter('CommerceAuthoringServicesPort')]",
+        "EngineCertificateThumbprint": "[variable('Security.CertificateThumbprint')]",
         "SitecoreBizFxPort": "[parameter('SitecoreBizFxPort')]",
+        "CommerceServicesHostPostfix": "[parameter('CommerceServicesHostPostfix')]",
+        "CommerceAuthoringServicesPort": "[parameter('CommerceAuthoringServicesPort')]",
         "CommerceSearchProvider": "[parameter('CommerceSearchProvider')]",
         "SolrUrl": "[parameter('SolrUrl')]",
         "SearchIndexPrefix": "[parameter('SearchIndexPrefix')]",
@@ -259,9 +288,10 @@
       "Type": "InstallSitecoreConfiguration",
       "Params": {
         "Path": "[variable('InstallSiteConfigurationFilePath')]",
-        "WebsiteHostName": "[parameter('EngineHostName')]",
+        "CommerceServicesHostPostfix": "[parameter('CommerceServicesHostPostfix')]",
         "CommerceInstallRoot": "[parameter('CommerceInstallRoot')]",
         "WebsiteName": "[variable('CommerceShops')]",
+        "HostPrefix": "commerceshops",
         "WebsitePort": "[parameter('CommerceShopsServicesPort')]",
         "UserDomain": "[parameter('UserDomain')]",
         "UserName": "[parameter('UserName')]",
@@ -300,9 +330,10 @@
       "Type": "InstallSitecoreConfiguration",
       "Params": {
         "Path": "[variable('InstallSiteConfigurationFilePath')]",
-        "WebsiteHostName": "[parameter('EngineHostName')]",
+        "CommerceServicesHostPostfix": "[parameter('CommerceServicesHostPostfix')]",
         "CommerceInstallRoot": "[parameter('CommerceInstallRoot')]",
         "WebsiteName": "[variable('CommerceAuthoring')]",
+        "HostPrefix": "commerceauthoring",
         "WebsitePort": "[parameter('CommerceAuthoringServicesPort')]",
         "UserDomain": "[parameter('UserDomain')]",
         "UserName": "[parameter('UserName')]",
@@ -341,9 +372,10 @@
       "Type": "InstallSitecoreConfiguration",
       "Params": {
         "Path": "[variable('InstallSiteConfigurationFilePath')]",
-        "WebsiteHostName": "[parameter('EngineHostName')]",
+        "CommerceServicesHostPostfix": "[parameter('CommerceServicesHostPostfix')]",
         "CommerceInstallRoot": "[parameter('CommerceInstallRoot')]",
         "WebsiteName": "[variable('CommerceMinions')]",
+        "HostPrefix": "commerceminions",
         "WebsitePort": "[parameter('CommerceMinionsServicesPort')]",
         "UserDomain": "[parameter('UserDomain')]",
         "UserName": "[parameter('UserName')]",
