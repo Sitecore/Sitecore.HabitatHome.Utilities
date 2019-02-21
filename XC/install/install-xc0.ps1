@@ -358,12 +358,12 @@ Function Install-Commerce {
 $StopWatch = New-Object -TypeName System.Diagnostics.Stopwatch 
 $StopWatch.Start()
 
-# Install-RequiredInstallationAssets
-# Set-ModulesPath
-# Install-CommerceAssets
-# Publish-CommerceEngine
-# Publish-BizFx
-#Convert-Modules
+Install-RequiredInstallationAssets
+Set-ModulesPath
+Install-CommerceAssets
+Publish-CommerceEngine
+Publish-BizFx
+Convert-Modules
 Install-Commerce
 Start-Site
 
