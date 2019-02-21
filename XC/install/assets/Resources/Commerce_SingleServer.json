@@ -341,7 +341,8 @@
         "Path": "[concat(parameter('BaseConfigurationFolder'), '\\Commerce\\IdentityServer\\sitecore-identity-config.json')]",
         "CommerceInstallRoot": "[parameter('CommerceInstallRoot')]",
         "SitecoreIdentityServerApplicationName": "[parameter('SitecoreIdentityServerApplicationName')]",
-        "CommerceServicesHostPostfix": "[parameter('CommerceServicesHostPostfix')]"
+        "CommerceServicesHostPostfix": "[parameter('CommerceServicesHostPostfix')]",
+        "BaseConfigurationFolder":"[parameter('BaseConfigurationFolder')]"
       }
     },
     "InstallSolrCores": {

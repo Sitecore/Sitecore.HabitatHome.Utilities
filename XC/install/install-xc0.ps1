@@ -264,28 +264,19 @@ Function Install-Commerce {
     $bootLoaderPackagePath = [IO.Path]::Combine( $assets.sitecoreazuretoolkit, "resources\9.1.0\Addons\Sitecore.Cloud.Integration.Bootload.wdp.zip")
     $bootloaderConfigurationOverride = $([io.path]::combine($sharedResourcePath, 'Sitecore.Cloud.Integration.Bootload.InstallJob.exe.config'))
     $bootloaderInstallationPath = $([io.path]::combine($site.webRoot, $site.hostName, "App_Data\tools\InstallJob"))
-    $secureCertificatePassword = ConvertTo-SecureString $sql.adminPassword -AsPlainText -Force
 
     $params = @{
         Path                                        = $(Join-Path $resourcePath  'Commerce_SingleServer.json')
         BaseConfigurationFolder                     = $(Join-Path $resourcePath "Configuration")
         SharedConfigurationFolder                   = $(Join-Path $sharedResourcePath "Configuration")
-        CommerceInstallRoot                         = $site.webRoot
-        CommerceServicesPostfix                     = $site.prefix
-        Environments                                = @('HabitatAuthoring')
-        EnvironmentsPrefix                          = $site.prefix
-        SiteName                                    = $site.hostName
         SiteHostHeaderName                          = $commerce.storefrontHostName
         InstallDir                                  = $(Join-Path $site.webRoot $site.hostName)
-        XConnectSiteName                            = $xConnect.siteName
         XConnectInstallDir                          = $xConnect.siteRoot
-        RootCertFileName                            = $sitecore.rootCertificateName
+        CommerceInstallRoot                         = $site.webRoot
         CommerceServicesDbServer                    = $sql.server
         CommerceServicesDbName                      = $($site.prefix + "_SharedEnvironments")
         CommerceServicesGlobalDbName                = $($site.prefix + "_Global")
         SitecoreDbServer                            = $sql.server
-        SqlAdminUserName                            = $sql.adminUser
-        SqlAdminPassword                            = $sql.adminPassword
         SitecoreCoreDbName                          = $($site.prefix + "_Core")
         SitecoreUsername                            = "sitecore\admin"
         SitecoreUserPassword                        = $sitecore.adminPassword
@@ -294,7 +285,11 @@ Function Install-Commerce {
         SolrRoot                                    = $solr.root
         SolrService                                 = $solr.serviceName
         SolrSchemas                                 = (Join-Path -Path $assets.commerce.sifCommerceRoot -ChildPath "SolrSchemas" )
+        CommerceServicesPostfix                     = $site.prefix
+        CommerceServicesHostPostfix                 = $site.hostName
         SearchIndexPrefix                           = $site.prefix
+        EnvironmentsPrefix                          = $site.prefix
+        Environments                                = @('HabitatAuthoring')
         AzureSearchServiceName                      = ""
         AzureSearchAdminKey                         = ""
         AzureSearchQueryKey                         = ""
@@ -304,12 +299,11 @@ Function Install-Commerce {
         CommerceAuthoringServicesPort               = "5000"
         CommerceMinionsServicesPort                 = "5010"
         SitecoreBizFxPort                           = "4200"
-        SitecoreBizFxServerName                     = $("SitecoreBizFX_" + $site.prefix)
         SitecoreCommerceEnginePath                  = $($publishPath + "\" + $site.prefix + ".Commerce.Engine")
         SitecoreBizFxServicesContentPath            = $($publishPath + "\" + $site.prefix + ".Commerce.BizFX")
-        CommerceEngineCertificatePath               = $(Join-Path -Path $assets.certificatesPath -ChildPath $($xConnect.siteName + ".pfx") )
-        CommerceEngineCertificatePassword           = $secureCertificatePassword
+		CommerceEngineCertificateName               = $site.prefix + "storefront.engine"
         SiteUtilitiesSrc                            = $(Join-Path -Path $assets.commerce.sifCommerceRoot -ChildPath "SiteUtilityPages")
+        HabitatImagesModuleFullPath                 = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include  "Habitat Home Product Images.scwdp.zip" -Recurse)
         CommerceConnectModuleFullPath               = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include "Sitecore Commerce Connect Core*.scwdp.zip" -Recurse  )
         CommercexProfilesModuleFullPath             = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include "Sitecore Commerce ExperienceProfile Core *.scwdp.zip" -Recurse)
         CommercexAnalyticsModuleFullPath            = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include "Sitecore Commerce ExperienceAnalytics Core *.scwdp.zip"	-Recurse)
@@ -321,7 +315,6 @@ Function Install-Commerce {
         SXAStorefrontThemeModuleFullPath            = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include  "Sitecore Commerce Experience Accelerator Storefront Themes*.scwdp.zip"-Recurse )
         SXAStorefrontCatalogModuleFullPath          = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include  "Sitecore Commerce Experience Accelerator Habitat Catalog*.scwdp.zip" -Recurse)
         MergeToolFullPath                           = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include  "*Microsoft.Web.XmlTransform.dll" -Recurse | Select-Object -ExpandProperty FullName)
-        HabitatImagesModuleFullPath                 = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include  "Habitat Home Product Images.scwdp.zip" -Recurse)
         UserDomain                                  = $commerce.serviceAccountDomain
         UserName                                    = $commerce.serviceAccountUserName
         UserPassword                                = $commerce.serviceAccountPassword
@@ -330,9 +323,15 @@ Function Install-Commerce {
             PublicKey  = $commerce.brainTreeAccountPublicKey
             PrivateKey = $commerce.brainTreeAccountPrivateKey
         }
-        
+        SitecoreBizFxServerName                     = $("SitecoreBizFX_" + $site.prefix)
         SitecoreIdentityServerApplicationName       = $identityServer.name
         SitecoreIdentityServerHostName              = $identityServer.url
+        SiteName                                    = $site.hostName
+        XConnectSiteName                            = $xConnect.siteName
+        RootCertFileName                            = $sitecore.rootCertificateName
+        
+        SqlAdminUserName                            = $sql.adminUser
+        SqlAdminPassword                            = $sql.adminPassword
         SecurityUserName                            = $sql.securityUser
         SecurityUserPassword                        = $sql.SecurityPassword
         CoreUserName                                = $sql.coreUser
@@ -359,11 +358,11 @@ Function Install-Commerce {
 $StopWatch = New-Object -TypeName System.Diagnostics.Stopwatch 
 $StopWatch.Start()
 
-#Install-RequiredInstallationAssets
-#Set-ModulesPath
-#Install-CommerceAssets
-#Publish-CommerceEngine
-#Publish-BizFx
+# Install-RequiredInstallationAssets
+# Set-ModulesPath
+# Install-CommerceAssets
+# Publish-CommerceEngine
+# Publish-BizFx
 #Convert-Modules
 Install-Commerce
 Start-Site
