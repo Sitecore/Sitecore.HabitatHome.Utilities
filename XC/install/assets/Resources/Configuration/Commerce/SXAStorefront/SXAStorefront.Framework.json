@@ -1,4 +1,11 @@
-﻿{
+﻿// ------------------------------------------------------------------------------ //
+//         Sitecore Install Framework - Install SXA Storefront Framework          //
+//                                                                                //
+//  Run this configuration to install SXA Storefront Framework module.            //
+//                                                                                //
+//  NOTE: Only single line comments are accepted in configurations.               //
+// ------------------------------------------------------------------------------ //
+{
   "Parameters": {
     "ModuleFullPath": {
       "Type": "string",
