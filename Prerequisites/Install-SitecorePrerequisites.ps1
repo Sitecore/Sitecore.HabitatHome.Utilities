@@ -1,0 +1,1 @@
+Install-SitecoreConfiguration -Path (Resolve-Path .\prerequisites.json)
