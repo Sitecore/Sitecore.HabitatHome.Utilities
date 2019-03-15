@@ -28,6 +28,7 @@ $solr = $config.settings.solr
 $assets = $config.assets
 $modules = $config.modules
 $resourcePath = Join-Path $assets.root "configuration"
+$sharedResourcePath = Join-Path $assets.sharedUtilitiesRoot "assets\configuration"
 
 Import-Module -Name SitecoreInstallFramework -RequiredVersion 2.0.0 -Force
 
@@ -94,16 +95,17 @@ $singleDeveloperParams = @{
     PasswordRecoveryUrl           = $site.hostName
     SitecoreIdentityAuthority     = $identityServer.name
     XConnectCollectionService     = $xConnect.siteName
-    ClientSecret                  = $identityServer.clientSecret
+    ClientSecret   = $identityServer.clientSecret
     AllowedCorsOrigins            = $site.hostName
 }
 Push-Location $resourcePath
 Install-SitecoreConfiguration @singleDeveloperParams -Uninstall  *>&1 | Tee-Object XP0-SingleDeveloper.log
+Pop-Location
 
-$sxaSolrConfigPath = Join-Path $resourcePath 'HabitatHome\sxa-solr-config.json'
+$sxaSolrConfigPath = Join-Path $sharedresourcePath 'sxa\sxa-solr-config.json'
 
 $sxaSolrUninstallParams = @{
-    Path                  = Join-path $resourcePath 'HabitatHome\sxa-solr.json'
+    Path                  = Join-path $sharedresourcePath 'sxa\sxa-solr.json'
     SolrUrl               = $solr.url 
     SolrRoot              = $solr.root 
     SolrService           = $solr.serviceName 
@@ -113,9 +115,8 @@ $sxaSolrUninstallParams = @{
     SitecoreAdminPassword = $sitecore.adminPassword
 }
 
-Install-SitecoreConfiguration @sxaSolrUninstallParams -Uninstall  *>&1 | Tee-Object XP0-SingleDeveloper.log
+#Install-SitecoreConfiguration @sxaSolrUninstallParams -Uninstall  *>&1 | Tee-Object XP0-SingleDeveloper.log
 
-Pop-Location
 
 Write-Host "Removing folders from webroot" -ForegroundColor Green
 $webRoot = $site.webRoot
