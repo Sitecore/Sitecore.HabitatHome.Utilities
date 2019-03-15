@@ -5,30 +5,35 @@ function InstallNugetPackageProvider{
 }
 
 function InstallOrUpdateChocoPackages {
-    $packages = @(
-        #Format: (id, version)
-        ('googlechrome', ''), 
-        ('git', ''),
-        ('NuGet.CommandLine', ''),
-        ('7zip', ''),
-        ('nodejs.install', ''),
-        ('vscode', ''),
-        ('vscode-powershell', ''),
-        ('vscode-csharp', ''),
-        ('jre8', ''),
-        #('urlrewrite', ''), #installed inside '\Install-IIS.ps1'
-        ('snaketail', '')
-    )
+    [xml]$xml = Get-Content .\choco-packages.config
+    
+    # $packages = @(
+    #     #Format: (id, version)
+    #     ('googlechrome', ''), 
+    #     ('git', ''),
+    #     ('NuGet.CommandLine', ''),
+    #     ('7zip', ''),
+    #     ('nodejs.install', ''),
+    #     ('vscode', ''),
+    #     ('vscode-powershell', ''),
+    #     ('vscode-csharp', ''),
+    #     ('jre8', ''),
+    #     #('urlrewrite', ''), #installed inside '\Install-IIS.ps1'
+    #     ('snaketail', '')
+    # )
 
     $installedPackages = choco list -lo
-    foreach ($package in $packages) {
-        $installedPackage = $installedPackages | Where-object { $_.ToLower().StartsWith($package[0].ToLower() + ' ') }
+    $xml.packages.package | Foreach-Object {
+        $packageId = $_.id.ToLower()
+        $packageVersion = $_.version
+        $installedPackage = $installedPackages | Where-object { $_.ToLower().StartsWith($packageId + ' ') }
+        
         $installedVersion = ''
         if (![string]::IsNullOrEmpty($installedPackage)) {
             $installedVersion = $installedPackage.Split(' ')[1]
         }
         Write-Host "InstallOrUpdateChocoPackage -packageId $package[0] -version $package[1] -installedVersion $installedVersion" 
-        InstallOrUpdateChocoPackage -packageId $package[0] -version $package[1] -installedVersion $installedVersion
+        InstallOrUpdateChocoPackage -packageId $packageId -version $packageVersion -installedVersion $installedVersion
     }
 }
 
