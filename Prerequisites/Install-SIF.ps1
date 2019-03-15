@@ -1,0 +1,1 @@
+.\Install-Module.ps1 -moduleName SitecoreInstallFramework

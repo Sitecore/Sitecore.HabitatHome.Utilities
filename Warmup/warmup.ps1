@@ -1,9 +1,9 @@
 param(
-    $instance = "",
+    [string]$instance,
     [ValidateSet('xp', 'xc')]
-    $demoType,
-    $adminUser = "admin",
-    $adminPassword = "b"
+    [string]$demoType,
+    [string]$adminUser = 'admin',
+    [string]$adminPassword = 'b'
 )
 
 $config = Get-Content -Raw -Path "$PSSCriptRoot\warmup-config.json" | ConvertFrom-Json
@@ -15,6 +15,24 @@ else {
 }
 Write-Host $instanceName
 
+function TestStatusCode {
+    param($response)
+
+    if ($response.StatusCode -ne 200) {
+        throw "The request returned a non-200 status code [$($response.StatusCode)]"
+    }
+}
+
+function TestCookie {
+    param([System.Net.CookieContainer]$cookies)
+
+    $discovered = @($cookies.GetCookies($site) |
+            Where-Object { $_.Name -eq '.ASPXAUTH' -Or $_.Name -eq '.AspNet.Cookies' })
+
+    if ($discovered.Count -ne 1) {
+        throw "Authentication failed. Check username and password"
+    }
+}
 Function Get-SitecoreSession {
     param(
         [Parameter(Mandatory = $true, Position = 0)]
@@ -25,28 +43,27 @@ Function Get-SitecoreSession {
         [string]$password
     )
 
-    # Login - to create web session with authorisation cookies
-    $loginPage = ("https://{0}/sitecore/login" -f $site)
-  
-    $login = Invoke-WebRequest $loginPage -SessionVariable webSession
-  
-    $form = $login.forms[0]
-    $form.fields["UserName"] = $username
-    $form.fields["Password"] = $password
-  
-    Write-Host ""
-    Write-Host "logging in"
-  
-    $request = Invoke-WebRequest -Uri $loginPage -WebSession $webSession -Method POST -Body $form | Out-Null
-	$cookies = $websession.Cookies.GetCookies($loginPage)
-	if ($cookies["sitecore_userticket"]){
-        Write-Host "login done"
-	    Write-Host ""
-		$webSession
-    }else{
-        Write-Host "login failed" -ForegroundColor Red
-        exit 2
-    }
+    $uri = "$site/sitecore/login?fbc=1"
+    $authResponse = Invoke-WebRequest -uri $uri -SessionVariable session -UseBasicParsing
+    TestStatusCode $authResponse
+
+    # Set login info
+    $fields = @{}
+    $authResponse.InputFields.ForEach( {
+        
+            $fields[$_.Name] = $_.Value
+        
+        })
+
+    $fields.UserName = $Username
+    $fields.Password = $Password
+
+    # Login using the same session
+    $authResponse = Invoke-WebRequest -uri $uri -WebSession $session -Method POST -Body $fields -UseBasicParsing
+    TestStatusCode $authResponse
+    TestCookie $session.Cookies
+
+    return $session
 }
 
 Function RequestPage {
@@ -59,46 +76,47 @@ Function RequestPage {
     Write-Host $(Get-Date -Format HH:mm:ss.fff)
     Write-Host "requesting $url ..."
     try { 
-		$request = Invoke-WebRequest $url -WebSession $webSession -TimeoutSec 60000
+        $request = Invoke-WebRequest $url -WebSession $webSession -TimeoutSec 60000
         Write-Host "Done" 
         return $true
-	} 
-	catch {
+    } 
+    catch {
         $status = $_.Exception.Response.StatusCode.Value__
         if ($status -ne 200) {
-            Write-Host ("ERROR Something went wrong while requesting {0} - Error {1}" -f $url,$status) -ForegroundColor Red
+            Write-Host ("ERROR Something went wrong while requesting {0} - Error {1}" -f $url, $status) -ForegroundColor Red
         }
-		return $false
+        return $false
     }
-	finally{
-		Write-Host $(Get-Date -Format HH:mm:ss.fff)
+    finally {
+        Write-Host $(Get-Date -Format HH:mm:ss.fff)
         Write-Host ""
-	}
+    }
 }
 
 $demoType = $demoType.ToLower()
-$session = Get-SitecoreSession $instanceName ("sitecore\{0}" -f $adminUser) $adminPassword
+$session = Get-SitecoreSession "https://$instanceName" ("sitecore\{0}" -f $adminUser) $adminPassword
 $errors = 0
 
 Write-Host "Warming up XP Demo" -ForegroundColor Green
 foreach ($page in $config.urls.xp) {
-	if (!$(RequestPage "https://$instanceName$($page.url)" $session)){
-		$errors++
-	}
-}
-
-if ($demoType -eq "xc") {
-Write-Host "Warming up XC Demo" -ForegroundColor Green
-    foreach ($page in $config.urls.xc) {
-		if (!$(RequestPage "https://$instanceName$($page.url)" $session)){
-			$errors++
-		}
+    if (!$(RequestPage "https://$instanceName$($page.url)" $session)) {
+        $errors++
     }
 }
 
-if ($errors -eq 0){
-	Write-Host "Warmup Complete" -ForegroundColor Green
-}else{
-	Write-Host "Warmup Complete With Errors" -ForegroundColor Red
-	exit 1
+if ($demoType -eq "xc") {
+    Write-Host "Warming up XC Demo" -ForegroundColor Green
+    foreach ($page in $config.urls.xc) {
+        if (!$(RequestPage "https://$instanceName$($page.url)" $session)) {
+            $errors++
+        }
+    }
+}
+
+if ($errors -eq 0) {
+    Write-Host "Warmup Complete" -ForegroundColor Green
+}
+else {
+    Write-Host "Warmup Complete With Errors" -ForegroundColor Red
+    exit 1
 }
