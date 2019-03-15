@@ -9,15 +9,14 @@ Param(
     [string] $version,
     [string] $resourceGroupName,
     [string] $virtualMachineSize = "Standard_D4s_v3", 
-  [Parameter(Mandatory = $true)]
-    [string] $sourceSnapshotSubscriptionId ,
-	[string] $deploymentName = "habitathome",
+    [Parameter(Mandatory = $true)]
+	[string] $sourceSnapshotSubscriptionId,    
+    [string] $deploymentName = "habitathome",
     [string] $sourceSnapshotPrefix = "habitathome",
     [switch] $DisableAutoShutdown
 )
 
 $account = Get-AzureRMContext | Select-Object Account
-
 if ($null -eq $account.Account) {
     Login-AzureRmAccount
 }

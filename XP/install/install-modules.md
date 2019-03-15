@@ -12,11 +12,13 @@ After you call `install-modules.ps1` the following occurs:
   - **Kill** any remaining **connections** to Core and master databases (workaround)
     - InstallWDP requires Database Containement to be set to None. In doing so, it needs exclusive access to the Database in order to make that change. Killing any remaining open connections ensures the installation will succeed
   - **Install Bootloader**: Bootloader is used to apply transforms and poststeps packaged with the Sitecore wdp (scwdp)
+
 - **Download** latest module based on assets.json details
   - if not already an scwdp, use Sitecore Azure Toolkit to **convert** it
 
 - **Install Module**
   - The initial PR contains the steps to install Sitecore PowerShell Extensions and Sitecore Experience Accelerator Modules
+
 - **Post Installation**
   - Enable Contained Databases
   - Add Database Users
