@@ -137,7 +137,7 @@ Function Start-SitecoreSite {
             [int]$ExpectedResponseStatus
         )
 
-        if ($Response.StatusCode -eq $ExpectedResponseStatus) {
+        if ($Response.StatusCode -eq $ExpectedResponseStatus -or $Response.StatusCode -eq 503) {
             return $true
         }
 
