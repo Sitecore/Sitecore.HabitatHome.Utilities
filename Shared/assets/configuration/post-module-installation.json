@@ -140,7 +140,7 @@
     },
     "Variables": {
         "MarketingAutomationServiceName": "[concat(parameter('XConnectSiteName'),'-MarketingAutomationService')]",
-        "IndexWorkerServiceServiceName": "[concat(parameter('XConnectSiteName'),'-IndexWorkerService')]",
+        "IndexWorkerServiceServiceName": "[concat(parameter('XConnectSiteName'),'-IndexWorker')]",
         "ProcessingEngineServiceName": "[concat(parameter('XConnectSiteName'),'-ProcessingEngineService')]",
         "StartMarketingAutomationService:Service.Name": "[variable('MarketingAutomationServiceName')]",
         "StartIndexWorkerService:Service.Name": "[variable('IndexWorkerServiceServiceName')]",
@@ -156,6 +156,9 @@
         "AddSecurityUser:Database.Suffix": "Core"
     },
     "Includes": {
+        "EnableContainedDatabases": {
+            "Source": ".\\enable-contained-databases.json"
+        },
         "AddCoreUser": {
             "Source": ".\\add-database-user.json"
         },
@@ -165,17 +168,14 @@
         "AddSecurityUser": {
             "Source": ".\\add-database-user.json"
         },
-        "StartMarketingAutomationService": {
+        "StartIndexWorkerService": {
             "Source": ".\\manage-service.json"
         },
-        "StartIndexWorkerService": {
+        "StartMarketingAutomationService": {
             "Source": ".\\manage-service.json"
         },
         "StartProcessingEngineService": {
             "Source": ".\\manage-service.json"
-        },
-        "EnableContainedDatabases": {
-            "Source": ".\\enable-contained-databases.json"
         },
         "WarmUpSite": {
             "Source": ".\\warmup-instance.json"

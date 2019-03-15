@@ -35,4 +35,4 @@ See the [README.md](XC/Install/README.md) in the XC/install folder for a detaile
 
 The XP folder contains a set of scripts for installing Sitecore Experience Platform 9 with all the required modules and certificates.
 
-See the [README.md](https://github.com/Sitecore/Sitecore.HabitatHome.Utilities/blob/develop/XP/install/README.md) in the XP/install folder for a detailed description and instructions.
+See the [README.md](XP/Install/README.md) in the XP/install folder for a detailed description and instructions.

@@ -66,7 +66,7 @@ Function Install-SitecoreInstallFramework {
     $module = Get-Module -FullyQualifiedName @{ModuleName = "SitecoreInstallFramework"; ModuleVersion = $sifVersion }
     if (-not $module) {
         write-host "Installing the Sitecore Install Framework, version $($assets.installerVersion)" -ForegroundColor Green
-        Install-Module SitecoreInstallFramework -Repository $assets.psRepositoryName -RequiredVersion $sifVersion -Scope CurrentUser -Force -AllowPrerelease
+        Install-Module SitecoreInstallFramework -Repository $assets.psRepositoryName -RequiredVersion $sifVersion -Scope CurrentUser -Force
         Import-Module SitecoreInstallFramework -Force
     }
 }
@@ -166,7 +166,7 @@ Function Install-Modules {
         SitecoreAdminPassword           = $sitecore.adminPassword
     }
     Push-Location $sharedResourcePath
-    Install-SitecoreConfiguration @params  *>&1 | Tee-Object "C:\projects\Demo.Utilities.VSTS\XP\Install\output.log"
+    Install-SitecoreConfiguration @params
     Pop-Location
    
 }

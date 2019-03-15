@@ -158,6 +158,16 @@
             "convert": true,
             "source": "sitecore",
             "databases": "master,core"
+        },
+        {
+            "id": "jss",
+            "name": "JavaScript Services",
+            "fileName": "Sitecore JavaScript Services Server for Sitecore 9.1 XP 11.0.0 rev. 181113.scwdp.zip",
+            "url": "https://dev.sitecore.net/~/media/E899E132CB8E4FAEA5305EF0D19A59FC.ashx",
+            "install": false,
+            "convert": false,
+            "source": "sitecore",
+            "databases": "master,core"
         }
     ],
     "habitatHome": {
