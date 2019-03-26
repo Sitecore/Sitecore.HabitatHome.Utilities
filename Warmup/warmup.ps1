@@ -76,7 +76,7 @@ Function RequestPage {
     Write-Host $(Get-Date -Format HH:mm:ss.fff)
     Write-Host "requesting $url ..."
     try { 
-        $request = Invoke-WebRequest $url -WebSession $webSession -TimeoutSec 60000
+        $request = Invoke-WebRequest $url -WebSession $webSession -TimeoutSec 60000 -UseBasicParsing
         Write-Host "Done" 
         return $true
     } 
