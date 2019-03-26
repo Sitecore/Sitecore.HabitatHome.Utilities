@@ -106,7 +106,7 @@ if ($demoType -eq "sitecore") {
     }
 }
 
-if ($demoType -eq "xp" -or "xc") {
+if ($demoType -eq ("xp" -or "xc")) {
     Write-Host "Warming up XP Demo" -ForegroundColor Green
     foreach ($page in $config.urls.sitecore) {
         if (!$(RequestPage "https://$instanceName$($page.url)" $session)) {
