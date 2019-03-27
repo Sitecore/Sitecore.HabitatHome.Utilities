@@ -1,7 +1,7 @@
 Param(
     [string] $ConfigurationFile = "configuration-xp0.json",
 	[string] $assetsRoot,
-    [string] $sitecoreVersion
+    [string] $sitecoreVersion = "9.1.1 rev. 002399"
 )
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
@@ -19,21 +19,16 @@ if (![string]::IsNullOrEmpty($assetsRoot)) {
 else {
     $assets.root = "$PSScriptRoot\assets"
 }
-if (![string]::IsNullOrEmpty($sitecoreVersion)) {
-    $assets.sitecoreVersion = $sitecoreVersion
-}
-else {
-    $assets.sitecoreVersion = "9.1.0 rev. 001564"
-}
 # SIF settings
 $assets.psRepository = "https://sitecore.myget.org/F/sc-powershell/api/v2/"
-$assets.psRepositoryName = "SitecoreGallery"
-$assets.installerVersion = "2.0.0"
+$assets.psRepositoryName = "Sitecore_Gallery"
+$assets.installerVersion = "2.1.0"
 $assets.sharedUtilitiesRoot = (Resolve-Path "..\..\Shared" | Select-Object -ExpandProperty Path)
 $assets.sitecoreazuretoolkit = Join-Path $assets.sharedUtilitiesRoot "sat"
 $assets.licenseFilePath = Join-Path $assets.root "license.xml"
+$assets.sitecoreVersion = $sitecoreVersion
 
-$assets.sitecoreVersion = "9.1.1 rev. 002225"
+# TODO - get the IdentityServer version from the Sitecore package rather than specifying in the config.
 $assets.identityServerVersion = "2.0.1 rev. 00166"
 
 
