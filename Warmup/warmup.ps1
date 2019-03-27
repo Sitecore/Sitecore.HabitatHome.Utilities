@@ -1,6 +1,6 @@
 param(
     [string]$instance,
-    [ValidateSet('xp', 'xc')]
+    [ValidateSet('sitecore', 'xp', 'xc')]
     [string]$demoType,
     [string]$adminUser = 'admin',
     [string]$adminPassword = 'b'
@@ -76,7 +76,7 @@ Function RequestPage {
     Write-Host $(Get-Date -Format HH:mm:ss.fff)
     Write-Host "requesting $url ..."
     try { 
-        $request = Invoke-WebRequest $url -WebSession $webSession -TimeoutSec 60000
+        $request = Invoke-WebRequest $url -WebSession $webSession -TimeoutSec 60000 -UseBasicParsing
         Write-Host "Done" 
         return $true
     } 
@@ -97,10 +97,24 @@ $demoType = $demoType.ToLower()
 $session = Get-SitecoreSession "https://$instanceName" ("sitecore\{0}" -f $adminUser) $adminPassword
 $errors = 0
 
-Write-Host "Warming up XP Demo" -ForegroundColor Green
-foreach ($page in $config.urls.xp) {
-    if (!$(RequestPage "https://$instanceName$($page.url)" $session)) {
-        $errors++
+    Write-Host "Warming up Sitecore" -ForegroundColor Green
+    foreach ($page in $config.urls.sitecore) {
+        if (!$(RequestPage "https://$instanceName$($page.url)" $session)) {
+            $errors++
+        }
+    }
+
+if ($demoType -eq ("xp" -or "xc")) {
+    Write-Host "Warming up XP Demo" -ForegroundColor Green
+    foreach ($page in $config.urls.sitecore) {
+        if (!$(RequestPage "https://$instanceName$($page.url)" $session)) {
+            $errors++
+        }
+    }
+    foreach ($page in $config.urls.xp) {
+        if (!$(RequestPage "https://$instanceName$($page.url)" $session)) {
+            $errors++
+        }
     }
 }
 
