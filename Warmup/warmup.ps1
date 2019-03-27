@@ -97,14 +97,12 @@ $demoType = $demoType.ToLower()
 $session = Get-SitecoreSession "https://$instanceName" ("sitecore\{0}" -f $adminUser) $adminPassword
 $errors = 0
 
-if ($demoType -eq "sitecore") {
     Write-Host "Warming up Sitecore" -ForegroundColor Green
     foreach ($page in $config.urls.sitecore) {
         if (!$(RequestPage "https://$instanceName$($page.url)" $session)) {
             $errors++
         }
     }
-}
 
 if ($demoType -eq ("xp" -or "xc")) {
     Write-Host "Warming up XP Demo" -ForegroundColor Green
