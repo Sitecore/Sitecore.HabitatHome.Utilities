@@ -3,7 +3,7 @@
         {
             "id": "xp",
             "name": "Sitecore Experience Platform",
-            "fileName": "Sitecore 9.1.1 rev. 002225 (WDP XPSingle packages).zip",
+            "fileName": "Sitecore 9.1.1 rev. 002399 (WDP XP0 packages).zip",
             "url": "https://dev.sitecore.net/~/media/442BA3B6E6334CEA9546C647D434BC13.ashx",
             "extract": true,
             "source": "sitecore"
@@ -32,7 +32,7 @@
         {
             "id": "sxa",
             "name": "Sitecore Experience Accelerator",
-            "fileName": "Sitecore Experience Accelerator 1.8.1 rev. 190220 for 9.1.1.scwdp.zip",
+            "fileName": "Sitecore Experience Accelerator 1.8 rev. 181112 for 9.1.scwdp.zip",
             "url": "https://dev.sitecore.net/~/media/D494E255F40A49F097DE86C001495FFD.ashx",
             "install": true,
             "convert": false,

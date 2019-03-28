@@ -201,7 +201,6 @@ Function Confirm-Prerequisites {
 Function Install-SingleDeveloper {
     $singleDeveloperParams = @{
         Path                           = $sitecore.singleDeveloperConfigurationPath
-        CertificatePath                = $assets.certificatesPath
         SqlServer                      = $sql.server
         SqlAdminUser                   = $sql.adminUser
         SqlAdminPassword               = $sql.adminPassword
