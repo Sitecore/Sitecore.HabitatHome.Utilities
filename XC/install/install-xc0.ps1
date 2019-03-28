@@ -350,7 +350,7 @@ Function Install-Commerce {
         Install-SitecoreConfiguration @params  -Verbose 
     }
     Else {
-        Install-SitecoreConfiguration @params -Skip "InitializeCommerceEngine", "GenerateCatalogTemplates", "InstallHabitatImagesModule", "Reindex" -Verbose *>&1 | Tee-Object "C:\projects\Demo.Utilities.VSTS\Xc\Install\output.log"
+        Install-SitecoreConfiguration @params -Skip "InitializeCommerceEngine", "GenerateCatalogTemplates", "InstallHabitatImagesModule", "Reindex" -Verbose *>&1 | Tee-Object "logs\output.log"
     }
 }
 
