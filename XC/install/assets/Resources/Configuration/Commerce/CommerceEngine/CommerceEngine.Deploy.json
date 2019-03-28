@@ -399,7 +399,7 @@
       "Description": "Starts the app pool.",
       "Type": "ManageAppPool",
       "Params": {
-        "Name": "[variable('CommerceAuthoring')]",
+        "Name": "[variable('CommerceMinions')]",
         "Action": "Start"
       }
     },
@@ -407,7 +407,7 @@
       "Description": "Starts the website.",
       "Type": "ManageWebsite",
       "Params": {
-        "Name": "[variable('CommerceAuthoring')]",
+        "Name": "[variable('CommerceMinions')]",
         "Action": "Start"
       }
     },
