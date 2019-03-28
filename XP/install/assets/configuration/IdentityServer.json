@@ -162,6 +162,14 @@
                 "Action": "Stop"
             }
         },
+        "CreateRegistryStorageForAppPool": {
+            "Description": "Provisions the HKLM registry so that the specified user account can persist auto-generated machine keys.",
+            "Type": "ManageKeyStorage",
+            "Params": {
+                "AppPoolName": "[parameter('SiteName')]",
+                "Action": "Create"
+            }
+        },
         "RemoveDefaultBinding": {
             "Description": "Removes the default *:80 web binding.",
             "Type": "WebBinding",
@@ -291,6 +299,14 @@
                 "Name": "[parameter('SiteName')]",
                 "Action": "Stop",
                 "ErrorAction": "SilentlyContinue"
+            }
+        },
+        "DeleteRegistryStorageForAppPool": {
+            "Description": "Deletes the HKLM registry so that the specified user account can persist auto-generated machine keys.",
+            "Type": "ManageKeyStorage",
+            "Params": {
+                "AppPoolName": "[parameter('SiteName')]",
+                "Action": "Delete"
             }
         },
         "RemoveAppPool": {
