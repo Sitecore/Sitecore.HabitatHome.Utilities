@@ -30,7 +30,7 @@ $modules = $config.modules
 $resourcePath = Join-Path $assets.root "configuration"
 $sharedResourcePath = Join-Path $assets.sharedUtilitiesRoot "assets\configuration"
 
-Import-Module -Name SitecoreInstallFramework -RequiredVersion 2.0.0 -Force
+Import-Module -Name SitecoreInstallFramework -RequiredVersion 2.1.0 -Force
 
 Write-Host "*******************************************************" -ForegroundColor Green
 Write-Host " UNInstalling Sitecore $($assets.sitecoreVersion)" -ForegroundColor Green

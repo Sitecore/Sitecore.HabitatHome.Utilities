@@ -201,7 +201,6 @@ Function Confirm-Prerequisites {
 Function Install-SingleDeveloper {
     $singleDeveloperParams = @{
         Path                           = $sitecore.singleDeveloperConfigurationPath
-        CertificatePath                = $assets.certificatesPath
         SqlServer                      = $sql.server
         SqlAdminUser                   = $sql.adminUser
         SqlAdminPassword               = $sql.adminPassword
@@ -224,7 +223,6 @@ Function Install-SingleDeveloper {
         SolrService                    = $solr.serviceName
         Prefix                         = $site.prefix
         XConnectCertificateName        = $xconnect.siteName
-        XConnectCertificatePassword    = $sql.adminPassword
         IdentityServerCertificateName  = $identityServer.name
         IdentityServerSiteName         = $identityServer.name
         LicenseFile                    = $assets.licenseFilePath
