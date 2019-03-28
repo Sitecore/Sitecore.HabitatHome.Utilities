@@ -1,5 +1,5 @@
 {
-  "Parameters": {
+  "Parameters": {    
     "CommerceInstallRoot": {
       "Type": "string",
       "Description": "The root path of commerce services."
@@ -19,9 +19,9 @@
     }
   },
   "Variables": {
-    "ShopsUrl": "[concat('https://commerceshops.', parameter('CommerceServicesHostPostfix'))]",
+    "AuthoringUrl": "[concat('https://commerceauthoring.', parameter('CommerceServicesHostPostfix'))]",
     "BizfxUrl": "[concat('https://bizfx.', parameter('CommerceServicesHostPostfix'))]",
-    "Group2": "[concat(variable('BizfxUrl'),concat('|', variable('ShopsUrl')))]",
+    "Group2": "[concat(variable('BizfxUrl'),concat('|', variable('AuthoringUrl')))]",
     "IdentityServerConfigurationPath": "[joinpath(parameter('BaseConfigurationFolder'),'.\\IdentityServer\\Sitecore.Commerce.IdentityServer.Host.xml')]"
   },
   "Tasks": {
