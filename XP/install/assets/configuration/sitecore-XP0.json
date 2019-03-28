@@ -700,6 +700,13 @@
                 "Destination": "[variable('Site.DataFolder')]"
             }
         },
+        "CreateBindingsWithDevelopmentThumprint": {
+            "Type": "AddWebFeatureSSL",
+            "Params": {
+                "HostName": "[parameter('SiteName')]",
+                "OutputDirectory": "[variable('Site.DataFolder')]"
+            }
+        },
         "StartAppPool": {
             "Description": "Starts the app pool.",
             "Type": "ManageAppPool",
