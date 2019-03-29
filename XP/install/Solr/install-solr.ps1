@@ -10,6 +10,7 @@ Param(
 	[string]$keystoreSecret = "secret",
 	[string]$KeystoreFile = 'solr-ssl.keystore.jks',
 	[string]$SolrDomain = 'localhost',
+	[string]$maxJvmMem = '512m',
 	[switch]$Clobber
 )
 # Turning off progress bar to (greatly) speed up installation
@@ -123,6 +124,7 @@ Copy-Item $KeystorePath -Destination "$solrRoot\server\etc\solr-ssl.keystore.jks
 	 $newCfg = $newCfg | ForEach-Object { $_ -replace "REM set SOLR_SSL_TRUST_STORE=etc/solr-ssl.keystore.jks", "set SOLR_SSL_TRUST_STORE=$certStorePath" }
 	 $newCfg = $newCfg | ForEach-Object { $_ -replace "REM set SOLR_SSL_TRUST_STORE_PASSWORD=secret", "set SOLR_SSL_TRUST_STORE_PASSWORD=$keystoreSecret" }
 	 $newCfg = $newCfg | ForEach-Object { $_ -replace "REM set SOLR_HOST=192.168.1.1", "set SOLR_HOST=$solrHost" }
+	 $newCfg = $newCfg | ForEach-Object { $_ -replace "REM set SOLR_JAVA_MEM=-Xms512m -Xmx512m", "set SOLR_JAVA_MEM=-Xms512m -Xmx$maxJvmMem" }
 	 $newCfg | Set-Content "$solrRoot\bin\solr.in.cmd"
 
 # install the service & runs
