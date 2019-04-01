@@ -1,12 +1,9 @@
-﻿// -------------------------------------------------------------------------- //
-//         Sitecore Install Framework - SXA Storefront                        //
-//                                                                            //
-//  Run this configuration to install a SXA Storefront module.                //
-//                                                                            //
-//  NOTE: Only single line comments are accepted in configurations.           //
-// -------------------------------------------------------------------------- //
-{
+﻿{
   "Parameters": {
+    "SharedConfigurationFolder": {
+      "Type": "string",
+      "Description": "The base folder where shared configurations are stored"
+    },
     "SXACommerceModuleFullPath": {
       "Type": "string",
       "Description": "The path to the SXA Commerce module zip."
@@ -15,13 +12,38 @@
       "Type": "string",
       "Description": "The path to the SXA Commerce Storefront module zip."
     },
-	"SXAStorefrontThemeModuleFullPath": {
+    "SXAStorefrontThemeModuleFullPath": {
       "Type": "string",
       "Description": "The path to the SXA Commerce Storefront Theme module zip."
     },
     "SXAStorefrontCatalogModuleFullPath": {
       "Type": "string",
       "Description": "The path to the SXA Commerce Storefront Catalog module zip."
+    },
+    "SiteName": {
+      "Type": "string",
+      "DefaultValue": "Sitecore",
+      "Description": "The name of the site to be deployed."
+    },
+    "DatabasePrefix": {
+      "Type": "string",
+      "DefaultValue": "",
+      "Description": "SQL DB Prefix"
+    },
+    "SqlAdminUser": {
+      "Type": "string",
+      "DefaultValue": "sa",
+      "Description": "The Sql admin user account to use when installing databases."
+    },
+    "SqlAdminPassword": {
+      "Type": "string",
+      "DefaultValue": "12345",
+      "Description": "The Sql admin password to use when installing databases."
+    },
+    "SqlServer": {
+      "Type": "string",
+      "DefaultValue": ".\\SQLSERVER",
+      "Description": "The Sql Server where databases will be installed."
     },
     "ModulesDirDst": {
       "Type": "string",
@@ -44,7 +66,10 @@
       "Description": "The path to the web config file."
     }
   },
-  "Modules": [ "SitecoreUtilityTasks", "MergeWebConfig" ],
+  "Modules": [
+    "SitecoreUtilityTasks",
+    "MergeWebConfig"
+  ],
   "Tasks": {
     "CheckSXAPaths": {
       "Type": "EnsurePath",
@@ -56,62 +81,55 @@
       }
     },
     "InstallSXAModule": {
-      "Type": "InstallModule",
+      "Type": "InstallSitecoreConfiguration",
       "Params": {
-        "ModuleFullPath": "[parameter('SXACommerceModuleFullPath')]",
-        "ModulesDirDst": "[parameter('ModulesDirDst')]",
-        "BaseUrl": "[parameter('BaseUrl')]"
-      }
-    },
-    "CheckStorefrontPaths": {
-      "Type": "EnsurePath",
-      "Params": {
-        "Exists": [
-          "[parameter('SXAStorefrontModuleFullPath')]",
-          "[parameter('ModulesDirDst')]"
-        ]
+        "Path": "[concat(parameter('SharedConfigurationFolder'), '\\install-module.json')]",
+        "Package": "[parameter('SXACommerceModuleFullPath')]",
+        "SiteName": "[parameter('SiteName')]",
+        "DatabasePrefix": "[parameter('DatabasePrefix')]",
+        "SqlAdminUser": "[parameter('SqlAdminUser')]",
+        "SqlAdminPassword": "[parameter('SqlAdminPassword')]",
+        "SqlServer": "[parameter('SqlServer')]",
+        "ModuleDatabase": "master"
       }
     },
     "InstallStorefrontModule": {
-      "Type": "InstallModule",
+      "Type": "InstallSitecoreConfiguration",
       "Params": {
-        "ModuleFullPath": "[parameter('SXAStorefrontModuleFullPath')]",
-        "ModulesDirDst": "[parameter('ModulesDirDst')]",
-        "BaseUrl": "[parameter('BaseUrl')]"
-      }
-    },
-    "CheckThemesPaths": {
-      "Type": "EnsurePath",
-      "Params": {
-        "Exists": [
-          "[parameter('SXAStorefrontThemeModuleFullPath')]",
-          "[parameter('ModulesDirDst')]"
-        ]
+        "Path": "[concat(parameter('SharedConfigurationFolder'), '\\install-module.json')]",
+        "Package": "[parameter('SXAStorefrontModuleFullPath')]",
+        "SiteName": "[parameter('SiteName')]",
+        "DatabasePrefix": "[parameter('DatabasePrefix')]",
+        "SqlAdminUser": "[parameter('SqlAdminUser')]",
+        "SqlAdminPassword": "[parameter('SqlAdminPassword')]",
+        "SqlServer": "[parameter('SqlServer')]",
+        "ModuleDatabase": "master"
       }
     },
     "InstallThemesModule": {
-      "Type": "InstallModule",
+      "Type": "InstallSitecoreConfiguration",
       "Params": {
-        "ModuleFullPath": "[parameter('SXAStorefrontThemeModuleFullPath')]",
-        "ModulesDirDst": "[parameter('ModulesDirDst')]",
-        "BaseUrl": "[parameter('BaseUrl')]"
-      }
-    },
-    "CheckCatalogPaths": {
-      "Type": "EnsurePath",
-      "Params": {
-        "Exists": [
-          "[parameter('SXAStorefrontCatalogModuleFullPath')]",
-          "[parameter('ModulesDirDst')]"
-        ]
+        "Path": "[concat(parameter('SharedConfigurationFolder'), '\\install-module.json')]",
+        "Package": "[parameter('SXAStorefrontThemeModuleFullPath')]",
+        "SiteName": "[parameter('SiteName')]",
+        "DatabasePrefix": "[parameter('DatabasePrefix')]",
+        "SqlAdminUser": "[parameter('SqlAdminUser')]",
+        "SqlAdminPassword": "[parameter('SqlAdminPassword')]",
+        "SqlServer": "[parameter('SqlServer')]",
+        "ModuleDatabase": "master"
       }
     },
     "InstallCatalogModule": {
-      "Type": "InstallModule",
+      "Type": "InstallSitecoreConfiguration",
       "Params": {
-        "ModuleFullPath": "[parameter('SXAStorefrontCatalogModuleFullPath')]",
-        "ModulesDirDst": "[parameter('ModulesDirDst')]",
-        "BaseUrl": "[parameter('BaseUrl')]"
+        "Path": "[concat(parameter('SharedConfigurationFolder'), '\\install-module.json')]",
+        "Package": "[parameter('SXAStorefrontCatalogModuleFullPath')]",
+        "SiteName": "[parameter('SiteName')]",
+        "DatabasePrefix": "[parameter('DatabasePrefix')]",
+        "SqlAdminUser": "[parameter('SqlAdminUser')]",
+        "SqlAdminPassword": "[parameter('SqlAdminPassword')]",
+        "SqlServer": "[parameter('SqlServer')]",
+        "ModuleDatabase": "master"
       }
     },
     "MergeWebConfig": {
