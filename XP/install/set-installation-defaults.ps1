@@ -1,7 +1,7 @@
 Param(
     [string] $ConfigurationFile = "configuration-xp0.json",
 	[string] $assetsRoot,
-    [string] $sitecoreVersion = "9.1.1 rev. 002399"
+    [string] $sitecoreVersion = "9.1.1 rev. 002459"
 )
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
