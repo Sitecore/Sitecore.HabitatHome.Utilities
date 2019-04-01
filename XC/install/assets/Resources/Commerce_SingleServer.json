@@ -244,6 +244,10 @@
       "Type": "string",
       "Description": "Habitat Images module full path"
     },
+    "AdvImagesModuleFullPath": {
+      "Type": "String",
+      "Description": "Adventure Works Images module full path"
+    },
     "RootCertFileName": {
       "Type": "string",
       "Description": "Name of Root certificate"
@@ -342,7 +346,7 @@
         "CommerceInstallRoot": "[parameter('CommerceInstallRoot')]",
         "SitecoreIdentityServerApplicationName": "[parameter('SitecoreIdentityServerApplicationName')]",
         "CommerceServicesHostPostfix": "[parameter('CommerceServicesHostPostfix')]",
-        "BaseConfigurationFolder":"[parameter('BaseConfigurationFolder')]"
+        "BaseConfigurationFolder": "[parameter('BaseConfigurationFolder')]"
       }
     },
     "InstallSolrCores": {
@@ -506,7 +510,6 @@
         "ModuleDatabase": "master"
       }
     },
-    
     "InstallAutomationEngineModule": {
       "Type": "ExpandArchive",
       "Params": {
@@ -537,22 +540,22 @@
         "WebConfig": "[variable('WebConfig')]"
       }
     },
-    "InstallSXACommerceModule": {
+    "InstallSXAStorefrontModules": {
       "Type": "InstallSitecoreConfiguration",
       "Params": {
-        "Path": "[concat(parameter('SharedConfigurationFolder'), '\\install-module.json')]",
-        "Package": "[parameter('SXACommerceModuleFullPath')]",
+        "Path": "[concat(parameter('BaseConfigurationFolder'), '\\Commerce\\SXAStorefront\\SXAStorefront.Storefront.json')]",
+        "SharedConfigurationFolder": "[parameter('SharedConfigurationFolder')]",
+        "SXACommerceModuleFullPath": "[parameter('SXACommerceModuleFullPath')]",
+        "SXAStorefrontModuleFullPath": "[parameter('SXAStorefrontModuleFullPath')]",
+        "SXAStorefrontThemeModuleFullPath": "[parameter('SXAStorefrontThemeModuleFullPath')]",
+        "SXAStorefrontCatalogModuleFullPath": "[parameter('SXAStorefrontCatalogModuleFullPath')]",
         "SiteName": "[parameter('SiteName')]",
         "DatabasePrefix": "[parameter('EnvironmentsPrefix')]",
         "SqlAdminUser": "[parameter('SqlAdminUserName')]",
         "SqlAdminPassword": "[parameter('SqlAdminPassword')]",
         "SqlServer": "[parameter('SitecoreDbServer')]",
-        "ModuleDatabase": "master"
-      }
-    },
-    "MergeSXACommerceWebConfig": {
-      "Type": "MergeWebConfig",
-      "Params": {
+        "ModulesDirDst": "[variable('ModulesDirDst')]",
+        "BaseUrl": "[variable('UtilitiesBaseUrl')]",
         "MergeTool": "[parameter('MergeToolFullPath')]",
         "InputFile": "[variable('SXAMergeInputFile')]",
         "WebConfig": "[variable('WebConfig')]"
@@ -563,6 +566,19 @@
       "Params": {
         "Path": "[concat(parameter('SharedConfigurationFolder'), '\\install-module.json')]",
         "Package": "[parameter('HabitatImagesModuleFullPath')]",
+        "SiteName": "[parameter('SiteName')]",
+        "DatabasePrefix": "[parameter('EnvironmentsPrefix')]",
+        "SqlAdminUser": "[parameter('SqlAdminUserName')]",
+        "SqlAdminPassword": "[parameter('SqlAdminPassword')]",
+        "SqlServer": "[parameter('SitecoreDbServer')]",
+        "ModuleDatabase": "master"
+      }
+    },
+    "InstallAdventureWorksImagesModule": {
+      "Type": "InstallSitecoreConfiguration",
+      "Params": {
+        "Path": "[concat(parameter('SharedConfigurationFolder'), '\\install-module.json')]",
+        "Package": "[parameter('AdvImagesModuleFullPath')]",
         "SiteName": "[parameter('SiteName')]",
         "DatabasePrefix": "[parameter('EnvironmentsPrefix')]",
         "SqlAdminUser": "[parameter('SqlAdminUserName')]",

@@ -226,6 +226,7 @@ Function Convert-Modules {
     Import-Module $sat -Force
 
     $modules = @{  
+        AdventureWorksImagesModuleFullPath = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include "Adventure Works Images.zip" -Exclude "*.scwdp.zip" -Recurse  )
         CommerceConnectModuleFullPath      = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include "Sitecore Commerce Connect*.zip" -Exclude "*.scwdp.zip" -Recurse  )
         CommercexProfilesModuleFullPath    = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include "Sitecore Commerce ExperienceProfile Core *.zip" -Exclude "*.scwdp.zip" -Recurse)
         CommercexAnalyticsModuleFullPath   = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include "Sitecore Commerce ExperienceAnalytics Core *.zip"	-Exclude "*.scwdp.zip" -Recurse)
@@ -304,6 +305,7 @@ Function Install-Commerce {
 		CommerceEngineCertificateName               = $site.prefix + "storefront.engine"
         SiteUtilitiesSrc                            = $(Join-Path -Path $assets.commerce.sifCommerceRoot -ChildPath "SiteUtilityPages")
         HabitatImagesModuleFullPath                 = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include  "Habitat Home Product Images.scwdp.zip" -Recurse)
+        AdvImagesModuleFullPath                     = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include  "Adventure Works Images.scwdp.zip" -Recurse)
         CommerceConnectModuleFullPath               = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include "Sitecore Commerce Connect Core*.scwdp.zip" -Recurse  )
         CommercexProfilesModuleFullPath             = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include "Sitecore Commerce ExperienceProfile Core *.scwdp.zip" -Recurse)
         CommercexAnalyticsModuleFullPath            = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include "Sitecore Commerce ExperienceAnalytics Core *.scwdp.zip"	-Recurse)
