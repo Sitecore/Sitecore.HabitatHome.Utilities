@@ -107,7 +107,7 @@
         "OutputThumbprint" : {
             "Type": "WriteHost",
             "Params": {
-                "MessageData" : "[parameter('WildcardCertificateThumbprint')]"
+                "MessageData" : "[ variable('Security.IdentityServer.CertificateThumbprint')]"
             }
         },
         "CreatePaths": {
