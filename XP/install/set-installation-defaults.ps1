@@ -116,7 +116,7 @@ Write-Host "Setting default 'IdentityServer' parameters"
 $identityServer = $json.settings.identityServer
 $identityServer.packagePath = Join-Path $assets.root $("Sitecore.IdentityServer " + $assets.identityServerVersion + " (OnPrem)_identityserver.scwdp.zip")
 $identityServer.configurationPath = (Get-ChildItem $assets.root -filter "IdentityServer.json" -Recurse).FullName 
-$identityServer.name = "IdentityServer." + $site.hostname
+$identityServer.name = "IdentityServer-" + $site.hostname
 $identityServer.url = ("https://{0}" -f $identityServer.name)
 $identityServer.clientSecret = "ClientSecret"
 

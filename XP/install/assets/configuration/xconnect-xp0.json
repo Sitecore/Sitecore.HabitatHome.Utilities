@@ -3,12 +3,12 @@
         "Package": {
             "Type": "string",
             "Description": "The path to the Web Deploy package to deploy.",
-            "DefaultValue" : ""
+            "DefaultValue": ""
         },
         "LicenseFile": {
             "Type": "string",
             "Description": "The path to the Sitecore license file.",
-            "DefaultValue" : ".\\Licence.xml"
+            "DefaultValue": ".\\Licence.xml"
         },
         "SiteName": {
             "Type": "string",
@@ -18,17 +18,17 @@
         "XConnectCert": {
             "Type": "string",
             "Description": "The certificate to use for encryption. Provide the name or the thumbprint.",
-            "DefaultValue" : ""
+            "DefaultValue": ""
         },
         "SqlDbPrefix": {
             "Type": "string",
             "Description": "The prefix used for all Sql databases.",
-            "DefaultValue" : ""
+            "DefaultValue": ""
         },
         "SolrCorePrefix": {
             "Type": "string",
             "Description": "The prefix used for all Solr cores.",
-            "DefaultValue" : ""
+            "DefaultValue": ""
         },
         "SSLCert": {
             "Type": "string",
@@ -170,59 +170,53 @@
             "Reference": "SiteName",
             "Description": "The host mapping name of the site."
         },
-        "DnsName" :{
+        "DnsName": {
             "Type": "string",
             "Reference": "SiteName",
             "Description": "The dns name of the site."
         },
         "WebRoot": {
-          "Type": "string",
-          "DefaultValue": "c:\\inetpub\\wwwroot",
-          "Description": "The physical path of the configured Web Root for the environment"
+            "Type": "string",
+            "DefaultValue": "c:\\inetpub\\wwwroot",
+            "Description": "The physical path of the configured Web Root for the environment"
+        },
+        "WildcardCertificateThumbprint": {
+            "Type": "String",
+            "Description": "Certificate Thumbprint of a wildcard cert (ie: *.mysites.com)",
+            "DefaultValue": ""
         }
     },
     "Variables": {
         "Sharding.Database.Prefix": "[concat(parameter('SqlDbPrefix'), '_Xdb.Collection.Shard')]",
-
-        "Sql.Database.ShardMapManager":     "[concat(variable('Sharding.Database.Prefix'), 'MapManager')]",
-        "Sql.Database.Shard0":              "[concat(variable('Sharding.Database.Prefix'), '0')]",
-        "Sql.Database.Shard1":              "[concat(variable('Sharding.Database.Prefix'), '1')]",
-        "Sql.Database.Pools":               "[concat(parameter('SqlDbPrefix'), '_Processing.Pools')]",
+        "Sql.Database.ShardMapManager": "[concat(variable('Sharding.Database.Prefix'), 'MapManager')]",
+        "Sql.Database.Shard0": "[concat(variable('Sharding.Database.Prefix'), '0')]",
+        "Sql.Database.Shard1": "[concat(variable('Sharding.Database.Prefix'), '1')]",
+        "Sql.Database.Pools": "[concat(parameter('SqlDbPrefix'), '_Processing.Pools')]",
         "Sql.Database.MarketingAutomation": "[concat(parameter('SqlDbPrefix'), '_MarketingAutomation')]",
-        "Sql.Database.Messaging":           "[concat(parameter('SqlDbPrefix'), '_Messaging')]",
-        "Sql.Database.Reference":           "[concat(parameter('SqlDbPrefix'), '_ReferenceData')]",
-        "Sql.Database.Reporting":           "[concat(parameter('SqlDbPrefix'), '_Reporting')]",
-        "Sql.Database.ProcessingEngineTasks":   "[concat(parameter('SqlDbPrefix'), '_ProcessingEngineTasks')]",
+        "Sql.Database.Messaging": "[concat(parameter('SqlDbPrefix'), '_Messaging')]",
+        "Sql.Database.Reference": "[concat(parameter('SqlDbPrefix'), '_ReferenceData')]",
+        "Sql.Database.Reporting": "[concat(parameter('SqlDbPrefix'), '_Reporting')]",
+        "Sql.Database.ProcessingEngineTasks": "[concat(parameter('SqlDbPrefix'), '_ProcessingEngineTasks')]",
         "Sql.Database.ProcessingEngineStorage": "[concat(parameter('SqlDbPrefix'), '_ProcessingEngineStorage')]",
-
-        "Security.CertificateStore":                "Cert:\\Localmachine\\My",
-        "Security.SSL.CertificateThumbprint":       "[GetCertificateThumbprint(parameter('SSLCert'), variable('Security.CertificateStore'))]",
-        "Security.XConnect.CertificateThumbprint":  "[GetCertificateThumbprint(parameter('XConnectCert'), variable('Security.CertificateStore'))]",
-        "Security.XConnect.CertificatePath":        "[joinpath(variable('Security.CertificateStore'), variable('Security.XConnect.CertificateThumbprint'))]",
-
+        "Security.CertificateStore": "Cert:\\Localmachine\\My",
+        "Security.SSL.CertificateThumbprint": "[if(parameter('WildCardCertificateThumbprint'),parameter('WildCardCertificateThumbprint'), GetCertificateThumbprint(parameter('XConnectCert'), variable('Security.CertificateStore')))]",
+        "Security.XConnect.CertificateThumbprint": "[GetCertificateThumbprint(parameter('XConnectCert'), variable('Security.CertificateStore'))]",
+        "Security.XConnect.CertificatePath": "[joinpath(variable('Security.CertificateStore'), variable('Security.XConnect.CertificateThumbprint'))]",
         "Site.PhysicalPath": "[concat(parameter('WebRoot'),'\\', parameter('SiteName'))]",
-        "Site.DataFolder":  "[joinpath(variable('Site.PhysicalPath'), 'App_Data')]",
-
+        "Site.DataFolder": "[joinpath(variable('Site.PhysicalPath'), 'App_Data')]",
         "Services.IndexWorker.InstallPath": "[joinpath(variable('Site.DataFolder'), 'jobs','continuous','IndexWorker')]",
-        "Services.IndexWorker.Name":        "[concat(parameter('SiteName'), '-IndexWorker')]",
-
-        "Services.MarketingAutomationEngine.InstallPath":   "[joinpath(variable('Site.DataFolder'), 'jobs','continuous','AutomationEngine')]",
-        "Services.MarketingAutomationEngine.Name":          "[concat(parameter('SiteName'), '-MarketingAutomationService')]",
-
-        "Services.ProcessingEngine.InstallPath":   "[joinpath(variable('Site.DataFolder'), 'jobs','continuous','ProcessingEngine')]",
-        "Services.ProcessingEngine.Name":          "[concat(parameter('SiteName'), '-ProcessingEngineService')]",
-
+        "Services.IndexWorker.Name": "[concat(parameter('SiteName'), '-IndexWorker')]",
+        "Services.MarketingAutomationEngine.InstallPath": "[joinpath(variable('Site.DataFolder'), 'jobs','continuous','AutomationEngine')]",
+        "Services.MarketingAutomationEngine.Name": "[concat(parameter('SiteName'), '-MarketingAutomationService')]",
+        "Services.ProcessingEngine.InstallPath": "[joinpath(variable('Site.DataFolder'), 'jobs','continuous','ProcessingEngine')]",
+        "Services.ProcessingEngine.Name": "[concat(parameter('SiteName'), '-ProcessingEngineService')]",
         "Endpoint.MarketingAutomation": "[concat('https://', parameter('SiteName'))]",
-
         "Endpoint.ReferenceData": "[concat(variable('Endpoint.MarketingAutomation'), '/refdata')]",
-
         "Endpoint.Collection": "[concat('https://', parameter('SiteName'))]",
-
         "Endpoint.Processing.BlobStorage": "[concat('https://', parameter('SiteName'))]",
         "Endpoint.Processing.TableStorage": "[concat('https://', parameter('SiteName'))]",
-
-        "Sharding.Root.Path":   "[joinpath(variable('Site.DataFolder'), 'collectiondeployment')]",
-        "Sharding.Tool.Path":   "[joinpath(variable('Sharding.Root.Path'), 'Sitecore.Xdb.Collection.Database.SqlShardingDeploymentTool.exe')]",
+        "Sharding.Root.Path": "[joinpath(variable('Site.DataFolder'), 'collectiondeployment')]",
+        "Sharding.Tool.Path": "[joinpath(variable('Sharding.Root.Path'), 'Sitecore.Xdb.Collection.Database.SqlShardingDeploymentTool.exe')]",
         "Sharding.DacPac.Path": "[joinpath(variable('Sharding.Root.Path'), 'Sitecore.Xdb.Collection.Database.Sql.dacpac')]",
         "Sharding.Map.Names": [
             "ContactIdShardMap",
@@ -231,16 +225,13 @@
         ],
         "Sharding.DB.Connection": "[sqlconnectionstring(parameter('SqlServer'), '', parameter('SqlAdminUser'), parameter('SqlAdminPassword'))]",
         "Sharding.Edition": "Basic",
-        "Sharding.SqlCmd.Path.CreateShardApplicationDatabaseServerLogin":   "[joinpath(variable('Sharding.Root.Path'), 'CreateShardApplicationDatabaseServerLogin.sql')]",
-        "Sharding.SqlCmd.Path.CreateShardManagerApplicationDatabaseUser":   "[joinpath(variable('Sharding.Root.Path'), 'CreateShardManagerApplicationDatabaseUser.sql')]",
-        "Sharding.SqlCmd.Path.CreateShardApplicationDatabaseUser":          "[joinpath(variable('Sharding.Root.Path'), 'CreateShardApplicationDatabaseUser.sql')]",
-
-        "Xdb.Name":         "[concat(parameter('SolrCorePrefix'), '_xdb')]",
+        "Sharding.SqlCmd.Path.CreateShardApplicationDatabaseServerLogin": "[joinpath(variable('Sharding.Root.Path'), 'CreateShardApplicationDatabaseServerLogin.sql')]",
+        "Sharding.SqlCmd.Path.CreateShardManagerApplicationDatabaseUser": "[joinpath(variable('Sharding.Root.Path'), 'CreateShardManagerApplicationDatabaseUser.sql')]",
+        "Sharding.SqlCmd.Path.CreateShardApplicationDatabaseUser": "[joinpath(variable('Sharding.Root.Path'), 'CreateShardApplicationDatabaseUser.sql')]",
+        "Xdb.Name": "[concat(parameter('SolrCorePrefix'), '_xdb')]",
         "Xdb.Rebuild.Name": "[concat(variable('Xdb.Name'), '_rebuild')]",
-        "Solr.Url.Xdb":     "[concat(parameter('SolrUrl'), '/', variable('Xdb.Name'))]",
-
+        "Solr.Url.Xdb": "[concat(parameter('SolrUrl'), '/', variable('Xdb.Name'))]",
         "Solr.Config.Path": "[joinpath(variable('Site.DataFolder'), 'solrcommands', 'schema.json')]",
-
         "SqlProcessingPools.Password": "[parameter('SqlProcessingPoolsPassword'))]",
         "SqlCollection.Password": "[parameter('SqlCollectionPassword'))]",
         "SqlReferenceData.Password": "[parameter('SqlReferenceDataPassword'))]",
@@ -248,16 +239,13 @@
         "SqlMessaging.Password": "[parameter('SqlMessagingPassword'))]",
         "SqlProcessingEngine.Password": "[parameter('SqlProcessingEnginePassword'))]",
         "SqlReporting.Password": "[parameter('SqlReportingPassword'))]",
-
-        "SqlCollection.User":  "[if(variable('Test.SqlCollection.User'),variable('Generate.SqlCollection.User'),parameter('SqlCollectionUser'))]",
+        "SqlCollection.User": "[if(variable('Test.SqlCollection.User'),variable('Generate.SqlCollection.User'),parameter('SqlCollectionUser'))]",
         "Test.SqlCollection.User": "[equal(parameter('SqlCollectionUser'),'collectionuser')]",
         "Generate.SqlCollection.User": "[concat(parameter('SqlDbPrefix'), '_collectionuser')]",
-
-        "Sql.Secure.Password" : "[ConvertToSecureString(String:parameter('SqlAdminPassword'),AsPlainText:true,Force:true)]",
+        "Sql.Secure.Password": "[ConvertToSecureString(String:parameter('SqlAdminPassword'),AsPlainText:true,Force:true)]",
         "Sql.Credential": "[NewPSCredential(Username:parameter('SqlAdminUser'),Password:variable('SQL.Secure.Password'))]"
-
     },
-    "Register":{
+    "Register": {
         "Tasks": {
             "RemoveItem": "Remove-Item",
             "RemoveSqlLogin": "Remove-SqlLogin"
@@ -296,8 +284,12 @@
                 "Rights": [
                     {
                         "User": "[concat('IIS AppPool\\', parameter('SiteName'))]",
-                        "FileSystemRights": [ "Read" ],
-                        "InheritanceFlags": [ "None" ]
+                        "FileSystemRights": [
+                            "Read"
+                        ],
+                        "InheritanceFlags": [
+                            "None"
+                        ]
                     }
                 ]
             }
@@ -352,9 +344,15 @@
             "Description": "Removes the current service.",
             "Type": "RemoveService",
             "Params": [
-                { "Name": "[variable('Services.IndexWorker.Name')]" },
-                { "Name": "[variable('Services.MarketingAutomationEngine.Name')]" },
-                { "Name": "[variable('Services.ProcessingEngine.Name')]" }
+                {
+                    "Name": "[variable('Services.IndexWorker.Name')]"
+                },
+                {
+                    "Name": "[variable('Services.MarketingAutomationEngine.Name')]"
+                },
+                {
+                    "Name": "[variable('Services.ProcessingEngine.Name')]"
+                }
             ]
         },
         "RemoveDefaultBinding": {
@@ -362,7 +360,12 @@
             "Type": "WebBinding",
             "Params": {
                 "SiteName": "[parameter('SiteName')]",
-                "Remove": [ { "Port": "80", "IPAddress": "*" } ]
+                "Remove": [
+                    {
+                        "Port": "80",
+                        "IPAddress": "*"
+                    }
+                ]
             }
         },
         "CreateBindingsWithThumbprint": {
@@ -414,7 +417,10 @@
                     {
                         "User": "[concat('IIS AppPool\\', parameter('SiteName'))]",
                         "FileSystemRights": "FullControl",
-                        "InheritanceFlags": [ "ContainerInherit", "ObjectInherit" ]
+                        "InheritanceFlags": [
+                            "ContainerInherit",
+                            "ObjectInherit"
+                        ]
                     }
                 ]
             }
@@ -430,55 +436,202 @@
                     },
                     "Dest": "Auto",
                     "SetParam": [
-                        { "Name": "IIS Web Application Name", "Value": "[parameter('SiteName')]" },
-                        { "Name": "Database Server Name", "Value": "[parameter('SqlServer')]" },
-                        { "Name": "Database Admin User Name", "Value": "[parameter('SqlAdminUser')]" },
-                        { "Name": "Database Admin User Password", "Value": "[parameter('SqlAdminPassword')]" },
-                        { "Name": "Collection Database Server Name", "Value": "[parameter('SqlServer')]" },
-                        { "Name": "Collection Shard Map Manager Database Name", "Value": "[variable('Sql.Database.ShardMapManager')]" },
-                        { "Name": "Collection Shard 0 Database Name", "Value": "[variable('Sql.Database.Shard0')]" },
-                        { "Name": "Collection Shard 1 Database Name", "Value": "[variable('Sql.Database.Shard1')]" },
-                        { "Name": "Processing Pools Database Name", "Value": "[variable('Sql.Database.Pools')]" },
-                        { "Name": "Marketing Automation Database Name", "Value": "[variable('Sql.Database.MarketingAutomation')]" },
-                        { "Name": "Messaging Database Name", "Value": "[variable('Sql.Database.Messaging')]" },
-                        { "Name": "Reference Data Database Name", "Value": "[variable('Sql.Database.Reference')]" },
-                        { "Name": "Reporting Database Name", "Value": "[variable('Sql.Database.Reporting')]" },
-                        { "Name": "Processing Engine Tasks Database Name", "Value":  "[variable('Sql.Database.ProcessingEngineTasks')]" },
-                        { "Name": "Processing Engine Storage Database Name", "Value":  "[variable('Sql.Database.ProcessingEngineStorage')]" },
-                        { "Name": "Search SOLR Core Application Connection String", "Value": "[variable('Solr.Url.Xdb')]" },
-                        { "Name": "XConnect Server Configuration Environment", "Value": "[parameter('XConnectEnvironment')]" },
-                        { "Name": "XConnect Server Certificate Validation Thumbprint", "Value": "[variable('Security.XConnect.CertificateThumbprint')]" },
-                        { "Name": "XConnect Server Log Level", "Value": "[parameter('XConnectLogLevel')]" },
-                        { "Name": "Marketing Automation Engine Xconnect Collection Client Endpoint", "Value": "[variable('Endpoint.MarketingAutomation')]" },
-                        { "Name": "Marketing Automation Engine Xconnect Collection Client Certificate Thumbprint", "Value": "[variable('Security.XConnect.CertificateThumbprint')]" },
-                        { "Name": "Marketing Automation Engine Xdb Reference Data Endpoint", "Value": "[variable('Endpoint.ReferenceData')]" },
-                        { "Name": "Marketing Automation Engine Xdb Reference Data Client Certificate Thumbprint", "Value": "[variable('Security.XConnect.CertificateThumbprint')]" },
-                        { "Name": "Processing Engine Xconnect Collection Client Endpoint", "Value": "[variable('Endpoint.Collection')]" },
-                        { "Name": "Processing Engine Xconnect Collection Client Certificate Thumbprint", "Value": "[variable('Security.XConnect.CertificateThumbprint')]" },
-                        { "Name": "Processing Engine Xconnect Search Client Endpoint", "Value": "[variable('Endpoint.Collection')]" },
-                        { "Name": "Processing Engine Xconnect Search Client Certificate Thumbprint", "Value": "[variable('Security.XConnect.CertificateThumbprint')]" },
-                        { "Name": "Processing Engine Blob Storage WebApi Endpoint", "Value": "[variable('Endpoint.Processing.BlobStorage')]" },
-                        { "Name": "Processing Engine Table Storage WebApi Endpoint", "Value": "[variable('Endpoint.Processing.TableStorage')]" },
-                        { "Name": "Processing Engine Machine Learning Server Endpoint", "Value": "[parameter('MachineLearningServerUrl')]" },
-                        { "Name": "Collection Database Application User Name", "Value": "[variable('SqlCollection.User')]" },
-                        { "Name": "Collection Database Application User Password", "Value": "[variable('SqlCollection.Password')]" },
-                        { "Name": "Processing Pool Database Application User Name", "Value": "[parameter('SqlProcessingPoolsUser')]" },
-                        { "Name": "Processing Pool Database Application User Password", "Value": "[variable('SqlProcessingPools.Password')]" },
-                        { "Name": "Reference Data Database Application User Name", "Value": "[parameter('SqlReferenceDataUser')]" },
-                        { "Name": "Reference Data Database Application User Password", "Value": "[variable('SqlReferenceData.Password')]" },
-                        { "Name": "Reporting Database Application User Name", "Value": "[parameter('SqlReportingUser')]" },
-                        { "Name": "Reporting Database Application User Password", "Value": "[variable('SqlReporting.Password')]" },
-                        { "Name": "Marketing Automation Database Application User Name", "Value": "[parameter('SqlMarketingAutomationUser')]" },
-                        { "Name": "Marketing Automation Database Application User Password", "Value": "[variable('SqlMarketingAutomation.Password')]" },
-                        { "Name": "Messaging Database Application User Name", "Value": "[parameter('SqlMessagingUser')]" },
-                        { "Name": "Messaging Database Application User Password", "Value": "[variable('SqlMessaging.Password')]" },
-                        { "Name": "Processing Engine Database Application User Name", "Value": "[parameter('SqlProcessingEngineUser')]" },
-                        { "Name": "Processing Engine Database Application User Password", "Value": "[variable('SqlProcessingEngine.Password')]" },
-                        { "Name": "Machine Learning Server Blob Storage WebApi Endpoint Certificate Path", "Value": "[parameter('MachineLearningServerBlobEndpointCertificatePath')]" },
-                        { "Name": "Machine Learning Server Blob Storage WebApi Endpoint Certificate Password", "Value": "[parameter('MachineLearningServerBlobEndpointCertificatePassword')]" },
-                        { "Name": "Machine Learning Server Table Storage WebApi Endpoint Certificate Path", "Value": "[parameter('MachineLearningServerTableEndpointCertificatePath')]" },
-                        { "Name": "Machine Learning Server Table Storage WebApi Endpoint Certificate Password", "Value": "[parameter('MachineLearningServerTableEndpointCertificatePassword')]" },
-                        { "Name": "Machine Learning Server Storage WebApi Endpoint Certification Authority Certificate Path", "Value": "[parameter('MachineLearningServerEndpointCertificationAuthorityCertificatePath')]" }
+                        {
+                            "Name": "IIS Web Application Name",
+                            "Value": "[parameter('SiteName')]"
+                        },
+                        {
+                            "Name": "Database Server Name",
+                            "Value": "[parameter('SqlServer')]"
+                        },
+                        {
+                            "Name": "Database Admin User Name",
+                            "Value": "[parameter('SqlAdminUser')]"
+                        },
+                        {
+                            "Name": "Database Admin User Password",
+                            "Value": "[parameter('SqlAdminPassword')]"
+                        },
+                        {
+                            "Name": "Collection Database Server Name",
+                            "Value": "[parameter('SqlServer')]"
+                        },
+                        {
+                            "Name": "Collection Shard Map Manager Database Name",
+                            "Value": "[variable('Sql.Database.ShardMapManager')]"
+                        },
+                        {
+                            "Name": "Collection Shard 0 Database Name",
+                            "Value": "[variable('Sql.Database.Shard0')]"
+                        },
+                        {
+                            "Name": "Collection Shard 1 Database Name",
+                            "Value": "[variable('Sql.Database.Shard1')]"
+                        },
+                        {
+                            "Name": "Processing Pools Database Name",
+                            "Value": "[variable('Sql.Database.Pools')]"
+                        },
+                        {
+                            "Name": "Marketing Automation Database Name",
+                            "Value": "[variable('Sql.Database.MarketingAutomation')]"
+                        },
+                        {
+                            "Name": "Messaging Database Name",
+                            "Value": "[variable('Sql.Database.Messaging')]"
+                        },
+                        {
+                            "Name": "Reference Data Database Name",
+                            "Value": "[variable('Sql.Database.Reference')]"
+                        },
+                        {
+                            "Name": "Reporting Database Name",
+                            "Value": "[variable('Sql.Database.Reporting')]"
+                        },
+                        {
+                            "Name": "Processing Engine Tasks Database Name",
+                            "Value": "[variable('Sql.Database.ProcessingEngineTasks')]"
+                        },
+                        {
+                            "Name": "Processing Engine Storage Database Name",
+                            "Value": "[variable('Sql.Database.ProcessingEngineStorage')]"
+                        },
+                        {
+                            "Name": "Search SOLR Core Application Connection String",
+                            "Value": "[variable('Solr.Url.Xdb')]"
+                        },
+                        {
+                            "Name": "XConnect Server Configuration Environment",
+                            "Value": "[parameter('XConnectEnvironment')]"
+                        },
+                        {
+                            "Name": "XConnect Server Certificate Validation Thumbprint",
+                            "Value": "[variable('Security.XConnect.CertificateThumbprint')]"
+                        },
+                        {
+                            "Name": "XConnect Server Log Level",
+                            "Value": "[parameter('XConnectLogLevel')]"
+                        },
+                        {
+                            "Name": "Marketing Automation Engine Xconnect Collection Client Endpoint",
+                            "Value": "[variable('Endpoint.MarketingAutomation')]"
+                        },
+                        {
+                            "Name": "Marketing Automation Engine Xconnect Collection Client Certificate Thumbprint",
+                            "Value": "[variable('Security.XConnect.CertificateThumbprint')]"
+                        },
+                        {
+                            "Name": "Marketing Automation Engine Xdb Reference Data Endpoint",
+                            "Value": "[variable('Endpoint.ReferenceData')]"
+                        },
+                        {
+                            "Name": "Marketing Automation Engine Xdb Reference Data Client Certificate Thumbprint",
+                            "Value": "[variable('Security.XConnect.CertificateThumbprint')]"
+                        },
+                        {
+                            "Name": "Processing Engine Xconnect Collection Client Endpoint",
+                            "Value": "[variable('Endpoint.Collection')]"
+                        },
+                        {
+                            "Name": "Processing Engine Xconnect Collection Client Certificate Thumbprint",
+                            "Value": "[variable('Security.XConnect.CertificateThumbprint')]"
+                        },
+                        {
+                            "Name": "Processing Engine Xconnect Search Client Endpoint",
+                            "Value": "[variable('Endpoint.Collection')]"
+                        },
+                        {
+                            "Name": "Processing Engine Xconnect Search Client Certificate Thumbprint",
+                            "Value": "[variable('Security.XConnect.CertificateThumbprint')]"
+                        },
+                        {
+                            "Name": "Processing Engine Blob Storage WebApi Endpoint",
+                            "Value": "[variable('Endpoint.Processing.BlobStorage')]"
+                        },
+                        {
+                            "Name": "Processing Engine Table Storage WebApi Endpoint",
+                            "Value": "[variable('Endpoint.Processing.TableStorage')]"
+                        },
+                        {
+                            "Name": "Processing Engine Machine Learning Server Endpoint",
+                            "Value": "[parameter('MachineLearningServerUrl')]"
+                        },
+                        {
+                            "Name": "Collection Database Application User Name",
+                            "Value": "[variable('SqlCollection.User')]"
+                        },
+                        {
+                            "Name": "Collection Database Application User Password",
+                            "Value": "[variable('SqlCollection.Password')]"
+                        },
+                        {
+                            "Name": "Processing Pool Database Application User Name",
+                            "Value": "[parameter('SqlProcessingPoolsUser')]"
+                        },
+                        {
+                            "Name": "Processing Pool Database Application User Password",
+                            "Value": "[variable('SqlProcessingPools.Password')]"
+                        },
+                        {
+                            "Name": "Reference Data Database Application User Name",
+                            "Value": "[parameter('SqlReferenceDataUser')]"
+                        },
+                        {
+                            "Name": "Reference Data Database Application User Password",
+                            "Value": "[variable('SqlReferenceData.Password')]"
+                        },
+                        {
+                            "Name": "Reporting Database Application User Name",
+                            "Value": "[parameter('SqlReportingUser')]"
+                        },
+                        {
+                            "Name": "Reporting Database Application User Password",
+                            "Value": "[variable('SqlReporting.Password')]"
+                        },
+                        {
+                            "Name": "Marketing Automation Database Application User Name",
+                            "Value": "[parameter('SqlMarketingAutomationUser')]"
+                        },
+                        {
+                            "Name": "Marketing Automation Database Application User Password",
+                            "Value": "[variable('SqlMarketingAutomation.Password')]"
+                        },
+                        {
+                            "Name": "Messaging Database Application User Name",
+                            "Value": "[parameter('SqlMessagingUser')]"
+                        },
+                        {
+                            "Name": "Messaging Database Application User Password",
+                            "Value": "[variable('SqlMessaging.Password')]"
+                        },
+                        {
+                            "Name": "Processing Engine Database Application User Name",
+                            "Value": "[parameter('SqlProcessingEngineUser')]"
+                        },
+                        {
+                            "Name": "Processing Engine Database Application User Password",
+                            "Value": "[variable('SqlProcessingEngine.Password')]"
+                        },
+                        {
+                            "Name": "Machine Learning Server Blob Storage WebApi Endpoint Certificate Path",
+                            "Value": "[parameter('MachineLearningServerBlobEndpointCertificatePath')]"
+                        },
+                        {
+                            "Name": "Machine Learning Server Blob Storage WebApi Endpoint Certificate Password",
+                            "Value": "[parameter('MachineLearningServerBlobEndpointCertificatePassword')]"
+                        },
+                        {
+                            "Name": "Machine Learning Server Table Storage WebApi Endpoint Certificate Path",
+                            "Value": "[parameter('MachineLearningServerTableEndpointCertificatePath')]"
+                        },
+                        {
+                            "Name": "Machine Learning Server Table Storage WebApi Endpoint Certificate Password",
+                            "Value": "[parameter('MachineLearningServerTableEndpointCertificatePassword')]"
+                        },
+                        {
+                            "Name": "Machine Learning Server Storage WebApi Endpoint Certification Authority Certificate Path",
+                            "Value": "[parameter('MachineLearningServerEndpointCertificationAuthorityCertificatePath')]"
+                        }
                     ]
                 }
             }
@@ -509,8 +662,12 @@
                 "Rights": [
                     {
                         "User": "NT AUTHORITY\\LocalService",
-                        "FileSystemRights": [ "Read" ],
-                        "InheritanceFlags": [ "None" ]
+                        "FileSystemRights": [
+                            "Read"
+                        ],
+                        "InheritanceFlags": [
+                            "None"
+                        ]
                     }
                 ]
             }
@@ -521,11 +678,16 @@
             "Params": {
                 "Path": "[variable('Sharding.Tool.Path')]",
                 "Arguments": [
-                    "/operation", "drop",
-                    "/connectionstring", "[variable('Sharding.DB.Connection')]",
-                    "/dbedition", "[variable('Sharding.Edition')]",
-                    "/shardMapManagerDatabaseName", "[variable('Sql.Database.ShardMapManager')]",
-                    "/shardMapNames", "[join(variable('Sharding.Map.Names'))]"
+                    "/operation",
+                    "drop",
+                    "/connectionstring",
+                    "[variable('Sharding.DB.Connection')]",
+                    "/dbedition",
+                    "[variable('Sharding.Edition')]",
+                    "/shardMapManagerDatabaseName",
+                    "[variable('Sql.Database.ShardMapManager')]",
+                    "/shardMapNames",
+                    "[join(variable('Sharding.Map.Names'))]"
                 ],
                 "TaskName": "ShardingTool - Clean"
             }
@@ -536,15 +698,24 @@
             "Params": {
                 "Path": "[variable('Sharding.Tool.Path')]",
                 "Arguments": [
-                    "/operation", "create",
-                    "/connectionstring", "[variable('Sharding.DB.Connection')]",
-                    "/dbedition", "[variable('Sharding.Edition')]",
-                    "/shardMapManagerDatabaseName", "[variable('Sql.Database.ShardMapManager')]",
-                    "/shardMapNames", "[join(variable('Sharding.Map.Names'))]",
-                    "/shardnumber", 2,
-                    "/shardnameprefix", "[variable('Sharding.Database.Prefix')]",
-                    "/shardnamesuffix", "\"\"",
-                    "/dacpac", "[variable('Sharding.DacPac.Path')]"
+                    "/operation",
+                    "create",
+                    "/connectionstring",
+                    "[variable('Sharding.DB.Connection')]",
+                    "/dbedition",
+                    "[variable('Sharding.Edition')]",
+                    "/shardMapManagerDatabaseName",
+                    "[variable('Sql.Database.ShardMapManager')]",
+                    "/shardMapNames",
+                    "[join(variable('Sharding.Map.Names'))]",
+                    "/shardnumber",
+                    2,
+                    "/shardnameprefix",
+                    "[variable('Sharding.Database.Prefix')]",
+                    "/shardnamesuffix",
+                    "\"\"",
+                    "/dacpac",
+                    "[variable('Sharding.DacPac.Path')]"
                 ],
                 "TaskName": "ShardingTool - Create"
             }
@@ -676,8 +847,13 @@
                 "Rights": [
                     {
                         "User": "NT AUTHORITY\\LocalService",
-                        "FileSystemRights": [ "FullControl" ],
-                        "InheritanceFlags": [ "ContainerInherit", "ObjectInherit" ]
+                        "FileSystemRights": [
+                            "FullControl"
+                        ],
+                        "InheritanceFlags": [
+                            "ContainerInherit",
+                            "ObjectInherit"
+                        ]
                     }
                 ]
             }
@@ -690,8 +866,13 @@
                 "Rights": [
                     {
                         "User": "NT AUTHORITY\\LocalService",
-                        "FileSystemRights": [ "FullControl" ],
-                        "InheritanceFlags": [ "ContainerInherit", "ObjectInherit" ]
+                        "FileSystemRights": [
+                            "FullControl"
+                        ],
+                        "InheritanceFlags": [
+                            "ContainerInherit",
+                            "ObjectInherit"
+                        ]
                     }
                 ]
             }
@@ -704,8 +885,13 @@
                 "Rights": [
                     {
                         "User": "NT AUTHORITY\\LocalService",
-                        "FileSystemRights": [ "FullControl" ],
-                        "InheritanceFlags": [ "ContainerInherit", "ObjectInherit" ]
+                        "FileSystemRights": [
+                            "FullControl"
+                        ],
+                        "InheritanceFlags": [
+                            "ContainerInherit",
+                            "ObjectInherit"
+                        ]
                     }
                 ]
             }
@@ -716,15 +902,24 @@
             "Params": [
                 {
                     "Path": "[joinpath(variable('Services.IndexWorker.InstallPath'), 'XConnectSearchIndexer.exe')]",
-                    "Arguments": [ "-i", "[variable('Services.IndexWorker.Name')]" ]
+                    "Arguments": [
+                        "-i",
+                        "[variable('Services.IndexWorker.Name')]"
+                    ]
                 },
                 {
                     "Path": "[joinpath(variable('Services.MarketingAutomationEngine.InstallPath'), 'maengine.exe')]",
-                    "Arguments": [ "-i", "[variable('Services.MarketingAutomationEngine.Name')]" ]
+                    "Arguments": [
+                        "-i",
+                        "[variable('Services.MarketingAutomationEngine.Name')]"
+                    ]
                 },
                 {
                     "Path": "[joinpath(variable('Services.ProcessingEngine.InstallPath'), 'Sitecore.ProcessingEngine.exe')]",
-                    "Arguments": [ "-i", "[variable('Services.ProcessingEngine.Name')]" ]
+                    "Arguments": [
+                        "-i",
+                        "[variable('Services.ProcessingEngine.Name')]"
+                    ]
                 }
             ]
         },
@@ -805,9 +1000,15 @@
             "Description": "Removes the services.",
             "Type": "RemoveService",
             "Params": [
-                { "Name": "[variable('Services.IndexWorker.Name')]" },
-                { "Name": "[variable('Services.MarketingAutomationEngine.Name')]" },
-                { "Name": "[variable('Services.ProcessingEngine.Name')]" }
+                {
+                    "Name": "[variable('Services.IndexWorker.Name')]"
+                },
+                {
+                    "Name": "[variable('Services.MarketingAutomationEngine.Name')]"
+                },
+                {
+                    "Name": "[variable('Services.ProcessingEngine.Name')]"
+                }
             ]
         },
         "StopWebsite": {
@@ -832,14 +1033,14 @@
             "Description": "Removes the AppPool.",
             "Type": "RemoveAppPool",
             "Params": {
-                "Name":  "[parameter('SiteName')]"
+                "Name": "[parameter('SiteName')]"
             }
         },
         "RemoveWebsite": {
             "Description": "Removes the website.",
             "Type": "RemoveWebsite",
             "Params": {
-                "Name":  "[parameter('SiteName')]"
+                "Name": "[parameter('SiteName')]"
             }
         },
         "RemoveContent": {
@@ -880,7 +1081,7 @@
                 ]
             }
         },
-        "Removelogin":{
+        "Removelogin": {
             "Description": "Removes the sqlcollectionuser login from the database server.",
             "Type": "RemoveSQLLogin",
             "Params": {
