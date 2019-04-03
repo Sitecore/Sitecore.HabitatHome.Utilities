@@ -251,7 +251,7 @@ Function Install-SingleDeveloper {
     }
 
     Push-Location $resourcePath
-#    Install-SitecoreConfiguration @singleDeveloperParams   *>&1 | Tee-Object XP0-SingleDeveloper.log
+    Install-SitecoreConfiguration @singleDeveloperParams 
     Pop-Location
 }
 Function Add-AppPoolMembership {
