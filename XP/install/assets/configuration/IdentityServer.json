@@ -99,10 +99,17 @@
     },
     "Register": {
         "Tasks": {
-            "RemoveItem": "Remove-Item"
+            "RemoveItem": "Remove-Item",
+            "WriteHost":"Write-Information"
         }
     },
     "Tasks": {
+        "OutputThumbprint" : {
+            "Type": "WriteHost",
+            "Params": {
+                "MessageData" : "[parameter('WildcardCertificateThumbprint')]"
+            }
+        },
         "CreatePaths": {
             "Description": "Ensure the destination path for the site exists.",
             "Type": "EnsurePath",
