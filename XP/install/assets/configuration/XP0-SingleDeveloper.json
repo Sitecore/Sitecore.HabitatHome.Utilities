@@ -250,7 +250,6 @@
             "Reference": "WildcardCertificateThumbprint",
             "Description": "Certificate Thumbprint of a wildcard cert (ie: *.mysites.com)"
         },
-        
         "SitecoreXP0:Package": {
             "Type": "String",
             "Reference": "SitecorePackage",
@@ -581,7 +580,8 @@
         "IdentityServer:Client.Secret": "[variable('Client.Secret')]",
         "SitecoreXP0:Sitecore.IdentitySecret": "[variable('Client.Secret')]",
         "Test.Client.Secret": "[equal(parameter('ClientSecret'),'SIF-Default')]",
-        "Generate.Client.Secret": "[randomstring(Length:100,DisAllowSpecial:True)]"
+        "Generate.Client.Secret": "[randomstring(Length:100,DisAllowSpecial:True)]",
+        "IdentityServerCertificates:Skip": "[parameter('WildcardCertificateThumbprint')]"
     },
     "Includes": {
         "IdentityServerCertificates": {
