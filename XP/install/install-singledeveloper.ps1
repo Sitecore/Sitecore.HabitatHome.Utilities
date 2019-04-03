@@ -22,9 +22,9 @@ $StopWatch.Start()
 Set-Location $PSScriptRoot
 $LogFolder = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($LogFolder) 
 if (!(Test-Path $LogFolder)) {
-    New-item -ItemType Directory -Path $LogFolder
+    New-Item -ItemType Directory -Path $LogFolder
 }
-$LogFile = Join-path $LogFolder $LogFileName
+$LogFile = Join-Path $LogFolder $LogFileName
 if (Test-Path $LogFile) {
     Get-Item $LogFile | Remove-Item
 }
@@ -34,7 +34,7 @@ if (!(Test-Path $ConfigurationFile)) {
     Write-Host  "Please use 'set-installation...ps1' files to generate a configuration file." -ForegroundColor Red
     Exit 1
 }
-$config = Get-Content -Raw $ConfigurationFile |  ConvertFrom-Json
+$config = Get-Content -Raw $ConfigurationFile | ConvertFrom-Json
 if (!$config) {
     throw "Error trying to load configuration!"
 }
@@ -59,7 +59,7 @@ Write-Host "*******************************************************" -Foreground
 
 Function Install-SitecoreInstallFramework {
     #Register Assets PowerShell Repository
-    if ((Get-PSRepository | Where-Object {$_.Name -eq $assets.psRepositoryName}).count -eq 0) {
+    if ((Get-PSRepository | Where-Object { $_.Name -eq $assets.psRepositoryName }).count -eq 0) {
         Register-PSRepository -Name $assets.psRepositoryName -SourceLocation $assets.psRepository -InstallationPolicy Trusted 
     }
 
@@ -71,7 +71,7 @@ Function Install-SitecoreInstallFramework {
     
     $module = Get-Module -FullyQualifiedName @{ModuleName = "SitecoreInstallFramework"; ModuleVersion = $sifVersion }
     if (-not $module) {
-        write-host "Installing the Sitecore Install Framework, version $($assets.installerVersion)" -ForegroundColor Green
+        Write-Host "Installing the Sitecore Install Framework, version $($assets.installerVersion)" -ForegroundColor Green
         Install-Module SitecoreInstallFramework -Repository $assets.psRepositoryName -Scope CurrentUser -Force
         Import-Module SitecoreInstallFramework -Force
     }
@@ -104,9 +104,9 @@ Function Download-Assets {
 
     $loginRequest = Invoke-RestMethod -Uri https://dev.sitecore.net/api/authorization -Method Post -ContentType "application/json" -Body "{username: '$user', password: '$password'}" -SessionVariable loginSession -UseBasicParsing 
 
-    $downloadJsonPath = $([io.path]::combine($sharedResourcePath,  'download-assets.json'))
+    $downloadJsonPath = $([io.path]::combine($sharedResourcePath, 'download-assets.json'))
     Set-Alias sz 'C:\Program Files\7-Zip\7z.exe'
-    $package = $modules | Where-Object {$_.id -eq "xp"}
+    $package = $modules | Where-Object { $_.id -eq "xp" }
     
     Write-Host ("Downloading {0}  -  if required" -f $package.name )
         
@@ -198,7 +198,15 @@ Function Confirm-Prerequisites {
         throw "XConnect package $($xConnect.packagePath) not found"
     }
 }
+
 Function Install-SingleDeveloper {
+
+    $cert = Get-ChildItem cert:\\localmachine\my | Where-Object { $_.FriendlyName -eq $site.hostName } | Select-Object -ExpandProperty Thumbprint
+    if ($null -eq $cert) {
+        $cert = ""
+    }
+
+
     $singleDeveloperParams = @{
         Path                           = $sitecore.singleDeveloperConfigurationPath
         CertificatePath                = $assets.certificatesPath
@@ -239,10 +247,11 @@ Function Install-SingleDeveloper {
         ClientSecret                   = $identityServer.clientSecret
         AllowedCorsOrigins             = ("https://{0}|https://{1}" -f $site.hostName, "habitathomebasic.dev.local") # Need to add to proper config
         WebRoot                        = $site.webRoot
+        WildcardCertificateThumbprint  = $cert
     }
 
     Push-Location $resourcePath
-    Install-SitecoreConfiguration @singleDeveloperParams   *>&1 | Tee-Object XP0-SingleDeveloper.log
+#    Install-SitecoreConfiguration @singleDeveloperParams   *>&1 | Tee-Object XP0-SingleDeveloper.log
     Pop-Location
 }
 Function Add-AppPoolMembership {
