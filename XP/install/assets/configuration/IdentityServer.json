@@ -89,13 +89,16 @@
     "Variables": {
         "Sql.Database.Core": "[concat(parameter('SqlDbPrefix'), parameter('SqlCoreDbName'))]",
         "Security.CertificateStore": "Cert:\\Localmachine\\My",
-        "Security.IdentityServer.CertificateThumbprint": "[if(parameter('WildCardCertificateThumbprint'),parameter('WildCardCertificateThumbprint'), GetCertificateThumbprint(parameter('SitecoreIdentityCert'), variable('Security.CertificateStore')))]",
+        "Security.IdentityServer.CertificateThumbprint": "[if(variable('Check.CertificateThumbprint'),parameter('WildCardCertificateThumbprint'),variable('SelfSigned.Thumbprint'))]",
         "Security.IdentityServer.CertificatePath": "[joinpath(variable('Security.CertificateStore'), variable('Security.IdentityServer.CertificateThumbprint'))]",
         "Site.PhysicalPath": "[concat(parameter('WebRoot'),'\\', parameter('SiteName'))]",
         "Site.LicenseFolder": "[joinpath(variable('Site.PhysicalPath'), 'sitecoreruntime')]",
         "Site.ConfigFolder": "[joinpath(variable('Site.PhysicalPath'), 'Config', 'production')]",
         "SqlCore.Password": "[parameter('SqlCorePassword')]",
-        "Client.Secret": "[parameter('ClientSecret'))]"
+        "Client.Secret": "[parameter('ClientSecret'))]",
+        "Check.CertificateThumbprint":"[not(equal(parameter('WildcardCertificateThumbprint'),'')]",
+        "SelfSigned.Thumbprint":"[GetCertificateThumbprint(parameter('SitecoreIdentityCert'), variable('Security.CertificateStore'))]"
+
     },
     "Register": {
         "Tasks": {
@@ -107,7 +110,7 @@
         "OutputThumbprint" : {
             "Type": "WriteHost",
             "Params": {
-                "MessageData" : "[ variable('Security.IdentityServer.CertificateThumbprint')]"
+                "MessageData" : "[variable('Security.IdentityServer.CertificateThumbprint')]"
             }
         },
         "CreatePaths": {
