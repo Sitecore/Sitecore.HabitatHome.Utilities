@@ -370,6 +370,15 @@
             "Reference": "Prefix",
             "Description": "Override to pass Prefix value to XConnectXP0 config."
         },
+        "XConnectCertificates:CertificateName": {
+            "Type": "String",
+            "Reference": "XConnectCertificateName",
+            "Description": "Override to pass XConnectCertificateName value to XConnectCertificates config."
+        },
+        "XConnectCertificates:CertPath": {
+            "Type": "String",
+            "Reference": "CertificatePath"
+        },
         "SitecoreSolr:CorePrefix": {
             "Type": "String",
             "Reference": "Prefix",
@@ -551,7 +560,7 @@
         "IdentityServerCertificates:Skip": "[parameter('WildcardCertificateThumbprint')]"
     },
     "Includes": {
-       "IdentityServer": {
+        "IdentityServer": {
             "Source": ".\\identityServer.json"
         },
         "XConnectCertificates": {
