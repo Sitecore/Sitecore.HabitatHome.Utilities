@@ -19,11 +19,6 @@
             "Type": "String",
             "Description": "Password to export certificates with.",
             "DefaultValue": "SIF-Default"
-        },
-        "SkipTasks": {
-            "Type": "Boolean",
-            "Description": "Pass true to skip all of the tasks",
-            "DefaultValue": false
         }
     },
     "Variables": {
@@ -34,9 +29,7 @@
         "User.Supplied.Password": "[not(equal(parameter('ExportPassword'),'SIF-Default'))]",
         "Secure.Password": "[ConvertToSecureString(String:variable('Password.String'),AsPlainText:true,Force:true)]",
         "Password.String": "[RandomString(Length:20,EnforceComplexity:True)]",
-        "Convert.User.Password": "[ConvertToSecureString(String:parameter('ExportPassword'),AsPlainText:true,Force:true)]",
-        "Skip": "[parameter('SkipTasks')]",
-        "Skip.DisplayPassword": "[or(variable('Skip'),variable('User.Supplied.Password'))]"
+        "Convert.User.Password": "[ConvertToSecureString(String:parameter('ExportPassword'),AsPlainText:true,Force:true)]"
     },
     "Register": {
         "Tasks": {
@@ -54,8 +47,7 @@
                 "Exists": [
                     "[parameter('CertPath')]"
                 ]
-            },
-            "Skip": "[variable('Skip')]"
+            }
         },
         "DisplayPassword": {
             "Description": "Print password if the user hasn't supplied their own.",
@@ -64,7 +56,7 @@
                 "Messagedata": "[concat('Certificate Password: ',variable('Password.String'))]",
                 "InformationAction": "Continue"
             },
-            "Skip": "[variable('Skip.DisplayPassword')]"
+            "Skip": "[variable('User.Supplied.Password')]"
         },
         "CreateRootCert": {
             "Description": "Create the root certificate.",
@@ -78,8 +70,7 @@
                 ],
                 "IncludePrivateKey": true,
                 "Password": "[variable('Export.Password')]"
-            },
-            "Skip": "[variable('Skip')]"
+            }
         },
         "CreateSignedCert": {
             "Description": "Create a certificate signed by the root authority.",
@@ -95,8 +86,7 @@
                 ],
                 "IncludePrivateKey": true,
                 "Password": "[variable('Export.Password')]"
-            },
-            "Skip": "[variable('Skip')]"
+            }
         }
     }
 }

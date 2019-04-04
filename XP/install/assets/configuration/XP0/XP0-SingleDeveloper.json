@@ -5,10 +5,10 @@
             "Description": "The name of the certificate to be created for the xconnect server.",
             "DefaultValue": ""
         },
-        "CertificatePath": {
-            "Type": "string",
-            "Description": "Path on filesystem where generated certificates are stored",
-            "DefaultValue": "c:\\certificates"
+        "CertificatePath":{
+            "Type":"string",
+            "Description":"Path on filesystem where generated certificates are stored",
+            "DefaultValue":"c:\\certificates"
         },
         "IdentityServerCertificateName": {
             "Type": "String",
@@ -225,15 +225,10 @@
             "DefaultValue": "",
             "Description": "Desired WebRoot"
         },
-        "WildcardCertificateThumbprint": {
-            "Type": "String",
-            "Description": "Certificate Thumbprint of a wildcard cert (ie: *.mysites.com)",
-            "DefaultValue": ""
-        },
-        "XConnectCertificatePassword": {
-            "Type": "string",
-            "DefaultValue": "Password",
-            "Description": "Password for the Exported XConnect Certificate"
+        "XConnectCertificatePassword":{
+            "Type":"string",
+            "DefaultValue":"Password",
+            "Description":"Password for the Exported XConnect Certificate"
         },
         "XConnectXP0:Package": {
             "Type": "String",
@@ -245,11 +240,6 @@
             "Reference": "WebRoot",
             "Description": "Override to pass WebRoot"
         },
-        "XConnectXP0:WildcardCertificateThumbprint": {
-            "Type": "String",
-            "Reference": "WildcardCertificateThumbprint",
-            "Description": "Certificate Thumbprint of a wildcard cert (ie: *.mysites.com)"
-        },
         "SitecoreXP0:Package": {
             "Type": "String",
             "Reference": "SitecorePackage",
@@ -260,11 +250,6 @@
             "Reference": "WebRoot",
             "Description": "Override to pass WebRoot"
         },
-        "SitecoreXP0:WildcardCertificateThumbprint": {
-            "Type": "String",
-            "Reference": "WildcardCertificateThumbprint",
-            "Description": "Certificate Thumbprint of a wildcard cert (ie: *.mysites.com)"
-        },
         "IdentityServer:Package": {
             "Type": "String",
             "Reference": "IdentityServerPackage",
@@ -274,11 +259,6 @@
             "Type": "String",
             "Reference": "WebRoot",
             "Description": "Override to pass WebRoot"
-        },
-        "IdentityServer:WildcardCertificateThumbprint": {
-            "Type": "String",
-            "Reference": "WildcardCertificateThumbprint",
-            "Description": "Certificate Thumbprint of a wildcard cert (ie: *.mysites.com)"
         },
         "XConnectXP0:Sitename": {
             "Type": "String",
@@ -405,11 +385,11 @@
             "Reference": "XConnectCertificateName",
             "Description": "Override to pass XConnectCertificateName value to XConnectCertificates config."
         },
-        "XConnectCertificates:CertPath": {
+        "XConnectCertificates:CertPath":{
             "Type": "String",
             "Reference": "CertificatePath"
         },
-        "XConnectCertificates:ExportPassword": {
+        "XConnectCertificates:ExportPassword":{
             "Type": "String",
             "Reference": "XConnectCertificatePassword"
         },
@@ -515,73 +495,88 @@
         "SitecoreXP0:SqlProcessingPools.Password": "[variable('SqlProcessingPools.Password')]",
         "Test.SqlProcessingPools.Password": "[equal(parameter('SqlProcessingPoolsPassword'),'SIF-Default')]",
         "Generate.SqlProcessingPools.Password": "[randomstring(Length:20,DisAllowSpecial:True,EnforceComplexity:True)]",
+
         "SqlCollection.Password": "[if(variable('Test.SqlCollection.Password'),variable('Generate.SqlCollection.Password'),parameter('SqlCollectionPassword'))]",
         "XConnectXP0:SqlCollection.Password": "[variable('SqlCollection.Password')]",
         "Test.SqlCollection.Password": "[equal(parameter('SqlCollectionPassword'),'SIF-Default')]",
         "Generate.SqlCollection.Password": "[randomstring(Length:20,DisAllowSpecial:True,EnforceComplexity:True)]",
+
         "SqlReferenceData.Password": "[if(variable('Test.SqlReferenceData.Password'),variable('Generate.SqlReferenceData.Password'),parameter('SqlReferenceDataPassword'))]",
         "XConnectXP0:SqlReferenceData.Password": "[variable('SqlReferenceData.Password')]",
         "SitecoreXP0:SqlReferenceData.Password": "[variable('SqlReferenceData.Password')]",
         "Test.SqlReferenceData.Password": "[equal(parameter('SqlReferenceDataPassword'),'SIF-Default')]",
         "Generate.SqlReferenceData.Password": "[randomstring(Length:20,DisAllowSpecial:True,EnforceComplexity:True)]",
+
         "SqlMarketingAutomation.Password": "[if(variable('Test.SqlMarketingAutomation.Password'),variable('Generate.SqlMarketingAutomation.Password'),parameter('SqlMarketingAutomationPassword'))]",
         "XConnectXP0:SqlMarketingAutomation.Password": "[variable('SqlMarketingAutomation.Password')]",
         "SitecoreXP0:SqlMarketingAutomation.Password": "[variable('SqlMarketingAutomation.Password')]",
         "Test.SqlMarketingAutomation.Password": "[equal(parameter('SqlMarketingAutomationPassword'),'SIF-Default')]",
         "Generate.SqlMarketingAutomation.Password": "[randomstring(Length:20,DisAllowSpecial:True,EnforceComplexity:True)]",
+
         "SqlMessaging.Password": "[if(variable('Test.SqlMessaging.Password'),variable('Generate.SqlMessaging.Password'),parameter('SqlMessagingPassword'))]",
         "XConnectXP0:SqlMessaging.Password": "[variable('SqlMessaging.Password')]",
         "SitecoreXP0:SqlMessaging.Password": "[variable('SqlMessaging.Password')]",
         "Test.SqlMessaging.Password": "[equal(parameter('SqlMessagingPassword'),'SIF-Default')]",
         "Generate.SqlMessaging.Password": "[randomstring(Length:20,DisAllowSpecial:True,EnforceComplexity:True)]",
+
         "SqlProcessingEngine.Password": "[if(variable('Test.SqlProcessingEngine.Password'),variable('Generate.SqlProcessingEngine.Password'),parameter('SqlProcessingEnginePassword'))]",
         "XConnectXP0:SqlProcessingEngine.Password": "[variable('SqlProcessingEngine.Password')]",
         "Test.SqlProcessingEngine.Password": "[equal(parameter('SqlProcessingEnginePassword'),'SIF-Default')]",
         "Generate.SqlProcessingEngine.Password": "[randomstring(Length:20,DisAllowSpecial:True,EnforceComplexity:True)]",
+
         "SqlReporting.Password": "[if(variable('Test.SqlReporting.Password'),variable('Generate.SqlReporting.Password'),parameter('SqlReportingPassword'))]",
         "XConnectXP0:SqlReporting.Password": "[variable('SqlReporting.Password')]",
         "SitecoreXP0:SqlReporting.Password": "[variable('SqlReporting.Password')]",
         "Test.SqlReporting.Password": "[equal(parameter('SqlReportingPassword'),'SIF-Default')]",
         "Generate.SqlReporting.Password": "[randomstring(Length:20,DisAllowSpecial:True,EnforceComplexity:True)]",
+
         "SqlCore.Password": "[if(variable('Test.SqlCore.Password'),variable('Generate.SqlCore.Password'),parameter('SqlCorePassword'))]",
         "SitecoreXP0:SqlCore.Password": "[variable('SqlCore.Password')]",
         "IdentityServer:SqlCore.Password": "[variable('SqlCore.Password')]",
         "Test.SqlCore.Password": "[equal(parameter('SqlCorePassword'),'SIF-Default')]",
         "Generate.SqlCore.Password": "[randomstring(Length:20,DisAllowSpecial:True,EnforceComplexity:True)]",
+
         "SqlSecurity.Password": "[if(variable('Test.SqlSecurity.Password'),variable('Generate.SqlSecurity.Password'),parameter('SqlSecurityPassword'))]",
         "SitecoreXP0:SqlSecurity.Password": "[variable('SqlSecurity.Password')]",
         "Test.SqlSecurity.Password": "[equal(parameter('SqlSecurityPassword'),'SIF-Default')]",
         "Generate.SqlSecurity.Password": "[randomstring(Length:20,DisAllowSpecial:True,EnforceComplexity:True)]",
+
         "SqlMaster.Password": "[if(variable('Test.SqlMaster.Password'),variable('Generate.SqlMaster.Password'),parameter('SqlMasterPassword'))]",
         "SitecoreXP0:SqlMaster.Password": "[variable('SqlMaster.Password')]",
         "Test.SqlMaster.Password": "[equal(parameter('SqlMasterPassword'),'SIF-Default')]",
         "Generate.SqlMaster.Password": "[randomstring(Length:20,DisAllowSpecial:True,EnforceComplexity:True)]",
+
         "SqlWeb.Password": "[if(variable('Test.SqlWeb.Password'),variable('Generate.SqlWeb.Password'),parameter('SqlWebPassword'))]",
         "SitecoreXP0:SqlWeb.Password": "[variable('SqlWeb.Password')]",
         "Test.SqlWeb.Password": "[equal(parameter('SqlWebPassword'),'SIF-Default')]",
         "Generate.SqlWeb.Password": "[randomstring(Length:20,DisAllowSpecial:True,EnforceComplexity:True)]",
+
         "SqlProcessingTasks.Password": "[if(variable('Test.SqlProcessingTasks.Password'),variable('Generate.SqlProcessingTasks.Password'),parameter('SqlProcessingTasksPassword'))]",
         "SitecoreXP0:SqlProcessingTasks.Password": "[variable('SqlProcessingTasks.Password')]",
         "Test.SqlProcessingTasks.Password": "[equal(parameter('SqlProcessingTasksPassword'),'SIF-Default')]",
         "Generate.SqlProcessingTasks.Password": "[randomstring(Length:20,DisAllowSpecial:True,EnforceComplexity:True)]",
+
         "SqlForms.Password": "[if(variable('Test.SqlForms.Password'),variable('Generate.SqlForms.Password'),parameter('SqlFormsPassword'))]",
         "SitecoreXP0:SqlForms.Password": "[variable('SqlForms.Password')]",
         "Test.SqlForms.Password": "[equal(parameter('SqlFormsPassword'),'SIF-Default')]",
         "Generate.SqlForms.Password": "[randomstring(Length:20,DisAllowSpecial:True,EnforceComplexity:True)]",
+
         "SqlExmMaster.Password": "[if(variable('Test.SqlExmMaster.Password'),variable('Generate.SqlExmMaster.Password'),parameter('SqlExmMasterPassword'))]",
         "SitecoreXP0:SqlExmMaster.Password": "[variable('SqlExmMaster.Password')]",
         "Test.SqlExmMaster.Password": "[equal(parameter('SqlExmMasterPassword'),'SIF-Default')]",
         "Generate.SqlExmMaster.Password": "[randomstring(Length:20,DisAllowSpecial:True,EnforceComplexity:True)]",
+
         "Sitecore.Admin.Password": "[if(variable('Test.Admin.Password'),variable('Generate.Admin.Password'),parameter('SitecoreAdminPassword'))]",
         "SitecoreXP0:Sitecore.Admin.Password": "[variable('Sitecore.Admin.Password')]",
         "Test.Admin.Password": "[equal(parameter('SitecoreAdminPassword'),'SIF-Default')]",
         "Generate.Admin.Password": "[randomstring(Length:20,DisAllowSpecial:True,EnforceComplexity:True)]",
+
         "Client.Secret": "[if(variable('Test.Client.Secret'),variable('Generate.Client.Secret'),parameter('ClientSecret'))]",
         "IdentityServer:Client.Secret": "[variable('Client.Secret')]",
         "SitecoreXP0:Sitecore.IdentitySecret": "[variable('Client.Secret')]",
         "Test.Client.Secret": "[equal(parameter('ClientSecret'),'SIF-Default')]",
-        "Generate.Client.Secret": "[randomstring(Length:100,DisAllowSpecial:True)]",
-        "IdentityServerCertificates:Skip": "[parameter('WildcardCertificateThumbprint')]"
+        "Generate.Client.Secret": "[randomstring(Length:100,DisAllowSpecial:True)]"
+
     },
     "Includes": {
         "IdentityServerCertificates": {
