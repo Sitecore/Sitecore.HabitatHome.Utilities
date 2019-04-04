@@ -198,8 +198,7 @@
                         "Thumbprint": "[variable('Security.IdentityServer.CertificateThumbprint')]"
                     }
                 ]
-            },
-            "Skip": "[not(parameter('SitecoreIdentityCert'))]"
+            }
         },
         "CreateHostHeader": {
             "Description": "Sets a hostheader for the website.",
