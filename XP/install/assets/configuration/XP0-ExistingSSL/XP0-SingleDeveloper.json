@@ -10,11 +10,6 @@
             "Description": "Path on filesystem where generated certificates are stored",
             "DefaultValue": "c:\\certificates"
         },
-        "IdentityServerCertificateName": {
-            "Type": "String",
-            "Description": "The name of the certificate to be created for the identity server.",
-            "DefaultValue": ""
-        },
         "IdentityServerSiteName": {
             "Type": "String",
             "Description": "The name of the identity server to be created.",
@@ -230,11 +225,6 @@
             "Description": "Certificate Thumbprint of a wildcard cert (ie: *.mysites.com)",
             "DefaultValue": ""
         },
-        "XConnectCertificatePassword": {
-            "Type": "string",
-            "DefaultValue": "Password",
-            "Description": "Password for the Exported XConnect Certificate"
-        },
         "XConnectXP0:Package": {
             "Type": "String",
             "Reference": "XConnectPackage",
@@ -380,6 +370,15 @@
             "Reference": "Prefix",
             "Description": "Override to pass Prefix value to XConnectXP0 config."
         },
+        "XConnectCertificates:CertificateName": {
+            "Type": "String",
+            "Reference": "XConnectCertificateName",
+            "Description": "Override to pass XConnectCertificateName value to XConnectCertificates config."
+        },
+        "XConnectCertificates:CertPath": {
+            "Type": "String",
+            "Reference": "CertificatePath"
+        },
         "SitecoreSolr:CorePrefix": {
             "Type": "String",
             "Reference": "Prefix",
@@ -400,33 +399,10 @@
             "Reference": "Prefix",
             "Description": "Override to pass Prefix value to SitecoreXP0 config."
         },
-        "XConnectCertificates:CertificateName": {
-            "Type": "String",
-            "Reference": "XConnectCertificateName",
-            "Description": "Override to pass XConnectCertificateName value to XConnectCertificates config."
-        },
-        "XConnectCertificates:CertPath": {
-            "Type": "String",
-            "Reference": "CertificatePath"
-        },
-        "XConnectCertificates:ExportPassword": {
-            "Type": "String",
-            "Reference": "XConnectCertificatePassword"
-        },
-        "IdentityServerCertificates:CertificateName": {
-            "Type": "String",
-            "Reference": "IdentityServerCertificateName",
-            "Description": "Override to pass IdentityServerCertificateName value to IdentityServerCertificates config."
-        },
         "IdentityServer:SiteName": {
             "Type": "String",
             "Reference": "IdentityServerSiteName",
             "Description": "Override to pass IdentityServerSiteName value to IdentityServer config."
-        },
-        "IdentityServer:SitecoreIdentityCert": {
-            "Type": "String",
-            "Reference": "IdentityServerCertificateName",
-            "Description": "Override to pass IdentityServerCertificateName value to IdentityServer config."
         },
         "XConnectXP0:XConnectCert": {
             "Type": "String",
@@ -584,9 +560,6 @@
         "IdentityServerCertificates:Skip": "[parameter('WildcardCertificateThumbprint')]"
     },
     "Includes": {
-        "IdentityServerCertificates": {
-            "Source": ".\\createcert.json"
-        },
         "IdentityServer": {
             "Source": ".\\identityServer.json"
         },
