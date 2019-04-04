@@ -10,11 +10,6 @@
             "Description": "The prefix used for all Sql databases.",
             "DefaultValue": ""
         },
-        "SitecoreIdentityCert": {
-            "Type": "string",
-            "Description": "The certificate to use for encryption. Provide the name or the thumbprint.",
-            "DefaultValue": ""
-        },
         "LicenseFile": {
             "Type": "string",
             "Description": "The path to the Sitecore license file.",
@@ -89,7 +84,7 @@
     "Variables": {
         "Sql.Database.Core": "[concat(parameter('SqlDbPrefix'), parameter('SqlCoreDbName'))]",
         "Security.CertificateStore": "Cert:\\Localmachine\\My",
-        "Security.IdentityServer.CertificateThumbprint": "[if(parameter('WildCardCertificateThumbprint'),parameter('WildCardCertificateThumbprint'), GetCertificateThumbprint(parameter('SitecoreIdentityCert'), variable('Security.CertificateStore')))]",
+        "Security.IdentityServer.CertificateThumbprint": "[parameter('WildCardCertificateThumbprint')]",
         "Security.IdentityServer.CertificatePath": "[joinpath(variable('Security.CertificateStore'), variable('Security.IdentityServer.CertificateThumbprint'))]",
         "Site.PhysicalPath": "[concat(parameter('WebRoot'),'\\', parameter('SiteName'))]",
         "Site.LicenseFolder": "[joinpath(variable('Site.PhysicalPath'), 'sitecoreruntime')]",
@@ -99,10 +94,17 @@
     },
     "Register": {
         "Tasks": {
-            "RemoveItem": "Remove-Item"
+            "RemoveItem": "Remove-Item",
+            "WriteHost": "Write-Information"
         }
     },
     "Tasks": {
+        "OutputThumbprint": {
+            "Type": "WriteHost",
+            "Params": {
+                "MessageData": "[variable('Security.IdentityServer.CertificateThumbprint')]"
+            }
+        },
         "CreatePaths": {
             "Description": "Ensure the destination path for the site exists.",
             "Type": "EnsurePath",
@@ -196,8 +198,7 @@
                         "Thumbprint": "[variable('Security.IdentityServer.CertificateThumbprint')]"
                     }
                 ]
-            },
-            "Skip": "[not(parameter('SitecoreIdentityCert'))]"
+            }
         },
         "CreateHostHeader": {
             "Description": "Sets a hostheader for the website.",
