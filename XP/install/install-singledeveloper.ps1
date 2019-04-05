@@ -243,7 +243,7 @@ Function Install-SingleDeveloper {
         WebRoot                        = $site.webRoot
     }
 
-    Push-Location $resourcePath
+    Push-Location (Join-Path $resourcePath "XP0")
     Install-SitecoreConfiguration @singleDeveloperParams 
     Pop-Location
 }
