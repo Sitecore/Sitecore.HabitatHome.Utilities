@@ -1,45 +1,41 @@
-### Suggested Steps for installation of prerequisites
+# Installation of prerequisites
 
-#### Install Sitecore Install Framework (SIF)
+
 
 - Open PowerShell session as Administrator
+
 ```
-Install-Package SitecoreInstallFramework -Version 2.0.0 -Source https://sitecore.myget.org/F/sc-powershell/api/v3/index.json
-Import-Module SitecoreInstallFramework
+.\Install-All.ps1
 ```
 
+### Steps Performed by Install-All
+
+#### Install Chocolatey
+Chocolatey builds on technologies you know - unattended installation and PowerShell. Chocolatey works with all existing software installation technologies like MSI, NSIS, InnoSetup, etc
+#### Install IIS Features
+Uses Windows' native `Enable-WindowsOptionalFeature` to install relevant Windows **IIS Features **as well as **Url Rewrite** and **Web Deploy**
+#### Install Sitecore Gallery
+Registers Sitecore's PowerShell repository (Sitecore Gallery) in order to support installing SIF (next step)
+
+#### Install Sitecore Install Framework (SIF)
+Installs Sitecore Install Framework from the newly registered Sitecore Gallery
 
 #### Install Prerequisites
+Uses the `prerequisites.json` SIF configuration file supplied to install the known Windows prerequisites for the version of Sitecore you are attempting to install.
 
-- Create a working directory
-	```
-	md c:\projects
-	Set-Location c:\projects
-	```
-- Clone the [Sitecore.HabitatHome.Utilities](https://github.com/Sitecore/Sitecore.HabitatHome.Utilities/) repository
+The Prerequisites.json file can be found in the XP*Configuration zip package available when downloading Sitecore (OnPrem) from dev.sitecore.com
 
-	```
-	git clone https://github.com/Sitecore/Sitecore.HabitatHome.Utilities.git
-	```
-	
-- Navigate to the XP\install\assets\Configuration folder
+Ensure you're using the correct version of the Prerequisites.json file. One has been included here as an example but may change with new versions of the product.
 
-```
-	Set-Location c:\projects\Sitecore.HabitatHome.Utilities\XP\install\assets\configuration
-```
-
-- Turn off PowerShell Progress Bar to greatly enhance download speeds
+This will also turn off the PowerShell progress bar to **greatly ** enhance download speeds
 
 ```
 	$Global:ProgressPreference = 'SilentlyContinue'
 ```
-- Install prerequisites
-    ```
-	Install-SitecoreConfiguration -Path (Resolve-Path .\prerequisites.json)
-	```
-- Set Progress Bar preferences back to defaults
+
 ```
 	$Global:ProgressPreference = 'Continue'
+```
 	
 ### RESTART COMPUTER
 
