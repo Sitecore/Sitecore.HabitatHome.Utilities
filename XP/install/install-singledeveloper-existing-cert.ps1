@@ -201,8 +201,15 @@ Function Confirm-Prerequisites {
 
 Function Install-SingleDeveloper {
 
+    $cert = Get-ChildItem cert:\\localmachine\my | Where-Object { $_.FriendlyName -eq $site.hostName } | Select-Object -ExpandProperty Thumbprint
+    if ($null -eq $cert) {
+        $cert = ""
+    }
+
+
     $singleDeveloperParams = @{
         Path                           = $sitecore.singleDeveloperConfigurationPath
+        CertificatePath                = $assets.certificatesPath
         SqlServer                      = $sql.server
         SqlAdminUser                   = $sql.adminUser
         SqlAdminPassword               = $sql.adminPassword
@@ -225,6 +232,7 @@ Function Install-SingleDeveloper {
         SolrService                    = $solr.serviceName
         Prefix                         = $site.prefix
         XConnectCertificateName        = $xconnect.siteName
+        XConnectCertificatePassword    = $sql.adminPassword
         IdentityServerCertificateName  = $identityServer.name
         IdentityServerSiteName         = $identityServer.name
         LicenseFile                    = $assets.licenseFilePath
@@ -239,9 +247,10 @@ Function Install-SingleDeveloper {
         ClientSecret                   = $identityServer.clientSecret
         AllowedCorsOrigins             = ("https://{0}|https://{1}" -f $site.hostName, "habitathomebasic.dev.local") # Need to add to proper config
         WebRoot                        = $site.webRoot
+        WildcardCertificateThumbprint  = $cert
     }
 
-    Push-Location (Join-Path $resourcePath "XP0")
+    Push-Location $resourcePath
     Install-SitecoreConfiguration @singleDeveloperParams 
     Pop-Location
 }
@@ -279,35 +288,11 @@ Function Add-AppPoolMembership {
     }
 }
 
-Function Add-AdditionalBindings {
-    foreach ($binding in $site.additionalBindings) {
-        $params = @{
-            Path            = $site.addSiteBindingWithSSLPath 
-            SiteName        = $site.hostName 
-            WebRoot         = $site.webRoot 
-            HostHeader      = $binding.hostName 
-            Port            = $binding.port
-            CertPath        = $assets.certificatesPath
-            CertificateName = $binding.hostName
-            Skip            = @()
-        }
-        if ($false -eq $binding.createCertificate) {
-            $params.Skip += "CreatePaths", "CreateRootCert", "ImportRootCertificate", "CreateSignedCert"
-        }
-        if ($binding.sslOnly) {
-            $params.Skip += "CreateBindings"
-        }
-
-        Install-SitecoreConfiguration  @params   -WorkingDirectory $(Join-Path $PWD "logs") -Verbose
-    }
-}
-
 Install-SitecoreInstallFramework
 Download-Assets
 Confirm-Prerequisites
 Install-SingleDeveloper
 Add-AppPoolMembership
-Add-AdditionalBindings
 
 $StopWatch.Stop()
 $StopWatch
