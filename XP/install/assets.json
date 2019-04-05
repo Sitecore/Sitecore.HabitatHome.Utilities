@@ -4,7 +4,7 @@
             "id": "xp",
             "name": "Sitecore Experience Platform",
             "fileName": "Sitecore 9.1.1 rev. 002459 (WDP XP0 packages).zip",
-            "url": "https://dev.sitecore.net/~/media/442BA3B6E6334CEA9546C647D434BC13.ashx",
+            "url": "https://dev.sitecore.net/~/media/B262F95B2AFA4C39BDE821590CE6F1A6.ashx",
             "extract": true,
             "source": "sitecore"
         }
@@ -13,8 +13,8 @@
         {
             "id": "sat",
             "name": "Sitecore Azure Toolkit",
-            "fileName": "Sitecore Azure Toolkit 2.1.0 rev. 181023.zip",
-            "url": "https://dev.sitecore.net/~/media/2976CA2FB22C47D18DCCD03581F7E67C.ashx",
+            "fileName": "Sitecore Azure Toolkit 2.2.0 rev. 190305.zip",
+            "url": "https://dev.sitecore.net/~/media/55B3AADF609441979C3806D20E9B12C4.ashx",
             "install": true,
             "convert": false,
             "source": "sitecore"
@@ -33,7 +33,7 @@
             "id": "sxa",
             "name": "Sitecore Experience Accelerator",
             "fileName": "Sitecore Experience Accelerator 1.8.1 rev. 190319 for 9.1.1.scwdp.zip",
-            "url": "https://dev.sitecore.net/~/media/D494E255F40A49F097DE86C001495FFD.ashx",
+            "url": "https://dev.sitecore.net/~/media/3B83F33FE0B848C6AF9F3B58E4408A96.ashx",
             "install": true,
             "convert": false,
             "source": "sitecore",
@@ -162,8 +162,8 @@
         {
             "id": "jss",
             "name": "JavaScript Services",
-            "fileName": "Sitecore JavaScript Services Server for Sitecore 9.1 XP 11.0.0 rev. 181113.scwdp.zip",
-            "url": "https://dev.sitecore.net/~/media/E899E132CB8E4FAEA5305EF0D19A59FC.ashx",
+            "fileName": "Sitecore JavaScript Services Server for Sitecore 9.1.1 XP 11.0.1 rev. 190318.scwdp.zip",
+            "url": "https://dev.sitecore.net/~/media/127032434274439DB84F8C47FCC90936.ashx",
             "install": false,
             "convert": false,
             "source": "sitecore",
