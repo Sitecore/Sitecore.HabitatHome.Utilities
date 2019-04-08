@@ -100,7 +100,7 @@ $xConnect.siteRoot = Join-Path $site.webRoot -ChildPath $xConnect.siteName
 $identityServer = $json.settings.identityServer
 $identityServer.packagePath = Join-Path $assets.root $("Sitecore.IdentityServer " + $assets.identityServerVersion + " (OnPrem)_identityserver.scwdp.zip")
 $identityServer.configurationPath = (Get-ChildItem $assets.root -filter "IdentityServer.json" -Recurse).FullName 
-$identityServer.name = $site.prefix + "_identityserver." + $site.suffix
+$identityServer.name = $site.prefix + "_identityserver-" + $site.suffix
 $identityServer.url = ("https://{0}" -f $identityServer.name)
 $identityServer.clientSecret = "ClientSecret"
 
