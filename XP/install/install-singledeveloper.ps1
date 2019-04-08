@@ -54,8 +54,8 @@ Write-Host "*******************************************************" -Foreground
 Write-Host " Installing Sitecore" -ForegroundColor Green
 Write-Host " Sitecore: $($site.hostName)" -ForegroundColor Green
 Write-Host " xConnect: $($xConnect.siteName)" -ForegroundColor Green
+Write-Host " identityserver: $($identityServer.name)" -ForegroundColor Green
 Write-Host "*******************************************************" -ForegroundColor Green
-
 
 Function Install-SitecoreInstallFramework {
     #Register Assets PowerShell Repository
