@@ -74,35 +74,34 @@ catch {
 
 
 $singleDeveloperParams = @{
-    Path                          = $sitecore.singleDeveloperConfigurationPath
-    SqlServer                     = $sql.server
-    SqlAdminUser                  = $sql.adminUser
-    SqlAdminPassword              = $sql.adminPassword
+    Path                           = $sitecore.singleDeveloperConfigurationPath
+    SqlServer                      = $sql.server
+    SqlAdminUser                   = $sql.adminUser
+    SqlAdminPassword               = $sql.adminPassword
     SitecoreAdminPassword         = $sitecore.adminPassword
-    SolrUrl                       = $solr.url
-    SolrRoot                      = $solr.root
-    SolrService                   = $solr.serviceName
-    Prefix                        = $site.prefix
-    XConnectCertificateName       = $xconnect.siteName
-    IdentityServerCertificateName = $identityServer.name
-    IdentityServerSiteName        = $identityServer.name
-    LicenseFile                   = $assets.licenseFilePath
-    XConnectPackage               = $xConnect.packagePath
-    SitecorePackage               = $sitecore.packagePath
-    IdentityServerPackage         = $identityServer.packagePath
-    XConnectSiteName              = $xConnect.siteName
-    SitecoreSitename              = $site.hostName
-    PasswordRecoveryUrl           = $site.hostName
-    SitecoreIdentityAuthority     = $identityServer.name
-    XConnectCollectionService     = $xConnect.siteName
-    ClientSecret   = $identityServer.clientSecret
-    AllowedCorsOrigins            = $site.hostName
+    SolrUrl                        = $solr.url
+    SolrRoot                       = $solr.root
+    SolrService                    = $solr.serviceName
+    Prefix                         = $site.prefix
+    XConnectCertificateName        = $xconnect.siteName
+    IdentityServerCertificateName  = $identityServer.name
+    IdentityServerSiteName         = $identityServer.name
+    LicenseFile                    = $assets.licenseFilePath
+    XConnectPackage                = $xConnect.packagePath
+    SitecorePackage                = $sitecore.packagePath
+    IdentityServerPackage          = $identityServer.packagePath
+    XConnectSiteName               = $xConnect.siteName
+    SitecoreSitename               = $site.hostName
+    PasswordRecoveryUrl            =  $site.hostName
+    SitecoreIdentityAuthority      =  $identityServer.name
+    XConnectCollectionService      =  $xConnect.siteName
+    ClientSecret                   = $identityServer.clientSecret
+    AllowedCorsOrigins             = $site.hostName # Need to add to proper config
+    WebRoot                        = $site.webRoot
 }
-Push-Location $resourcePath
-Install-SitecoreConfiguration @singleDeveloperParams -Uninstall  *>&1 | Tee-Object XP0-SingleDeveloper.log
+Push-Location (Join-Path $resourcePath "XP0")
+Install-SitecoreConfiguration @singleDeveloperParams -Uninstall
 Pop-Location
-
-$sxaSolrConfigPath = Join-Path $sharedresourcePath 'sxa\sxa-solr-config.json'
 
 $sxaSolrUninstallParams = @{
     Path                  = Join-path $sharedresourcePath 'sxa\sxa-solr.json'
@@ -110,12 +109,11 @@ $sxaSolrUninstallParams = @{
     SolrRoot              = $solr.root 
     SolrService           = $solr.serviceName 
     CorePrefix            = $site.prefix
-    SXASolrConfigPath     = $sxaSolrConfigPath
     SiteName              = $site.hostName
     SitecoreAdminPassword = $sitecore.adminPassword
 }
 
-#Install-SitecoreConfiguration @sxaSolrUninstallParams -Uninstall  *>&1 | Tee-Object XP0-SingleDeveloper.log
+Install-SitecoreConfiguration @sxaSolrUninstallParams -Uninstall  *>&1 | Tee-Object XP0-SingleDeveloper.log
 
 
 Write-Host "Removing folders from webroot" -ForegroundColor Green
