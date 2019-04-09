@@ -1,7 +1,7 @@
 Param(
     [string] $ConfigurationFile = "configuration-xp0.json",
 	[string] $assetsRoot,
-    [string] $sitecoreVersion = "9.1.1 rev. 002459"
+    [string] $sitecoreVersion = "9.2.0 rev. 002501"
 )
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
@@ -32,7 +32,7 @@ $assets.sitecoreazuretoolkit = Join-Path $assets.sharedUtilitiesRoot "sat"
 $assets.licenseFilePath = Join-Path $assets.root "license.xml"
 
 
-$assets.identityServerVersion = "2.0.1 rev. 00166"
+$assets.identityServerVersion = "3.0.0 rev. 00207"
 
 
 $assets.certificatesPath = Join-Path $assets.sharedUtilitiesRoot "Certificates"
