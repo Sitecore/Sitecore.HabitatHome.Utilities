@@ -5,11 +5,6 @@
             "Description": "The path to the Web Deploy package to deploy.",
             "DefaultValue": ""
         },
-        "SqlDbPrefix": {
-            "Type": "string",
-            "Description": "The prefix used for all Sql databases.",
-            "DefaultValue": ""
-        },
         "SitecoreIdentityCert": {
             "Type": "string",
             "Description": "The certificate to use for encryption. Provide the name or the thumbprint.",
@@ -25,25 +20,30 @@
             "DefaultValue": "IdentityServer",
             "Description": "The name of the site to be deployed."
         },
-        "SqlCoreUser": {
-            "Type": "string",
-            "DefaultValue": "coreuser",
-            "Description": "The user to create and use in Core connection string."
-        },
-        "SqlCoreDbName": {
-            "Type": "string",
-            "DefaultValue": "_Core",
-            "Description": "The database to use in Core connection string."
-        },
-        "SqlCorePassword": {
-            "Type": "string",
-            "DefaultValue": "SIF-Default",
-            "Description": "The Sql password for the Core connection string in Sitecore."
-        },
         "SqlServer": {
             "Type": "string",
             "DefaultValue": ".\\SQLSERVER",
             "Description": "The Sql Server where databases will be installed."
+        },
+        "SqlDbPrefix": {
+            "Type": "string",
+            "Description": "The prefix used for all Sql databases.",
+            "DefaultValue": ""
+        },
+        "SqlSecurityDbName": {
+            "Type": "string",
+            "DefaultValue": "_Core",
+            "Description": "The database to use in Security database connection string."
+        },
+        "SqlSecurityUser": {
+            "Type": "string",
+            "DefaultValue": "securityuser",
+            "Description": "The user to use in Security database connection string."
+        },
+        "SqlSecurityPassword": {
+            "Type": "string",
+            "DefaultValue": "SIF-Default",
+            "Description": "The Sql password for the Security database connection string."
         },
         "PasswordRecoveryUrl": {
             "Type": "string",
@@ -82,14 +82,16 @@
         }
     },
     "Variables": {
-        "Sql.Database.Core": "[concat(parameter('SqlDbPrefix'), parameter('SqlCoreDbName'))]",
+        "Sql.Database.Name": "[concat(parameter('SqlDbPrefix'), parameter('SqlSecurityDbName'))]",
+        "Sql.Database.User": "[parameter('SqlSecurityUser')]",
+        "Sql.Database.Password": "[parameter('SqlSecurityPassword')]",
+        "Sql.Connection.String": "[concat('Data Source=', parameter('SqlServer'), ';Initial Catalog=', variable('Sql.Database.Name'), ';User ID=', variable('Sql.Database.User'), ';Password=', variable('Sql.Database.Password'))]",
         "Security.CertificateStore": "Cert:\\Localmachine\\My",
         "Security.IdentityServer.CertificateThumbprint": "[GetCertificateThumbprint(parameter('SitecoreIdentityCert'), variable('Security.CertificateStore'))]",
         "Security.IdentityServer.CertificatePath": "[joinpath(variable('Security.CertificateStore'), variable('Security.IdentityServer.CertificateThumbprint'))]",
         "Site.PhysicalPath": "[concat(parameter('WebRoot'),'\\', parameter('SiteName'))]",
         "Site.LicenseFolder": "[joinpath(variable('Site.PhysicalPath'), 'sitecoreruntime')]",
         "Site.ConfigFolder": "[joinpath(variable('Site.PhysicalPath'), 'Config', 'production')]",
-        "SqlCore.Password": "[parameter('SqlCorePassword')]",
         "Client.Secret": "[parameter('ClientSecret'))]"
     },
     "Register": {
@@ -243,20 +245,8 @@
                             "Value": "[parameter('SiteName')]"
                         },
                         {
-                            "Name": "Database Server Name",
-                            "Value": "[parameter('SqlServer')]"
-                        },
-                        {
-                            "Name": "Core DB Name",
-                            "Value": "[variable('Sql.Database.Core')]"
-                        },
-                        {
-                            "Name": "Core DB User Name",
-                            "Value": "[parameter('SqlCoreUser')]"
-                        },
-                        {
-                            "Name": "Core DB User Password",
-                            "Value": "[variable('SqlCore.Password')]"
+                            "Name": "Security Connection String",
+                            "Value": "[variable('Sql.Connection.String')]"
                         },
                         {
                             "Name": "CertificateThumbprint",
