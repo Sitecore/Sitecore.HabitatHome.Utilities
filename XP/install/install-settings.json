@@ -1,6 +1,7 @@
 {
   "assets": {
     "root": "@@assets.root@@",
+    "packageRepository": "@@assets.pacakgeRepository",
     "psRepository": "@@assets.psRepository@@",
     "psRepositoryName": "@@assets.psRepositoryName@@",
     "licenseFilePath": "@@assets.licenseFilePath@@",
