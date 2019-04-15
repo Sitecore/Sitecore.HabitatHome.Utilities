@@ -246,7 +246,7 @@ Function Convert-Modules {
     }
     foreach ($key in $modules.Keys) {
         
-        if (!(Test-Path $modules[$key])){
+        if (!(Test-Path ($modules[$key] -replace ".zip",".scwdp.zip"))){
             Write-Host "Converting module: $modules[$key]" -ForegroundColor Green
             ConvertTo-SCModuleWebDeployPackage -Path $modules[$key] -Destination $assets.commerce.installationFolder -Verbose -Force
         }

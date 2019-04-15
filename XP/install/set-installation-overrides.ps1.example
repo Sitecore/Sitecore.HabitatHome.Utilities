@@ -14,7 +14,6 @@ $json = Get-Content -Raw $configurationFile |  ConvertFrom-Json
 
 # Assets and prerequisites
 $assets = $json.assets
-$assets.packageRepository = "C:\repository"
 $assets.licenseFilePath = Join-Path $assets.packageRepository "license.xml"
 
 # Settings
