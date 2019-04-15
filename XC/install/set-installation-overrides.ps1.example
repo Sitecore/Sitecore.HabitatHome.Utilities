@@ -10,7 +10,8 @@ $json = Get-Content -Raw $configurationFile |  ConvertFrom-Json
 
 $assets = $json.assets
 $assets.root = "$PSScriptRoot\assets"
-$assets.downloadFolder = Join-Path $assets.root "Downloads"
+$assets.packageRepository = "C:\repository"
+$assets.downloadFolder = $assets.packageRepository
 
 # Settings
 

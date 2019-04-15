@@ -27,7 +27,7 @@ function TestCookie {
     param([System.Net.CookieContainer]$cookies)
 
     $discovered = @($cookies.GetCookies($site) |
-            Where-Object { $_.Name -eq '.ASPXAUTH' -Or $_.Name -eq '.AspNet.Cookies' })
+        Where-Object { $_.Name -eq '.ASPXAUTH' -Or $_.Name -eq '.AspNet.Cookies' })
 
     if ($discovered.Count -ne 1) {
         throw "Authentication failed. Check username and password"
@@ -48,7 +48,7 @@ Function Get-SitecoreSession {
     TestStatusCode $authResponse
 
     # Set login info
-    $fields = @{}
+    $fields = @{ }
     $authResponse.InputFields.ForEach( {
         
             $fields[$_.Name] = $_.Value
@@ -97,20 +97,15 @@ $demoType = $demoType.ToLower()
 $session = Get-SitecoreSession "https://$instanceName" ("sitecore\{0}" -f $adminUser) $adminPassword
 $errors = 0
 
-    Write-Host "Warming up Sitecore" -ForegroundColor Green
-    foreach ($page in $config.urls.sitecore) {
-        if (!$(RequestPage "https://$instanceName$($page.url)" $session)) {
-            $errors++
-        }
+Write-Host "Warming up Sitecore" -ForegroundColor Green
+foreach ($page in $config.urls.sitecore) {
+    if (!$(RequestPage "https://$instanceName$($page.url)" $session)) {
+        $errors++
     }
+}
 
 if ($demoType -eq ("xp" -or "xc")) {
     Write-Host "Warming up XP Demo" -ForegroundColor Green
-    foreach ($page in $config.urls.sitecore) {
-        if (!$(RequestPage "https://$instanceName$($page.url)" $session)) {
-            $errors++
-        }
-    }
     foreach ($page in $config.urls.xp) {
         if (!$(RequestPage "https://$instanceName$($page.url)" $session)) {
             $errors++
