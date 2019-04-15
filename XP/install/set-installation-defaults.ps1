@@ -1,6 +1,7 @@
 Param(
     [string] $ConfigurationFile = "configuration-xp0.json",
-	[string] $assetsRoot,
+    [string] $assetsRoot,
+    [string] $packageRepository,
     [string] $sitecoreVersion = "9.2.0 rev. 002501"
 )
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
@@ -22,14 +23,19 @@ else {
 $baseConfiguration = Join-Path $assets.root "configuration\XP0"
 
 $assets.sitecoreVersion = $sitecoreVersion
+if (![string]::IsNullOrEmpty($packageRepository)){
+    $assets.packageRepository = $packageRepository
+}
+else {
+    $assets.packageRepository = $assets.root
+}
 
-# SIF settings
 $assets.psRepository = "https://sitecore.myget.org/F/sc-powershell/api/v2/"
 $assets.psRepositoryName = "SitecoreGallery"
 $assets.installerVersion = "2.1.0"
 $assets.sharedUtilitiesRoot = (Resolve-Path "..\..\Shared" | Select-Object -ExpandProperty Path)
 $assets.sitecoreazuretoolkit = Join-Path $assets.sharedUtilitiesRoot "sat"
-$assets.licenseFilePath = Join-Path $assets.root "license.xml"
+$assets.licenseFilePath = Join-Path $assets.packageRepository "license.xml"
 
 
 $assets.identityServerVersion = "3.0.0 rev. 00207"
@@ -94,7 +100,7 @@ $xConnect = $json.settings.xConnect
 $xConnect.ConfigurationPath = (Get-ChildItem $baseConfiguration -filter "xconnect-xp0.json" -Recurse).FullName
 $xConnect.certificateConfigurationPath = (Get-ChildItem $baseConfiguration -filter "createcert.json" -Recurse).FullName
 $xConnect.solrConfigurationPath = (Get-ChildItem $baseConfiguration -filter "xconnect-solr.json" -Recurse).FullName
-$xConnect.packagePath = Join-Path $assets.root $("Sitecore " + $assets.sitecoreVersion + " (OnPrem)_xp0xconnect.scwdp.zip")
+$xConnect.packagePath = Join-Path $assets.packageRepository $("Sitecore " + $assets.sitecoreVersion + " (OnPrem)_xp0xconnect.scwdp.zip")
 $xConnect.siteName = $site.prefix + "_xconnect." + $site.suffix
 $xConnect.siteRoot = Join-Path $site.webRoot -ChildPath $xConnect.siteName
 
@@ -104,7 +110,7 @@ $sitecore = $json.settings.sitecore
 $sitecore.solrConfigurationPath = (Get-ChildItem $baseConfiguration -filter "sitecore-solr.json" -Recurse).FullName
 $sitecore.singleDeveloperConfigurationPath = (Get-ChildItem $baseConfiguration -filter "XP0-SingleDeveloper.json" -Recurse).FullName
 $sitecore.sslConfigurationPath = "$($baseConfiguration)\certificates\sitecore-ssl.json"
-$sitecore.packagePath = Join-Path $assets.root $("Sitecore " + $assets.sitecoreVersion + " (OnPrem)_single.scwdp.zip")
+$sitecore.packagePath = Join-Path $assets.packageRepository $("Sitecore " + $assets.sitecoreVersion + " (OnPrem)_single.scwdp.zip")
 $sitecore.adminPassword = "b"
 $sitecore.exmCryptographicKey = "0x0000000000000000000000000000000000000000000000000000000000000000"
 $sitecore.exmAuthenticationKey = "0x0000000000000000000000000000000000000000000000000000000000000000"
@@ -112,7 +118,7 @@ $sitecore.telerikEncryptionKey = "PutYourCustomEncryptionKeyHereFrom32To256Chara
 $sitecore.rootCertificateName = "SitecoreRoot91"
 Write-Host "Setting default 'IdentityServer' parameters"
 $identityServer = $json.settings.identityServer
-$identityServer.packagePath = Join-Path $assets.root $("Sitecore.IdentityServer " + $assets.identityServerVersion + " (OnPrem)_identityserver.scwdp.zip")
+$identityServer.packagePath = Join-Path $assets.packageRepository $("Sitecore.IdentityServer " + $assets.identityServerVersion + " (OnPrem)_identityserver.scwdp.zip")
 $identityServer.configurationPath = (Get-ChildItem $baseConfiguration -filter "IdentityServer.json" -Recurse).FullName 
 $identityServer.name = $site.prefix + "-identityserver." + $site.suffix
 $identityServer.url = ("https://{0}" -f $identityServer.name)
