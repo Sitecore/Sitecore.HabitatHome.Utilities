@@ -157,7 +157,7 @@ Function Install-Modules {
         SitecoreAdminPassword           = $sitecore.adminPassword
     }
     Push-Location $sharedResourcePath
-    Install-SitecoreConfiguration @params
+    Install-SitecoreConfiguration @params -Verbose
     Pop-Location
    
 }
