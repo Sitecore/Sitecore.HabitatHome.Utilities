@@ -53,7 +53,8 @@
     "Module.IsScwdp": "[ValidatePattern('scwdp.zip', variable('Module.OriginalFileName'))]",
     "Module.DestinationPath": "[SplitPath(variable('Module.OriginalFileName'))]",
     "Skip.Download": "[TestPath(variable('Module.OriginalFileName'))]",
-    "Skip.Convert": "[or(not(equal(SelectObject(ExpandProperty:'convert',InputObject:variable('Module.Configuration')),'True')),not(variable('Module.IsScwdp')))]",
+    "Check.Convert":"[SelectObject(ExpandProperty:'convert',InputObject:variable('Module.Configuration'))]",
+    "Skip.Convert": "[or(not(variable('Check.Convert')),variable('Module.IsScwdp'))]",
     "Skip.Master": "[not(equal(variable('Module.Database'), 'master'))]",
     "Skip.MasterCore": "[not(equal(variable('Module.Database'), 'mastercore'))]",
     "Skip.Core": "[not(equal(variable('Module.Database'), 'core'))]",
@@ -61,7 +62,8 @@
   },
   "Register":{
     "Tasks":{
-      "InstallSitecoreModule":"Install-SitecoreConfiguration"
+      "InstallSitecoreModule":"Install-SitecoreConfiguration",
+      "ConvertToWDP":"ConvertTo-SCModuleWebDeployPackage"
     }
   },
   "Settings": {
@@ -98,7 +100,7 @@
         "Destination": "[variable('Module.DestinationPath')]",
         "Force": true
       },
-      "Skip": "[equal(variable('Skip.Convert'),'True')]"
+      "Skip": "[variable('Skip.Convert')]"
     },
     "InstallModule": {
       "Type": "InstallSitecoreModule",
