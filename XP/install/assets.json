@@ -24,7 +24,7 @@
             "name": "Sitecore PowerShell Extensions",
             "fileName": "Sitecore PowerShell Extensions-5.0.scwdp.zip",
             "url": "https://dev.sitecore.net/~/media/2C02EB17879548139937A41E5DA0EFCF.ashx",
-            "install": true,
+            "install": false,
             "convert": false,
             "source": "sitecore",
             "databases": "master,core"
@@ -34,7 +34,7 @@
             "name": "Sitecore Experience Accelerator",
             "fileName": "Sitecore Experience Accelerator 1.8.1 rev. 190319 for 9.1.1.scwdp.zip",
             "url": "https://dev.sitecore.net/~/media/3B83F33FE0B848C6AF9F3B58E4408A96.ashx",
-            "install": true,
+            "install": false,
             "convert": false,
             "source": "sitecore",
             "databases": "master,core"
@@ -164,7 +164,7 @@
             "name": "JavaScript Services",
             "fileName": "Sitecore JavaScript Services Server for Sitecore 9.1.1 XP 11.0.1 rev. 190318.scwdp.zip",
             "url": "https://dev.sitecore.net/~/media/127032434274439DB84F8C47FCC90936.ashx",
-            "install": false,
+            "install": true,
             "convert": false,
             "source": "sitecore",
             "databases": "master,core"
