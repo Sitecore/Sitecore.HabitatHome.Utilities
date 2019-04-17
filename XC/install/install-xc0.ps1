@@ -131,7 +131,7 @@ function Install-CommerceAssets {
         New-Item -ItemType Directory -Path $commerceAssetFolder
     }
     
-    $habitatHomeImagePackageUrl = "https://sitecore.box.com/shared/static/bjvge68eqge87su5vg258366rve6bg5d.zip"
+    $habitatHomeImagePackageUrl = "https://sitecore.box.com/shared/static/acv0qhew42m2653qtg2s7qlxlrmqjfpe.zip"
     $habitatHomeImagePackageFileName = "Habitat Home Product Images.zip"
     $habitatHomeImagePackageDestination = (Join-Path $CommerceAssetFolder $habitatHomeImagePackageFileName)
 
