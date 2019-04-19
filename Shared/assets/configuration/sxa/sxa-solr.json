@@ -179,7 +179,7 @@
       "Type": "SitecoreUrl",
       "Params": {
         "SitecoreInstanceRoot": "[concat('https://', parameter('SiteName'))]",
-        "SitecoreActionPath": "[concat('sitecore/admin/PopulateManagedSchema.aspx?indexes=',variable('SXA.Master.Name'),'|',variable('SXA.Web.Name'))]",
+        "SitecoreActionPath": "[concat('sitecore/admin/PopulateManagedSchema.aspx?indexes=',variable('sitecore_sxa_master_index'),'|',variable('sitecore_sxa_web_index'))]",
         "UserName": "admin",
         "Password": "[parameter('SitecoreAdminPassword')]"
       }
