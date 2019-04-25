@@ -1,9 +1,9 @@
 # Credit primarily to jermdavis for the original script
 
 Param(
-    [string]$solrVersion = "7.2.1",
+    [string]$solrVersion = "7.5.0",
     [string]$installFolder = "c:\solr",
-    [string]$solrPort = "8721",
+    [string]$solrPort = "8750",
     [string]$solrHost = "localhost",
     [bool]$solrSSL = $TRUE,
     [string]$nssmVersion = "2.24",
