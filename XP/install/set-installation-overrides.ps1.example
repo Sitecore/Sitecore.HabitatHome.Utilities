@@ -14,7 +14,7 @@ $json = Get-Content -Raw $configurationFile |  ConvertFrom-Json
 
 # Assets and prerequisites
 $assets = $json.assets
-$assets.licenseFilePath = Join-Path $assets.packageRepository "license.xml"
+$assets.licenseFilePath = Join-Path $assets.root "license.xml"
 
 # Settings
 
@@ -51,9 +51,9 @@ $sitecore.telerikEncryptionKey = "PutYourCustomEncryptionKeyHereFrom32To256Chara
 
 # Solr Parameters
 $solr = $json.settings.solr
-$solr.url = "https://localhost:8750/solr"
-$solr.root = "c:\solr\solr-7.5.0"
-$solr.serviceName = "Solr-7.5.0"
+$solr.url = "https://localhost:8721/solr"
+$solr.root = "c:\solr\solr-7.2.1"
+$solr.serviceName = "Solr-7.2.1"
 
 # SQL Settings
 $sql = $json.settings.sql
@@ -98,7 +98,7 @@ $xConnect.siteRoot = Join-Path $site.webRoot -ChildPath $xConnect.siteName
 
 # IdentityServer Parameters
 $identityServer = $json.settings.identityServer
-$identityServer.packagePath = Join-Path $assets.packageRepository $("Sitecore.IdentityServer " + $assets.identityServerVersion + " (OnPrem)_identityserver.scwdp.zip")
+$identityServer.packagePath = Join-Path $assets.root $("Sitecore.IdentityServer " + $assets.identityServerVersion + " (OnPrem)_identityserver.scwdp.zip")
 $identityServer.name = $site.prefix + "-identityserver." + $site.suffix
 $identityServer.url = ("https://{0}" -f $identityServer.name)
 $identityServer.clientSecret = "ClientSecret"
@@ -147,7 +147,7 @@ Function Replace-Path {
         $module,
         $root
     )
-    $module.fileName = (Join-Path $root ("\modules\{0}" -f $module.fileName))    
+    $module.fileName = (Join-Path $root ("\packages\{0}" -f $module.fileName))    
 }
 
 $modulesConfig = Get-Content -Raw .\assets.json -Encoding Ascii |  ConvertFrom-Json
@@ -159,7 +159,7 @@ $sitecore = $modulesConfig.sitecore
 $config = @{
     id       = $sitecore.id
     name     = $sitecore.name
-    fileName = Join-Path $assets.packageRepository ("\{0}" -f $sitecore.fileName) 
+    fileName = Join-Path $assets.root ("\{0}" -f $sitecore.fileName) 
     url      = $sitecore.url
     extract  = $sitecore.extract
     source   = $sitecore.source
@@ -169,7 +169,7 @@ $config = $config| ConvertTo-Json
 $modules += (ConvertFrom-Json -InputObject $config) 
 
 foreach ($module in $modulesConfig.modules) {
-    Replace-Path $module $assets.packageRepository
+    Replace-Path $module $assets.root
 }
 $modules += $modulesConfig.modules
 
@@ -181,7 +181,7 @@ $habitatHomeurls = Get-HabitathomeAssetUrls $habitatHome
 ($habitathome.modules | Where-Object {$_.id -eq "habitathome_xConnect"}).url = $habitatHomeurls.habitatHomexConnectPackageUrl
 
 foreach ($entry in $habitatHome.modules) {
-    Replace-Path $entry $assets.packageRepository
+    Replace-Path $entry $assets.root 
 }
 
 $modules += $modulesConfig.habitatHome
