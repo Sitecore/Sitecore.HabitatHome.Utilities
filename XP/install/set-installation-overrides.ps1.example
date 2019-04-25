@@ -181,7 +181,7 @@ $habitatHomeurls = Get-HabitathomeAssetUrls $habitatHome
 ($habitathome.modules | Where-Object {$_.id -eq "habitathome_xConnect"}).url = $habitatHomeurls.habitatHomexConnectPackageUrl
 
 foreach ($entry in $habitatHome.modules) {
-    Replace-Path $entry $assets.root 
+    Replace-Path $entry $assets.packageRepository 
 }
 
 $modules += $modulesConfig.habitatHome
