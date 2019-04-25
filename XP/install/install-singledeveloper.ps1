@@ -102,7 +102,7 @@ Function Download-Assets {
 
     $downloadAssets = $modules
     $downloadFolder = $assets.packageRepository
-    $packagesFolder = (Join-Path $downloadFolder "packages")
+    $packagesFolder = (Join-Path $downloadFolder "modules")
     
    
     # Download Sitecore
