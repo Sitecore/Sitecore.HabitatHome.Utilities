@@ -66,13 +66,29 @@
     "SXA.Solr.Config": "[ReadJson(variable('SXA.Solr.ConfigPath'))]"
   },
   "Tasks": {
-    "StopSolr": {
-      "Type": "ManageService",
-      "Params": {
-        "Name": "[parameter('SolrService')]",
-        "Status": "Stopped",
-        "PostDelay": 1000
-      }
+    "RemoveCores": {
+      "Description": "Removes the cores and instance folders.",
+      "Type": "ManageSolrCore",
+      "Params": [
+        {
+          "Action": "Unload",
+          "Address": "[parameter('SolrUrl')]",
+          "Arguments": {
+            "core": "[variable('SXA.Master.Name')]",
+            "deleteInstanceDir": "true"
+          },
+          "ErrorAction": "SilentlyContinue"
+        },
+        {
+          "Action": "Unload",
+          "Address": "[parameter('SolrUrl')]",
+          "Arguments": {
+            "core": "[variable('SXA.Web.Name')]",
+            "deleteInstanceDir": "true"
+          },
+          "ErrorAction": "SilentlyContinue"
+        }
+      ]
     },
     "CleanCores": {
       "Type": "EnsurePath",
@@ -127,14 +143,6 @@
           "Value": "[variable('Solr.UniqueField')]"
         }
       ]
-    },
-    "StartSolr": {
-      "Type": "ManageService",
-      "Params": {
-        "Name": "[parameter('SolrService')]",
-        "Status": "Running",
-        "PostDelay": 8000
-      }
     },
     "CreateCores": {
       "Type": "ManageSolrCore",
