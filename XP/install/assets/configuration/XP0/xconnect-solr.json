@@ -36,14 +36,14 @@
         "Rebuild.Root":     "[joinpath(variable('Solr.Server'), variable('Xdb.Rebuild.Name'))]"
     },
     "Tasks": {
-        "StopSolr": {
-            "Description" : "Stops the Solr service if it is running.",
-            "Type": "ManageService",
-            "Params": {
-                "Name": "[parameter('SolrService')]",
-                "Status": "Stopped",
-                "PostDelay": 1000
-            }
+        "UnloadCores": {
+			"Description" : "Unloads existing Cores (if exists)",
+            "Type": "ManageSolrCore",
+            "Params": [
+                { "Action": "Unload", "Address": "[parameter('SolrUrl')]", "Arguments": { "core": "[variable('Xdb.Name')]", "deleteInstanceDir": "true" }, "ErrorAction": "SilentlyContinue" },
+                { "Action": "Unload", "Address": "[parameter('SolrUrl')]", "Arguments": { "core": "[variable('Xdb.Rebuild.Name')]", "deleteInstanceDir": "true" }, "ErrorAction": "SilentlyContinue" }
+         ]
+            
         },
         "CleanCores": {
             "Description" : "Creates/clears core paths.",
@@ -63,15 +63,6 @@
                 { "Source": "[joinpath(variable('Solr.BaseConfigs'), '*')]", "Destination": "[variable('Rebuild.Root')]" }
             ]
         },
-        "StartSolr": {
-            "Description" : "Starts the Solr service.",
-            "Type": "ManageService",
-            "Params": {
-                "Name": "[parameter('SolrService')]",
-                "Status": "Running",
-                "PostDelay": 8000
-            }
-        },
         "CreateCores":{
             "Description" : "Tells Solr to create the new cores.",
             "Type": "ManageSolrCore",
@@ -86,8 +77,8 @@
             "Description": "Removes the cores and instance folders.",
             "Type": "ManageSolrCore",
             "Params": [
-                { "Action": "Unload", "Address": "[parameter('SolrUrl')]", "Arguments": { "core": "[variable('Xdb.Name')]", "deleteInstanceDir": "true" }, "ErrorAction": "SilentlyContinue" },
-                { "Action": "Unload", "Address": "[parameter('SolrUrl')]", "Arguments": { "core": "[variable('Xdb.Rebuild.Name')]", "deleteInstanceDir": "true" }, "ErrorAction": "SilentlyContinue" }
+                { "Action": "unload", "Address": "[parameter('SolrUrl')]", "Arguments": { "core": "[variable('Xdb.Name')]", "deleteInstanceDir": "true" }, "ErrorAction": "SilentlyContinue" },
+                { "Action": "unload", "Address": "[parameter('SolrUrl')]", "Arguments": { "core": "[variable('Xdb.Rebuild.Name')]", "deleteInstanceDir": "true" }, "ErrorAction": "SilentlyContinue" }
             ]
         }
     }
