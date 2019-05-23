@@ -2,7 +2,7 @@ Param(
     [string] $ConfigurationFile = "configuration-xp0.json",
     [string] $assetsRoot,
     [string] $packageRepository,
-    [string] $sitecoreVersion = "9.2.0 rev. 002755"
+    [string] $sitecoreVersion = "9.2.0 rev. 002893"
 )
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
@@ -38,7 +38,7 @@ $assets.sitecoreazuretoolkit = Join-Path $assets.sharedUtilitiesRoot "sat"
 $assets.licenseFilePath = Join-Path $assets.packageRepository "license.xml"
 
 
-$assets.identityServerVersion = "3.0.0 rev. 00210.4"
+$assets.identityServerVersion = "3.0.0 rev. 00211"
 
 
 $assets.certificatesPath = Join-Path $assets.sharedUtilitiesRoot "Certificates"
@@ -127,7 +127,7 @@ $identityServer.clientSecret = "ClientSecret"
 Write-Host "Setting default 'Solr' parameters"
 # Solr Parameters
 $solr = $json.settings.solr
-$solr.url = "https://localhost:8721/solr"
+$solr.url = "https://localhost:8750/solr"
 $solr.root = "c:\solr"
 $solr.serviceName = "Solr"
 
