@@ -31,55 +31,33 @@
     }
   },
   "Variables": {
-    // Variables are values calculated in a configuration.
-    // They can reference Parameters, other Variables, and config functions.
-
-    // Resolves the full path to Solr on disk in case a relative path was passed.
     "Solr.FullRoot": "[resolvepath(parameter('SolrRoot'))]",
-
-    // Resolves the full solr folder path on disk.
     "Solr.Server": "[joinpath(variable('Solr.FullRoot'), 'server', 'solr')]",
-
-    // Resolves the full path for the base configset to use for each core.
     "Solr.BaseConfigs": "[joinpath(variable('Solr.Server'), 'configsets', parameter('BaseConfig'))]",
-
-    // Resolves the full path for the schemas to use for each core.
     "Solr.CustomersSchema": "[concat(parameter('SolrSchemas'), '\\Customers')]",
     "Solr.OrdersSchema": "[concat(parameter('SolrSchemas'), '\\Orders')]",
     "Solr.CatalogItemsSchema": "[concat(parameter('SolrSchemas'), '\\CatalogItems')]",
-
-    // The names of the cores to create.
     "Customers.Name": "[concat(parameter('CorePrefix'), 'CustomersScope')]",
     "Orders.Name": "[concat(parameter('CorePrefix'), 'OrdersScope')]",
     "CatalogItems.Name": "[concat(parameter('CorePrefix'), 'CatalogItemsScope')]",
-
-    // The destination paths of the cores to create.
     "Customers.Root": "[joinpath(variable('Solr.Server'), variable('Customers.Name'))]",
     "Orders.Root": "[joinpath(variable('Solr.Server'), variable('Orders.Name'))]",
     "CatalogItems.Root": "[joinpath(variable('Solr.Server'), variable('CatalogItems.Name'))]",
-
-    // The destination paths for the base configurations of each core.
     "Customers.Conf": "[joinpath(variable('Customers.Root'), 'conf')]",
     "Orders.Conf": "[joinpath(variable('Orders.Root'), 'conf')]",
     "CatalogItems.Conf": "[joinpath(variable('CatalogItems.Root'), 'conf')]"
   },
   "Tasks": {
-    // Tasks are separate units of work in a configuration.
-    // Each task is an action that will be completed when Install-SitecoreConfiguration is called.
-    // By default, tasks are applied in the order they are declared.
-    // Tasks may reference Parameters, Variables, and config functions.
-
-    "StopSolr": {
-      // Stops the Solr service if it is running.
-      "Type": "ManageService",
-      "Params": {
-        "Name": "[parameter('SolrService')]",
-        "Status": "Stopped",
-        "PostDelay": 1000
-      }
-    },
+    "UnloadCores": {
+			"Description" : "Unloads existing Cores (if exists)",
+            "Type": "ManageSolrCore",
+            "Params": [
+                { "Action": "Unload", "Address": "[parameter('SolrUrl')]", "Arguments": { "core": "[variable('Customers.Name')]", "deleteInstanceDir": "true" }, "ErrorAction": "SilentlyContinue" },
+                { "Action": "Unload", "Address": "[parameter('SolrUrl')]", "Arguments": { "core": "[variable('Orders.Name')]", "deleteInstanceDir": "true" }, "ErrorAction": "SilentlyContinue" },
+                { "Action": "Unload", "Address": "[parameter('SolrUrl')]", "Arguments": { "core": "[variable('CatalogItems.Name')]", "deleteInstanceDir": "true" }, "ErrorAction": "SilentlyContinue" }
+            ]
+        },
     "CleanCores": {
-      // Creates/clears core paths.
       "Type": "EnsurePath",
       "Params": {
         "Clean": [
@@ -90,7 +68,6 @@
       }
     },
     "PrepareCores": {
-      // Copies base configs into the core paths.
       "Type": "Copy",
       "Params": [
         { "Source": "[joinpath(variable('Solr.BaseConfigs'), '*')]", "Destination": "[variable('Customers.Root')]" },
@@ -106,17 +83,7 @@
         { "Source": "[joinpath(variable('Solr.CatalogItemsSchema'), '*')]", "Destination": "[variable('CatalogItems.Conf')]" }
       ]
     },
-    "StartSolr": {
-      // Starts the Solr service.
-      "Type": "ManageService",
-      "Params": {
-        "Name": "[parameter('SolrService')]",
-        "Status": "Running",
-        "PostDelay": 8000
-      }
-    },
     "CreateCores": {
-      // Tells Solr to create the new cores.
       "Type": "ManageSolrCore",
       "Params": [
         {
