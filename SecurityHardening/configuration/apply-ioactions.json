@@ -1,0 +1,26 @@
+{
+    "Parameters": {
+        "SiteRoot": {
+            "Type": "string",
+            "DefaultValue": "",
+            "Description": "Phyiscal Root of Sitecore Site"
+        },
+        "IoActionPath": {
+            "Type": "string",
+            "DefaultValue": "",
+            "Description": "Path to IOAction.xml file"
+        }
+    },
+    "Variables":{
+        "Site.Root":"[parameter('SiteRoot')]"
+    },
+    "Tasks": {
+        "ApplyIOActions": {
+            "Type": "BlockFilesUsingIOActions",
+            "Params": {
+                "RootDirectoryPath": "[variable('Site.Root')]",
+                "IoXmlPath": "[parameter('IOActionPath')]"
+            }
+        }
+    }
+}
