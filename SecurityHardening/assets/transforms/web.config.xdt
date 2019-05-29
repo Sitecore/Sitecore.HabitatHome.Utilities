@@ -1,0 +1,41 @@
+<configuration  xmlns:xdt="http://schemas.microsoft.com/XML-Document-Transform">
+
+    <system.webServer>
+		<modules runAllManagedModulesForAllRequests="true">
+		  <!-- Secure the file upload functionality - https://doc.sitecore.com/developers/91/platform-administration-and-architecture/en/secure-the-file-upload-functionality.html -->
+		  <add xdt:Transform="Remove" xdt:Locator="Match(name)" type="Sitecore.Resources.Media.UploadWatcher, Sitecore.Kernel" name="SitecoreUploadWatcher" />
+		</modules>
+		
+		<handlers>
+			<!-- Disable client RSS feeds - https://doc.sitecore.com/developers/91/platform-administration-and-architecture/en/disable-client-rss-feeds.html -->
+			<add xdt:Transform="Remove" verb="*" xdt:Locator="Match(name)" path="sitecore_feed.ashx" type="Sitecore.Shell.Feeds.FeedRequestHandler, Sitecore.Kernel" name="Sitecore.FeedRequestHandler"/>
+			
+			<!-- Limit access to .XML, .XSLT, and .MRT files https://doc.sitecore.com/developers/91/platform-administration-and-architecture/en/security-tasks.html-->
+			<add xdt:Transform="InsertIfMissing" xdt:Locator="Match(name)" path="*.xml" verb="*" type="System.Web.HttpForbiddenHandler" name="xml (integrated)" preCondition="integratedMode"/>
+			<add xdt:Transform="InsertIfMissing" xdt:Locator="Match(name)" path="*.xslt" verb="*" type="System.Web.HttpForbiddenHandler" name="xslt (integrated)" preCondition="integratedMode"/>
+			<add xdt:Transform="InsertIfMissing" xdt:Locator="Match(name)" path="*.config.xml" verb="*" type="System.Web.HttpForbiddenHandler" name="config.xml (integrated)" preCondition="integratedMode"/>
+			<add xdt:Transform="InsertIfMissing" xdt:Locator="Match(name)" path="*.mrt" verb="*" type="System.Web.HttpForbiddenHandler" name="mrt (integrated)" preCondition="integratedMode"/>
+		</handlers>
+		
+		<!-- Enforce HTTPS webpages -->
+        <rewrite xdt:Transform="InsertIfMissing" >
+            <rules xdt:Transform="InsertIfMissing" >
+                <rule name="HTTP/S to HTTPS Redirect" enabled="true" stopProcessing="true" xdt:Transform="InsertIfMissing" xdt:Locator="Match(name)">
+                    <match url="(.*)" />
+                    <conditions logicalGrouping="MatchAll">
+                        <add input="{SERVER_PORT_SECURE}" pattern="^0$" />
+                    </conditions>
+                    <action type="Redirect" url="https://{HTTP_HOST}{REQUEST_URI}" redirectType="Permanent"  appendQueryString="true" />
+                </rule>
+            </rules>
+        </rewrite>
+    </system.webServer>
+	
+	<system.web>
+		<!-- Change the hash algorithm for password encryption - https://doc.sitecore.com/developers/91/platform-administration-and-architecture/en/change-the-hash-algorithm-for-password-encryption.html -->
+		<membership xdt:Transform="SetAttributes" xdt:Locator="Match(defaultProvider)" defaultProvider="sitecore" hashAlgorithmType="SHA512" />
+		<!-- Enable HTTPS for core roles - https://doc.sitecore.com/developers/91/platform-administration-and-architecture/en/enable-https-for-core-roles.html -->
+		<httpCookies xdt:Transform="InsertIfMissing" httpOnlyCookies="true" requireSSL="true" lockItem="true" />
+	</system.web>
+	
+</configuration>
