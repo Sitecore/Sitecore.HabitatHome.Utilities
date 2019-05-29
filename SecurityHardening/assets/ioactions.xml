@@ -1,0 +1,45 @@
+<IOActions>
+    <IOAction path="/sitecore/admin/Cache.aspx" action="disable" />
+    <IOAction path="/sitecore/admin/ConvertContactListSources.aspx" action="disable" />
+    <IOAction path="/sitecore/admin/Default.aspx" action="disable" />
+    <IOAction path="/sitecore/admin/DispatchSummary.aspx" action="disable" />
+    <IOAction path="/sitecore/admin/DBCleanup.aspx" action="disable" />
+    <IOAction path="/sitecore/admin/Dbbrowser.aspx" action="disable" />
+    <IOAction path="/sitecore/admin/eventqueuestats.aspx" action="disable" />
+    <IOAction path="/sitecore/admin/FillDB.aspx" action="disable" />
+    <IOAction path="/sitecore/admin/index.html" action="disable" />
+    <IOAction path="/sitecore/admin/InstallLanguage.aspx" action="disable" />
+    <IOAction path="/sitecore/admin/Jobs.aspx" action="disable" />
+    <IOAction path="/sitecore/admin/LinqScratchPad.aspx" action="disable" />
+    <IOAction path="/sitecore/admin/Login.aspx" action="disable" />
+    <IOAction path="/sitecore/admin/Logs.aspx" action="disable" />
+    <IOAction path="/sitecore/admin/MediaHash.aspx" action="disable" />
+    <IOAction path="/sitecore/admin/MessageStatistics.aspx" action="disable" />
+    <IOAction path="/sitecore/admin/NonSecurePageDisabled.aspx" action="disable" />
+    <IOAction path="/sitecore/admin/PackageItem.aspx" action="disable" />
+    <IOAction path="/sitecore/admin/PathAnalyzer.aspx" action="disable" />
+    <IOAction path="/sitecore/admin/Pipelines.aspx" action="disable" />
+    <IOAction path="/sitecore/admin/PopulateManagedSchema.aspx" action="disable" />
+    <IOAction path="/sitecore/admin/PublishQueueStats.aspx" action="disable" />
+    <IOAction path="/sitecore/admin/RawSearch.aspx" action="disable" />
+    <IOAction path="/sitecore/admin/RebuildKeyBehaviorCache.aspx" action="disable" />
+    <IOAction path="/sitecore/admin/RebuildReportingDB.aspx" action="disable" />
+    <IOAction path="/sitecore/admin/RedeployMarketingData.aspx" action="disable" />
+    <IOAction path="/sitecore/admin/RemoveBrokenLinks.aspx" action="disable" />
+    <IOAction path="/sitecore/admin/restore.aspx" action="disable" />
+    <IOAction path="/sitecore/admin/SecurityTools.aspx" action="disable" />
+    <IOAction path="/sitecore/admin/serialization.aspx" action="disable" />
+    <IOAction path="/sitecore/admin/SessionSummary.aspx" action="disable" />
+    <IOAction path="/sitecore/admin/SetSACEndpoint.aspx" action="disable" />
+    <IOAction path="/sitecore/admin/ShowConfig.aspx" action="disable" />
+    <IOAction path="/sitecore/admin/ShowConfigLayers.aspx" action="disable" />
+    <IOAction path="/sitecore/admin/ShowServicesConfig.aspx" action="disable" />
+    <IOAction path="/sitecore/admin/SqlShell.aspx" action="disable" />
+    <IOAction path="/sitecore/admin/stats.aspx" action="disable" />
+    <IOAction path="/sitecore/admin/unlock_admin.aspx" action="disable" />
+    <IOAction path="/sitecore/admin/UpdateInstallationWizard.aspx" action="disable" />
+    <IOAction path="/sitecore/admin/UserInfo.aspx" action="disable" />
+    <IOAction path="sitecore/admin/Wizard/InstallPackage.aspx" action="disable" />
+    <IOAction path="sitecore/admin/Wizard/InstallUpdatePackage.aspx" action="disable" />
+</IOActions>
+
