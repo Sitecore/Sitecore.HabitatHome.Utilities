@@ -1,0 +1,23 @@
+{
+    "Parameters": {
+        "SiteName": {
+            "Type": "string",
+            "DefaultValue": "",
+            "Description": "Name of IIS Site"
+        },
+        "Folders": {
+            "Type": "string[]",
+            "DefaultValue": "",
+            "Description": "List of folders to deny anonymous access to"
+        }
+    },
+    "Tasks": {
+        "DisableAnonymousAccessToFolders": {
+            "Type": "DisableAnonymousAccess",
+            "Params": {
+                "SiteName": "[parameter('SiteName')]",
+                "Folders": "[parameter('Folders')]"
+            }
+        }
+    }
+}
