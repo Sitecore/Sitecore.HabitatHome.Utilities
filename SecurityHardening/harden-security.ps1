@@ -10,13 +10,8 @@ $assetsPath = Resolve-Path .\assets
 
 $sharedModulesPath = Resolve-Path ..\Shared\assets\modules
 
-if ($env:PSModulePath -notlike "*$sharedModulesPath*") {
-    $p = $env:PSModulePath + ";" + $sharedModulesPath
-    [Environment]::SetEnvironmentVariable("PSModulePath", $p)
-}
-
 Import-Module SitecoreInstallFramework -RequiredVersion 2.1.0
-Import-Module SecurityHardening -Force -Verbose
+Import-Module (Join-Path $sharedModulesPath 'SecurityHardening') -Force -Verbose
 
 # Folders that will have the "Anonymous Authentication" feature disabled in IIS
 # ref: https://doc.sitecore.com/developers/90/platform-administration-and-architecture/en/deny-anonymous-users-access-to-a-folder.html
