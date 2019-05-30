@@ -1,0 +1,58 @@
+{
+    "Parameters": {
+        "WebRoot": {
+            "Type": "String",
+            "DefaultValue": ""
+        },
+        "SiteName": {
+            "Type": "String",
+            "Reference": "SiteName"
+        },
+        "UploadFilterPackageUri": {
+            "Type": "String",
+            "Reference": "UploadFilterPackageUri"
+        },
+        "WorkingFolder": {
+            "Type": "String",
+            "Reference": "WorkingFolder"
+        },
+        "UploadFilterPackageFileName": {
+            "Type": "String",
+            "Reference": "UploadFilterPackageFileName"
+        }
+    },
+    "Variables": {
+        "Package.Destination": "[JoinPath(parameter('WorkingFolder'),parameter('UploadFilterPackageFileName'))]",
+        "Site.PhysicalPath": "[JoinPath(parameter('WebRoot'),parameter('SiteName'))]"
+    },
+    "Tasks": {
+        "DownloadPackage": {
+            "Type": "DownloadFile",
+            "Params": {
+                "Source": "[parameter('UploadFilterPackageUri')]",
+                "Destination": "[variable('Package.Destination')]"
+            }
+        },
+        "ExtractPackage": {
+            "Type": "Unpack",
+            "Params": {
+                "Source": "[variable('Package.Destination')]",
+                "Destination": "[parameter('WorkingFolder')]"
+            }
+        },
+        "UnzipFiles": {
+            "Type": "Unpack",
+            "Params": {
+                "Source": "[JoinPath(parameter('WorkingFolder'),'package.zip')]",
+                "Destination": "[parameter('WorkingFolder')]"
+            }
+        },
+        "CopyFilesToWebRoot": {
+            "Type": "Copy",
+            "Params": {
+                "Source": "[JoinPath(parameter('WorkingFolder'),'files\\*')]",
+                "Destination": "[variable('Site.PhysicalPath')]"
+            }
+        }
+    }
+}
