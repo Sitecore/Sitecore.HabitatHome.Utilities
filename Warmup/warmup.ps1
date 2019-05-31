@@ -1,6 +1,6 @@
 param(
     $instance = "habitathome.dev.local",
-    $identityServerUrl = "https://identityserver.habitathome.dev.local",
+    #$identityServerUrl = "https://identityserver.habitathome.dev.local",
     [ValidateSet('xp', 'xc', 'sitecore')]
     $demoType,
     $adminUser = "admin",
@@ -14,73 +14,115 @@ if ($instance -eq "") {
 else {
     $instanceName = $instance    
 }
-Write-Host $instanceName
 
-function Convert-FromBase64StringWithNoPadding([string]$data) {
-    $data = $data.Replace('-', '+').Replace('_', '/')
-    switch ($data.Length % 4) {
-        0 { break }
-        2 { $data += '==' }
-        3 { $data += '=' }
-        default { throw New-Object ArgumentException('data') }
+function TestStatusCode {
+    param($response)
+
+    if ($response.StatusCode -ne 200) {
+        throw "The request returned a non-200 status code [$($response.StatusCode)]"
     }
-    return [System.Convert]::FromBase64String($data)
 }
-Function Get-SitecoreToken {
+
+function TestCookie {
+    param([System.Net.CookieContainer]$cookies)
+
+    $discovered = @($cookies.GetCookies($site) |
+        Where-Object { $_.Name -eq '.ASPXAUTH' -Or $_.Name -eq '.AspNet.Cookies' })
+
+    if ($discovered.Count -ne 1) {
+        throw "Authentication failed. Check username and password"
+    }
+}
+Function Get-SitecoreSession {
     param(
         [Parameter(Mandatory = $true, Position = 0)]
-        [string]$identityserverUrl,
+        [string]$site,
         [Parameter(Mandatory = $true, Position = 1)]
         [string]$username,
         [Parameter(Mandatory = $true, Position = 2)]
         [string]$password
     )
-    $tokenendpointurl = $identityserverUrl + "/connect/token"
-    $granttype = "password" # client_credentials / password 
-    $client_id = "postman-api"
-    $client_secret = "ClientSecret"
-    $scope = "openid sitecore.profile sitecore.profile.api offline_access"
-    
-    $body = @{
-        grant_type    = $granttype
-        scope         = $scope
-        client_id     = $client_id
-        client_secret = $client_secret    
-        username      = $username
-        password      = $password
-    }
-    $headers = New-Object "System.Collections.Generic.Dictionary[[String],[String]]"
-    $headers.Add("Content-Type", 'application/x-www-form-urlencoded')
-    $headers.Add("Accept", 'application/json')
 
-    $resp = Invoke-RestMethod -Method Post -Body $body -Headers $headers -Uri $tokenendpointurl 
+    Write-Host "Logging into Sitecore" -ForegroundColor Green
+    $uri = "$site/sitecore/login?fbc=1"
+    $authResponse = Invoke-WebRequest -uri $uri -SessionVariable session -UseBasicParsing
+    TestStatusCode $authResponse
 
-    Write-Host "`***** SUCCESSFULLY FETCHED TOKEN ***** `n" -foreground Green
+    # Set login info
+    $fields = @{ }
+    $authResponse.InputFields.ForEach( {
+        
+            $fields[$_.Name] = $_.Value
+        
+        })
 
-    Write-Host "`ACCESS TOKEN: `n" -foreground Yellow
-    $access_token = $resp.access_token #| Format-Table -Wrap | Out-String
-    Write-Host $access_token -foreground White
-    Write-Host   
-    return $access_token
-    
+    $fields.UserName = $Username
+    $fields.Password = $Password
+
+    # Login using the same session
+    $authResponse = Invoke-WebRequest -uri $uri -WebSession $session -Method POST -Body $fields -UseBasicParsing
+    TestStatusCode $authResponse
+    TestCookie $session.Cookies
+
+    return $session
 }
+# Function Get-SitecoreToken {
+#     param(
+#         [Parameter(Mandatory = $true, Position = 0)]
+#         [string]$identityserverUrl,
+#         [Parameter(Mandatory = $true, Position = 1)]
+#         [string]$username,
+#         [Parameter(Mandatory = $true, Position = 2)]
+#         [string]$password
+#     )
+#     $tokenendpointurl = $identityserverUrl + "/connect/token"
+#     $granttype = "password" # client_credentials / password 
+#     $client_id = "warmup-client"
+#     $client_secret = "ClientSecret"
+#     $scope = "openid sitecore.profile sitecore.profile.api offline_access"
+    
+#     $body = @{
+#         grant_type    = $granttype
+#         scope         = $scope
+#         client_id     = $client_id
+#         client_secret = $client_secret    
+#         username      = $username
+#         password      = $password
+#     }
+#     $headers = New-Object "System.Collections.Generic.Dictionary[[String],[String]]"
+#     $headers.Add("Content-Type", 'application/x-www-form-urlencoded')
+#     $headers.Add("Accept", 'application/json')
+
+#     $resp = Invoke-RestMethod -Method Post -Body $body -Headers $headers -Uri $tokenendpointurl 
+
+#     Write-Host "`***** SUCCESSFULLY FETCHED TOKEN ***** `n" -foreground Green
+
+#     Write-Host "`ACCESS TOKEN: `n" -foreground Yellow
+#     $access_token = $resp.access_token #| Format-Table -Wrap | Out-String
+#     Write-Host $access_token -foreground White
+#     Write-Host   
+#     return $access_token
+    
+# }
 
 Function RequestPage {
     param(
         [Parameter(Mandatory = $true, Position = 0)]
         [string]$url,
         [Parameter(Mandatory = $true, Position = 1)]
-        [string]$access_token
+        [Microsoft.PowerShell.Commands.WebRequestSession]$session
     )
     Write-Host $(Get-Date -Format HH:mm:ss.fff)
     Write-Host "requesting $url ..."
 
-    $headers = New-Object "System.Collections.Generic.Dictionary[[String],[String]]"
-    $headers.Add("Authorization", ("Bearer {0}" -f $access_token))
+    # $headers = New-Object "System.Collections.Generic.Dictionary[[String],[String]]"
+    # $headers.Add("Authorization", ("Bearer {0}" -f $access_token))
 
     try { 
         
-        $response = Invoke-WebRequest -method Get $url -Headers $headers -TimeoutSec 60000 
+#        $response = Invoke-WebRequest -method Get $url -Headers $headers -TimeoutSec 60000 
+        $response = Invoke-WebRequest $url -WebSession $session -TimeoutSec 60000 -UseBasicParsing
+
         if ($response.StatusCode -eq "200" ) {
             Write-Host "Success" 
             return $true
@@ -100,7 +142,9 @@ Function RequestPage {
 }
 
 $demoType = $demoType.ToLower()
-$session = Get-SitecoreToken $identityServerUrl ("sitecore\{0}" -f $adminUser) $adminPassword
+#$session = Get-SitecoreToken $identityServerUrl ("sitecore\{0}" -f $adminUser) $adminPassword
+$session = Get-SitecoreSession "https://$instanceName" ("sitecore\{0}" -f $adminUser) $adminPassword
+
 $errors = 0
 
 Write-Host "Warming up Sitecore" -ForegroundColor Green
