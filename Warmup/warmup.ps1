@@ -80,9 +80,11 @@ Function RequestPage {
 
     try { 
         
-        $content = Invoke-WebRequest $url -Headers $headers -TimeoutSec 60000 | select -Expand Content
-        Write-Host "Done" 
-        return $true
+        $response = Invoke-WebRequest -method Get $url -Headers $headers -TimeoutSec 60000 
+        if ($response.StatusCode -eq "200" ) {
+            Write-Host "Success" 
+            return $true
+        }
     } 
     catch {
         $status = $_.Exception.Response.StatusCode.Value__
@@ -102,6 +104,7 @@ $session = Get-SitecoreToken $identityServerUrl ("sitecore\{0}" -f $adminUser) $
 $errors = 0
 
 Write-Host "Warming up Sitecore" -ForegroundColor Green
+
 foreach ($page in $config.urls.sitecore) {
     if (!$(RequestPage "https://$instanceName$($page.url)" $session)) {
         $errors++
