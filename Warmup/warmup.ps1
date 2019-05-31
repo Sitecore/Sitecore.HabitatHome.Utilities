@@ -1,9 +1,10 @@
 param(
-    [string]$instance,
-    [ValidateSet('sitecore', 'xp', 'xc')]
-    [string]$demoType,
-    [string]$adminUser = 'admin',
-    [string]$adminPassword = 'b'
+    $instance = "habitathome.dev.local",
+    $identityServerUrl = "https://identityserver.habitathome.dev.local",
+    [ValidateSet('xp', 'xc', 'sitecore')]
+    $demoType,
+    $adminUser = "admin",
+    $adminPassword = "b"
 )
 
 $config = Get-Content -Raw -Path "$PSSCriptRoot\warmup-config.json" | ConvertFrom-Json
@@ -15,55 +16,53 @@ else {
 }
 Write-Host $instanceName
 
-function TestStatusCode {
-    param($response)
-
-    if ($response.StatusCode -ne 200) {
-        throw "The request returned a non-200 status code [$($response.StatusCode)]"
+function Convert-FromBase64StringWithNoPadding([string]$data) {
+    $data = $data.Replace('-', '+').Replace('_', '/')
+    switch ($data.Length % 4) {
+        0 { break }
+        2 { $data += '==' }
+        3 { $data += '=' }
+        default { throw New-Object ArgumentException('data') }
     }
+    return [System.Convert]::FromBase64String($data)
 }
-
-function TestCookie {
-    param([System.Net.CookieContainer]$cookies)
-
-    $discovered = @($cookies.GetCookies($site) |
-        Where-Object { $_.Name -eq '.ASPXAUTH' -Or $_.Name -eq '.AspNet.Cookies' })
-
-    if ($discovered.Count -ne 1) {
-        throw "Authentication failed. Check username and password"
-    }
-}
-Function Get-SitecoreSession {
+Function Get-SitecoreToken {
     param(
         [Parameter(Mandatory = $true, Position = 0)]
-        [string]$site,
+        [string]$identityserverUrl,
         [Parameter(Mandatory = $true, Position = 1)]
         [string]$username,
         [Parameter(Mandatory = $true, Position = 2)]
         [string]$password
     )
+    $tokenendpointurl = $identityserverUrl + "/connect/token"
+    $granttype = "password" # client_credentials / password 
+    $client_id = "postman-api"
+    $client_secret = "ClientSecret"
+    $scope = "openid sitecore.profile sitecore.profile.api offline_access"
+    
+    $body = @{
+        grant_type    = $granttype
+        scope         = $scope
+        client_id     = $client_id
+        client_secret = $client_secret    
+        username      = $username
+        password      = $password
+    }
+    $headers = New-Object "System.Collections.Generic.Dictionary[[String],[String]]"
+    $headers.Add("Content-Type", 'application/x-www-form-urlencoded')
+    $headers.Add("Accept", 'application/json')
 
-    $uri = "$site/sitecore/login?fbc=1"
-    $authResponse = Invoke-WebRequest -uri $uri -SessionVariable session -UseBasicParsing
-    TestStatusCode $authResponse
+    $resp = Invoke-RestMethod -Method Post -Body $body -Headers $headers -Uri $tokenendpointurl 
 
-    # Set login info
-    $fields = @{ }
-    $authResponse.InputFields.ForEach( {
-        
-            $fields[$_.Name] = $_.Value
-        
-        })
+    Write-Host "`***** SUCCESSFULLY FETCHED TOKEN ***** `n" -foreground Green
 
-    $fields.UserName = $Username
-    $fields.Password = $Password
-
-    # Login using the same session
-    $authResponse = Invoke-WebRequest -uri $uri -WebSession $session -Method POST -Body $fields -UseBasicParsing
-    TestStatusCode $authResponse
-    TestCookie $session.Cookies
-
-    return $session
+    Write-Host "`ACCESS TOKEN: `n" -foreground Yellow
+    $access_token = $resp.access_token #| Format-Table -Wrap | Out-String
+    Write-Host $access_token -foreground White
+    Write-Host   
+    return $access_token
+    
 }
 
 Function RequestPage {
@@ -71,14 +70,21 @@ Function RequestPage {
         [Parameter(Mandatory = $true, Position = 0)]
         [string]$url,
         [Parameter(Mandatory = $true, Position = 1)]
-        [object]$webSession
+        [string]$access_token
     )
     Write-Host $(Get-Date -Format HH:mm:ss.fff)
     Write-Host "requesting $url ..."
+
+    $headers = New-Object "System.Collections.Generic.Dictionary[[String],[String]]"
+    $headers.Add("Authorization", ("Bearer {0}" -f $access_token))
+
     try { 
-        $request = Invoke-WebRequest $url -WebSession $webSession -TimeoutSec 60000 -UseBasicParsing
-        Write-Host "Done" 
-        return $true
+        
+        $response = Invoke-WebRequest -method Get $url -Headers $headers -TimeoutSec 60000 
+        if ($response.StatusCode -eq "200" ) {
+            Write-Host "Success" 
+            return $true
+        }
     } 
     catch {
         $status = $_.Exception.Response.StatusCode.Value__
@@ -94,10 +100,11 @@ Function RequestPage {
 }
 
 $demoType = $demoType.ToLower()
-$session = Get-SitecoreSession "https://$instanceName" ("sitecore\{0}" -f $adminUser) $adminPassword
+$session = Get-SitecoreToken $identityServerUrl ("sitecore\{0}" -f $adminUser) $adminPassword
 $errors = 0
 
 Write-Host "Warming up Sitecore" -ForegroundColor Green
+
 foreach ($page in $config.urls.sitecore) {
     if (!$(RequestPage "https://$instanceName$($page.url)" $session)) {
         $errors++
