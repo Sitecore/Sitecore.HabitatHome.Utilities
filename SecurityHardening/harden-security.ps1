@@ -15,8 +15,8 @@ Import-Module (Join-Path $sharedModulesPath 'SecurityHardening') -Force -Verbose
 
 # Folders that will have the "Anonymous Authentication" feature disabled in IIS
 # ref: https://doc.sitecore.com/developers/90/platform-administration-and-architecture/en/deny-anonymous-users-access-to-a-folder.html
-$foldersToDenyAnonymousAccess = @('App_Config', 'sitecore/admin', 'sitecore/debug', 'sitecore/shell/WebService')
-# Doc mentions to remove access to  'sitecore/login' but the warmup script uses this and it is a very low risk exposure
+$foldersToDenyAnonymousAccess = @('App_Config', 'sitecore/admin', 'sitecore/debug','sitecore/login', 'sitecore/shell/WebService')
+
 
 #contains the list of files to .disable
 # ref: https://doc.sitecore.com/developers/90/platform-administration-and-architecture/en/disable-administrative-tools.html
