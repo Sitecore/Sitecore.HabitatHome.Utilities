@@ -32,12 +32,12 @@
         {
             "id": "sxa",
             "name": "Sitecore Experience Accelerator",
-            "fileName": "Sitecore Experience Accelerator 1.9 rev. 190425 for 9.2.scwdp.zip",
+            "fileName": "Sitecore Experience Accelerator 1.9.0 rev. 190605 for 9.2.scwdp.zip",
             "url": "https://dev.sitecore.net/~/media/3B83F33FE0B848C6AF9F3B58E4408A96.ashx",
             "install": true,
             "convert": false,
             "source": "sitecore",
-            "databases": "master,core"
+            "databases": "master,core" 
         },
         {
             "id": "def",
