@@ -40,6 +40,16 @@
             "databases": "master,core" 
         },
         {
+            "id": "sd",
+            "name": "Sitecore Demo",
+            "fileName": "Sitecore.Demo-CM-9.2.0.17-defaults.scwdp.zip",
+            "url": "https://dev.sitecore.net/~/media/C10E96CD1EAC46C49C957D5C3445BFB2.ashx",
+            "install": true,
+            "convert": false,
+            "source": "sitecore",
+            "databases": "none"
+        },
+        {
             "id": "def",
             "name": "Data Exchange Framework",
             "fileName": "Data Exchange Framework 2.1.0 rev. 181113.zip",
