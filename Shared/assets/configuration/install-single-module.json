@@ -1,0 +1,231 @@
+{
+    "Parameters": {
+        "SharedConfigurationPath": {
+            "Type": "string",
+            "DefaultValue": "",
+            "Description": "Path to the 'Shared Configuration' folder"
+        },
+        "AssetsJson": {
+            "Type": "string",
+            "DefaultValue": ""
+        },
+        "ModuleId" : {
+            "Type": "String",
+            "Description": "Id of the module found in assets.json file",
+            "DefaultValue": ""
+        },
+        "SiteName": {
+            "Type": "string",
+            "DefaultValue": ""
+        },
+        "WebRoot": {
+            "Type": "string"
+        },
+        "XConnectSiteName": {
+            "Type": "string",
+            "DefaultValue": ""
+        },
+        "SqlServer": {
+            "Type": "string",
+            "DefaultValue": "",
+            "Description": "Name of SQL Server"
+        },
+        "SqlAdminUser": {
+            "Type": "string",
+            "DefaultValue": "sa",
+            "Description": "SQL Admin user name"
+        },
+        "SqlAdminPassword": {
+            "Type": "string",
+            "DefaultValue": "",
+            "Description": "SQL Admin user password"
+        },
+        "DatabasePrefix": {
+            "Type": "string",
+            "DefaultValue": "",
+            "Description": "Empty"
+        },
+        "SecurityUserName": {
+            "Type": "string",
+            "DefaultValue": "",
+            "Description": "Empty"
+        },
+        "SecurityUserPassword": {
+            "Type": "string",
+            "DefaultValue": "",
+            "Description": "Empty"
+        },
+        "CoreUserName": {
+            "Type": "string",
+            "DefaultValue": "",
+            "Description": "Empty"
+        },
+        "CoreUserPassword": {
+            "Type": "string",
+            "DefaultValue": "",
+            "Description": "Empty"
+        },
+        "MasterUserName": {
+            "Type": "string",
+            "DefaultValue": "",
+            "Description": "Empty"
+        },
+        "MasterUserPassword": {
+            "Type": "string",
+            "DefaultValue": "",
+            "Description": "Empty"
+        },
+        "BootloaderPackagePath": {
+            "Type": "string",
+            "DefaultValue": "",
+            "Description": "Path to the bootloader scwdp"
+        },
+        "BootloaderConfigurationOverride": {
+            "Type": "string",
+            "Description": "Optional configuration file override for bootloader"
+        },
+        "BootloaderInstallationPath": {
+            "Type": "string",
+            "Description": "Location of bootloader data folder"
+        },
+        "SitecoreAdminPassword": {
+            "Type": "string",
+            "Description": "Sitecore Admin password"
+        },
+        "InitializeInstallation:CoreUserName": {
+            "Type": "string",
+            "Reference": "CoreUserName"
+        },
+        "InitializeInstallation:SqlServer": {
+            "Type": "string",
+            "Reference": "SqlServer"
+        },
+        "InitializeInstallation:SecurityUserName": {
+            "Type": "string",
+            "Reference": "SecurityUserName"
+        },
+        "InitializeInstallation:SqlAdminUser": {
+            "Type": "string",
+            "Reference": "SqlAdminUser"
+        },
+        "InitializeInstallation:SqlAdminPassword": {
+            "Type": "string",
+            "Reference": "SqlAdminPassword"
+        },
+        "InitializeInstallation:DatabasePrefix": {
+            "Type": "string",
+            "Reference": "DatabasePrefix"
+        },
+        "InitializeInstallation:MasterUserName": {
+            "Type": "string",
+            "Reference": "MasterUserName"
+        },
+        "InitializeInstallation:SiteName": {
+            "Type": "string",
+            "Reference": "SiteName"
+        },
+        "InitializeInstallation:XConnectSiteName": {
+            "Type": "string",
+            "Reference": "XConnectSiteName"
+        },
+        "InitializeInstallation:BootloaderPackage": {
+            "Type": "string",
+            "Reference": "BootloaderPackagePath"
+        },
+        "InitializeInstallation:BootloaderConfigurationOverrideSource": {
+            "Type": "string",
+            "Reference": "BootloaderConfigurationOverride"
+        },
+        "InitializeInstallation:BootloaderConfigurationOverrideDestination": {
+            "Type": "string",
+            "Reference": "BootloaderInstallationPath"
+        },
+        "InstallModule:SqlServer": {
+            "Type": "string",
+            "Reference": "SqlServer"
+        },
+        "InstallModule:SqlAdminUser": {
+            "Type": "string",
+            "Reference": "SqlAdminUser"
+        },
+        "InstallModule:SqlAdminPassword": {
+            "Type": "string",
+            "Reference": "SqlAdminPassword"
+        },
+        "InstallModule:DatabasePrefix": {
+            "Type": "string",
+            "Reference": "DatabasePrefix"
+        },
+        "InstallModule:SiteName": {
+            "Type": "string",
+            "Reference": "SiteName"
+        },
+        "CompleteInstallation:SqlServer": {
+            "Type": "string",
+            "Reference": "SqlServer"
+        },
+        "CompleteInstallation:SqlAdminUser": {
+            "Type": "string",
+            "Reference": "SqlAdminUser"
+        },
+        "CompleteInstallation:SqlAdminPassword": {
+            "Type": "string",
+            "Reference": "SqlAdminPassword"
+        },
+        "CompleteInstallation:XConnectSiteName": {
+            "Type": "string",
+            "Reference": "XConnectSiteName"
+        },
+        "CompleteInstallation:SiteName": {
+            "Type": "string",
+            "Reference": "SiteName"
+        },
+        "CompleteInstallation:CoreUserName": {
+            "Type": "string",
+            "Reference": "CoreUserName"
+        },
+        "CompleteInstallation:CoreUserPassword": {
+            "Type": "string",
+            "Reference": "CoreUserPassword"
+        },
+        "CompleteInstallation:MasterUserName": {
+            "Type": "string",
+            "Reference": "MasterUserName"
+        },
+        "CompleteInstallation:MasterUserPassword": {
+            "Type": "string",
+            "Reference": "MasterUserPassword"
+        },
+        "CompleteInstallation:SecurityUserName": {
+            "Type": "string",
+            "Reference": "SecurityUserName"
+        },
+        "CompleteInstallation:SecurityUserPassword": {
+            "Type": "string",
+            "Reference": "SecurityUserPassword"
+        },
+        "CompleteInstallation:DatabasePrefix": {
+            "Type": "string",
+            "Reference": "DatabasePrefix"
+        }
+    },
+    "Variables": {
+        "Modules": "[ReadJson(parameter('AssetsJson'))]",
+        "SitecoreModule": "[GetSitecoreModuleDetails(variable('Modules'),parameter('ModuleId'))]",
+        "InstallModule:Module.Configuration": "[variable('SitecoreModule')]"
+    },
+    "Settings": {
+        "AutoRegisterExtensions": true
+    },
+    "Includes": {
+        "InitializeInstallation": {
+            "Source": ".\\pre-module-installation.json"
+        },
+        "InstallModule": {
+            "Source": ".\\download-and-install-module.json"
+        },
+        "CompleteInstallation": {
+            "Source": ".\\post-module-installation.json"
+        }
+    }
+}
