@@ -100,7 +100,7 @@ $singleDeveloperParams = @{
     WebRoot                        = $site.webRoot
 }
 Push-Location (Join-Path $resourcePath "XP0")
-Install-SitecoreConfiguration @singleDeveloperParams -Uninstall -Verbose
+Install-SitecoreConfiguration @singleDeveloperParams -Uninstall
 Pop-Location
 
 $sxaSolrUninstallParams = @{
