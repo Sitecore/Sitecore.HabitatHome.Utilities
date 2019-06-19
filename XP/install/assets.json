@@ -22,7 +22,7 @@
         {
             "id": "spe",
             "name": "Sitecore PowerShell Extensions",
-            "fileName": "Sitecore PowerShell Extensions-5.0 for 9.2.zip",
+            "fileName": "Sitecore PowerShell Extensions-5.0.scwdp.zip",
             "url": "https://dev.sitecore.net/~/media/2C02EB17879548139937A41E5DA0EFCF.ashx",
             "install": true,
             "convert": true,
@@ -32,7 +32,7 @@
         {
             "id": "sxa",
             "name": "Sitecore Experience Accelerator",
-            "fileName": "Sitecore Experience Accelerator 1.9.0 rev. 190605 for 9.2.scwdp.zip",
+            "fileName": "Sitecore Experience Accelerator 1.9.0 rev. 190528 for 9.2.scwdp.zip",
             "url": "https://dev.sitecore.net/~/media/3B83F33FE0B848C6AF9F3B58E4408A96.ashx",
             "install": true,
             "convert": false,
