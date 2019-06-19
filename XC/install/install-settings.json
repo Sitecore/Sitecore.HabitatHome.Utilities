@@ -32,6 +32,7 @@
     },
     "settings": {
         "commerce": {
+            "engineConfigurationPath":"@@settings.commerce.engineConfigurationPath@@",
             "storefrontHostName": "@@settings.commerce.storefrontHostName@@",
             "storefrontPrefix": "@@settings.commerce.storefrontPrefix@@",
             "identityServerName": "@@settings.commerce.identityServerName@@",
