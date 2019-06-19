@@ -43,12 +43,33 @@
     "Sql.Master.ConnectionString": "[SqlConnectionString(parameter('SqlServer'),variable('Sql.Database.Master'), parameter('SqlAdminUser'), parameter('SqlAdminPassword'))]",
     "Skip.Master": "[not(equal(parameter('ModuleDatabase'), 'master'))]",
     "Skip.MasterCore": "[not(equal(parameter('ModuleDatabase'), 'mastercore'))]",
-    "Skip.Core": "[not(equal(parameter('ModuleDatabase'), 'core'))]"
+    "Skip.Core": "[not(equal(parameter('ModuleDatabase'), 'core'))]",
+    "Skip.None":"[not(equal(parameter('ModuleDatabase'), 'none'))]"
   },
   "Settings": {
     "AutoRegisterExtensions": true
   },
   "Tasks": {
+    "InstallWDPModuleNoDB": {
+      "Type": "WebDeploy",
+      "Params": {
+        "Verb": "Sync",
+        "Arguments": {
+          "Source": {
+            "Package": "[resolvepath(parameter('Package'))]"
+          },
+          "Dest": "Auto",
+          "EnableRule": "DoNotDeleteRule",
+          "SetParam": [
+            {
+              "Name": "IIS Web Application name",
+              "Value": "[parameter('SiteName')]"
+            }
+          ]
+        }
+      },
+      "Skip": "[equal(variable('Skip.None'),'True')]"
+    },
     "InstallWDPModuleMasterCore": {
       "Type": "WebDeploy",
       "Params": {
