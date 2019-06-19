@@ -298,6 +298,13 @@
                 "HostName": "[parameter('SiteName')]"
             }
         },
+        "CreateBindingsWithDevelopmentThumprint": {
+            "Type": "AddWebFeatureSSL",
+            "Params": {
+                "HostName": "[parameter('SiteName')]",
+                "OutputDirectory": "[variable('Site.DataFolder')]"
+            }
+        },
         "SetPermissions": {
             "Type": "FilePermissions",
             "Params": {
@@ -405,6 +412,13 @@
                 "Destination": "[variable('Site.DataFolder')]"
             }
         },
+        "CreateBindingsWithDevelopmentThumprint": {
+            "Type": "AddWebFeatureSSL",
+            "Params": {
+                "HostName": "[parameter('SiteName')]",
+                "OutputDirectory": "[variable('Site.DataFolder')]"
+            }
+        },
         "StartAppPool": {
             "Type": "ManageAppPool",
             "Params": {
@@ -422,7 +436,7 @@
         "UpdateSolrSchema": {
             "Type": "SitecoreUrl",
             "Params": {
-                "SitecoreInstanceRoot": "[concat('http://', parameter('SiteName'))]",
+                "SitecoreInstanceRoot": "[concat('https://', parameter('SiteName'))]",
                 "SitecoreActionPath": "sitecore/admin/PopulateManagedSchema.aspx?indexes=all",
                 "UserName": "admin",
                 "Password": "[parameter('SitecoreAdminPassword')]"
