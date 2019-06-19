@@ -44,14 +44,36 @@ $solr = $config.settings.solr
 $sql = $config.settings.sql
 $xConnect = $config.settings.xConnect
 $sharedResourcePath = Join-Path $assets.sharedUtilitiesRoot "assets\configuration"
-$downloadFolder = $assets.root
-$packagesFolder = (Join-Path $downloadFolder "packages")
+$downloadFolder = $assets.packageRepository
+$packagesFolder = (Join-Path $downloadFolder "modules")
 
 $loginSession = $null
 
 if (!(Test-Path $packagesFolder)) {
     New-Item $packagesFolder -ItemType Directory -Force  > $null  
 }
+Function Get-SitecoreCredentials{
+    
+    if ($null -eq $global:credentials) {
+        if ([string]::IsNullOrEmpty($devSitecoreUsername)) {
+            $global:credentials = Get-Credential -Message "Please provide dev.sitecore.com credentials"
+        }
+        elseif (![string]::IsNullOrEmpty($devSitecoreUsername) -and ![string]::IsNullOrEmpty($devSitecorePassword)) {
+            $secpasswd = ConvertTo-SecureString $devSitecorePassword -AsPlainText -Force
+            $global:credentials = New-Object System.Management.Automation.PSCredential ($devSitecoreUsername, $secpasswd)
+        }
+        else {
+            throw "Credentials required for download"
+        }
+    }
+    $user = $global:credentials.GetNetworkCredential().UserName
+    $password = $global:credentials.GetNetworkCredential().Password
+
+    Invoke-RestMethod -Uri https://dev.sitecore.net/api/authorization -Method Post -ContentType "application/json" -Body "{username: '$user', password: '$password'}" -SessionVariable loginSession -UseBasicParsing 
+    $global:loginSession = $loginSession
+    
+}
+
 Function Install-SitecoreInstallFramework {
     if ((Get-PSRepository | Where-Object {$_.Name -eq $assets.psRepositoryName}).count -eq 0) {
         Register-PSRepository -Name $assets.psRepositoryName -SourceLocation $assets.psRepository -InstallationPolicy Trusted 
@@ -81,27 +103,11 @@ Function Install-SitecoreAzureToolkit {
     
     if (!(Test-Path $destination)) {
        
-        if ($null -eq $global:credentials) {
-            if ([string]::IsNullOrEmpty($devSitecoreUsername)) {
-                $global:credentials = Get-Credential -Message "Please provide dev.sitecore.com credentials"
-            }
-            elseif (![string]::IsNullOrEmpty($devSitecoreUsername) -and ![string]::IsNullOrEmpty($devSitecorePassword)) {
-               
-                $global:credentials = New-Object System.Management.Automation.PSCredential ($devSitecoreUsername, $devSitecorePassword)
-            }
-            else {
-                throw "Credentials required for download"
-            }
-        }
-        $user = $global:credentials.GetNetworkCredential().UserName
-        $password = $global:credentials.GetNetworkCredential().Password
-
-        Invoke-RestMethod -Uri https://dev.sitecore.net/api/authorization -Method Post -ContentType "application/json" -Body "{username: '$user', password: '$password'}" -SessionVariable loginSession -UseBasicParsing 
-        
+      Get-SitecoreCredentials
 
         $params = @{
             Path         = $([io.path]::combine($sharedResourcePath, 'download-assets.json'))
-            LoginSession = $loginSession
+            LoginSession = $global:loginSession
             Source       = $package.url
             Destination  = $destination
         }
@@ -122,22 +128,7 @@ Function Install-Modules {
     $bootloaderInstallationPath = $([io.path]::combine($site.webRoot, $site.hostName, "App_Data\tools\InstallJob"))
     $assetsJson = (Resolve-Path $ConfigurationFile) 
 
-    if ($null -eq $global:credentials) {
-        if ([string]::IsNullOrEmpty($devSitecoreUsername)) {
-            $global:credentials = Get-Credential -Message "Please provide dev.sitecore.com credentials"
-        }
-        elseif (![string]::IsNullOrEmpty($devSitecoreUsername) -and ![string]::IsNullOrEmpty($devSitecorePassword)) {
-            $global:credentials = New-Object System.Management.Automation.PSCredential ($devSitecoreUsername, $devSitecorePassword)
-        }
-        else {
-            throw "Credentials required for download"
-        }
-    }
-    $user = $global:credentials.GetNetworkCredential().UserName
-    $password = $global:credentials.GetNetworkCredential().Password
-
-    Invoke-RestMethod -Uri https://dev.sitecore.net/api/authorization -Method Post -ContentType "application/json" -Body "{username: '$user', password: '$password'}" -SessionVariable loginSession -UseBasicParsing 
-
+   Get-SitecoreCredentials
     $params = @{
         Path                            = (Join-Path $sharedResourcePath "module-master-install.json")
         SharedConfigurationPath         = $sharedResourcePath
@@ -158,7 +149,7 @@ Function Install-Modules {
         BootloaderConfigurationOverride = $bootloaderConfigurationOverride
         BootloaderInstallationPath      = $bootloaderInstallationPath
         AssetsJson                      = $assetsJson
-        LoginSession                    = $loginSession
+        LoginSession                    = $global:loginSession
         SolrUrl                         = $solr.url
         SolrRoot                        = $solr.root
         SolrService                     = $solr.serviceName
@@ -166,7 +157,7 @@ Function Install-Modules {
         SitecoreAdminPassword           = $sitecore.adminPassword
     }
     Push-Location $sharedResourcePath
-    Install-SitecoreConfiguration @params
+    Install-SitecoreConfiguration @params -Verbose
     Pop-Location
    
 }

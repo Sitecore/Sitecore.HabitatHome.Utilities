@@ -26,7 +26,7 @@ Write-host ("Preparing to copy {0} from {1}" -f $osSnapshotName, $snapshotResour
 $osVHDFileName = ("{0}{1}-{2}-os.vhd" -f $snapshotPrefix, $demoType, $version)
 
 
-$sasExpiryDuration = "10800"
+$sasExpiryDuration = "21600"
 
 Select-AzureRmSubscription -SubscriptionId $subscriptionId
 

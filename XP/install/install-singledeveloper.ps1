@@ -57,6 +57,28 @@ Write-Host " xConnect: $($xConnect.siteName)" -ForegroundColor Green
 Write-Host " identityserver: $($identityServer.name)" -ForegroundColor Green
 Write-Host "*******************************************************" -ForegroundColor Green
 
+Function Get-SitecoreCredentials{
+    
+    if ($null -eq $global:credentials) {
+        if ([string]::IsNullOrEmpty($devSitecoreUsername)) {
+            $global:credentials = Get-Credential -Message "Please provide dev.sitecore.com credentials"
+        }
+        elseif (![string]::IsNullOrEmpty($devSitecoreUsername) -and ![string]::IsNullOrEmpty($devSitecorePassword)) {
+            $secpasswd = ConvertTo-SecureString $devSitecorePassword -AsPlainText -Force
+            $global:credentials = New-Object System.Management.Automation.PSCredential ($devSitecoreUsername, $secpasswd)
+        }
+        else {
+            throw "Credentials required for download"
+        }
+    }
+    $user = $global:credentials.GetNetworkCredential().UserName
+    $password = $global:credentials.GetNetworkCredential().Password
+
+    Invoke-RestMethod -Uri https://dev.sitecore.net/api/authorization -Method Post -ContentType "application/json" -Body "{username: '$user', password: '$password'}" -SessionVariable loginSession -UseBasicParsing 
+    $global:loginSession = $loginSession
+    
+}
+
 Function Install-SitecoreInstallFramework {
     #Register Assets PowerShell Repository
     if ((Get-PSRepository | Where-Object { $_.Name -eq $assets.psRepositoryName }).count -eq 0) {
@@ -79,31 +101,15 @@ Function Install-SitecoreInstallFramework {
 Function Download-Assets {
 
     $downloadAssets = $modules
-    $downloadFolder = $assets.root
-    $packagesFolder = (Join-Path $downloadFolder "packages")
+    $downloadFolder = $assets.packageRepository
+    $packagesFolder = (Join-Path $downloadFolder "modules")
     
    
     # Download Sitecore
     if (!(Test-Path $downloadFolder)) {
         New-Item -ItemType Directory -Force -Path $downloadFolder
     }
-    if ($null -eq $credentials) {
-        if ([string]::IsNullOrEmpty($devSitecoreUsername)) {
-            $credentials = Get-Credential -Message "Please provide dev.sitecore.com credentials"
-        }
-        elseif (![string]::IsNullOrEmpty($devSitecoreUsername) -and ![string]::IsNullOrEmpty($devSitecorePassword)) {
-            $secpasswd = ConvertTo-SecureString $devSitecorePassword -AsPlainText -Force
-            $credentials = New-Object System.Management.Automation.PSCredential ($devSitecoreUsername, $secpasswd)
-        }
-        else {
-            throw "Credentials required for download"
-        }
-    }
-    $user = $credentials.GetNetworkCredential().UserName
-    $password = $Credentials.GetNetworkCredential().Password
-
-    $loginRequest = Invoke-RestMethod -Uri https://dev.sitecore.net/api/authorization -Method Post -ContentType "application/json" -Body "{username: '$user', password: '$password'}" -SessionVariable loginSession -UseBasicParsing 
-
+   Get-SitecoreCredentials
     $downloadJsonPath = $([io.path]::combine($sharedResourcePath, 'download-assets.json'))
     Set-Alias sz 'C:\Program Files\7-Zip\7z.exe'
     $package = $modules | Where-Object { $_.id -eq "xp" }
@@ -115,7 +121,7 @@ Function Download-Assets {
     if (!(Test-Path $destination)) {
         $params = @{
             Path         = $downloadJsonPath
-            LoginSession = $loginSession
+            LoginSession = $global:loginSession
             Source       = $package.url
             Destination  = $destination
         }

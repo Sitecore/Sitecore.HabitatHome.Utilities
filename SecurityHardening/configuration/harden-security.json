@@ -1,0 +1,117 @@
+{
+    "Parameters": {
+        "WebRoot": {
+            "Type": "String",
+            "DefaultValue": "",
+            "Description": "Physical root of Sitecore site"
+        },
+        "SiteName": {
+            "Type": "string",
+            "DefaultValue": "",
+            "Description": "Name of Sitecore Site"
+        },
+        "FoldersToDisable": {
+            "Type": "string[]",
+            "DefaultValue": "",
+            "Description": "List of folders to disable"
+        },
+        "IOActionPath": {
+            "Type": "String",
+            "DefaultValue": "",
+            "Description": "Path to IOActions.xml file"
+        },
+        "UploadFilterPackageUri": {
+            "Type": "String",
+            "DefaultValue": "",
+            "Description": "Path to upload-filter zip"
+        },
+        "UploadFilterPackageFileName": {
+            "Type": "String",
+            "Description": "Name of upload-filter file",
+            "DefaultValue": ""
+        },
+        "WorkingFolder": {
+            "Type": "String",
+            "Description": "Temporary working folder for unzipping",
+            "DefaultValue": ""
+        },
+        "ConfigurationPatchPath":{
+            "Type": "string",
+            "Description":"Path to folder which contains all Sitecore patch files to copy to App_Config\\INclude"
+        },
+        "TransformSourcePath" : {
+            "Type": "String",
+            "Description": "Path containing all xdts to be applied to the instance"
+        },
+        "DisableAnonymousAccess:SiteName": {
+            "Type": "string",
+            "Reference": "SiteName"
+        },
+        "DisableAnonymousAccess:Folders": {
+            "Type": "string[]",
+            "Reference": "FoldersToDisable"
+        },
+        "IOActions:IOActionPath": {
+            "Type": "String",
+            "Reference": "IOActionPath"
+        },
+        "DeployUploadFilter:WebRoot": {
+            "Type": "String",
+            "Reference": "WebRoot"
+        },
+        "DeployUploadFilter:SiteName": {
+            "Type": "String",
+            "Reference": "SiteName"
+        },
+        "DeployUploadFilter:UploadFilterPackageUri": {
+            "Type": "String",
+            "Reference": "UploadFilterPackageUri"
+        },
+        "DeployUploadFilter:WorkingFolder": {
+            "Type": "String",
+            "Reference": "WorkingFolder"
+        },
+        "DeployUploadFilter:UploadFilterPackageFileName": {
+            "Type": "String",
+            "Reference": "UploadFilterPackageFileName"
+        }
+    },
+    "Variables": {
+        "Site.PhysicalPath": "[joinpath(parameter('WebRoot'),parameter('SiteName'))]",
+        "Site.AppConfigIncludePath":"[joinpath(variable('Site.PhysicalPath'),'App_Config\\Include')]",
+        "Site.Root": "[variable('Site.PhysicalPath')]",
+        "IOActions:Site.Root": "[variable('Site.Root')]"
+    },
+    "Tasks":{
+        "CopyConfigurationPatches": {
+            "Description":"",
+            "Type": "Copy",
+            "Params": {
+                "Source": "[joinpath(parameter('ConfigurationPatchPath'),'\\*')]",
+                "Destination": "[variable('Site.AppConfigIncludePath')]"
+            }
+        },
+        "ApplyXmlTransforms" : {
+            "Type": "TransformXmlDoc",
+            "Params": {
+                "RootDirectoryPath" : "[variable('Site.PhysicalPath')]",
+                "XdtDirectory":"[parameter('TransformSourcePath')]"
+            }
+        }
+    },
+    "Includes": {
+        "DisableAnonymousAccess": {
+            "Source": ".\\disable-anonymous-access.json"
+        },
+        "IOActions": {
+            "Source": ".\\apply-ioactions.json"
+        }
+        ,
+        "DeployUploadFilter": {
+            "Source": ".\\deploy-upload-filter.json"
+        }
+    },
+    "Settings": {
+        "AutoRegisterExtensions": true
+    }
+}

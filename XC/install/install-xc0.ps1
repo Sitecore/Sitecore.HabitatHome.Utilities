@@ -47,7 +47,27 @@ Write-Host " Storefront $($site.storefrontHostName)" -ForegroundColor Green
 Write-Host " xConnect: $($xConnect.siteName)" -ForegroundColor Green
 Write-Host "*******************************************************" -ForegroundColor Green
 
+function Get-SitecoreCredentials{
+    
+    if ($null -eq $global:credentials) {
+        if ([string]::IsNullOrEmpty($devSitecoreUsername)) {
+            $global:credentials = Get-Credential -Message "Please provide dev.sitecore.com credentials"
+        }
+        elseif (![string]::IsNullOrEmpty($devSitecoreUsername) -and ![string]::IsNullOrEmpty($devSitecorePassword)) {
+            $secpasswd = ConvertTo-SecureString $devSitecorePassword -AsPlainText -Force
+            $global:credentials = New-Object System.Management.Automation.PSCredential ($devSitecoreUsername, $secpasswd)
+        }
+        else {
+            throw "Credentials required for download"
+        }
+    }
+    $user = $global:credentials.GetNetworkCredential().UserName
+    $password = $global:credentials.GetNetworkCredential().Password
 
+    Invoke-RestMethod -Uri https://dev.sitecore.net/api/authorization -Method Post -ContentType "application/json" -Body "{username: '$user', password: '$password'}" -SessionVariable loginSession -UseBasicParsing 
+    $global:loginSession = $loginSession
+    
+}
 function Install-RequiredInstallationAssets {
     #Register Assets PowerShell Repository
     if ((Get-PSRepository | Where-Object {$_.Name -eq $assets.psRepositoryName}).count -eq 0) {
@@ -73,33 +93,13 @@ function Install-RequiredInstallationAssets {
 function Install-CommerceAssets {
     Set-Location $PSScriptRoot
 
-    if ($null -eq $global:credentials) {
-        if ([string]::IsNullOrEmpty($devSitecoreUsername)) {
-            $global:credentials = Get-Credential -Message "Please provide dev.sitecore.com credentials"
-        }
-        elseif (![string]::IsNullOrEmpty($devSitecoreUsername) -and ![string]::IsNullOrEmpty($devSitecorePassword)) {
-            $secpasswd = ConvertTo-SecureString $devSitecorePassword -AsPlainText -Force
-            $global:credentials = New-Object System.Management.Automation.PSCredential ($devSitecoreUsername, $secpasswd)
-        }
-        else {
-            throw "Credentials required for download"
-        }
-    }
-    $user = $global:credentials.GetNetworkCredential().UserName
-    $password = $global:credentials.GetNetworkCredential().Password
-
-    $loginRequest = Invoke-RestMethod -Uri https://dev.sitecore.net/api/authorization -Method Post -ContentType "application/json" -Body "{username: '$user', password: '$password'}" -SessionVariable loginSession -UseBasicParsing 
-
-    
     $commercePackageDestination = Join-Path $assets.downloadFolder $assets.commerce.packageName
 
     if (!(Test-Path $commercePackageDestination)) {
-	
-        $credentials = Get-Credential -Message "Please provide dev.sitecore.com credentials"
-
+        Get-SitecoreCredentials
         $params = @{
             Path         = $([io.path]::combine($sharedResourcePath, 'configuration\download-assets.json'))
-            LoginSession = $loginSession
+            LoginSession = $global:loginSession
             Source       = $assets.commerce.packageUrl
             Destination  = $commercePackageDestination
         }
@@ -115,9 +115,10 @@ function Install-CommerceAssets {
 
     if (!(Test-Path $msbuildNuGetPackageDestination)) {
         Write-Host "Saving $msbuildNuGetUrl to $msbuildNuGetPackageDestination" -ForegroundColor Green
+        Get-SitecoreCredentials
         $params = @{
             Path         = $([io.path]::combine($sharedResourcePath, 'configuration\download-assets.json'))
-            LoginSession = $loginSession
+            LoginSession = $global:loginSession
             Source       = $msbuildNuGetUrl
             Destination  = $msbuildNuGetPackageDestination
         }
@@ -125,22 +126,27 @@ function Install-CommerceAssets {
     }
     
     $commerceAssetFolder = $assets.commerce.installationFolder
-
-    $habitatHomeImagePackageUrl = "https://sitecore.box.com/shared/static/bjvge68eqge87su5vg258366rve6bg5d.zip"
+    
+    if (!(Test-Path $commerceAssetFolder)){
+        New-Item -ItemType Directory -Path $commerceAssetFolder
+    }
+    
+    $habitatHomeImagePackageUrl = "https://sitecore.box.com/shared/static/acv0qhew42m2653qtg2s7qlxlrmqjfpe.zip"
     $habitatHomeImagePackageFileName = "Habitat Home Product Images.zip"
     $habitatHomeImagePackageDestination = (Join-Path $CommerceAssetFolder $habitatHomeImagePackageFileName)
 
+    Get-SitecoreCredentials
 
     if (!(Test-Path $habitatHomeImagePackageDestination)) {
         Write-Host ("Saving '{0}' to '{1}'" -f $habitatHomeImagePackageFileName, $habitatHomeImagePackageDestination) -ForegroundColor Green
         $params = @{
             Path         = $([io.path]::combine($sharedResourcePath, 'configuration\download-assets.json'))
-            LoginSession = $loginSession
+            LoginSession = $global:loginSession
             Source       = $habitatHomeImagePackageUrl
             Destination  = $habitatHomeImagePackageDestination
         }
         $Global:ProgressPreference = 'SilentlyContinue'
-        Install-SitecoreConfiguration  @params  -WorkingDirectory $(Join-Path $PWD "logs") -Verbose 
+        Install-SitecoreConfiguration  @params -WorkingDirectory $(Join-Path $PWD "logs") -Verbose 
         $Global:ProgressPreference = 'Continue'
 
     }
@@ -239,8 +245,11 @@ Function Convert-Modules {
         HabitatImagesModuleFullPath        = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include  "Habitat Home Product Images.zip" -Exclude "*.scwdp.zip" -Recurse)
     }
     foreach ($key in $modules.Keys) {
-        Write-Host $modules[$key]
-        ConvertTo-SCModuleWebDeployPackage -Path $modules[$key] -Destination $assets.commerce.installationFolder -Verbose -Force
+        
+        if (!(Test-Path ($modules[$key] -replace ".zip",".scwdp.zip"))){
+            Write-Host "Converting module: $modules[$key]" -ForegroundColor Green
+            ConvertTo-SCModuleWebDeployPackage -Path $modules[$key] -Destination $assets.commerce.installationFolder -Verbose -Force
+        }
     }
 }
 Function Install-Bootloader {
