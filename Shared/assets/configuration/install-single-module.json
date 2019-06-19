@@ -9,7 +9,7 @@
             "Type": "string",
             "DefaultValue": ""
         },
-        "ModuleId" : {
+        "ModuleId": {
             "Type": "String",
             "Description": "Id of the module found in assets.json file",
             "DefaultValue": ""
@@ -92,6 +92,10 @@
             "Type": "string",
             "Description": "Sitecore Admin password"
         },
+        "LoginSession": {
+            "Type": "Microsoft.PowerShell.Commands.WebRequestSession",
+            "Default": ""
+        },
         "InitializeInstallation:CoreUserName": {
             "Type": "string",
             "Reference": "CoreUserName"
@@ -160,6 +164,10 @@
             "Type": "string",
             "Reference": "SiteName"
         },
+        "InstallModule:LoginSession": {
+            "Type": "Microsoft.PowerShell.Commands.WebRequestSession",
+            "Reference": "LoginSession"
+        },
         "CompleteInstallation:SqlServer": {
             "Type": "string",
             "Reference": "SqlServer"
@@ -223,6 +231,9 @@
         },
         "InstallModule": {
             "Source": ".\\download-and-install-module.json"
+        },
+        "DeployModules":{
+            "Source":".\\deploy-xconnect-models.json"
         },
         "CompleteInstallation": {
             "Source": ".\\post-module-installation.json"
