@@ -69,3 +69,5 @@ Publish
 dev.creds.xml
 *.pfx
 shared/sat
+install-modules.json
+module-master-install.json

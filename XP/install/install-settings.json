@@ -10,7 +10,7 @@
     "sitecoreVersion": "@@assets.sitecoreVersion@@",
     "identityServerVersion": "@@assets.identityServerVersion@@",
     "sitecoreazuretoolkit": "@@assets.sitecoreazuretoolkit@@",
-    "sharedUtilitiesRoot":"@@assets.sharedUtilitiesRoot@@"
+    "sharedUtilitiesRoot": "@@assets.sharedUtilitiesRoot@@"
   },
   "settings": {
     "site": {
@@ -19,8 +19,7 @@
       "webRoot": "@@site.webRoot@@",
       "hostName": "@@site.hostName@@",
       "addSiteBindingWithSSLPath": "@@site.addSiteBindingWithSSLPath@@",
-      "additionalBindings":[
-      ]
+      "additionalBindings": []
     },
     "sql": {
       "server": "@@sql.server@@",
@@ -87,84 +86,7 @@
       "url": "@@solr.url@@",
       "root": "@@solr.root@@",
       "serviceName": "@@solr.serviceName@@"
-    },
-    "habitatHome": [
-      {
-        "id": "DemoDynamicsCRMConnectionString",
-        "value": "",
-        "description": "Connection string for Dynamics CRM"
-      },
-      {
-        "id": "DemoCRMSalesForceConnectionString",
-        "value": "",
-        "description": "Connection string for SalesForce CRM connector"
-      },
-      {
-        "id": "EnableEXMmodule",
-        "value": "yes",
-        "description": "Enable or disable the EXM module. Values: 'yes' or 'no'"
-      },
-      {
-        "id": "AllowInvalidSSLCertificate",
-        "value": true,
-        "description": "Allows the use of self-signed certificates for communication with XConnect. Values: 'True' or 'False'"
-      },
-      {
-        "id": "EnvironmentType",
-        "value": "Local",
-        "description": "Define the environment (Local or Production) - this affect some configuration settings"
-      },
-      {
-        "id": "UnicornEnabled",
-        "value": "Off",
-        "description": "Turn Unicorn functionality on or off"
-      },
-      {
-        "id": "ThirdPartyIntegrations",
-        "value": "None",
-        "description": "Use a keyword like CDN, Dynamics, Salesforce, Facebook, MS to enable"
-      },
-      {
-        "id": "ASPNETDebugging",
-        "value": false,
-        "description": "Turn debugging on or off for the environment. Values: 'true' or 'false'"
-      },
-      {
-        "id": "CDNEnabled",
-        "value": false,
-        "description": "Enable or disable CDN. Values: 'True' or 'False'"
-      },
-      {
-        "id": "MediaAlwaysIncludeServerURL",
-        "value": false,
-        "description": "Enable or disable Media URL display behavior. Values: 'True' or 'False'"
-      },
-      {
-        "id": "MediaLinkServerURL",
-        "value": "",
-        "description": "URL to the media server (if any)"
-      },
-      {
-        "id": "MediaResponseCacheabilityType",
-        "value": "private",
-        "description": "The type of cacheability of the media files on remote or proxy servers - private or public"
-      },
-      {
-        "id": "DemoEnabled",
-        "value": true,
-        "description": "Enable or disable the demo mode. Values: 'True' or 'False'"
-      },
-      {
-        "id": "RootHostName",
-        "value": "",
-        "description": "Habitat hostname"
-      },
-      {
-        "id": "AnalyticsCookieDomain",
-        "value": "",
-        "description": "Analytics cookie domain name"
-      }
-    ]
+    }
   },
   "modules": []
 }

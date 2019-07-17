@@ -25,7 +25,7 @@
             "fileName": "Sitecore PowerShell Extensions-5.0.scwdp.zip",
             "url": "https://dev.sitecore.net/~/media/2C02EB17879548139937A41E5DA0EFCF.ashx",
             "install": true,
-            "convert": true,
+            "convert": false,
             "source": "sitecore",
             "databases": "master,core"
         },
@@ -37,17 +37,8 @@
             "install": true,
             "convert": false,
             "source": "sitecore",
-            "databases": "master,core" 
-        },
-        {
-            "id": "sd",
-            "name": "Sitecore Demo",
-            "fileName": "Sitecore.Demo-CM-9.2.0.35-defaults.scwdp.zip",
-            "url": "https://dev.sitecore.net/~/media/C10E96CD1EAC46C49C957D5C3445BFB2.ashx",
-            "install": true,
-            "convert": false,
-            "source": "sitecore",
-            "databases": "none"
+            "databases": "master,core",
+            "additionalInstallationSteps": "sxa-installation-poststeps.json"
         },
         {
             "id": "def",
@@ -189,31 +180,5 @@
             "source": "sitecore",
             "databases": "master,core"
         }
-    ],
-    "habitatHome": {
-        "id": "habitatHome",
-        "install": false,
-        "version": "9.1.0.0",
-        "prerelease": true,
-        "modules": [
-            {
-                "id": "habitathome",
-                "name": "Habitat Home",
-                "fileName": "HabitatHome_single.scwdp.zip",
-                "url": "https://github.com/Sitecore/Sitecore.HabitatHome.Platform/releases/download/{version}/HabitatHome_single.scwdp.zip",
-                "install": false,
-                "convert": false,
-                "source": "external"
-            },
-            {
-                "id": "habitathome_xConnect",
-                "name": "Habitat Home xConnect",
-                "fileName": "HabitatHome_xConnect_single.scwdp.zip",
-                "url": "https://github.com/Sitecore/Sitecore.HabitatHome.Platform/releases/download/{version}/HabitatHome_xConnect_single.scwdp.zip",
-                "install": false,
-                "convert": false,
-                "source": "external"
-            }
-        ]
-    }
+    ]
 }

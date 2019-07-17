@@ -1,8 +1,8 @@
-## Installation helpers for Sitecore Experience Platform (XP)
+# Installation helpers for Sitecore Experience Platform (XP)
 
 > These steps assume you have all of the prerequisites installed or have followed the instructions at [README.md](../../Prerequisites/README.md)
 
-### Solr
+## Solr
 
 Solr can be installed with a script if you do not already have it.
 
@@ -24,19 +24,19 @@ Still in an elevated PowerShell session:
 
 > Once setup is complete, the installer should load the solr 'home' page
 
-#### To Uninstall Solr
+### To Uninstall Solr
 
 - Review the `remove-solr.ps1` script to ensure the Solr versions and its data folder are correct.
 - Uninstall Solr
 
-  ```powershell
-  .\remove-solr.ps1
+```powershell
+    .\remove-solr.ps1
   ```
 
 ### Prepare to install XP
 
-```
-Set-Location ..
+```powershell
+    Set-Location ..
 ```
 
 #### A bit about the process
@@ -57,42 +57,51 @@ The `set-installation-overrides.ps1.example` script needs to be renamed and modi
 
 #### Installation
 
-- Review the `assets.json` file to ensure everything is configured correctly. 
-	- By default, only the SPE and SXA modules get installed automatically. If you would like to install the Data Exchange Framework-related modules or the Salesforce Marketing Cloud connect modules you will need to set the appropriate flags in this file.
+- Review the `assets.json` file to ensure everything is configured correctly.
+  - By default, only the SPE and SXA modules get installed automatically. If you would like to install the Data Exchange Framework-related modules or the Salesforce Marketing Cloud connect modules you will need to set the appropriate flags in this file.
 
 
 - Set some predefined defaults
-  ```
-	.\set-installation-defaults.ps1
-	```
+
+```powershell
+    .\set-installation-defaults.ps1
+```
 
 - Create a copy of the overrides file
-  ```
-	copy set-installation-overrides.ps1.example set-installation-overrides.ps1
-	```
+
+```powershell
+    copy set-installation-overrides.ps1.example set-installation-overrides.ps1
+```
 
 - Edit **`set-installation-overrides.ps1`** to set the SQL instance name and sa password
 
 - Apply overrides
-  ```
-	.\set-installation-overrides.ps1
-	```
+
+  ```powershell
+    .\set-installation-overrides.ps1
+    ```
 
 - Copy your license file to the `.\assets` folder
-  ```
-	copy ~\Downloads\license.xml .\assets
-	```
+
+```powershell
+    copy ~\Downloads\license.xml .\assets
+```
 
 - Let's GO!
-  ```
+
+```powershell
   .\install-singledeveloper.ps1
-  ```
+```
+
 - Install Modules
-```.\install-modules.ps1```
+
+```powershell
+    .\install-modules.ps1
+```
 
 > You will be prompted for your dev.sitecore.com credentials - the required assets will be downloaded automatically.
-
+>
 > **KNOWN ISSUE:** Downloading large files take time and are causing connection issues.
 > After the download of larger files, you may get an error `Unable to read data from the transport connection: An existing connection was forcibly closed by the remote host.` The download was NOT completed successfully.
-> 
+>
 > **WORKAROUND:** Manually download the larger Sitecore WDP Package required and place it into the `XP/install/assets` folder.

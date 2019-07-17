@@ -1,0 +1,36 @@
+{
+  "Parameters": {
+    "SiteName": {
+      "Type": "string",
+      "DefaultValue": "",
+      "Description": "The name of the site to be deployed."
+    },
+    "DatabasePrefix": {
+      "Type": "string",
+      "DefaultValue": "",
+      "Description": "SQL DB Prefix"
+    },
+    "SqlAdminUser": {
+      "Type": "string",
+      "DefaultValue": "sa",
+      "Description": "The Sql admin user account to use when installing databases."
+    },
+    "SqlAdminPassword": {
+      "Type": "string",
+      "DefaultValue": "",
+      "Description": "The Sql admin password to use when installing databases."
+    },
+    "SqlServer": {
+      "Type": "string",
+      "DefaultValue": "",
+      "Description": "The Sql Server where databases will be installed."
+    },
+    "LoginSession": {
+      "Type": "Microsoft.PowerShell.Commands.WebRequestSession",
+      "DefaultValue": "",
+      "Description": "dev.sitecore.com login session"
+    }
+  },
+  "Variables":{},
+  "Includes": {}
+}
