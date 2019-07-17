@@ -18,7 +18,7 @@ lib/Sitecore/*
 !lib/Sitecore/readme.MD
 !lib/Modules/*
 lib/System/*
-!lib/System/readme.MD	
+!lib/System/readme.MD
 lib/LocalRepository/*
 .sonar
 vars.user.cmd
