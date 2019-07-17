@@ -1,6 +1,6 @@
 {
   "Parameters": {
-    "Module": {
+    "ModuleConfiguration": {
       "Type": "psobject",
       "DefaultValue": "",
       "Description": "The hashtable of the package to deploy."
@@ -41,7 +41,7 @@
     "Sql.Database.Master": "[concat(parameter('DatabasePrefix'), '_Master')]",
     "Sql.Core.ConnectionString": "[SqlConnectionString(parameter('SqlServer'),variable('Sql.Database.Core'), parameter('SqlAdminUser'), parameter('SqlAdminPassword'))]",
     "Sql.Master.ConnectionString": "[SqlConnectionString(parameter('SqlServer'),variable('Sql.Database.Master'), parameter('SqlAdminUser'), parameter('SqlAdminPassword'))]",
-    "Module.Configuration": "[parameter('Module')]",
+    "Module.Configuration": "[parameter('ModuleConfiguration')]",
     "Module.Databases": "[SelectObject(ExpandProperty:'databases',InputObject:variable('Module.Configuration'))]",
     "Module.Database": "[ReplaceString(variable('Module.Databases'),',','')]",
     "Module.Url": "[SelectObject(ExpandProperty:'url',InputObject:variable('Module.Configuration'))]",
