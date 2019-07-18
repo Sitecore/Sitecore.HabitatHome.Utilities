@@ -11,9 +11,9 @@ Assuming you have a base [Sitecore Installation](installing-sitecore-xp.md), you
 
 If the above is true, you should be set up with what you need to install modules!
 
-> This repo's default is to install `Sitecore PowerShell Extensions` and `Sitecore Experience Accelerator`.
->
-> If you have modified the defaults to install a different set of modules, that's okay too - we won't hold it against you.
+ This repo's default is to install `Sitecore PowerShell Extensions` and `Sitecore Experience Accelerator`.
+
+ If you have modified the defaults to install a different set of modules, that's okay too - we won't hold it against you.
 
 ### Install
 
@@ -36,11 +36,11 @@ Long story short, we're doing lots behind the scenes in order to install modules
 - Pre-module installation
   - Stop services
   - Remove core, master and web database users
-- Perform Module Installation
+- Perform module installation
   - Install Bootloader (tool to perform postSteps)
   - Download (missing) module files
   - Convert to scwdp (if required)
-  - Install Module
+  - Install modules
 - Post-module installation
   - Add core, master and web database users
   - Start services
@@ -114,3 +114,7 @@ _ in the above, we can see that the extracted package items folder contains a co
   - additional steps will be executed after all modules have been installed
 
 [Return to Index](index.md)
+
+[Return to preparing installation](preparing-installation.md)
+
+[Return to main docs index](../index.md)

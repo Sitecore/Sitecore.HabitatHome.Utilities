@@ -3,7 +3,7 @@
 ## Assets
 
 - Review the `assets.json` file to ensure everything is configured correctly.
-  - By default, only the SPE and SXA modules get installed automatically. If you would like to install the Data Exchange Framework-related modules or the Salesforce Marketing Cloud connect modules you will need to set the appropriate flags in this file.
+  - By default, only the SPE and SXA modules get installed automatically. If you would like to install additional modules you will need to set the appropriate flags in this file. See [installing-modules.md](installing-modules.md) for more details.
 
 ## Setting up Defaults
 
@@ -32,7 +32,7 @@
     copy license.xml c:\sitecore-repository
 ```
 
-## Overriding
+## Overriding Default Settings
 
 Now that we have some defaults configured, let's override some settings to match your local configuration.
 
@@ -44,15 +44,15 @@ Now that we have some defaults configured, let's override some settings to match
 
 > We avoid simply renaming the file from .example to .ps1 since it causes changes in source control.
 
-- Using VSCode, Notepad++ or any other text editor of your choice, edit **`set-installation-overrides.ps1`** to set the SQL instance name and sa password
+- Edit **`set-installation-overrides.ps1`** to set the Site, Solr and SQL settings relevant to your environment.
 
 - Apply overrides
 
 ```powershell
-    .\set-installation-overrides.ps1 -prefix "habitathome"
+    .\set-installation-overrides.ps1
 ```
 
-> ### NOTE: Remember to always execute `set-installation-defaults.ps1` prior to executing `set-installation-overrides.ps1`
+> NOTE: Remember to always execute `set-installation-defaults.ps1` prior to executing `set-installation-overrides.ps1`
 
 ### Override Parameters
 
