@@ -62,3 +62,5 @@ If a part of the installation fails, you can resume from the last failed step by
 The file is located in `XC\install\assets\Resources`.
 
 Make sure you make a backup copy of the file.
+
+[Return to main docs index](../index.md)

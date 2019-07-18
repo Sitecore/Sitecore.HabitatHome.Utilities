@@ -10,13 +10,13 @@
 ## Installing Prerequisites
 
 ```powershell
-    $Global:ProgressPreference = 'SilentlyContinue'
+$Global:ProgressPreference = 'SilentlyContinue'
 ```
 
-> The above will turn off the PowerShell progress bar to **greatly** enhance download speeds
+The above will turn off the PowerShell progress bar to **greatly** enhance download speeds
 
 ```powershell
-    $Global:ProgressPreference = 'Continue'
+$Global:ProgressPreference = 'Continue'
 ```
 
 ```powershell
@@ -57,4 +57,4 @@ Ensure you're using the correct version of the Prerequisites.json file. One has 
 
 [Installing Sitecore Experience Platform (XP)](../xp/index.md)
 
-[Return to main index](../index.md)
+[Return to main docs index](../index.md)

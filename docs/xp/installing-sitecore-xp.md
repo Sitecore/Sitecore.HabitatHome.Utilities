@@ -8,15 +8,13 @@ We're finally here, prerequisites are installed, configuration is set and now it
 .\install-singledeveloper.ps1
 ```
 
-> You will be prompted for your dev.sitecore.com credentials - the required assets will be downloaded automatically.
+You will be prompted for your dev.sitecore.com credentials - the required assets will be downloaded automatically.
 
-## We're done
+We're all done - that's it!
 
-> Now go grab a coffee, really...
->
-> Should take 12 to 15 minutes depending on your environment.
+Now go grab a coffee, really... Installation should take 12 to 15 minutes, depending on your environment.
 
-### What's happening
+## What's happening
 
 `install-singledeveloper.ps1` is a wrapper around the OOB `XP0-Singledevloper.ps1` and corresponding `XP0-SingleDeveloper.json` installation process _(although the Utilities repo did bring some enhancements to the OOB configurations)_.
 

@@ -16,4 +16,4 @@ To use, simply call the script and specify whether you have the XP or XC demo in
 
 Of course the script is provided as an example and can be modified to suit your needs.
 
-[Return to main index](../index.md)
+[Return to main docs index](../index.md)
