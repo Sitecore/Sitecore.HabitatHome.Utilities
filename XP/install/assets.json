@@ -13,8 +13,8 @@
         {
             "id": "sat",
             "name": "Sitecore Azure Toolkit",
-            "fileName": "Sitecore Azure Toolkit 2.2.0 rev. 190305.zip",
-            "url": "https://dev.sitecore.net/~/media/55B3AADF609441979C3806D20E9B12C4.ashx",
+            "fileName": "Sitecore Azure Toolkit 2.3.0 rev. 190410.zip",
+            "url": "https://dev.sitecore.net/~/media/0804C3F4CC524149B32AD25D52CDCA12.ashx",
             "install": true,
             "convert": false,
             "source": "sitecore"
