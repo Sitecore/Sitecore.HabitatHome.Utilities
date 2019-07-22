@@ -158,8 +158,8 @@
         {
             "id": "jss",
             "name": "JavaScript Services",
-            "fileName": "Sitecore JavaScript Services Server for Sitecore 9.1.1 XP 11.0.1 rev. 190318.scwdp.zip",
-            "url": "https://dev.sitecore.net/~/media/127032434274439DB84F8C47FCC90936.ashx",
+            "fileName": "Sitecore JavaScript Services Server for Sitecore 9.2 XP 12.0.0 rev. 190522.zip",
+            "url": "https://dev.sitecore.net/~/media/21E55AD5AEA145C2903E1FB3A25B079E.ashx",
             "install": false,
             "convert": false,
             "databases": "master,core"
