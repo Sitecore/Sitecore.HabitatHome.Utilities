@@ -4,7 +4,7 @@
             "id": "xp",
             "name": "Sitecore Experience Platform",
             "fileName": "Sitecore 9.2.0 rev. 002893 (WDP XP0 packages).zip",
-            "url": "https://dev.sitecore.net/~/media/B262F95B2AFA4C39BDE821590CE6F1A6.ashx",
+            "url": "https://dev.sitecore.net/~/media/C91BB36E7DA34E8688E80E742995F186.ashx",
             "extract": true,
             "source": "sitecore"
         }
@@ -22,8 +22,8 @@
         {
             "id": "spe",
             "name": "Sitecore PowerShell Extensions",
-            "fileName": "Sitecore PowerShell Extensions-5.0.scwdp.zip",
-            "url": "https://dev.sitecore.net/~/media/2C02EB17879548139937A41E5DA0EFCF.ashx",
+            "fileName": "Sitecore PowerShell Extensions-5.0 for 9.2.scwdp.zip",
+            "url": "https://dev.sitecore.net/~/media/7AB15C0432624E6CA9786DF00DD653AB.ashx",
             "install": true,
             "convert": false,
             "databases": "master,core"
@@ -32,7 +32,7 @@
             "id": "sxa",
             "name": "Sitecore Experience Accelerator",
             "fileName": "Sitecore Experience Accelerator 1.9.0 rev. 190528 for 9.2.scwdp.zip",
-            "url": "https://dev.sitecore.net/~/media/3B83F33FE0B848C6AF9F3B58E4408A96.ashx",
+            "url": "https://dev.sitecore.net/~/media/1A7A3C021C7649C98DA83EF50E624C8E.ashx",
             "install": true,
             "convert": false,
             "databases": "master,core",
