@@ -79,25 +79,6 @@ Function Get-SitecoreCredentials {
 
 }
 
-Function Install-SitecoreInstallFramework {
-    #Register Assets PowerShell Repository
-    if ((Get-PSRepository | Where-Object { $_.Name -eq $assets.psRepositoryName }).count -eq 0) {
-        Register-PSRepository -Name $assets.psRepositoryName -SourceLocation $assets.psRepository -InstallationPolicy Trusted
-    }
-
-    #Sitecore Install Framework dependencies
-    Import-Module WebAdministration
-
-    #Install SIF
-    $sifVersion = $assets.installerVersion -replace "-beta[0-9]*$"
-
-    $module = Get-Module -FullyQualifiedName @{ModuleName = "SitecoreInstallFramework"; ModuleVersion = $sifVersion }
-    if (-not $module) {
-        Write-Host "Installing the Sitecore Install Framework, version $($assets.installerVersion)" -ForegroundColor Green
-        Install-Module SitecoreInstallFramework -Repository $assets.psRepositoryName -Scope CurrentUser -Force
-        Import-Module SitecoreInstallFramework -Force
-    }
-}
 Function Download-Assets {
 
     $downloadAssets = $modules
@@ -134,6 +115,7 @@ Function Download-Assets {
     }
 
 }
+
 Function Confirm-Prerequisites {
     #Enable Contained Databases
     Write-Host "Enable contained databases" -ForegroundColor Green
@@ -251,6 +233,7 @@ Function Install-SingleDeveloper {
     Install-SitecoreConfiguration @singleDeveloperParams
     Pop-Location
 }
+
 Function Add-AppPoolMembership {
 
     #Add ApplicationPoolIdentity to performance log users to avoid Sitecore log errors (https://kb.sitecore.net/articles/404548)
@@ -308,7 +291,6 @@ Function Add-AdditionalBindings {
     }
 }
 
-Install-SitecoreInstallFramework
 Download-Assets
 Confirm-Prerequisites
 Install-SingleDeveloper

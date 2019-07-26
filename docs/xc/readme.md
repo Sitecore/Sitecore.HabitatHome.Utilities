@@ -1,35 +1,37 @@
 # Installing Sitecore Experience Commerce (XC)
 
-## \*_This page Needs Review_\*
+> ## Instructions for installing the latest version of Commerce can be found in the release/9.1.1/ branch
 
-> These steps assume you have all of the prerequisites installed or have followed the instructions at [Prerequisites README.md](../prerequisites\index.md) and [XP Installation README.md](..\XP\index.md)
+## Installation
+
+These steps assume you have all of the prerequisites installed or have followed the instructions at [Prerequisites README.md](../prerequisites\readme.md) and [XP Installation README.md](..\XP\readme.md)
 
 Still in an elevated PowerShell session
 
 - Browse to the XC installation folder
 
 ```powershell
-    Set-Location ..\..\XC\install
+Set-Location ..\..\XC\install
 ```
 
 - Set some predefined defaults
 
 ```powershell
-    .\set-installation-defaults.ps1
+.\set-installation-defaults.ps1
 ```
 
 - Create a copy of the overrides file
 
 ```powershell
-    copy set-installation-overrides.ps1.example set-installation-overrides.ps1
+copy set-installation-overrides.ps1.example set-installation-overrides.ps1
 ```
 
-- Edit **`set-installation-overrides.ps1`** to set the SQL instance name and sa password
+- Edit **`set-installation-overrides.ps1`** to set the service account and Braintree account details.
 
 - Apply overrides
 
 ```powershell
-    .\set-installation-overrides.ps1
+.\set-installation-overrides.ps1
 ```
 
 > **KNOWN ISSUE:** Automatic download of assets is current not working as expected.
@@ -63,4 +65,4 @@ The file is located in `XC\install\assets\Resources`.
 
 Make sure you make a backup copy of the file.
 
-[Return to main docs index](../index.md)
+[Return to main docs index](../readme.md)

@@ -55,6 +55,6 @@ Ensure you're using the correct version of the Prerequisites.json file. One has 
 
 ## Next Steps
 
-[Installing Sitecore Experience Platform (XP)](../xp/index.md)
+[Installing Sitecore Experience Platform (XP)](../xp/readme.md)
 
-[Return to main docs index](../index.md)
+[Return to main docs index](../readme.md)

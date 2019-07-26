@@ -64,4 +64,4 @@ Now that we have some defaults configured, let's override some settings to match
 
 [Continue to Next Step (Installing Sitecore XP)](installing-sitecore-xp.md)
 
-[Return to Index](index.md)
+[Return to Index](readme.md)

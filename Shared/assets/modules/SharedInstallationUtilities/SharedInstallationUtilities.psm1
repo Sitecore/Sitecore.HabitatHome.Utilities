@@ -148,33 +148,3 @@ Function Start-SitecoreSite {
         Write-Error $_
     }
 }
-
-Function Assert-IsDemoModule {
-    param (
-        [Parameter(Mandatory, Position = 0)]
-        [string]$Wdp
-    )
-    Add-Type -Assembly "system.io.compression.filesystem"
-    $zip = [io.compression.zipfile]::OpenRead($Wdp)
-    $file = $zip.Entries | Where-Object { $_.Name -eq "parameters.xml" }
-    if ($null -eq $file) {
-        Write-Error -Message "parameters.xml file not found"
-        return $false
-    }
-
-    $stream = $file.open()
-    $reader = New-Object IO.StreamReader($stream)
-    $text = $reader.ReadToEnd()
-    $reader.Close()
-    $stream.Close()
-    $zip.Dispose()
-    $xml = [xml]$text
-    $iisAppParameterName = ($xml.parameters.parameter | Where-Object { $_.tags -contains "iisapp" }).name
-    if ( $iisAppParameterName -eq "IIS Web Application Name") {
-        return $true
-    }
-    else {
-        return $false
-    }
-}
-
