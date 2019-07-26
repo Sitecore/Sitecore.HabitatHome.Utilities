@@ -77,6 +77,31 @@
         "LoginSession": {
             "Type": "Microsoft.PowerShell.Commands.WebRequestSession"
         },
+        "SolrUrl": {
+            "Type": "string",
+            "DefaultValue": "https://localhost:8721/solr",
+            "Description": "The Solr instance url."
+        },
+        "SolrRoot": {
+            "Type": "string",
+            "DefaultValue": "c:\\solr\\solr-7.2.1",
+            "Description": "The file path to the Solr instance."
+        },
+        "SolrService": {
+            "Type": "string",
+            "DefaultValue": "Solr-7.2.1",
+            "Description": "The name of the Solr service."
+        },
+        "CorePrefix": {
+            "Type": "string",
+            "DefaultValue": "",
+            "Description": "Solr Core Prefix"
+        },
+        "SitecoreAdminPassword": {
+            "Type": "string",
+            "DefaultValue": "",
+            "Description": "Sitecore Admin password"
+        },
         "InitializeInstallation:CoreUserName": {
             "Type": "string",
             "Reference": "CoreUserName"
@@ -218,8 +243,7 @@
             "Reference": "DatabasePrefix"
         }
     },
-    "Variables": {
-    },
+    "Variables": {},
     "Settings": {
         "AutoRegisterExtensions": true
     },
