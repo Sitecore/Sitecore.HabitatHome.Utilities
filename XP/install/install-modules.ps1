@@ -127,6 +127,8 @@ Function New-ModuleInstallationConfiguration {
 
     $template = Get-Content $moduleConfigurationTemplate -Raw | ConvertFrom-Json
     $destination = Get-Content $moduleConfigurationTemplate -Raw | ConvertFrom-Json
+    
+    $masterConfiguration = Get-Content $moduleMasterInstallConfigurationTemplate -Raw | ConvertFrom-Json
 
     foreach ($installableModule in $installableModules) {
         $moduleParameters = New-Object PSObject
@@ -156,17 +158,16 @@ Function New-ModuleInstallationConfiguration {
         if ($null -ne $installablemodule.additionalInstallationSteps) {
             $additionalSteps = Get-Content $([io.path]::combine($sharedResourcePath, $installableModule.id, $installableModule.additionalInstallationSteps)) -Raw | ConvertFrom-Json
 
-            $masterConfiguration = Get-Content $moduleMasterInstallConfigurationTemplate -Raw | ConvertFrom-Json
 
             $additionalSteps.Includes | Get-ObjectMembers | ForEach-Object { $masterConfiguration.Includes | Add-Member -MemberType NoteProperty -Name $_.Key -Value $_.Value -Force }
             $additionalSteps.Parameters | Get-ObjectMembers | Foreach-Object { $masterConfiguration.Parameters | Add-Member -MemberType NoteProperty -Name $_.Key -Value $_.Value -Force }
             if ($null -ne $additionalSteps.Variables) {
                 $additionalSteps.Variables | Get-ObjectMembers | Foreach-Object { $masterConfiguration.Variables | Add-Member -MemberType NoteProperty -Name $_.Key -Value $_.Value -Force }
             }
-            Set-Content $moduleMasterInstallationConfiguration  (ConvertTo-Json -InputObject $masterConfiguration -Depth 5) -Force
         }
         $moduleParameters | Get-ObjectMembers | ForEach-Object { $destination.parameters | Add-Member -MemberType NoteProperty -Name $_.Key -Value $_.Value }
     }
+    Set-Content $moduleMasterInstallationConfiguration  (ConvertTo-Json -InputObject $masterConfiguration -Depth 5) -Force
 
     Set-Content $moduleInstallationConfiguration  (ConvertTo-Json -InputObject $destination -Depth 5) -Force
 }
@@ -175,10 +176,10 @@ Function Set-IncludesPath {
     $moduleMasterInstallationConfiguration = Join-Path $assets.root "configuration\module-installation\module-master-install.json"
     $moduleInstallationConfiguration = Join-Path $assets.root "configuration\module-installation\install-modules.json"
     [regex]$pattern = [regex]::escape(".\\")
-     $pattern.replace((Get-Content $moduleMasterInstallationConfiguration -Raw), $sharedResourcePath.replace('\', '\\') + "\\") | Set-Content $moduleMasterInstallationConfiguration
-     $pattern.replace((Get-Content $moduleInstallationConfiguration -Raw), $sharedResourcePath.replace('\', '\\') + "\\") | Set-Content $moduleInstallationConfiguration
-     [regex]$pattern = "install-modules\.json"
-     $pattern.replace((Get-Content $moduleMasterInstallationConfiguration -Raw),  $moduleInstallationConfiguration.replace('\','\\')) | Set-Content $moduleMasterInstallationConfiguration
+    $pattern.replace((Get-Content $moduleMasterInstallationConfiguration -Raw), $sharedResourcePath.replace('\', '\\') + "\\") | Set-Content $moduleMasterInstallationConfiguration
+    $pattern.replace((Get-Content $moduleInstallationConfiguration -Raw), $sharedResourcePath.replace('\', '\\') + "\\") | Set-Content $moduleInstallationConfiguration
+    [regex]$pattern = "install-modules\.json"
+    $pattern.replace((Get-Content $moduleMasterInstallationConfiguration -Raw), $moduleInstallationConfiguration.replace('\', '\\')) | Set-Content $moduleMasterInstallationConfiguration
 }
 Function Install-Modules {
 
@@ -219,9 +220,9 @@ Function Install-Modules {
 
 Import-Module (Join-Path $assets.sharedUtilitiesRoot "assets\modules\SharedInstallationUtilities\SharedInstallationUtilities.psm1") -Force
 
-Install-SitecoreAzureToolkit
+#Install-SitecoreAzureToolkit
 New-ModuleInstallationConfiguration
-Set-IncludesPath
-Install-Modules
+#Set-IncludesPath
+#Install-Modules
 $StopWatch.Stop()
 $StopWatch

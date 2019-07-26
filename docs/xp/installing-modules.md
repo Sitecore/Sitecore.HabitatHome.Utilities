@@ -1,7 +1,5 @@
 # Installing Modules
 
-Assuming you have a base [Sitecore Installation](installing-sitecore-xp.md), you are now ready to install additional modules.
-
 ## Quick Start
 
 ### Assumptions

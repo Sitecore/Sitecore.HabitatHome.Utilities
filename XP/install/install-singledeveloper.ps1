@@ -6,6 +6,25 @@ Param(
     [string] $devSitecorePassword
 )
 
+#Register Assets PowerShell Repository
+if ((Get-PSRepository | Where-Object { $_.Name -eq $assets.psRepositoryName }).count -eq 0) {
+  Register-PSRepository -Name $assets.psRepositoryName -SourceLocation $assets.psRepository -InstallationPolicy Trusted
+}
+
+#Sitecore Install Framework dependencies
+Import-Module WebAdministration
+
+#Install SIF
+$sifVersion = $assets.installerVersion -replace "-beta[0-9]*$"
+
+$module = Get-Module -FullyQualifiedName @{ModuleName = "SitecoreInstallFramework"; ModuleVersion = $sifVersion }
+if (-not $module) {
+  Write-Host "Installing the Sitecore Install Framework, version $($assets.installerVersion)" -ForegroundColor Green
+  Install-Module SitecoreInstallFramework -Repository $assets.psRepositoryName -Scope CurrentUser -Force
+  Import-Module SitecoreInstallFramework -Force
+}
+
+
 #####################################################
 #
 #  Install Sitecore
