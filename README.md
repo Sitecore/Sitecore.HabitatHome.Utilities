@@ -18,4 +18,4 @@ These scripts are written in the context of the Habitat Home Demos. They can be 
 
 ## Installation Instructions
 
-[Installation Instructions](docs/index.md)
+[Installation Instructions](docs/readme.md)

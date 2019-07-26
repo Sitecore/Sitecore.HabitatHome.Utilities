@@ -27,4 +27,4 @@ In addition to what the OOB installer will do, `install-singledeveloper.ps1` wil
 
 [Continue to Next Step (Installing Modules)](installing-modules.md)
 
-[Return to Index](index.md)
+[Return to Index](readme.md)

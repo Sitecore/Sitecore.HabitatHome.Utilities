@@ -52,6 +52,7 @@ $loginSession = $null
 if (!(Test-Path $packagesFolder)) {
     New-Item $packagesFolder -ItemType Directory -Force  > $null
 }
+
 Function Get-SitecoreCredentials {
 
     if ($null -eq $global:credentials) {
@@ -74,24 +75,6 @@ Function Get-SitecoreCredentials {
 
 }
 
-Function Install-SitecoreInstallFramework {
-    if ((Get-PSRepository | Where-Object { $_.Name -eq $assets.psRepositoryName }).count -eq 0) {
-        Register-PSRepository -Name $assets.psRepositoryName -SourceLocation $assets.psRepository -InstallationPolicy Trusted
-    }
-
-    #Sitecore Install Framework dependencies
-    Import-Module WebAdministration
-
-    #Install SIF
-    $sifVersion = $assets.installerVersion
-
-    $module = Get-Module -FullyQualifiedName @{ModuleName = "SitecoreInstallFramework"; ModuleVersion = $sifVersion }
-    if (-not $module) {
-        write-host "Installing the Sitecore Install Framework, version $($assets.installerVersion)" -ForegroundColor Green
-        Install-Module SitecoreInstallFramework -Repository $assets.psRepositoryName -RequiredVersion $sifVersion -Scope CurrentUser -Force
-        Import-Module SitecoreInstallFramework -Force
-    }
-}
 Function Install-SitecoreAzureToolkit {
 
     # Download Sitecore Azure Toolkit (used for converting modules)
@@ -133,6 +116,7 @@ function Get-ObjectMembers {
         [PSCustomObject]@{Key = $key; Value = $obj."$key" }
     }
 }
+
 Function New-ModuleInstallationConfiguration {
     $installableModules = $modules | Where-Object { $_.install -eq $true -and $_.id -ne "sat" }
     $moduleConfigurationTemplate = Join-Path $sharedResourcePath  "templates\module-install-template.json"
@@ -231,12 +215,10 @@ Function Install-Modules {
     Push-Location $sharedResourcePath
     Install-SitecoreConfiguration @params
     Pop-Location
-
 }
 
 Import-Module (Join-Path $assets.sharedUtilitiesRoot "assets\modules\SharedInstallationUtilities\SharedInstallationUtilities.psm1") -Force
 
-Install-SitecoreInstallFramework
 Install-SitecoreAzureToolkit
 New-ModuleInstallationConfiguration
 Set-IncludesPath

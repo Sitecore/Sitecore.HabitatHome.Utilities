@@ -33,4 +33,4 @@ Still in an elevated PowerShell session:
 
 [Continue to Next Step (Preparing for Installation)](preparing-installation.md)
 
-[Return to Index](index.md)
+[Return to Index](readme.md)

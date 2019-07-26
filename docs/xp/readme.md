@@ -2,7 +2,7 @@
 
 ## Prerequisites
 
-These steps assume you have all of the prerequisites installed as detailed in the [instructions](../prerequisites/index.md)
+These steps assume you have all of the prerequisites installed as detailed in the [instructions](../prerequisites/readme.md)
 
 ## A bit about the process
 
@@ -53,6 +53,6 @@ Let's move onto the final step: [Installing Modules](installing-modules.md)
 
 [Security Hardening](..\securityHardening.md)
 
-[Installing Experience Commerce (XC)](..\xc\index.md)
+[Installing Experience Commerce (XC)](..\xc\readme.md)
 
-[Return to main docs index](../index.md)
+[Return to main docs index](../readme.md)
