@@ -3,9 +3,9 @@ Param(
 )
 
 #####################################################
-# 
+#
 #  Uninstall Sitecore
-# 
+#
 #####################################################
 $ErrorActionPreference = 'Stop'
 Set-Location $PSScriptRoot
@@ -15,7 +15,7 @@ if (!(Test-Path $ConfigurationFile)) {
     Write-Host  "Please use 'set-installation...ps1' files to generate a configuration file." -ForegroundColor Red
     Exit 1
 }
-$config = Get-Content -Raw $ConfigurationFile -Force |  ConvertFrom-Json 
+$config = Get-Content -Raw $ConfigurationFile -Force |  ConvertFrom-Json
 if (!$config) {
     throw "Error trying to load configuration!"
 }
@@ -40,12 +40,12 @@ Write-Host "*******************************************************" -Foreground
 
 
 
-# Remove App Pool membership 
+# Remove App Pool membership
 
 try {
     Remove-LocalGroupMember "Performance Log Users" "IIS AppPool\$($site.hostName)"
     Write-Host "Removed IIS AppPool\$($site.hostName) from Performance Log Users" -ForegroundColor Green
-  
+
 }
 catch {
     Write-Host "Warning: Couldn't remove IIS AppPool\$($site.hostName) from Performance Log Users -- user may not exist" -ForegroundColor Yellow
@@ -105,9 +105,9 @@ Pop-Location
 
 $sxaSolrUninstallParams = @{
     Path                  = Join-path $sharedresourcePath 'sxa\sxa-solr.json'
-    SolrUrl               = $solr.url 
-    SolrRoot              = $solr.root 
-    SolrService           = $solr.serviceName 
+    SolrUrl               = $solr.url
+    SolrRoot              = $solr.root
+    SolrService           = $solr.serviceName
     CorePrefix            = $site.prefix
     SiteName              = $site.hostName
     SitecoreAdminPassword = $sitecore.adminPassword
@@ -118,9 +118,9 @@ Install-SitecoreConfiguration @sxaSolrUninstallParams -Uninstall  *>&1 | Tee-Obj
 
 Write-Host "Removing folders from webroot" -ForegroundColor Green
 $webRoot = $site.webRoot
-Write-Host ("Removing {0}" -f (Join-path $webRoot $site.hostName)) 
+Write-Host ("Removing {0}" -f (Join-path $webRoot $site.hostName))
 Remove-Item -Path (Join-path $webRoot $site.hostName) -Recurse -Force -ErrorAction SilentlyContinue
-Write-Host ("Removing {0}" -f (Join-path $webRoot $xconnect.siteName)) 
+Write-Host ("Removing {0}" -f (Join-path $webRoot $xconnect.siteName))
 Remove-Item -Path (Join-path $webRoot $xconnect.siteName) -Recurse -Force -ErrorAction SilentlyContinue
-Write-Host ("Removing {0}" -f (Join-path $webRoot $identityServer.name)) 
+Write-Host ("Removing {0}" -f (Join-path $webRoot $identityServer.name))
 Remove-Item -Path (Join-path $webRoot $identityServer.name) -Recurse -Force -ErrorAction SilentlyContinue
