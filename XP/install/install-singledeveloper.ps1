@@ -18,7 +18,6 @@ $ErrorActionPreference = 'Stop'
 $StopWatch = New-Object -TypeName System.Diagnostics.Stopwatch
 $StopWatch.Start()
 
-
 Set-Location $PSScriptRoot
 $LogFolder = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($LogFolder)
 if (!(Test-Path $LogFolder)) {
@@ -50,6 +49,11 @@ $modules = $config.modules
 $resourcePath = Join-Path $assets.root "configuration"
 $sharedResourcePath = Join-Path $assets.sharedUtilitiesRoot "assets\configuration"
 
+Import-Module (Join-Path $assets.sharedUtilitiesRoot "assets\modules\SharedInstallationUtilities\SharedInstallationUtilities.psm1") -Force
+
+#Ensure the Correct SIF Version is Imported
+Import-SitecoreInstallFramework -version $assets.installerVersion
+
 Write-Host "*******************************************************" -ForegroundColor Green
 Write-Host " Installing Sitecore" -ForegroundColor Green
 Write-Host " Sitecore: $($site.hostName)" -ForegroundColor Green
@@ -58,7 +62,6 @@ Write-Host " identityserver: $($identityServer.name)" -ForegroundColor Green
 Write-Host "*******************************************************" -ForegroundColor Green
 
 Function Get-SitecoreCredentials {
-
     if ($null -eq $global:credentials) {
         if ([string]::IsNullOrEmpty($devSitecoreUsername)) {
             $global:credentials = Get-Credential -Message "Please provide dev.sitecore.com credentials"
@@ -76,34 +79,10 @@ Function Get-SitecoreCredentials {
 
     Invoke-RestMethod -Uri https://dev.sitecore.net/api/authorization -Method Post -ContentType "application/json" -Body "{username: '$user', password: '$password'}" -SessionVariable loginSession -UseBasicParsing
     $global:loginSession = $loginSession
-
 }
 
-Function Install-SitecoreInstallFramework {
-    #Register Assets PowerShell Repository
-    if ((Get-PSRepository | Where-Object { $_.Name -eq $assets.psRepositoryName }).count -eq 0) {
-        Register-PSRepository -Name $assets.psRepositoryName -SourceLocation $assets.psRepository -InstallationPolicy Trusted
-    }
-
-    #Sitecore Install Framework dependencies
-    Import-Module WebAdministration
-
-    #Install SIF
-    $sifVersion = $assets.installerVersion -replace "-beta[0-9]*$"
-
-    $module = Get-Module -FullyQualifiedName @{ModuleName = "SitecoreInstallFramework"; ModuleVersion = $sifVersion }
-    if (-not $module) {
-        Write-Host "Installing the Sitecore Install Framework, version $($assets.installerVersion)" -ForegroundColor Green
-        Install-Module SitecoreInstallFramework -Repository $assets.psRepositoryName -Scope CurrentUser -Force
-        Import-Module SitecoreInstallFramework -Force
-    }
-}
-Function Download-Assets {
-
-    $downloadAssets = $modules
+Function Get-Assets {
     $downloadFolder = $assets.packageRepository
-    $packagesFolder = (Join-Path $downloadFolder "modules")
-
 
     # Download Sitecore
     if (!(Test-Path $downloadFolder)) {
@@ -132,8 +111,8 @@ Function Download-Assets {
     if ((Test-Path $destination) -and ( $package.extract -eq $true)) {
         sz x -o"$DownloadFolder" $destination  -y -aoa
     }
-
 }
+
 Function Confirm-Prerequisites {
     #Enable Contained Databases
     Write-Host "Enable contained databases" -ForegroundColor Green
@@ -206,7 +185,6 @@ Function Confirm-Prerequisites {
 }
 
 Function Install-SingleDeveloper {
-
     $singleDeveloperParams = @{
         Path                           = $sitecore.singleDeveloperConfigurationPath
         SqlServer                      = $sql.server
@@ -251,8 +229,8 @@ Function Install-SingleDeveloper {
     Install-SitecoreConfiguration @singleDeveloperParams
     Pop-Location
 }
-Function Add-AppPoolMembership {
 
+Function Add-AppPoolMembership {
     #Add ApplicationPoolIdentity to performance log users to avoid Sitecore log errors (https://kb.sitecore.net/articles/404548)
 
     try {
@@ -308,8 +286,7 @@ Function Add-AdditionalBindings {
     }
 }
 
-Install-SitecoreInstallFramework
-Download-Assets
+Get-Assets
 Confirm-Prerequisites
 Install-SingleDeveloper
 Add-AppPoolMembership

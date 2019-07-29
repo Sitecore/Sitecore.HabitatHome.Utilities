@@ -1,4 +1,3 @@
-
 Function Replace-String {
     param(
         [Parameter(Mandatory = $true)]
@@ -18,13 +17,9 @@ Function Replace-String {
     $result = $null
     $result = $source -replace $search, $replace
 
-
     Write-Verbose "Result: $result"
     return $result
 }
-
-
-
 
 Function Add-DatabaseUser {
     param(
@@ -57,7 +52,6 @@ Function Add-DatabaseUser {
     }
     #Write-Host "Sql File: $sqlFile"
     Invoke-Sqlcmd -Variable $sqlVariables -Username $SqlAdminUser -Password $SqlAdminPassword -ServerInstance $SqlServer -InputFile $sqlFile
-
 }
 
 Function Kill-DatabaseConnections {
@@ -80,7 +74,6 @@ Function Kill-DatabaseConnections {
 
     #Write-Host "Sql File: $sqlFile"
     Invoke-Sqlcmd -Variable $sqlVariables -Username $SqlAdminUser -Password $SqlAdminPassword -ServerInstance $SqlServer -InputFile $sqlFile
-
 }
 
 Function Start-SitecoreSite {
@@ -149,32 +142,30 @@ Function Start-SitecoreSite {
     }
 }
 
-Function Assert-IsDemoModule {
-    param (
-        [Parameter(Mandatory, Position = 0)]
-        [string]$Wdp
+Function Get-ObjectMembers {
+    [CmdletBinding()]
+    Param(
+        [Parameter(Mandatory = $True, ValueFromPipeline = $True)]
+        [PSCustomObject]$obj
     )
-    Add-Type -Assembly "system.io.compression.filesystem"
-    $zip = [io.compression.zipfile]::OpenRead($Wdp)
-    $file = $zip.Entries | Where-Object { $_.Name -eq "parameters.xml" }
-    if ($null -eq $file) {
-        Write-Error -Message "parameters.xml file not found"
-        return $false
-    }
-
-    $stream = $file.open()
-    $reader = New-Object IO.StreamReader($stream)
-    $text = $reader.ReadToEnd()
-    $reader.Close()
-    $stream.Close()
-    $zip.Dispose()
-    $xml = [xml]$text
-    $iisAppParameterName = ($xml.parameters.parameter | Where-Object { $_.tags -contains "iisapp" }).name
-    if ( $iisAppParameterName -eq "IIS Web Application Name") {
-        return $true
-    }
-    else {
-        return $false
+    $obj | Get-Member -MemberType NoteProperty | ForEach-Object {
+        $key = $_.Name
+        [PSCustomObject]@{Key = $key; Value = $obj."$key" }
     }
 }
 
+Function Import-SitecoreInstallFramework {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $True)]
+        [string]$version
+    )
+
+    if (Get-Module -Name SitecoreInstallFramework) {
+        Write-Host "Unloading SIF"
+        Remove-Module SitecoreInstallFramework -Force
+    }
+    $sifVersion = $version -replace "-beta[0-9]*$"
+    Write-Host "Loading SIF $sifVersion"
+    Import-Module SitecoreInstallFramework -RequiredVersion $sifVersion -Global -Force
+}

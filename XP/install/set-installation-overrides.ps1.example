@@ -27,14 +27,6 @@ $site.suffix = "dev.local"
 $site.webroot = "C:\inetpub\wwwroot"
 $site.hostName = $json.settings.site.prefix + "." + $json.settings.site.suffix
 
-# #### EXAMPLE additional bindings
-# $otherAdditionalBinding = [ordered]@{
-#     hostName = "otherexample.dev.local"
-#     createCertificate = $false
-# }
-# $otherAdditionalBinding = $otherAdditionalBinding | ConvertTo-Json
-# $site.additionalBindings += (ConvertFrom-Json -InputObject $otherAdditionalBinding)
-
 # Sitecore Parameters
 $sitecore = $json.settings.sitecore
 $sitecore.adminPassword = "b"
@@ -51,11 +43,23 @@ $solr.serviceName = "Solr-7.5.0"
 # SQL Settings
 $sql = $json.settings.sql
 
-$SqlStrongPassword = "Str0NgPA33w0rd!!" # Used for all other services
-
+$SqlSaPassword = "Str0NgPA33w0rd!!"
+$SqlStrongPassword = $SqlSaPassword # Used for all other services
 $sql.server = "."
 $sql.adminUser = "sa"
-$sql.adminPassword = $SqlStrongPassword
+
+# #### EXAMPLE additional bindings
+# $otherAdditionalBinding = [ordered]@{
+#     hostName = "otherexample.dev.local"
+#     createCertificate = $false
+#     port = 443
+# }
+# $otherAdditionalBinding = $otherAdditionalBinding | ConvertTo-Json
+# $site.additionalBindings += (ConvertFrom-Json -InputObject $otherAdditionalBinding)
+
+##### You should not need to modify settings below
+
+$sql.adminPassword = $SqlSaPassword
 $sql.userPassword = $SqlStrongPassword
 $sql.coreUser =  "coreuser"
 $sql.corePassword = $SqlStrongPassword
@@ -96,11 +100,10 @@ $identityServer.name = $site.prefix + "-identityserver." + $site.suffix
 $identityServer.url = ("https://{0}" -f $identityServer.name)
 $identityServer.clientSecret = "ClientSecret"
 
-
-Write-Host "Setting  'modules' parameters"
+Write-Host "Setting modules parameters in $configurationFile"
 # Modules
 
-Function Replace-Path {
+Function Reset-Path {
     param(
         $module,
         $root
@@ -109,30 +112,25 @@ Function Replace-Path {
 }
 
 $modulesConfig = Get-Content $assetsJsonPath -Raw  -Encoding Ascii |  ConvertFrom-Json
-
 $modules = $json.modules
-
 $sitecore = $modulesConfig.sitecore
 
 $config = @{
-    id       = $sitecore.id
-    name     = $sitecore.name
-    fileName = Join-Path $assets.packageRepository ("\{0}" -f $sitecore.fileName)
-    url      = $sitecore.url
-    extract  = $sitecore.extract
-    source   = $sitecore.source
-    databases = $sitecore.databases
+    id          = $sitecore.id
+    name        = $sitecore.name
+    fileName    = Join-Path $assets.packageRepository ("\{0}" -f $sitecore.fileName)
+    url         = $sitecore.url
+    extract     = $sitecore.extract
+    source      = $sitecore.source
+    databases   = $sitecore.databases
 }
 $config = $config| ConvertTo-Json
 $modules += (ConvertFrom-Json -InputObject $config)
 
 foreach ($module in $modulesConfig.modules) {
-    Replace-Path $module $assets.packageRepository
+    Reset-Path $module $assets.packageRepository
 }
 $modules += $modulesConfig.modules
-
-$json.modules = $modules
-
 
 $json.modules = $modules
 
