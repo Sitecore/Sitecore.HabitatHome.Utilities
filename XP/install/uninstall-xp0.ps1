@@ -26,35 +26,19 @@ $sitecore = $config.settings.sitecore
 $identityServer = $config.settings.identityServer
 $solr = $config.settings.solr
 $assets = $config.assets
-$modules = $config.modules
 $resourcePath = Join-Path $assets.root "configuration"
 $sharedResourcePath = Join-Path $assets.sharedUtilitiesRoot "assets\configuration"
 
-#Register Assets PowerShell Repository
-if ((Get-PSRepository | Where-Object { $_.Name -eq $assets.psRepositoryName }).count -eq 0) {
-    Register-PSRepository -Name $assets.psRepositoryName -SourceLocation $assets.psRepository -InstallationPolicy Trusted
-}
+Import-Module (Join-Path $assets.sharedUtilitiesRoot "assets\modules\SharedInstallationUtilities\SharedInstallationUtilities.psm1") -Force
 
-#Sitecore Install Framework dependencies
-Import-Module WebAdministration
-
-#Install SIF
-$sifVersion = $assets.installerVersion -replace "-beta[0-9]*$"
-
-$module = Get-Module -FullyQualifiedName @{ModuleName = "SitecoreInstallFramework"; ModuleVersion = $sifVersion }
-if (-not $module) {
-    Write-Host "Installing the Sitecore Install Framework, version $($assets.installerVersion)" -ForegroundColor Green
-    Install-Module SitecoreInstallFramework -Repository $assets.psRepositoryName -Scope CurrentUser -Force
-    Import-Module SitecoreInstallFramework -Force
-}
+#Ensure the Correct SIF Version is Imported
+Import-SitecoreInstallFramework -version $assets.installerVersion
 
 Write-Host "*******************************************************" -ForegroundColor Green
 Write-Host " UNInstalling Sitecore $($assets.sitecoreVersion)" -ForegroundColor Green
 Write-Host " Sitecore: $($site.hostName)" -ForegroundColor Green
 Write-Host " xConnect: $($xConnect.siteName)" -ForegroundColor Green
 Write-Host "*******************************************************" -ForegroundColor Green
-
-
 
 # Remove App Pool membership
 
@@ -87,7 +71,6 @@ try {
 catch {
     Write-Host "Warning: Couldn't remove IIS AppPool\$($xConnect.siteName) from Performance Log Users -- user may not exist" -ForegroundColor Yellow
 }
-
 
 $singleDeveloperParams = @{
     Path                           = $sitecore.singleDeveloperConfigurationPath
@@ -130,7 +113,6 @@ $sxaSolrUninstallParams = @{
 }
 
 Install-SitecoreConfiguration @sxaSolrUninstallParams -Uninstall  *>&1 | Tee-Object XP0-SingleDeveloper.log
-
 
 Write-Host "Removing folders from webroot" -ForegroundColor Green
 $webRoot = $site.webRoot

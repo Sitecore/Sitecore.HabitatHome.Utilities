@@ -49,12 +49,16 @@ $packagesFolder = (Join-Path $downloadFolder "modules")
 
 $loginSession = $null
 
+Import-Module (Join-Path $assets.sharedUtilitiesRoot "assets\modules\SharedInstallationUtilities\SharedInstallationUtilities.psm1") -Force
+
+#Ensure the Correct SIF Version is Imported
+Import-SitecoreInstallFramework -version $assets.installerVersion
+
 if (!(Test-Path $packagesFolder)) {
     New-Item $packagesFolder -ItemType Directory -Force  > $null
 }
 
 Function Get-SitecoreCredentials {
-
     if ($null -eq $global:credentials) {
         if ([string]::IsNullOrEmpty($devSitecoreUsername)) {
             $global:credentials = Get-Credential -Message "Please provide dev.sitecore.com credentials"
@@ -72,11 +76,9 @@ Function Get-SitecoreCredentials {
 
     Invoke-RestMethod -Uri https://dev.sitecore.net/api/authorization -Method Post -ContentType "application/json" -Body "{username: '$user', password: '$password'}" -SessionVariable loginSession -UseBasicParsing
     $global:loginSession = $loginSession
-
 }
 
 Function Install-SitecoreAzureToolkit {
-
     # Download Sitecore Azure Toolkit (used for converting modules)
     $package = $modules | Where-Object { $_.id -eq "sat" }
 
@@ -85,7 +87,6 @@ Function Install-SitecoreAzureToolkit {
     $destination = $package.fileName
 
     if (!(Test-Path $destination)) {
-
         Get-SitecoreCredentials
 
         $params = @{
@@ -102,19 +103,6 @@ Function Install-SitecoreAzureToolkit {
         sz x -o"$($assets.sitecoreazuretoolkit)" $destination  -y -aoa
     }
     Import-Module (Join-Path $assets.sitecoreazuretoolkit "tools\Sitecore.Cloud.CmdLets.dll") -Force
-
-}
-
-function Get-ObjectMembers {
-    [CmdletBinding()]
-    Param(
-        [Parameter(Mandatory = $True, ValueFromPipeline = $True)]
-        [PSCustomObject]$obj
-    )
-    $obj | Get-Member -MemberType NoteProperty | ForEach-Object {
-        $key = $_.Name
-        [PSCustomObject]@{Key = $key; Value = $obj."$key" }
-    }
 }
 
 Function New-ModuleInstallationConfiguration {
@@ -127,7 +115,7 @@ Function New-ModuleInstallationConfiguration {
 
     $template = Get-Content $moduleConfigurationTemplate -Raw | ConvertFrom-Json
     $destination = Get-Content $moduleConfigurationTemplate -Raw | ConvertFrom-Json
-    
+
     $masterConfiguration = Get-Content $moduleMasterInstallConfigurationTemplate -Raw | ConvertFrom-Json
 
     foreach ($installableModule in $installableModules) {
@@ -158,7 +146,6 @@ Function New-ModuleInstallationConfiguration {
         if ($null -ne $installablemodule.additionalInstallationSteps) {
             $additionalSteps = Get-Content $([io.path]::combine($sharedResourcePath, $installableModule.id, $installableModule.additionalInstallationSteps)) -Raw | ConvertFrom-Json
 
-
             $additionalSteps.Includes | Get-ObjectMembers | ForEach-Object { $masterConfiguration.Includes | Add-Member -MemberType NoteProperty -Name $_.Key -Value $_.Value -Force }
             $additionalSteps.Parameters | Get-ObjectMembers | Foreach-Object { $masterConfiguration.Parameters | Add-Member -MemberType NoteProperty -Name $_.Key -Value $_.Value -Force }
             if ($null -ne $additionalSteps.Variables) {
@@ -167,6 +154,7 @@ Function New-ModuleInstallationConfiguration {
         }
         $moduleParameters | Get-ObjectMembers | ForEach-Object { $destination.parameters | Add-Member -MemberType NoteProperty -Name $_.Key -Value $_.Value }
     }
+
     Set-Content $moduleMasterInstallationConfiguration  (ConvertTo-Json -InputObject $masterConfiguration -Depth 5) -Force
 
     Set-Content $moduleInstallationConfiguration  (ConvertTo-Json -InputObject $destination -Depth 5) -Force
@@ -181,9 +169,9 @@ Function Set-IncludesPath {
     [regex]$pattern = "install-modules\.json"
     $pattern.replace((Get-Content $moduleMasterInstallationConfiguration -Raw), $moduleInstallationConfiguration.replace('\', '\\')) | Set-Content $moduleMasterInstallationConfiguration
 }
-Function Install-Modules {
 
-    $bootLoaderPackagePath = [IO.Path]::Combine( $assets.sitecoreazuretoolkit, "resources\9.2.0\Addons\Sitecore.Cloud.Integration.Bootload.wdp.zip")
+Function Install-Modules {
+    $bootLoaderPackagePath = [IO.Path]::Combine($assets.sitecoreazuretoolkit, "resources\9.2.0\Addons\Sitecore.Cloud.Integration.Bootload.wdp.zip")
     $bootloaderConfigurationOverride = $([io.path]::combine($assets.sharedUtilitiesRoot, "assets", 'Sitecore.Cloud.Integration.Bootload.InstallJob.exe.config'))
     $bootloaderInstallationPath = $([io.path]::combine($site.webRoot, $site.hostName, "App_Data\tools\InstallJob"))
 
@@ -218,11 +206,10 @@ Function Install-Modules {
     Pop-Location
 }
 
-Import-Module (Join-Path $assets.sharedUtilitiesRoot "assets\modules\SharedInstallationUtilities\SharedInstallationUtilities.psm1") -Force
-
-#Install-SitecoreAzureToolkit
+Install-SitecoreAzureToolkit
 New-ModuleInstallationConfiguration
-#Set-IncludesPath
-#Install-Modules
+Set-IncludesPath
+Install-Modules
+
 $StopWatch.Stop()
 $StopWatch
