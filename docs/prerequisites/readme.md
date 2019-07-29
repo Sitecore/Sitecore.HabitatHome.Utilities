@@ -37,11 +37,9 @@ Installs Sitecore Install Framework from the newly registered Sitecore Gallery
 
 ### Install Prerequisites
 
-Uses the `prerequisites.json` SIF configuration file supplied to install the known Windows prerequisites for the version of Sitecore you are attempting to install.
+Uses the `Prerequisites.json` SIF configuration file from the `Prerequisites` folder to install the known Windows prerequisites for the version of Sitecore you are attempting to install.
 
-The Prerequisites.json file can be found in the XP*Configuration zip package available when downloading Sitecore (OnPrem) from dev.sitecore.com
-
-Ensure you're using the correct version of the Prerequisites.json file. One has been included here as an example but may change with new versions of the product.
+The `Prerequisites.json` file is coming from the zip package of the Sitecore version to install. It is updated every time this repo is modified to install a different Sitecore version.
 
 ## Next Steps
 
