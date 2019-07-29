@@ -4,6 +4,12 @@
 
 These steps assume you have all of the prerequisites installed as detailed in the [instructions](../prerequisites/readme.md)
 
+### Solr
+
+If you haven't already done so, you need to ensure you have the correct (supported) version of Solr installed.
+
+See [solr instructions](solr.md) for details.
+
 ## A bit about the process
 
 The `install-singledeveloper.ps1` script takes in a JSON configuration file (defaults to `.\configuration-xp0.json`) and runs through the entire platform installation.
@@ -22,23 +28,17 @@ The `set-installation-overrides.ps1.example` script needs to be copied and renam
 
 ## Installation
 
-### 1. Solr - Prerequisite
+### 1. Preparing for Installation
 
-If you haven't already done so, you need to ensure you have the correct (supported) version of Solr installed.
+Just a couple of steps before we get started. Take a look at [preparing for installation](preparing-installation.md) before going any further.
 
-See [solr instructions](solr.md) for details
+### 2. Installing Sitecore XP
 
-### 2. Preparing for Installation
+Now that your configuration is set, [let's install!](installing-sitecore-xp.md)
 
-Just a **couple of steps** before we get started. Take a look at [**preparing for installation**](preparing-installation.md) before going any further.
+### 3. Installing Modules
 
-### 3. Installing Sitecore XP
-
-Now that your configuration is set, **[let's install!](installing-sitecore-xp.md)**
-
-### 4. Installing Modules
-
-If all went well in #2, you have a successful installation of Sitecore XP. In order to support HabitatHome.Platform (SXA Demo) you need to install additional modules.
+If all went well, you have a successful installation of Sitecore XP. In order to support HabitatHome.Platform (SXA Demo) you need to install additional modules.
 
 Let's move onto the final step: [Installing Modules](installing-modules.md)
 
@@ -49,10 +49,12 @@ Let's move onto the final step: [Installing Modules](installing-modules.md)
 >
 > **WORKAROUND:** Manually download the larger Sitecore WDP Package required and place it into the repository specified in `set-installation-defaults.ps1`.
 
-[Warming up an Instance](..\warmup.md)
+## Next Steps
 
-[Security Hardening](..\securityHardening.md)
+[Warming up an Instance](../warmup.md)
 
-[Installing Experience Commerce (XC)](..\xc\readme.md)
+[Security Hardening](../securityHardening.md)
+
+[Installing Experience Commerce (XC)](../xc/readme.md)
 
 [Return to main docs index](../readme.md)
