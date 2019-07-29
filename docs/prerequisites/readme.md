@@ -5,19 +5,9 @@
 - Open PowerShell session as Administrator
 - Ensure correct [ExecutionPolicy](https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_execution_policies?view=powershell-6) is set  for unsigned scripts
 
-**example:** `Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope CurrentUser`
+  - **example:** `Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope CurrentUser`
 
 ## Installing Prerequisites
-
-```powershell
-$Global:ProgressPreference = 'SilentlyContinue'
-```
-
-The above will turn off the PowerShell progress bar to **greatly** enhance download speeds
-
-```powershell
-$Global:ProgressPreference = 'Continue'
-```
 
 ```powershell
 .\Install-All.ps1
