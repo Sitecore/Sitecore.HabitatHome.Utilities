@@ -18,7 +18,7 @@ lib/Sitecore/*
 !lib/Sitecore/readme.MD
 !lib/Modules/*
 lib/System/*
-!lib/System/readme.MD	
+!lib/System/readme.MD
 lib/LocalRepository/*
 .sonar
 vars.user.cmd
@@ -69,3 +69,5 @@ Publish
 dev.creds.xml
 *.pfx
 shared/sat
+install-modules.json
+module-master-install.json

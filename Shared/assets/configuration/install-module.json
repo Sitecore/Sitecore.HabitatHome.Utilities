@@ -68,7 +68,7 @@
           ]
         }
       },
-      "Skip": "[equal(variable('Skip.None'),'True')]"
+      "Skip": "[variable('Skip.None')]"
     },
     "InstallWDPModuleMasterCore": {
       "Type": "WebDeploy",

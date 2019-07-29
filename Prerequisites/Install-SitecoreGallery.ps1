@@ -1,14 +1,15 @@
 param (
-    [string]$nugetServer="http://nuget1ca2/nuget/Sitecore_Gallery"
+    [string]$nugetServer="https://sitecore.myget.org/F/sc-powershell/api/v2/"
 )
 
-$gallery = Get-PSRepository|Where-Object {$_.Name -eq "SitecoreGallery"} 
+$repositoryName = "SitecoreGallery"
+$gallery = Get-PSRepository | Where-Object { $_.Name -eq $repositoryName }
 
 if (!$gallery) {
-    Register-PSRepository -Name SitecoreGallery -SourceLocation $nugetServer -PublishLocation $nugetServer -InstallationPolicy Trusted
+    Register-PSRepository -Name $repositoryName -SourceLocation $nugetServer -PublishLocation $nugetServer -InstallationPolicy Trusted
 }
 elseif (($gallery.SourceLocation -ne $nugetServer) -or ($gallery.PublishLocation -ne $nugetServer) -or !$gallery.Trusted) {
-    Set-PSRepository -Name SitecoreGallery -SourceLocation $nugetServer -PublishLocation $nugetServer -InstallationPolicy Trusted
+    Set-PSRepository -Name $repositoryName -SourceLocation $nugetServer -PublishLocation $nugetServer -InstallationPolicy Trusted
 }
 
-Get-PSRepository -Name "SitecoreGallery" | Format-List * -Force
+Get-PSRepository -Name $repositoryName | Format-List * -Force
