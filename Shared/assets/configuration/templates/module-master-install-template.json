@@ -1,13 +1,11 @@
 {
     "Parameters": {
-        "SharedConfigurationPath": {
-            "Type": "string",
-            "DefaultValue": "",
-            "Description": "Path to the 'Shared Configuration' folder"
-        },
         "SiteName": {
             "Type": "string",
             "DefaultValue": ""
+        },
+        "WebRoot": {
+            "Type": "string"
         },
         "XConnectSiteName": {
             "Type": "string",
@@ -63,13 +61,6 @@
             "DefaultValue": "",
             "Description": "Empty"
         },
-        "AssetsJson": {
-            "Type": "string",
-            "DefaultValue": ""
-        },
-        "LoginSession": {
-            "Type": "Microsoft.PowerShell.Commands.WebRequestSession"
-        },
         "BootloaderPackagePath": {
             "Type": "string",
             "DefaultValue": "",
@@ -82,6 +73,9 @@
         "BootloaderInstallationPath": {
             "Type": "string",
             "Description": "Location of bootloader data folder"
+        },
+        "LoginSession": {
+            "Type": "Microsoft.PowerShell.Commands.WebRequestSession"
         },
         "SolrUrl": {
             "Type": "string",
@@ -100,14 +94,13 @@
         },
         "CorePrefix": {
             "Type": "string",
+            "DefaultValue": "",
             "Description": "Solr Core Prefix"
         },
         "SitecoreAdminPassword": {
             "Type": "string",
+            "DefaultValue": "",
             "Description": "Sitecore Admin password"
-        },
-        "WebRoot": {
-            "Type": "string"
         },
         "InitializeInstallation:CoreUserName": {
             "Type": "string",
@@ -157,53 +150,49 @@
             "Type": "string",
             "Reference": "BootloaderInstallationPath"
         },
-        "InstallSitecorePowershellExtensions:SqlServer": {
-            "Type": "string",
-            "Reference": "SqlServer"
-        },
-        "InstallSitecorePowershellExtensions:SqlAdminUser": {
-            "Type": "string",
-            "Reference": "SqlAdminUser"
-        },
-        "InstallSitecorePowershellExtensions:SqlAdminPassword": {
-            "Type": "string",
-            "Reference": "SqlAdminPassword"
-        },
-        "InstallSitecorePowershellExtensions:DatabasePrefix": {
-            "Type": "string",
-            "Reference": "DatabasePrefix"
-        },
-        "InstallSitecorePowershellExtensions:LoginSession": {
-            "Type": "Microsoft.PowerShell.Commands.WebRequestSession",
-            "Reference": "LoginSession"
-        },
-        "InstallSitecorePowershellExtensions:SiteName": {
+        "InstallModules:SiteName": {
             "Type": "string",
             "Reference": "SiteName"
         },
-        "InstallSitecoreExperienceAccelerator:SqlServer": {
-            "Type": "string",
-            "Reference": "SqlServer"
-        },
-        "InstallSitecoreExperienceAccelerator:SqlAdminUser": {
-            "Type": "string",
-            "Reference": "SqlAdminUser"
-        },
-        "InstallSitecoreExperienceAccelerator:SqlAdminPassword": {
-            "Type": "string",
-            "Reference": "SqlAdminPassword"
-        },
-        "InstallSitecoreExperienceAccelerator:DatabasePrefix": {
+        "InstallModules:DatabasePrefix": {
             "Type": "string",
             "Reference": "DatabasePrefix"
         },
-        "InstallSitecoreExperienceAccelerator:LoginSession": {
+        "InstallModules:SqlAdminUser": {
+            "Type": "string",
+            "Reference": "SqlAdminUser"
+        },
+        "InstallModules:SqlAdminPassword": {
+            "Type": "string",
+            "Reference": "SqlAdminPassword"
+        },
+        "InstallModules:SqlServer": {
+            "Type": "string",
+            "Reference": "SqlServer"
+        },
+        "InstallModules:LoginSession": {
             "Type": "Microsoft.PowerShell.Commands.WebRequestSession",
             "Reference": "LoginSession"
         },
-        "InstallSitecoreExperienceAccelerator:SiteName": {
+        "InstallModules:CorePrefix": {
             "Type": "string",
-            "Reference": "SiteName"
+            "Reference": "CorePrefix"
+        },
+        "InstallModules:SitecoreAdminPassword": {
+            "Type": "string",
+            "Reference": "SitecoreAdminPassword"
+        },
+        "InstallModules:SolrRoot": {
+            "Type": "string",
+            "Reference": "SolrRoot"
+        },
+        "InstallModules:SolrService": {
+            "Type": "string",
+            "Reference": "SolrService"
+        },
+        "InstallModules:SolrUrl": {
+            "Type": "string",
+            "Reference": "SolrUrl"
         },
         "CompleteInstallation:SqlServer": {
             "Type": "string",
@@ -252,44 +241,9 @@
         "CompleteInstallation:DatabasePrefix": {
             "Type": "string",
             "Reference": "DatabasePrefix"
-        },
-        "ConfigureSXAIndexes:SolrUrl": {
-            "Type": "string",
-            "Reference": "SolrUrl"
-        },
-        "ConfigureSXAIndexes:SolrRoot": {
-            "Type": "string",
-            "Reference": "SolrRoot"
-        },
-        "ConfigureSXAIndexes:SolrService": {
-            "Type": "string",
-            "Reference": "SolrService"
-        },
-        "ConfigureSXAIndexes:CorePrefix": {
-            "Type": "string",
-            "Reference": "CorePrefix"
-        },
-        "ConfigureSXAIndexes:SiteName": {
-            "Type": "string",
-            "Reference": "SiteName"
-        },
-        "ConfigureSXAIndexes:SitecoreAdminPassword": {
-            "Type": "string",
-            "Reference": "SitecoreAdminPassword"
-        },
-        "ConfigureSXASearchIndexes:SitePrefix": {
-            "Type": "string",
-            "Reference": "CorePrefix"
         }
     },
-    "Variables": {
-        "Modules": "[ReadJson(parameter('AssetsJson'))]",
-        "SitecorePowershellExtensionsModule": "[GetSitecoreModuleDetails(variable('Modules'),'spe')]",
-        "SitecoreExperienceAcceleratorModule": "[GetSitecoreModuleDetails(variable('Modules'),'sxa')]",
-        "InstallSitecorePowershellExtensions:Module.Configuration": "[variable('SitecorePowershellExtensionsModule')]",
-        "InstallSitecoreExperienceAccelerator:Module.Configuration": "[variable('SitecoreExperienceAcceleratorModule')]",
-        "ConfigureSXASearchIndexes:Site.PhysicalPath": "[joinpath(parameter('WebRoot'),parameter('SiteName'))]"
-    },
+    "Variables": {},
     "Settings": {
         "AutoRegisterExtensions": true
     },
@@ -297,20 +251,11 @@
         "InitializeInstallation": {
             "Source": ".\\pre-module-installation.json"
         },
-        "InstallSitecorePowershellExtensions": {
-            "Source": ".\\download-and-install-module.json"
-        },
-        "InstallSitecoreExperienceAccelerator": {
-            "Source": ".\\download-and-install-module.json"
+        "InstallModules": {
+            "Source": "install-modules.json"
         },
         "CompleteInstallation": {
             "Source": ".\\post-module-installation.json"
-        },
-        "ConfigureSXASearchIndexes": {
-            "Source": ".\\sxa\\configure-search-indexes.json"
-        },
-        "ConfigureSXAIndexes": {
-            "Source": ".\\sxa\\sxa-solr.json"
         }
     }
 }

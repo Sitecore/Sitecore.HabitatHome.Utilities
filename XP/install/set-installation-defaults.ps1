@@ -58,11 +58,12 @@ Write-Host "Setting default 'SQL' parameters"
 $sql = $json.settings.sql
 # SQL Settings
 
-$SqlStrongPassword = "Str0NgPA33w0rd!!" # Used for all other services
+$SqlSaPassword = "Str0NgPA33w0rd!!"
+$SqlStrongPassword = $SqlSaPassword # Used for all other services
 
 $sql.server = "."
 $sql.adminUser = "sa"
-$sql.adminPassword = "Str0NgPA33w0rd!!"
+$sql.adminPassword = $SqlSaPassword
 $sql.userPassword = $SqlStrongPassword
 $sql.coreUser = "coreuser"
 $sql.corePassword = $SqlStrongPassword
