@@ -26,8 +26,6 @@ The Azure folder contains a set of scripts for managing Azure IaaS VMs. In parti
 - Creating a "master" VHD from the snapshot for use in replicating the "master"
 - Create VM from a stored VHD, complete with firewall configuration and auto-shutdown
 
-See the [README.md](Azure/README.md) in the Azure doc folder for a detailed description and instructions.
-
 #### Prerequisites
 
 The Prerequisites folder contains helper scripts to get a Windows environment ready for the installation of Sitecore (XP and/or XC).
