@@ -13,25 +13,10 @@ Function Invoke-InstallModuleTask {
 
     $moduleToInstall = Split-Path -Path $ModuleFullPath -Leaf -Resolve
 
-
-    Write-Host "Installing module: " $moduleToInstall -ForegroundColor Green ;
+    Write-Host "Installing module: " $moduleToInstall -ForegroundColor Green
     $urlInstallModules = $BaseUrl + "/InstallModules.aspx?modules=" + $moduleToInstall
     Write-Host $urlInstallModules
     Invoke-RestMethod $urlInstallModules -TimeoutSec 720
-}
-
-Function Invoke-PublishToWebTask {
-    [CmdletBinding()]
-    param(
-        [Parameter(Mandatory = $true)]
-        [string]$BaseUrl
-    )
-
-    Write-Host "Publishing to web..." -ForegroundColor Green ;
-    Start-Sleep -Seconds 60
-    $urlPublish = $BaseUrl + "/Publish.aspx"
-    Invoke-RestMethod $urlPublish -TimeoutSec 720
-    Write-Host "Publishing to web complete..." -ForegroundColor Green ;
 }
 
 Function Invoke-CreateDefaultStorefrontTask {
@@ -50,7 +35,7 @@ Function Invoke-CreateDefaultStorefrontTask {
     )
 
     if ($siteName -ne "") {
-        Write-Host "Restarting the website and application pool for $($siteName)..." -ForegroundColor Green ;
+        Write-Host "Restarting the website and application pool for $siteName ..." -ForegroundColor Green
         Import-Module WebAdministration
 
         Stop-WebSite $siteName
@@ -61,10 +46,10 @@ Function Invoke-CreateDefaultStorefrontTask {
 
         Start-WebAppPool -Name $siteName
         Start-WebSite $siteName
-        Write-Host "Restarting the website and application pool for $($siteName) complete..." -ForegroundColor Green ;
+        Write-Host "Restarting the website and application pool for $siteName complete..." -ForegroundColor Green
     }
 
-    Write-Host "Creating the default storefront..." -ForegroundColor Green ;
+    Write-Host "Creating the default storefront..." -ForegroundColor Green
 
     #Added Try catch to avoid deployment failure due to an issue in SPE 4.7.1 - Once fixed, we can remove this
     Try {
@@ -73,46 +58,10 @@ Function Invoke-CreateDefaultStorefrontTask {
     }
     Catch {
         $errorMessage = $_.Exception.Message
-        Write-Host "Error occured: $errorMessage..." -ForegroundColor Red;
+        Write-Host "Error occured: $errorMessage ..." -ForegroundColor Red
     }
 
-    Write-Host "Creating the default storefront complete..." -ForegroundColor Green;
-}
-
-Function Invoke-RebuildIndexesTask {
-    [CmdletBinding()]
-    param(
-        [Parameter(Mandatory = $true)]
-        [string]$BaseUrl
-    )
-
-    Write-Host "Rebuilding index 'sitecore_core_index' ..." -ForegroundColor Green ;
-    $urlRebuildIndex = $BaseUrl + "/RebuildIndex.aspx?index=sitecore_core_index"
-    Invoke-RestMethod $urlRebuildIndex -TimeoutSec 600
-    Write-Host "Rebuilding index 'sitecore_core_index' completed." -ForegroundColor Green ;
-
-    Write-Host "Rebuilding index 'sitecore_master_index' ..." -ForegroundColor Green ;
-    $urlRebuildIndex = $BaseUrl + "/RebuildIndex.aspx?index=sitecore_master_index"
-    Invoke-RestMethod $urlRebuildIndex -TimeoutSec 720
-    Write-Host "Rebuilding index 'sitecore_master_index' completed." -ForegroundColor Green ;
-
-    Write-Host "Rebuilding index 'sitecore_web_index' ..." -ForegroundColor Green ; 
-    $urlRebuildIndex = $BaseUrl + "/RebuildIndex.aspx?index=sitecore_web_index"
-    Invoke-RestMethod $urlRebuildIndex -TimeoutSec 720
-    Write-Host "Rebuilding index 'sitecore_web_index' completed." -ForegroundColor Green ; 
-}
-
-Function Invoke-GenerateCatalogTemplatesTask {
-    [CmdletBinding()]
-    param(
-        [Parameter(Mandatory = $true)]
-        [string]$BaseUrl
-    )
-
-    Write-Host "Generating Catalog Templates ..." -ForegroundColor Green ;
-    $urlGenerate = $BaseUrl + "/GenerateCatalogTemplates.aspx"
-    Invoke-RestMethod $urlGenerate -TimeoutSec 300
-    Write-Host "Generating Catalog Templates completed." -ForegroundColor Green ;
+    Write-Host "Creating the default storefront complete..." -ForegroundColor Green
 }
 
 Function Invoke-DisableConfigFilesTask {
@@ -125,19 +74,20 @@ Function Invoke-DisableConfigFilesTask {
     )
 
     foreach ($configFileName in $ConfigFileList) {
-        Write-Host "Disabling config file: $configFileName" -ForegroundColor Green;
+        Write-Host "Disabling config file: $configFileName" -ForegroundColor Green
         $configFilePath = Join-Path $ConfigDir -ChildPath $configFileName
-        $disabledFilePath = "$configFilePath.disabled";
+        $disabledFilePath = "$configFilePath.disabled"
 
         if (Test-Path $configFilePath) {
-            Rename-Item -Path $configFilePath -NewName $disabledFilePath;
-            Write-Host "  successfully disabled $configFilePath";
+            Rename-Item -Path $configFilePath -NewName $disabledFilePath
+            Write-Host "  successfully disabled $configFilePath"
         }
         else {
-            Write-Host "  configuration file not found." -ForegroundColor Red;
+            Write-Host "  configuration file not found." -ForegroundColor Red
         }
     }
 }
+
 Function Invoke-EnableConfigFilesTask {
     [CmdletBinding()]
     param(
@@ -148,24 +98,24 @@ Function Invoke-EnableConfigFilesTask {
     )
 
     foreach ($configFileName in $ConfigFileList) {
-        Write-Host "Enabling config file: $configFileName" -ForegroundColor Green;
+        Write-Host "Enabling config file: $configFileName" -ForegroundColor Green
         $configFilePath = Join-Path $ConfigDir -ChildPath $configFileName
-        $disabledFilePath = "$configFilePath.disabled";
-        $exampleFilePath = "$configFilePath.example";
+        $disabledFilePath = "$configFilePath.disabled"
+        $exampleFilePath = "$configFilePath.example"
 
         if (Test-Path $configFilePath) {
-            Write-Host "  config file is already enabled...";
+            Write-Host "  config file is already enabled..."
         }
         elseif (Test-Path $disabledFilePath) {
-            Rename-Item -Path $disabledFilePath -NewName $configFileName;
-            Write-Host "  successfully enabled $disabledFilePath";
+            Rename-Item -Path $disabledFilePath -NewName $configFileName
+            Write-Host "  successfully enabled $disabledFilePath"
         }
         elseif (Test-Path $exampleFilePath) {
-            Rename-Item -Path $exampleFilePath -NewName $configFileName;
-            Write-Host "  successfully enabled $exampleFilePath";
+            Rename-Item -Path $exampleFilePath -NewName $configFileName
+            Write-Host "  successfully enabled $exampleFilePath"
         }
         else {
-            Write-Host "  configuration file not found." -ForegroundColor Red;
+            Write-Host "  configuration file not found." -ForegroundColor Red
         }
     }
 }
@@ -180,17 +130,16 @@ Function Invoke-ExpandArchive {
     )
 
     Expand-Archive $SourceZip -DestinationPath $DestinationPath -Force
-}   
+}
 
-		
 Function Invoke-NewCommerceSignedCertificateTask {
     [CmdletBinding(SupportsShouldProcess = $true)]
     param
     (
         [Parameter(Mandatory)]
-        [ValidateScript( {$_.HasPrivateKey -eq $true})]
+        [ValidateScript( { $_.HasPrivateKey -eq $true })]
         [System.Security.Cryptography.X509Certificates.X509Certificate2]$Signer,
-        [ValidateScript( { $_.StartsWith("Cert:\", "CurrentCultureIgnoreCase")})]
+        [ValidateScript( { $_.StartsWith("Cert:\", "CurrentCultureIgnoreCase") })]
         [ValidateScript( { Test-Path $_ -Type Container })]
         [string]$CertStoreLocation = 'Cert:\LocalMachine\My',
         [ValidateNotNullOrEmpty()]
@@ -201,14 +150,14 @@ Function Invoke-NewCommerceSignedCertificateTask {
         [string]$Path,
         [string]$Name = 'localhost'
     )
-    Write-Host "Creating self-signed certificate for $Name" -ForegroundColor Yellow                    
+    Write-Host "Creating self-signed certificate for $Name" -ForegroundColor Yellow
     $params = @{
         CertStoreLocation = $CertStoreLocation.Split('\')[1]
         DnsNames          = $DnsName
         FriendlyName      = $FriendlyName
         Signer            = $Signer
     }
-    # Get or create self-signed certificate for localhost                                        
+    # Get or create self-signed certificate for localhost
     $certificates = Get-ChildItem -Path $CertStoreLocation -DnsName $DnsName | Where-Object { $_.FriendlyName -eq $FriendlyName }
     if ($certificates.Length -eq 0) {
         Write-Host "Create new self-signed certificate"
@@ -219,6 +168,7 @@ Function Invoke-NewCommerceSignedCertificateTask {
     }
     Write-Host "Created self-signed certificate for $Name" -ForegroundColor Green
 }
+
 # This function is a complete copy from SIF/Private/Certificates.ps1 and should be removed together with Invoke-NewCommerceSignedCertificateTask later.
 function NewCertificate {
     param(
@@ -226,7 +176,7 @@ function NewCertificate {
         [string[]]$DNSNames = "127.0.0.1",
         [ValidateSet("LocalMachine", "CurrentUser")]
         [string]$CertStoreLocation = "LocalMachine",
-        [ValidateScript( {$_.HasPrivateKey})]
+        [ValidateScript( { $_.HasPrivateKey })]
         [System.Security.Cryptography.X509Certificates.X509Certificate2]$Signer
     )
     # DCOM errors in System Logs are by design.
@@ -235,7 +185,7 @@ function NewCertificate {
     $certificateLocation = "Cert:\\$CertStoreLocation\My"
     $rootCertificateLocation = "Cert:\\$CertStoreLocation\Root"
     # Certificate Creation Location.
-    $location = @{}
+    $location = @{ }
     if ($CertStoreLocation -eq "LocalMachine") {
         $location.MachineContext = $true
         $location.Value = 2 # Machine Context
@@ -336,38 +286,188 @@ function NewCertificate {
     $createdCertificate = New-Object -TypeName System.Security.Cryptography.X509Certificates.X509Certificate2
     $createdCertificate.Import($certificateByteData)
     # Locate newly created certificate.
-    $newCertificate = Get-ChildItem -Path $certificateLocation | Where-Object {$_.Thumbprint -Like $createdCertificate.Thumbprint}
+    $newCertificate = Get-ChildItem -Path $certificateLocation | Where-Object { $_.Thumbprint -Like $createdCertificate.Thumbprint }
     # Move CA to root store.
     if (!$Signer) {
         Move-Item -Path $newCertificate.PSPath -Destination $rootCertificateLocation
-        $newCertificate = Get-ChildItem -Path $rootCertificateLocation | Where-Object {$_.Thumbprint -Like $createdCertificate.Thumbprint}
+        $newCertificate = Get-ChildItem -Path $rootCertificateLocation | Where-Object { $_.Thumbprint -Like $createdCertificate.Thumbprint }
     }
     return $newCertificate
 }
 
+Function Invoke-OpenConnectionTask {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$ConnString
+    )
+
+    try {
+        $global:SqlConnection = New-Object System.Data.SqlClient.SqlConnection
+        $global:SqlConnection.ConnectionString = $ConnString
+        $global:SqlConnection.Open()
+        $global:SqlTransaction = $global:SqlConnection.BeginTransaction()
+    }
+    catch {
+        Write-Host "An error happened in OpenConnection, transaction will be rollbacked..." -ForegroundColor Red
+        $global:SqlTransaction.Rollback()
+        foreach ( $errorRecord in $Error ) {
+            Write-Host -Object $errorRecord -ForegroundColor Red
+            Write-Host -Object $errorRecord.InvocationInfo.PositionMessage -ForegroundColor Red
+        }
+    }
+}
+
+Function Invoke-CloseConnectionTask {
+    $global:SqlTransaction.Commit();
+    $global:SqlConnection.Close();
+}
+
+Function Invoke-CreateRoleTask {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$ConnString,
+        [Parameter(Mandatory = $true)]
+        [string]$RoleName,
+        [string]$ApplicationName = "sitecore"
+    )
+
+    Write-Host "Create Role $RoleName" -ForegroundColor Green
+    try {
+        Invoke-OpenConnectionTask $ConnString
+
+        $SqlCommand = $global:SqlConnection.CreateCommand()
+        $SqlCommand.Transaction = $global:SqlTransaction
+        $SqlCommand.CommandText = "[dbo].[aspnet_Roles_CreateRole]"
+        $SqlCommand.CommandType = [System.Data.CommandType]::StoredProcedure
+        $SqlCommand.Parameters.AddWithValue("@ApplicationName", $ApplicationName) | Out-Null
+        $SqlCommand.Parameters.AddWithValue("@RoleName", $RoleName) | Out-Null
+        $SqlCommand.ExecuteNonQuery()
+    }
+    catch {
+        Write-Host "An error happened, transaction will be rollbacked..." -ForegroundColor Red
+        $global:SqlTransaction.Rollback()
+        foreach ( $errorRecord in $Error ) {
+            Write-Host -Object $errorRecord -ForegroundColor Red
+            Write-Host -Object $errorRecord.InvocationInfo.PositionMessage -ForegroundColor Red
+        }
+    }
+    finally {
+        Invoke-CloseConnectionTask
+    }
+}
+
+Function Invoke-AddRolesToUserTask {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$ConnString,
+        [Parameter(Mandatory = $true)]
+        [string]$UserName,
+        [Parameter(Mandatory = $true)]
+        [string]$RoleNames,
+        [string]$ApplicationName = "sitecore"
+    )
+
+    Write-Host "Add user $UserName to roles $RoleNames" -ForegroundColor Green
+    try {
+        Invoke-OpenConnectionTask $ConnString
+
+        $SqlCommand = $global:SqlConnection.CreateCommand()
+        $SqlCommand.Transaction = $global:SqlTransaction
+        $SqlCommand.CommandText = "[dbo].[aspnet_UsersInRoles_AddUsersToRoles]"
+        $SqlCommand.CommandType = [System.Data.CommandType]::StoredProcedure
+        $SqlCommand.Parameters.AddWithValue("@ApplicationName", $ApplicationName) | Out-Null
+        $SqlCommand.Parameters.AddWithValue("@UserNames", $UserName) | Out-Null
+        $SqlCommand.Parameters.AddWithValue("@RoleNames", $RoleNames) | Out-Null
+        $SqlCommand.Parameters.AddWithValue("@CurrentTimeUtc", (Get-Date)) | Out-Null
+        $SqlCommand.ExecuteNonQuery();
+    }
+    catch {
+        Write-Host "An error happened, transaction will be rollbacked..." -ForegroundColor Red
+        $global:SqlTransaction.Rollback()
+        foreach ( $errorRecord in $Error ) {
+            Write-Host -Object $errorRecord -ForegroundColor Red
+            Write-Host -Object $errorRecord.InvocationInfo.PositionMessage -ForegroundColor Red
+        }
+    }
+    finally {
+        Invoke-CloseConnectionTask
+    }
+}
+
+Function Invoke-AddRoleToRoleTask {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$ConnString,
+        [Parameter(Mandatory = $true)]
+        [string]$MemberRoleName,
+        [Parameter(Mandatory = $true)]
+        [string]$TargetRoleName,
+        [string]$ApplicationName = ""
+    )
+
+    Write-Host "Add member role $MemberRoleName to target role $TargetRoleName" -ForegroundColor Green
+    try {
+        Invoke-OpenConnectionTask $ConnString
+
+        $SqlCommand = $global:SqlConnection.CreateCommand()
+        $SqlCommand.Transaction = $global:SqlTransaction
+        $SqlCommand.CommandText = "INSERT INTO RolesInRoles (MemberRoleName, TargetRoleName, ApplicationName, Created) VALUES (@MemberRoleName, @TargetRoleName, @ApplicationName, @CurrentTimeUtc)"
+        $SqlCommand.Parameters.AddWithValue("@MemberRoleName", $MemberRoleName) | Out-Null
+        $SqlCommand.Parameters.AddWithValue("@TargetRoleName", $TargetRoleName) | Out-Null
+        $SqlCommand.Parameters.AddWithValue("@ApplicationName", $ApplicationName) | Out-Null
+        $SqlCommand.Parameters.AddWithValue("@CurrentTimeUtc", (Get-Date)) | Out-Null
+        $SqlCommand.ExecuteNonQuery()
+    }
+    catch {
+        Write-Host "An error happened, transaction will be rollbacked..." -ForegroundColor Red
+        $global:SqlTransaction.Rollback()
+        foreach ( $errorRecord in $Error ) {
+            Write-Host -Object $errorRecord -ForegroundColor Red
+            Write-Host -Object $errorRecord.InvocationInfo.PositionMessage -ForegroundColor Red
+        }
+    }
+    finally {
+        Invoke-CloseConnectionTask
+    }
+}
+
+Function Invoke-ClearRedisTask {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$RedisInstallationPath,
+        [Parameter(Mandatory = $true)]
+        [string[]]$EnvironmentsGuids
+    )
+
+    $redisCli = "$RedisInstallationPath\redis-cli.exe"
+
+    foreach ($envGuid in $EnvironmentsGuids) {
+        Write-Host "Clean Redis * $envGuid *" -ForegroundColor Green
+        & $redisCli KEYS "*$envGuid*" | ForEach-Object { & $redisCli DEL $_ }
+    }
+}
+
 Register-SitecoreInstallExtension -Command Invoke-NewCommerceSignedCertificateTask -As NewCommerceSignedCertificate -Type Task -Force
-
 Register-SitecoreInstallExtension -Command Invoke-InstallModuleTask -As InstallModule -Type Task -Force
-
-Register-SitecoreInstallExtension -Command Invoke-PublishToWebTask -As PublishToWeb -Type Task -Force
-
-Register-SitecoreInstallExtension -Command Invoke-RebuildIndexesTask -As RebuildIndexes -Type Task -Force
-
-Register-SitecoreInstallExtension -Command Invoke-GenerateCatalogTemplatesTask -As GenerateCatalogTemplates -Type Task -Force
-
 Register-SitecoreInstallExtension -Command Invoke-EnableConfigFilesTask -As EnableConfigFiles -Type Task -Force
-
 Register-SitecoreInstallExtension -Command Invoke-DisableConfigFilesTask -As DisableConfigFiles -Type Task -Force
-
 Register-SitecoreInstallExtension -Command Invoke-CreateDefaultStorefrontTask -As CreateDefaultStorefront -Type Task -Force
-
 Register-SitecoreInstallExtension -Command Invoke-ExpandArchive -As ExpandArchive -Type Task -Force
-
+Register-SitecoreInstallExtension -Command Invoke-OpenConnectionTask -As OpenConnection -Type Task -Force
+Register-SitecoreInstallExtension -Command Invoke-CloseConnectionTask -As CloseConnection -Type Task -Force
+Register-SitecoreInstallExtension -Command Invoke-CreateRoleTask -As CreateRole -Type Task -Force
+Register-SitecoreInstallExtension -Command Invoke-AddRolesToUserTask -As AddRolesToUser -Type Task -Force
+Register-SitecoreInstallExtension -Command Invoke-AddRoleToRoleTask -As AddRoleToRole -Type Task -Force
+Register-SitecoreInstallExtension -Command Invoke-ClearRedisTask -As ClearRedis -Type Task -Force
 # SIG # Begin signature block
 # MIIXwQYJKoZIhvcNAQcCoIIXsjCCF64CAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUB2592XN18ClPKnXqcvUAQWSd
-# 40SgghL8MIID7jCCA1egAwIBAgIQfpPr+3zGTlnqS5p31Ab8OzANBgkqhkiG9w0B
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUK9PwpRi7w5SrXbdkXfyuPvD7
+# FUegghL8MIID7jCCA1egAwIBAgIQfpPr+3zGTlnqS5p31Ab8OzANBgkqhkiG9w0B
 # AQUFADCBizELMAkGA1UEBhMCWkExFTATBgNVBAgTDFdlc3Rlcm4gQ2FwZTEUMBIG
 # A1UEBxMLRHVyYmFudmlsbGUxDzANBgNVBAoTBlRoYXd0ZTEdMBsGA1UECxMUVGhh
 # d3RlIENlcnRpZmljYXRpb24xHzAdBgNVBAMTFlRoYXd0ZSBUaW1lc3RhbXBpbmcg
@@ -473,22 +573,22 @@ Register-SitecoreInstallExtension -Command Invoke-ExpandArchive -As ExpandArchiv
 # bTExMC8GA1UEAxMoRGlnaUNlcnQgU0hBMiBBc3N1cmVkIElEIENvZGUgU2lnbmlu
 # ZyBDQQIQB6Zc7QsNL9EyTYMCYZHvVTAJBgUrDgMCGgUAoHAwEAYKKwYBBAGCNwIB
 # DDECMAAwGQYJKoZIhvcNAQkDMQwGCisGAQQBgjcCAQQwHAYKKwYBBAGCNwIBCzEO
-# MAwGCisGAQQBgjcCARUwIwYJKoZIhvcNAQkEMRYEFFHX7tF8dFKwvAcr8vqlDYdn
-# Pql5MA0GCSqGSIb3DQEBAQUABIIBAC1BQs5369saBn0lIwTDJM3fEczbH9VfyzOH
-# kIau05W462IvZOX8t8yNyWPc+q0pHjuTTiybXHfUN1gusfqb/Wj1FrKuQRG6dhed
-# uR1RVU1CECc0elo9zXKIpAuN2uGQ1peNtXA2ycTR/Ag/IrGJ+U/RiFaDsp7IaZxn
-# 2xq4Vl9o3HHGv7OteaQ8f5tV7LMhokNNPqx0B9Bkxa1hwqmUhR7n0J2IGzLlgZa4
-# Ne54a6VE4v7Csdphj1O2fixhAuLeYe0B5tWn2+dDV7RDWJqLH9mkI64ErlfeDzSN
-# PMLmNs+VUOlHyaxp3ii1cv2zBLd0p2yR/ZPnbMUtZk85sxCP0CChggILMIICBwYJ
+# MAwGCisGAQQBgjcCARUwIwYJKoZIhvcNAQkEMRYEFEccAKLqzLAFirs9JutGMPcn
+# UaNfMA0GCSqGSIb3DQEBAQUABIIBAB6YVJaVej86LjJaeu9bsdGeGlMHEKy56MvZ
+# CGXNUp7IXQ2IBUyl3YdrJaI6If5Bb5TM5k/WPpeCHX8rsfM3Td/UY42nDVF3hWgH
+# nPb9kTsEaUio8MTlgCn7LWic63AD8IOScKKWliWxS8TAp35Iau1IZG2yOZZbSMBP
+# 6/f1lUpqWV7jMXegEoChHd6xB8PoOB6IT/h3LwJHOM2AhpQ4/mzKjLSfSD1Gj5pe
+# XQuTtZT91M2nv5s68P9u8xTmh4Jy2IwUbPXuJY6T/iz7adw7VHmdK8RbzdYqeDfV
+# dA8/JdG8FH1C3mspoFSGFdMDuzRzpcLPKHcsF5ZVsMFi3yvZDCehggILMIICBwYJ
 # KoZIhvcNAQkGMYIB+DCCAfQCAQEwcjBeMQswCQYDVQQGEwJVUzEdMBsGA1UEChMU
 # U3ltYW50ZWMgQ29ycG9yYXRpb24xMDAuBgNVBAMTJ1N5bWFudGVjIFRpbWUgU3Rh
 # bXBpbmcgU2VydmljZXMgQ0EgLSBHMgIQDs/0OMj+vzVuBNhqmBsaUDAJBgUrDgMC
 # GgUAoF0wGAYJKoZIhvcNAQkDMQsGCSqGSIb3DQEHATAcBgkqhkiG9w0BCQUxDxcN
-# MTkwMjE4MjEwODIzWjAjBgkqhkiG9w0BCQQxFgQU8otfJ0AolvlfIPxDAjE8RQQ6
-# jqcwDQYJKoZIhvcNAQEBBQAEggEAP05Bjb2SZFb8ASWJa+QBGVtyAhzWF0Rwbn7U
-# 5WKq0DGs+t2/QNTPkpLGPBwPFxvpjm/r4xI6XgzicK+wObHoH5aUsu2qPtRGA0Vw
-# /7Sry8OVnDdqPDYcvpG7r1HfvNyQm/suAJ6C/Ay/yO6LfTyJ3TP/IcCY5umrrPMv
-# dnaA83XQ2bNHHhlknPqa8m0j5ebvBjKUKu6ZJUbwykVf8iYL1BQ0EU1ORVu8H+i/
-# aAgcbC/vYhPsh6eIGt80VCR1ZafiY932fdFVh+OoWS01LjCPYcMC5e0UUub4NTk+
-# g4wllZdlPGV+/nADi75IiDU52SWT9NCTf/gbmiRqL4SGgVRiYA==
+# MTkwNzA1MTgzMzIyWjAjBgkqhkiG9w0BCQQxFgQUZDhGUy3M+fDBFgF0N7J/snM2
+# PdUwDQYJKoZIhvcNAQEBBQAEggEAcJg4hgtbO7MafJsSPQzkAstfkxTMCt1cU0lW
+# lTlLMe6KStF8PYkPaiSGSED7NxbuAy478X0eH/gmpCd+L7jUiSYlqE35R16H02UT
+# IT/jG/Ed9olhd9mWLe/nAy3yUbaDueYcyznIFrTnJjR0kwhk0Sb6tElOz76UNwSc
+# rHKmzXg0FY19313/3bwgtG1ltrWuO7wOik6Xb+yJP0ljz4WWVospmgkQlZ0Fo+5P
+# m2rfPvKcZPuLmjgqjMJu87rFYsWiS/YWwqCrME03Jj2Kt36qkxtaO5qb6PHBmz2w
+# aEz0Sc/whRjRWxkQbZT2TUm+4Wr8AcLOw2lKC/5a0gc1Sa4sCw==
 # SIG # End signature block

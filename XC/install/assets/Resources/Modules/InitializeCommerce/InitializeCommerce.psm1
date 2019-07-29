@@ -84,6 +84,7 @@ Function Invoke-GetIdServerTokenTask {
 
     Write-Host "Get Token From Sitecore.IdentityServer" -ForegroundColor Green
     $response = Invoke-RestMethod $UrlIdentityServerGetToken -Method Post -Body $body -Headers $headers
+    Write-Host "Bearer {0} "$response.access_token -ForegroundColor Green
 
     $global:sitecoreIdToken = "Bearer {0}" -f $response.access_token
 }
@@ -120,7 +121,7 @@ Function Invoke-InitializeCommerceServicesTask {
         $initializeUrl = $UrlInitializeEnvironment
 
         $payload = @{
-            "environment" = $env;
+            "environment"=$env;
         }
 
         $result = Invoke-RestMethod $initializeUrl -TimeoutSec 1200 -Method POST -Body ($payload|ConvertTo-Json) -Headers $headers -ContentType "application/json"
@@ -142,6 +143,37 @@ Function Invoke-InitializeCommerceServicesTask {
     }
 
     Write-Host "Initialization completed ..." -ForegroundColor Green 
+}
+
+Function Invoke-IndexCatalogItemsTask {
+    [CmdletBinding()]
+    param(        
+        [Parameter(Mandatory = $true)]
+        [string]$UrlRunMinion,
+        [Parameter(Mandatory = $true)]
+        [string[]]$MinionEnvironments)
+
+    $headers = New-Object "System.Collections.Generic.Dictionary[[String],[String]]"
+    $headers.Add("Authorization", $global:sitecoreIdToken);
+
+    foreach ($env in $MinionEnvironments) {
+        Write-Host "Indexing $($env) ..." -ForegroundColor Yellow
+
+        $payload = @{            
+            'minionFullName'='Sitecore.Commerce.Plugin.Search.FullIndexMinion, Sitecore.Commerce.Plugin.Search';
+            'environmentName'=$env;
+            'policies'=@(@{
+                '$type'='Sitecore.Commerce.Core.RunMinionPolicy, Sitecore.Commerce.Core';
+                'WithListToWatch'='CatalogItems';
+            })
+        }
+
+        $result = Invoke-RestMethod $UrlRunMinion -TimeoutSec 1200 -Method POST -Body ($payload|ConvertTo-Json) -Headers $headers -ContentType "application/json"
+
+        Write-Host "Indexing for $($env) completed ..." -ForegroundColor Green
+    }
+
+    Write-Host "Indexing completed ..." -ForegroundColor Green 
 }
 
 Function Invoke-EnableCsrfValidationTask {
@@ -224,6 +256,8 @@ Register-SitecoreInstallExtension -Command Invoke-BootStrapCommerceServicesTask 
 
 Register-SitecoreInstallExtension -Command Invoke-InitializeCommerceServicesTask -As InitializeCommerceServices -Type Task -Force
 
+Register-SitecoreInstallExtension -Command Invoke-IndexCatalogItemsTask -As IndexCatalogItems -Type Task -Force
+
 Register-SitecoreInstallExtension -Command Invoke-EnableCsrfValidationTask -As EnableCsrfValidation -Type Task -Force
 
 Register-SitecoreInstallExtension -Command Invoke-DisableCsrfValidationTask -As DisableCsrfValidation -Type Task -Force
@@ -232,8 +266,8 @@ Register-SitecoreInstallExtension -Command Invoke-EnsureSyncDefaultContentPathsT
 # SIG # Begin signature block
 # MIIXwQYJKoZIhvcNAQcCoIIXsjCCF64CAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUJOI9P7jicTBcPxRQOnzVezDY
-# oQugghL8MIID7jCCA1egAwIBAgIQfpPr+3zGTlnqS5p31Ab8OzANBgkqhkiG9w0B
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUR2wiDjPq+6XOZOBiqCYVHZok
+# OWSgghL8MIID7jCCA1egAwIBAgIQfpPr+3zGTlnqS5p31Ab8OzANBgkqhkiG9w0B
 # AQUFADCBizELMAkGA1UEBhMCWkExFTATBgNVBAgTDFdlc3Rlcm4gQ2FwZTEUMBIG
 # A1UEBxMLRHVyYmFudmlsbGUxDzANBgNVBAoTBlRoYXd0ZTEdMBsGA1UECxMUVGhh
 # d3RlIENlcnRpZmljYXRpb24xHzAdBgNVBAMTFlRoYXd0ZSBUaW1lc3RhbXBpbmcg
@@ -339,22 +373,22 @@ Register-SitecoreInstallExtension -Command Invoke-EnsureSyncDefaultContentPathsT
 # bTExMC8GA1UEAxMoRGlnaUNlcnQgU0hBMiBBc3N1cmVkIElEIENvZGUgU2lnbmlu
 # ZyBDQQIQB6Zc7QsNL9EyTYMCYZHvVTAJBgUrDgMCGgUAoHAwEAYKKwYBBAGCNwIB
 # DDECMAAwGQYJKoZIhvcNAQkDMQwGCisGAQQBgjcCAQQwHAYKKwYBBAGCNwIBCzEO
-# MAwGCisGAQQBgjcCARUwIwYJKoZIhvcNAQkEMRYEFO0d55eHp9H6TVIygOkiJE+7
-# i5F9MA0GCSqGSIb3DQEBAQUABIIBADGmlzbglXBVCahZCP6peNnot9nxfVswbwXW
-# pfdIk4qLKvPCNWUV8Ke1aV7rmwo8NXU3keRCxFCCcM9PtACOGYZBqe+y4LyFWZnG
-# 9hhKTx0tSS0wA190xBpJMIGIMYTbN2RHUev+Rjb2fwEQlmk/L8WjjgFx8yO5B+5d
-# /9bAON/JEr4wSE7nnEuxa4/6kURtlASm5R4zQ2HUrIBjV0w5lN4TojsMymh12DMM
-# lcEb/Arexgzjuq5xg26z/VwTPwr1VnCmByd9MUL9f4+InM9B5nef9W/o3mxSUiAM
-# xYmUSYP9I6S8kGr0sfisSZxbIUNMkUOKOp0jEwIGH/akVvhTWXWhggILMIICBwYJ
+# MAwGCisGAQQBgjcCARUwIwYJKoZIhvcNAQkEMRYEFPaX3QIlBaKo6iAl8iMoF5gs
+# dCxjMA0GCSqGSIb3DQEBAQUABIIBACf+nfSB9h/kUNYLzXXIYGcGLUeXF8ACoouE
+# 3uFac5/tO1Lr/w5nl/tmUHhWLBqtn7SdQXCFDBtCrsm5RByoRIo3gP60LSDOMcR9
+# u1NZvfzHg5CXBTgXUdh00Y0sx2M/fEd/ypEDEDAhA2wSLE1dHOqa0IeUv967lYJg
+# AuAZvevnoA60YDRkiUPR1nFfhJ62Kj2+PdBtpDMP7QZ7751Bij4wGbfpGVDysU0M
+# QTzeOOAlCAsKLgtw74f2lw3Kyc8xjnfS8MlhUmh8hRKELGRENnX4iifzCpab0GxQ
+# 49MH2nDfLn0R8Nk/4wY8cNFu5/Q+05OSG4qS1u02dvAiA2xCbmKhggILMIICBwYJ
 # KoZIhvcNAQkGMYIB+DCCAfQCAQEwcjBeMQswCQYDVQQGEwJVUzEdMBsGA1UEChMU
 # U3ltYW50ZWMgQ29ycG9yYXRpb24xMDAuBgNVBAMTJ1N5bWFudGVjIFRpbWUgU3Rh
 # bXBpbmcgU2VydmljZXMgQ0EgLSBHMgIQDs/0OMj+vzVuBNhqmBsaUDAJBgUrDgMC
 # GgUAoF0wGAYJKoZIhvcNAQkDMQsGCSqGSIb3DQEHATAcBgkqhkiG9w0BCQUxDxcN
-# MTkwMjE4MjEwODA1WjAjBgkqhkiG9w0BCQQxFgQUhptUrmVJW9qWxzrfSrYyYhyi
-# tYowDQYJKoZIhvcNAQEBBQAEggEAJq0WTOqlvvlcHu028kgordcmzt0kijbipFj+
-# QoyyADt8UISKcSdKNftNpHyniMzi3TJbxo6HODp60uKfx4ykh6ZnMM+QKkjDFx9A
-# UbP0B84DndNuPGzC2vOHN5r1Y0mxMCfRcPhuFDGgllgv2lLNyl0a096n/4w7j2Ia
-# lT4sXk0xDZ8+wk6mxJzuSoI3exH7l0ZXmMhWyi+A1X5Jm7qVryILnifCC+JXeV6Q
-# nQrSltdmlXFkVSSIamr06zje8nvH2D5ZV8uOOmsYoYkg0+12JQEEq0rc5c/oufIF
-# +hMe/i3vcByOIqdjqzyefybawWwjCN38lvRFO4hfr3HfG0zPhg==
+# MTkwNzA1MTgzMzEyWjAjBgkqhkiG9w0BCQQxFgQUgxTrjxIQB/ugFl0PVk62xp40
+# ICkwDQYJKoZIhvcNAQEBBQAEggEAZszCkO/hkbPE1LwUwii63NcP1yDA7p10GaZF
+# +RRk9b3rHt6Wtg1Uh0vwa3Ag1FYOl/pWdiFWrKCdq247lg7rs+DR5lHi22DYsNAe
+# XuwsH93COkGOyd2AVSIGk9rXPhuiGiblxsB7Thogvr+yX3+KDvH/rbw7pi0TlSnb
+# 3JxlXai4mH2jm4p/gELrXMQo2MvlMw+VKU9kNdeL3VPki0Q5xdgDZ2BHO2B4sIbq
+# LDAjrxVgQ0MU8+ct7j/3QRocjAJNjYxEoTcuTS66Ocu9qBFmBAvqVY9udp+TPbP/
+# KIRiSvW5Y5W/DO0n2evsztlFEV4gj2shlGljIErcOAvn2/h8ug==
 # SIG # End signature block

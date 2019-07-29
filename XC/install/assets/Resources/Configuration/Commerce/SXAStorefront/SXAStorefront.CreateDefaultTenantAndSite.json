@@ -2,35 +2,56 @@
   "Parameters": {
     "SiteName": {
       "Type": "string",
-      "Description": "The name of the site."
+      "Description": "The name of the site.",
+      "DefaultValue": ""
     },
     "SiteRootUrl": {
       "Type": "string",
-      "Description": "Site root url."
+      "Description": "Site root url.",
+      "DefaultValue": ""
     },
     "SitecoreUsername": {
       "Type": "string",
-      "Description": "Sitecore Admin Username"
+      "Description": "Sitecore Admin Username",
+      "DefaultValue": ""
     },
     "SitecoreUserPassword": {
       "Type": "string",
-      "Description": "Sitecore Admin Password"
+      "Description": "Sitecore Admin Password",
+      "DefaultValue": ""
     },
     "ProjectConfigIncludeDir": {
       "Type": "string",
-      "Description": "Path of the config directory for project configurations."
+      "Description": "Path of the config directory for project configurations.",
+      "DefaultValue": ""
+    },
+    "SkipInstallDefaultStorefront": {
+      "Type": "bool",
+      "Description": "Boolean value to indicate whether default storefront should be installed or not.",
+      "DefaultValue": false
     }
   },
-  "Modules": [ "SitecoreUtilityTasks" ],
+  "Modules": [
+    "SitecoreUtilityTasks"
+  ],
+  "Variables": {
+    "Site.RootUrl": "[parameter('SiteRootUrl')]",
+    "Sitecore.Username":  "parameter('SitecoreUsername')" ,
+    "Project.ConfigIncludeDir": "[parameter('ProjectConfigIncludeDir')]"
+  },
   "Tasks": {
     "EnableSPEWebAPI": {
+      "Skip": "[parameter('SkipInstallDefaultStorefront')]",
       "Type": "EnableConfigFiles",
       "Params": {
-        "ConfigDir": "[parameter('ProjectConfigIncludeDir')]",
-        "ConfigFileList": [ "z.Sitecore.Commerce.XA.SPE.WebAPI.Enabler.config" ]
+        "ConfigDir": "[variable('Project.ConfigIncludeDir')]",
+        "ConfigFileList": [
+          "z.Sitecore.Commerce.XA.SPE.WebAPI.Enabler.config"
+        ]
       }
     },
     "RestartWebAppPoolOps": {
+      "Skip": "[parameter('SkipInstallDefaultStorefront')]",
       "Type": "ManageAppPool",
       "Params": {
         "Name": "[parameter('SiteName')]",
@@ -38,19 +59,23 @@
       }
     },
     "CreateDefaultStorefront": {
+      "Skip": "[parameter('SkipInstallDefaultStorefront')]",
       "Type": "CreateDefaultStorefront",
       "Params": {
-        "BaseUrl": "[parameter('SiteRootUrl')]",
+        "BaseUrl": "[variable('Site.RootUrl')]",
         "SiteName": "",
-        "SitecoreUsername": "[parameter('SitecoreUsername')]",
+        "SitecoreUsername": "[variable('Sitecore.Username')]",
         "SitecoreUserPassword": "[parameter('SitecoreUserPassword')]"
       }
     },
     "DisableSPEWebAPI": {
+      "Skip": "[parameter('SkipInstallDefaultStorefront')]",
       "Type": "DisableConfigFiles",
       "Params": {
-        "ConfigDir": "[parameter('ProjectConfigIncludeDir')]",
-        "ConfigFileList": [ "z.Sitecore.Commerce.XA.SPE.WebAPI.Enabler.config" ]
+        "ConfigDir": "[variable('Project.ConfigIncludeDir')]",
+        "ConfigFileList": [
+          "z.Sitecore.Commerce.XA.SPE.WebAPI.Enabler.config"
+        ]
       }
     }
   }

@@ -77,7 +77,7 @@ Function Write-TaskHeader {
 Function Remove-Website {
     [CmdletBinding()]
     param(
-        [string]$siteName		
+        [string]$siteName
     )
 
     $appCmd = "C:\windows\system32\inetsrv\appcmd.exe"
@@ -86,7 +86,7 @@ Function Remove-Website {
 
 Function Remove-AppPool {
     [CmdletBinding()]
-    param(		
+    param(
         [string]$appPoolName
     )
 

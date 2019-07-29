@@ -2,7 +2,23 @@
   "Parameters": {
     "SiteName": {
       "Type": "string",
-      "Description": "The name of the site."
+      "Description": "The name of the site.",
+      "DefaultValue": ""
+    },
+    "SiteHostHeaderName": {
+      "Type": "string",
+      "Description": "The host name of the storefront.",
+      "DefaultValue": ""
+    },
+    "InstallDir": {
+      "Type": "string",
+      "Description": "The sitecore site content path.",
+      "DefaultValue": ""
+    },
+    "SiteUtilitiesSrc": {
+      "Type": "string",
+      "Description": "Site Utilities source path",
+      "DefaultValue": ""
     },
     "CertPath": {
       "Type": "string",
@@ -13,28 +29,15 @@
       "Type": "string",
       "Description": "The name of the root certificate.",
       "DefaultValue": "SitecoreRootCert"
-    },
-    "StorefrontHostName": {
-      "Type": "string",
-      "Description": "The host name of the storefront."
-    },
-    "InstallDir": {
-      "Type": "string",
-      "Description": "The sitecore site content path."
-    },
-    "SiteUtilitiesSrc": {
-      "Type": "string",
-      "Description": "Site Utilities source path"
     }
   },
   "Variables": {
-    // The name dns name of the root certificate.
-    "Root.Cert.DnsName": "[concat('DO_NOT_TRUST_', parameter('RootCertName'))]",
-    // The certificate store for the root certificate.
-    "Root.Cert.Store": "cert:\\LocalMachine\\Root",
-    // The certificate store for the client certificate.
     "Client.Cert.Store": "cert:\\LocalMachine\\My",
-    "Security.SSL.CertificateThumbprint": "[GetCertificateThumbprint(parameter('StorefrontHostName'), variable('Client.Cert.Store'))]",
+    "Security.SSL.CertificateThumbprint": "[GetCertificateThumbprint(parameter('SiteHostHeaderName'), variable('Client.Cert.Store'))]",
+
+    "Root.Cert.DnsName": "[concat('DO_NOT_TRUST_', parameter('RootCertName'))]",
+    "Root.Cert.Store": "cert:\\LocalMachine\\Root",
+    
     "ContentSearchConfig": "[concat(parameter('InstallDir'), '\\App_Config\\Sitecore\\ContentSearch\\Sitecore.ContentSearch.config')]",
     "ContentSearchEnabledXpath": "//configuration/sitecore/settings/setting[@name='ContentSearch.Enabled']",
     "MarketingConfigDir": "[concat(parameter('InstallDir'), '\\App_Config\\Sitecore\\Marketing.Operations.xMgmt')]"
@@ -42,7 +45,6 @@
   "Modules": [ "SitecoreUtilityTasks" ],
   "Tasks": {
     "CreatePaths": {
-      // Create the physical disk path.
       "Type": "EnsurePath",
       "Params": {
         "Exists": [
@@ -51,18 +53,16 @@
       }
     },
     "CreateSignedCert": {
-      // Create a certificate signed by the root authority.
       "Type": "NewSignedCertificate",
       "Params": {
         "Signer": "[GetCertificate(variable('Root.Cert.DnsName'), variable('Root.Cert.Store'))]",
         "Path": "[parameter('CertPath')]",
         "CertStoreLocation": "[variable('Client.Cert.Store')]",
-        "Name": "[parameter('StorefrontHostName')]",
-        "DnsName": "[parameter('StorefrontHostName')]"
+        "Name": "[parameter('SiteHostHeaderName')]",
+        "DnsName": "[parameter('SiteHostHeaderName')]"
       }
     },
     "StopWebsite": {
-      // Stops the website if it is running.
       "Type": "ManageWebsite",
       "Params": {
         "Name": "[parameter('SiteName')]",
@@ -70,7 +70,6 @@
       }
     },
     "StopAppPool": {
-      // Stops the app pool if it is running.
       "Type": "ManageAppPool",
       "Params": {
         "Name": "[parameter('SiteName')]",
@@ -82,21 +81,15 @@
       "Type": "WebBinding",
       "Params": {
         "SiteName": "[parameter('SiteName')]",
-        "Remove": [
-          {
-            "Port": "80",
-            "IPAddress": "*"
-          }
-        ],
         "Add": [
           {
-            "HostHeader": "[parameter('StorefrontHostName')]",
+            "HostHeader": "[parameter('SiteHostHeaderName')]",
             "Protocol": "https",
             "SSLFlags": 1,
             "Thumbprint": "[variable('Security.SSL.CertificateThumbprint')]"
           },
           {
-            "HostHeader": "[parameter('StorefrontHostName')]",
+            "HostHeader": "[parameter('SiteHostHeaderName')]",
             "Protocol": "http",
             "Port": "80"
           }
@@ -104,14 +97,12 @@
       }
     },
     "CreateHostHeader": {
-      // Sets a hostheader for the website.
       "Type": "HostHeader",
       "Params": {
-        "HostName": "[parameter('StorefrontHostName')]"
+        "HostName": "[parameter('SiteHostHeaderName')]"
       }
     },
     "StartAppPool": {
-      // Starts the app pool.
       "Type": "ManageAppPool",
       "Params": {
         "Name": "[parameter('SiteName')]",
@@ -119,7 +110,6 @@
       }
     },
     "StartWebsite": {
-      // Starts the website.
       "Type": "ManageWebsite",
       "Params": {
         "Name": "[parameter('SiteName')]",
@@ -134,7 +124,6 @@
       }
     },
     "DisableIndexUpdate": {
-      // Speed up deployment
       "Type": "SetXml",
       "Params": [
         {
@@ -147,7 +136,6 @@
       ]
     },
     "DisableConfigFiles": {
-      // Speed up deployment
       "Type": "DisableConfigFiles",
       "Params": {
         "ConfigDir": "[variable('MarketingConfigDir')]",
