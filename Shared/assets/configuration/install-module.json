@@ -44,9 +44,7 @@
     "Skip.Master": "[not(equal(parameter('ModuleDatabase'), 'master'))]",
     "Skip.MasterCore": "[not(equal(parameter('ModuleDatabase'), 'mastercore'))]",
     "Skip.Core": "[not(equal(parameter('ModuleDatabase'), 'core'))]",
-    "Skip.None":"[not(equal(parameter('ModuleDatabase'), 'none'))]",
-    "Check.IsDemoModule":"[assertisdemomodule(resolvepath(parameter('Package')))]",
-    "Skip.DemoModule":"[and(variable('Skip.None'),variable('Check.IsDemoModule'))]"
+    "Skip.None":"[not(equal(parameter('ModuleDatabase'), 'none'))]"
   },
   "Settings": {
     "AutoRegisterExtensions": true
@@ -70,7 +68,7 @@
           ]
         }
       },
-      "Skip": "[or(variable('Skip.None'),variable('Skip.DemoModule'))]"
+      "Skip": "[variable('Skip.None')]"
     },
     "InstallWDPModuleMasterCore": {
       "Type": "WebDeploy",

@@ -26,19 +26,19 @@ $sitecore = $config.settings.sitecore
 $identityServer = $config.settings.identityServer
 $solr = $config.settings.solr
 $assets = $config.assets
-$modules = $config.modules
 $resourcePath = Join-Path $assets.root "configuration"
 $sharedResourcePath = Join-Path $assets.sharedUtilitiesRoot "assets\configuration"
 
-Import-Module -Name SitecoreInstallFramework -RequiredVersion 2.1.0 -Force
+Import-Module (Join-Path $assets.sharedUtilitiesRoot "assets\modules\SharedInstallationUtilities\SharedInstallationUtilities.psm1") -Force
+
+#Ensure the Correct SIF Version is Imported
+Import-SitecoreInstallFramework -version $assets.installerVersion
 
 Write-Host "*******************************************************" -ForegroundColor Green
 Write-Host " UNInstalling Sitecore $($assets.sitecoreVersion)" -ForegroundColor Green
 Write-Host " Sitecore: $($site.hostName)" -ForegroundColor Green
 Write-Host " xConnect: $($xConnect.siteName)" -ForegroundColor Green
 Write-Host "*******************************************************" -ForegroundColor Green
-
-
 
 # Remove App Pool membership
 
@@ -71,7 +71,6 @@ try {
 catch {
     Write-Host "Warning: Couldn't remove IIS AppPool\$($xConnect.siteName) from Performance Log Users -- user may not exist" -ForegroundColor Yellow
 }
-
 
 $singleDeveloperParams = @{
     Path                           = $sitecore.singleDeveloperConfigurationPath
@@ -114,7 +113,6 @@ $sxaSolrUninstallParams = @{
 }
 
 Install-SitecoreConfiguration @sxaSolrUninstallParams -Uninstall  *>&1 | Tee-Object XP0-SingleDeveloper.log
-
 
 Write-Host "Removing folders from webroot" -ForegroundColor Green
 $webRoot = $site.webRoot
