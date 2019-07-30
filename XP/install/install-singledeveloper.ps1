@@ -286,11 +286,21 @@ Function Add-AdditionalBindings {
     }
 }
 
+Function Edit-CryptographyAlgorithmsBindingRedirect {
+    $webConfigFilePath = Join-Path (Join-Path $site.webRoot $site.hostName) "Web.config"
+    [xml]$text = Get-Content -Path $webConfigFilePath
+
+    ($text.configuration.runtime.assemblyBinding.dependentAssembly | Where-Object { $_.assemblyIdentity.name -eq "System.Security.Cryptography.Algorithms" }).bindingRedirect.newVersion = "4.0.0.0"
+
+    $text.save($webConfigFilePath)
+}
+
 Get-Assets
 Confirm-Prerequisites
 Install-SingleDeveloper
 Add-AppPoolMembership
 Add-AdditionalBindings
+Edit-CryptographyAlgorithmsBindingRedirect
 
 $StopWatch.Stop()
 $StopWatch
