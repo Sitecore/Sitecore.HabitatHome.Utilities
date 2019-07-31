@@ -1,0 +1,27 @@
+{
+  "Parameters": {
+    "ConfigDir": {
+      "Type": "string",
+      "Description": "Configuration directory",
+      "DefaultValue": ""
+    }
+  },
+  "Modules": [
+    "SitecoreUtilityTasks"
+  ],
+  "Variables": {
+    "Config.Dir": "[parameter('ConfigDir')]"
+  },
+  "Tasks": {
+    "EnableConfigFiles": {
+      "Type": "EnableConfigFiles",
+      "Params": {
+        "ConfigDir": "[variable('Config.Dir')]",
+        "ConfigFileList": [
+          "Sitecore.Commerce.Engine.Connectors.Index.Common.config",
+          "Sitecore.Commerce.Engine.Connectors.Index.Solr.config"
+        ]
+      }
+    }
+  }
+}

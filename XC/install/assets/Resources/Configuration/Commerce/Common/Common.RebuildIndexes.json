@@ -1,0 +1,38 @@
+{
+  "Parameters": {
+    "BaseUrl": {
+      "Type": "string",
+      "Description": "The utility pages base url.",
+      "DefaultValue": ""
+    }
+  },
+  "Variables": {
+    "Base.Url": "[parameter('BaseUrl')]",
+    "Core.Uri": "[concat(variable('Base.Url'), '/RebuildIndex.aspx?index=sitecore_core_index')]",
+    "Master.Uri": "[concat(variable('Base.Url'), '/RebuildIndex.aspx?index=sitecore_master_index')]",
+    "Web.Uri": "[concat(variable('Base.Url'), '/RebuildIndex.aspx?index=sitecore_web_index')]"
+  },
+  "Tasks": {
+    "RebuildIndex-Core": {
+      "Type": "WebRequest",
+      "Params": {
+        "Uri": "[variable('Core.Uri')]",
+        "RequestTimeout": "600000"
+      }
+    },
+    "RebuildIndex-Master": {
+      "Type": "WebRequest",
+      "Params": {
+        "Uri": "[variable('Master.Uri')]",
+        "RequestTimeout": "720000"
+      }
+    },    
+    "RebuildIndex-Web": {
+      "Type": "WebRequest",
+      "Params": {
+        "Uri": "[variable('Web.Uri')]",
+        "RequestTimeout": "720000"
+      }
+    }  
+  }
+}

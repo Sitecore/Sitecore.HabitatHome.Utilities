@@ -1,0 +1,304 @@
+{
+  "Parameters": {
+    "SiteName": {
+      "Type": "string",
+      "Description": "The name of the site to be deployed.",
+      "DefaultValue": "SitecoreBizFx"
+    },
+    "Port": {
+      "Type": "string",
+      "Description": "The port  of the site to be deployed.",
+      "DefaultValue": "4200"
+    },
+    "Package": {
+      "Type": "string",
+      "Description": "The path to the Web Deploy package to deploy.",
+      "DefaultValue": ""
+    },
+    "SitecoreIdentityServerUrl": {
+      "Type": "string",
+      "Description": "The identity server full hostname.",
+      "DefaultValue": ""
+    },
+    "UserDomain": {
+      "Type": "string",
+      "DefaultValue": "$env:COMPUTERNAME"
+    },
+    "UserName": {
+      "Type": "string",
+      "Description": "User Name for Commerce Services App Pool",
+      "DefaultValue": ""
+    },
+    "UserPassword": {
+      "Type": "string",
+      "Description": "User Password for Commerce Services App Pool",
+      "DefaultValue": ""
+    },
+    "HostPrefix": {
+      "Type": "string",
+      "Description": "The prefix to the host name.",
+      "DefaultValue": ""
+    },
+    "CommerceServicesHostPostfix": {
+      "Type": "string",
+      "Description": "The postfix for Commerce Engine services host names",
+      "DefaultValue": ""
+    },
+    "EngineBizFxUrl": {
+      "Type": "string",
+      "Description": "The url for BizFx",
+      "DefaultValue": ""
+    },
+    "EngineAuthoringUrl": {
+      "Type": "string",
+      "Description": "The url for Authoring",
+      "DefaultValue": ""
+    }
+  },
+  "Register": {
+    "Tasks": {
+      "RemoveItem": "Remove-Item"
+    }
+  },
+  "Variables": {
+    "Site.Name": "[parameter('SiteName')]",
+    "Host.Prefix": "[parameter('HostPrefix')]",
+    "Site.PhysicalPath": "[joinpath(environment('SystemDrive'), 'inetpub', 'wwwroot', variable('Site.Name'))]",
+    "Client.Cert.Store": "cert:\\LocalMachine\\My",
+    "DnsName": "[concat('*.', parameter('CommerceServicesHostPostfix'))]",
+    "Security.Dns.CertificateThumbprint": "[GetCertificateThumbprint(variable('DnsName'), variable('Client.Cert.Store'))]",
+    "Security.Localhost.CertificateThumbprint": "[GetCertificateThumbprint('localhost', variable('Client.Cert.Store'))]",
+    "CommerceServicesHostPostfix.Not.empty": "[not(equal(parameter('CommerceServicesHostPostfix'), ''))]",
+    "WebsiteHostName": "[concat(variable('Host.Prefix'), concat('.', parameter('CommerceServicesHostPostfix')))]",
+    "Engine.BizFxUrl": "[parameter('EngineBizFxUrl')]",
+    "Engine.AuthoringUrl": "[parameter('EngineAuthoringUrl')]"
+  },
+  "Tasks": {
+    "BizFx-CreatePaths": {
+      "Description": "Ensure the destination path for the site exists.",
+      "Type": "EnsurePath",
+      "Params": {
+        "Exists": [
+          "[variable('Site.PhysicalPath')]"
+        ]
+      }
+    },
+    "BizFx-CreateAppPool": {
+      "Description": "Creates or updates the app pool.",
+      "Type": "AppPool",
+      "Params": {
+        "Name": "[variable('Site.Name')]",
+        "Properties": {
+          "ProcessModel": {
+            "identityType": "SpecificUser",
+            "userName": "[concat(parameter('UserDomain'), concat('\\', parameter('UserName')))]",
+            "password": "[parameter('UserPassword')]",
+            "idleTimeout": "00:20:00",
+            "idleTimeoutAction": "0"
+          },
+          "Recycling": {
+            "PeriodicRestart": {
+              "time": "29:00:00"
+            }
+          },
+          "ManagedPipelineMode": "Integrated",
+          "ManagedRuntimeVersion": "",
+          "startmode": "OnDemand",
+          "autostart": "true"
+        }
+      }
+    },
+    "BizFx-CreateWebsite": {
+      "Description": "Creates or updates the IIS website instance.",
+      "Type": "Website",
+      "Params": {
+        "Name": "[variable('Site.Name')]",
+        "ApplicationPool": "[variable('Site.Name')]",
+        "PhysicalPath": "[variable('Site.PhysicalPath')]"
+      }
+    },
+    "BizFx-StopWebsite": {
+      "Description": "Stops the website if it is running.",
+      "Type": "ManageWebsite",
+      "Params": {
+        "Name": "[variable('Site.Name')]",
+        "Action": "Stop"
+      }
+    },
+    "BizFx-StopAppPool": {
+      "Description": "Stops the app pool if it is running.",
+      "Type": "ManageAppPool",
+      "Params": {
+        "Name": "[variable('Site.Name')]",
+        "Action": "Stop"
+      }
+    },
+    "BizFx-RemoveDefaultBinding": {
+      "Description": "Removes the default *:80 web binding.",
+      "Type": "WebBinding",
+      "Params": {
+        "SiteName": "[variable('Site.Name')]",
+        "Remove": [
+          {
+            "Port": "80",
+            "IPAddress": "*"
+          }
+        ]
+      }
+    },
+    "BizFx-CreateBindings": {
+      "Description": "Configures the site bindings for the website.",
+      "Type": "WebBinding",
+      "Params": {
+        "SiteName": "[variable('Site.Name')]",
+        "Add": [
+          {
+            "HostHeader": "localhost",
+            "Port": "[parameter('Port')]",
+            "Protocol": "https",
+            "SSLFlags": 1,
+            "Thumbprint": "[variable('Security.Localhost.CertificateThumbprint')]"
+          }
+        ]
+      }
+    },
+    "BizFx-CreateHostBinding": {
+      "Skip": "[not(parameter('CommerceServicesHostPostfix'))]",
+      "Type": "WebBinding",
+      "Params": {
+        "SiteName": "[variable('Site.Name')]",
+        "Add": [
+          {
+            "HostHeader": "[variable('WebsiteHostName')]",
+            "Port": "443",
+            "Protocol": "https",
+            "SSLFlags": 1,
+            "Thumbprint": "[variable('Security.Dns.CertificateThumbprint')]"
+          }
+        ]
+      }
+    },
+    "BizFx-CreateHostHeader": {
+      "Skip": "[not(parameter('CommerceServicesHostPostfix'))]",
+      "Type": "HostHeader",
+      "Params": {
+        "HostName": "[variable('WebsiteHostName')]"
+      }
+    },
+    "BizFx-SetPermissions": {
+      "Description": "Sets permissions for the app pool user.",
+      "Type": "FilePermissions",
+      "Params": {
+        "Path": "[variable('Site.PhysicalPath')]",
+        "Rights": [
+          {
+            "User": "[concat('IIS AppPool\\', variable('Site.Name'))]",
+            "FileSystemRights": "FullControl",
+            "InheritanceFlags": [
+              "ContainerInherit",
+              "ObjectInherit"
+            ]
+          }
+        ]
+      }
+    },
+    "BizFx-InstallWDP": {
+      "Type": "WebDeploy",
+      "Params": {
+        "Verb": "Sync",
+        "Arguments": {
+          "Source": {
+            "Package": "[resolvepath(parameter('Package'))]"
+          },
+          "Dest": "Auto",
+          "SetParam": [
+            {
+              "Name": "IIS Web Application Name",
+              "Value": "[variable('Site.Name')]"
+            },
+            {
+              "Name": "EngineAuthoringUrl",
+              "Value": "[variable('Engine.AuthoringUrl')]"
+            },
+            {
+              "Name": "IdentityServerUrl",
+              "Value": "[parameter('SitecoreIdentityServerUrl')]"
+            },
+            {
+              "Name": "BizFxUrl",
+              "Value": "[variable('Engine.BizFxUrl')]"
+            }
+          ]
+        }
+      }
+    },
+    "BizFx-StartAppPool": {
+      "Description": "Starts the app pool.",
+      "Type": "ManageAppPool",
+      "Params": {
+        "Name": "[variable('Site.Name')]",
+        "Action": "Start"
+      }
+    },
+    "BizFx-StartWebsite": {
+      "Description": "Starts the website.",
+      "Type": "ManageWebsite",
+      "Params": {
+        "Name": "[variable('Site.Name')]",
+        "Action": "Start"
+      }
+    }
+  },
+  "UninstallTasks": {
+    "Uninstall-StopWebsite": {
+      "Description": "Stops the website if it is running.",
+      "Type": "ManageWebsite",
+      "Params": {
+        "Name": "[variable('Site.Name')]",
+        "Action": "Stop",
+        "ErrorAction": "SilentlyContinue"
+      }
+    },
+    "Uninstall-RemoveWebsite": {
+      "Description": "Removes the website.",
+      "Type": "RemoveWebsite",
+      "Params": {
+        "Name": "[variable('Site.Name')]"
+      }
+    },
+    "Uninstall-StopAppPool": {
+      "Description": "Stops the app pool if it is running.",
+      "Type": "ManageAppPool",
+      "Params": {
+        "Name": "[variable('Site.Name')]",
+        "Action": "Stop",
+        "ErrorAction": "SilentlyContinue"
+      }
+    },
+    "Uninstall-RemoveAppPool": {
+      "Description": "Removes the AppPool.",
+      "Type": "RemoveAppPool",
+      "Params": {
+        "Name": "[variable('Site.Name')]"
+      }
+    },
+    "Uninstall-RemoveContent": {
+      "Description": "Removes website content.",
+      "Type": "RemoveItem",
+      "Params": {
+        "Path": "[variable('Site.PhysicalPath')]",
+        "Recurse": true,
+        "ErrorAction": "SilentlyContinue"
+      }
+    },
+    "Uninstall-RemoveHostHeader": {
+      "Description": "Removes the hostheader for the website.",
+      "Type": "HostHeader",
+      "Params": {
+        "HostName": "[variable('Site.Name')]",
+        "Action": "Remove"
+      }
+    }
+  }
+
+}

@@ -126,7 +126,7 @@ foreach ($environment in $Environments) {
     Remove-Item ("$($site.webRoot)\{0}_backup" -f $siteName) -recurse -force -ErrorAction SilentlyContinue
 }
 $bizfxPrefix = "SitecoreBizFx"
-$bizfx = ("{0}_{1}" -f $bizfxPrefix, $site.prefix)
+$bizfx = ("{0}-{1}" -f $site.prefix, $bizfxPrefix)
 Write-Host ("Deleting Website {0}" -f $bizfx)
 Remove-Website -siteName $bizfx -ErrorAction SilentlyContinue
 Remove-AppPool -appPoolName $bizfx

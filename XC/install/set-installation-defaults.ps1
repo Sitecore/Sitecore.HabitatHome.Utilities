@@ -19,25 +19,25 @@ $assets.root = "$PSScriptRoot\assets"
 $assets.downloadFolder =  $assets.packageRepository
 
 #Commerce
-$assets.commerce.packageName = "Sitecore.Commerce.WDP.2019.07-4.0.158.zip"
+$assets.commerce.packageName = "Sitecore.Commerce.WDP.2019.07-4.0.165.zip"
 $assets.commerce.packageUrl = "https://dev.sitecore.net/~/media/EF8EE376257142B4BDFAFF7EB1E1CA3E.ashx"
 $assets.commerce.installationFolder = Join-Path $assets.packageRepository "Commerce"
 
 
 #Commerce Files to Extract
 $sifCommerceVersion = $assets.commerce.filesToExtract | Where-Object { $_.name -eq "SIF.Sitecore.Commerce"} 
-$sifCommerceVersion.version = "3.0.24"
+$sifCommerceVersion.version = "3.0.28"
 
 $assets.commerce.sifCommerceRoot = Join-Path $assets.commerce.installationFolder $($sifCommerceVersion.name + "." + $sifCommerceVersion.version)
 
 $commerceEngineVersion = $assets.commerce.filesToExtract | Where-Object { $_.name -eq "Sitecore.Commerce.Engine"} 
-$commerceEngineVersion.version = "4.0.98"
+$commerceEngineVersion.version = "4.0.165"
 
 $commerceEngineSDKVersion = $assets.commerce.filesToExtract | Where-Object { $_.name -eq "Sitecore.Commerce.Engine.SDK"} 
-$commerceEngineSDKVersion.version = "4.0.98"
+$commerceEngineSDKVersion.version = "4.0.102"
 
 $bizFxVersion = $assets.commerce.filesToExtract | Where-Object { $_.name -eq "Sitecore.BizFX"} 
-$bizFxVersion.version = "3.0.5"
+$bizFxVersion.version = "3.0.7"
 
 # Settings
 $site = $json.settings.site

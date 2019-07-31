@@ -355,14 +355,6 @@
       "Type": "string",
       "Reference": "CommerceServicesHostPostfix"
     },
-    "IdentityServer:CommerceAuthoringServicesPort": {
-      "Type": "string",
-      "Reference": "CommerceAuthoringServicesPort"
-    },
-    "IdentityServer:BizFxPort": {
-      "Type": "string",
-      "Reference": "BizFxPort"
-    },
     "Solr:SolrUrl": {
       "Type": "string",
       "Reference": "SolrUrl"
@@ -858,9 +850,9 @@
     "BizFx:Host.Prefix": "bizfx",
     "BizFx:Engine.BizFxUrl": "[variable('Engine.BizFxUrl')]",
     "BizFx:Engine.AuthoringUrl": "[variable('Engine.AuthoringUrl')]",
-    "CommerceEngine:Engine.AuthoringUrl": "",
-    "CommerceEngine:Engine.ShopsUrl": "",
-    "CommerceEngine:Engine.MinionsUrl": "",
+    "CommerceEngine:Engine.AuthoringUrl": "[variable('Engine.AuthoringUrl')]",
+    "CommerceEngine:Engine.ShopsUrl": "[variable('Engine.ShopsUrl')]",
+    "CommerceEngine:Engine.MinionsUrl": "[variable('Engine.MinionsUrl')]",
     "Modules.DirDst": "[concat(parameter('InstallDir'), '\\App_Data\\packages')]",
     "Modules.BaseUrl": "[concat(variable('Site.RootUrl'), '/SiteUtilityPages')]",
     "Module-DirDst-EnsurePath:Full.Path": "[variable('Modules.DirDst')]",
@@ -935,12 +927,12 @@
     "Module-DirDst-EnsurePath": {
       "Source": ".\\Configuration\\Commerce\\Common.EnsurePath.json"
     },
-    "Module-PowershellExtensions": {
-      "Source": ".\\Configuration\\SitecoreUtilities\\InstallModule.json"
-    },
-    "Module-SXAFramework": {
-      "Source": ".\\Configuration\\SitecoreUtilities\\InstallModule.json"
-    },
+    //"Module-PowershellExtensions": {
+    //  "Source": ".\\Configuration\\SitecoreUtilities\\InstallModule.json"
+    //},
+    //"Module-SXAFramework": {
+    //  "Source": ".\\Configuration\\SitecoreUtilities\\InstallModule.json"
+    //},
     "Publish-Extensions": {
       "Source": ".\\Configuration\\Commerce\\Common.PublishToWeb.json"
     },
@@ -998,9 +990,9 @@
     "CEConnect-GenerateCatalogTemplates": {
       "Source": ".\\Configuration\\Commerce\\CEConnect.GenerateCatalogTemplates.json"
     },
-    "SXAStorefront-CreateDefaultTenantAndSite": {
-      "Source": ".\\Configuration\\Commerce\\SXAStorefront.CreateDefaultTenantAndSite.json"
-    },
+    //"SXAStorefront-CreateDefaultTenantAndSite": {
+    //  "Source": ".\\Configuration\\Commerce\\SXAStorefront.CreateDefaultTenantAndSite.json"
+    //},
     "Publish-Commerce": {
       "Source": ".\\Configuration\\Commerce\\Common.PublishToWeb.json"
     },

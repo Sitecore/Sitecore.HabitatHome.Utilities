@@ -1,21 +1,24 @@
 {
-  "Parameters": {    
+  "Parameters": {
     "CommerceInstallRoot": {
       "Type": "string",
-      "Description": "The root path of commerce services."
+      "Description": "The root path of commerce services.",
+      "DefaultValue": ""
     },
     "SitecoreIdentityServerApplicationName": {
       "Type": "string",
-      "Description": "Application name of Sitecore Identity Server in the IIS"
+      "Description": "Application name of Sitecore Identity Server in the IIS",
+      "DefaultValue": ""
     },
     "CommerceServicesHostPostfix": {
       "Type": "string",
-      "DefaultValue": "",
-      "Description": "The postfix for Commerce Engine services host names"
+      "Description": "The postfix for Commerce Engine services host names",
+      "DefaultValue": ""
     },
     "BaseConfigurationFolder": {
       "Type": "string",
-      "Description": "The base folder for SIF configuration."
+      "Description": "The base folder for SIF configuration.",
+      "DefaultValue": ""
     }
   },
   "Variables": {
@@ -25,10 +28,6 @@
     "IdentityServerConfigurationPath": "[joinpath(parameter('BaseConfigurationFolder'),'.\\IdentityServer\\Sitecore.Commerce.IdentityServer.Host.xml')]"
   },
   "Tasks": {
-    // Tasks are separate units of work in a configuration.
-    // Each task is an action that will be completed when Install-SitecoreConfiguration is called.
-    // By default, tasks are applied in the order they are declared.
-    // Tasks may reference Parameters, Variables, and config functions.
     "UpdateIdentityServerCommerceConfiguration": {
       "Skip": "[not(parameter('CommerceServicesHostPostfix'))]",
       "Type": "SetXml",
