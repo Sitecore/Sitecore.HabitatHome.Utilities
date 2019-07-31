@@ -223,8 +223,10 @@ Function Publish-BizFx {
     Copy-Item -Path $bizFxSource -Destination $PublishLocation  -Force -Recurse
 }
 Function Convert-Modules {
+	#todo: can we publish the images wdp and download that package directly
     $sat = Join-Path $assets.sitecoreazuretoolkit "tools\Sitecore.Cloud.Cmdlets.dll"
     Import-Module $sat -Force
+	Write-Host "$($assets.commerce.installationFolder)"
 
     $modules = @{
         # AdventureWorksImagesModuleFullPath = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include "Adventure Works Images.zip" -Exclude "*.scwdp.zip" -Recurse  )
@@ -255,7 +257,7 @@ Function Install-Commerce {
     Get-ChildItem $configurationDir -exclude 'Master_SingleServer.json' -Include *.json -Recurse | Copy-Item -Destination "$configurationDir\Commerce"
 
     $params = @{
-        Path                                     = $(Join-Path $configurationDir  'Master_SingleServer.json')
+        Path                                     = $(Join-Path $configurationDir  'Commerce\Master_SingleServer.json')
         SiteName                                 = $site.hostName
         SiteHostHeaderName                       = $commerce.storefrontHostName
         InstallDir                               = $(Join-Path $site.webRoot $site.hostName)
@@ -319,7 +321,7 @@ Function Install-Commerce {
         BraintreeMerchantId                      = $commerce.brainTreeAccountMerchandId
         BraintreePrivateKey                      = $commerce.brainTreeAccountPrivateKey
         BraintreePublicKey                       = $commerce.brainTreeAccountPublicKey
-        BizFxSiteName                            = "SitecoreBizFx"
+        BizFxSiteName                            = $($site.prefix + "-SitecoreBizFx")
         BizFxPort                                = "4200"
         BizFxPackage                             = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include  "Sitecore.BizFx.OnPrem*.scwdp.zip" -Recurse)
     }
@@ -339,12 +341,12 @@ Pop-Location
 $StopWatch = New-Object -TypeName System.Diagnostics.Stopwatch
 $StopWatch.Start()
 
-#Install-RequiredInstallationAssets
-#Set-ModulesPath
-#Install-CommerceAssets
+Install-RequiredInstallationAssets
+Set-ModulesPath
+Install-CommerceAssets
 #Publish-CommerceEngine
 #Publish-BizFx
-#Convert-Modules
+Convert-Modules
 Install-Commerce
 Start-Site
 

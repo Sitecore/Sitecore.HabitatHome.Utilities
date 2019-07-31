@@ -384,11 +384,11 @@ Register-SitecoreInstallExtension -Command Invoke-EnsureSyncDefaultContentPathsT
 # U3ltYW50ZWMgQ29ycG9yYXRpb24xMDAuBgNVBAMTJ1N5bWFudGVjIFRpbWUgU3Rh
 # bXBpbmcgU2VydmljZXMgQ0EgLSBHMgIQDs/0OMj+vzVuBNhqmBsaUDAJBgUrDgMC
 # GgUAoF0wGAYJKoZIhvcNAQkDMQsGCSqGSIb3DQEHATAcBgkqhkiG9w0BCQUxDxcN
-# MTkwNzA1MTgzMzEyWjAjBgkqhkiG9w0BCQQxFgQUgxTrjxIQB/ugFl0PVk62xp40
-# ICkwDQYJKoZIhvcNAQEBBQAEggEAZszCkO/hkbPE1LwUwii63NcP1yDA7p10GaZF
-# +RRk9b3rHt6Wtg1Uh0vwa3Ag1FYOl/pWdiFWrKCdq247lg7rs+DR5lHi22DYsNAe
-# XuwsH93COkGOyd2AVSIGk9rXPhuiGiblxsB7Thogvr+yX3+KDvH/rbw7pi0TlSnb
-# 3JxlXai4mH2jm4p/gELrXMQo2MvlMw+VKU9kNdeL3VPki0Q5xdgDZ2BHO2B4sIbq
-# LDAjrxVgQ0MU8+ct7j/3QRocjAJNjYxEoTcuTS66Ocu9qBFmBAvqVY9udp+TPbP/
-# KIRiSvW5Y5W/DO0n2evsztlFEV4gj2shlGljIErcOAvn2/h8ug==
+# MTkwNzA0MTQwNjA5WjAjBgkqhkiG9w0BCQQxFgQUgxTrjxIQB/ugFl0PVk62xp40
+# ICkwDQYJKoZIhvcNAQEBBQAEggEAdcx1v+n7ZZnqPmfmRvxXDBiSB91X7y22me0A
+# mvo4as0XLSKRnrwvAtjFdBSN7jbjPL0+fP5CsfgfCEzfLLxAPL3iLK+2mLi/Og6i
+# F9wxefYP1toWnQSYsLtdp+nbWo2NBG3Y9gEM+vhqr4HQGds/CXpK4rBHQLNM/vKP
+# ExBrBCAFubOmxU5u0F4vQg6xJuMSIndyXd5Wx2Duwaemv3+fmx/z6z+FGy3YTh4C
+# TnH8TUueW+uxLK59SgXVBXntBzu6GQEjvMPjLfXXldg8b2rd8b5kz7DnKMgPihPn
+# v8vFzAdA37d1fAiBstmL7qtjvV7Z7pWHmv/m7GcUuLN2mZKYLA==
 # SIG # End signature block

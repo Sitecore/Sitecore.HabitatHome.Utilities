@@ -1,0 +1,22 @@
+{
+  "Parameters": {
+    "BaseUrl": {
+      "Type": "string",
+      "Description": "The utility pages base url.",
+      "DefaultValue": ""
+    }
+  },
+  "Variables": {
+    "Base.Url": "[parameter('BaseUrl')]",
+    "RebuildDescendants.Uri": "[concat(variable('Base.Url'), '/RebuildDescendants.aspx')]"
+  },
+  "Tasks": {
+    "RebuildDescendants": {
+      "Type": "WebRequest",
+      "Params": {
+        "Uri": "[variable('RebuildDescendants.Uri')]",
+        "RequestTimeout": "60000"
+      }
+    } 
+  }
+}

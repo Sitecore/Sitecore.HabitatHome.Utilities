@@ -355,14 +355,6 @@
       "Type": "string",
       "Reference": "CommerceServicesHostPostfix"
     },
-    "IdentityServer:CommerceAuthoringServicesPort": {
-      "Type": "string",
-      "Reference": "CommerceAuthoringServicesPort"
-    },
-    "IdentityServer:BizFxPort": {
-      "Type": "string",
-      "Reference": "BizFxPort"
-    },
     "Solr:SolrUrl": {
       "Type": "string",
       "Reference": "SolrUrl"
@@ -858,9 +850,9 @@
     "BizFx:Host.Prefix": "bizfx",
     "BizFx:Engine.BizFxUrl": "[variable('Engine.BizFxUrl')]",
     "BizFx:Engine.AuthoringUrl": "[variable('Engine.AuthoringUrl')]",
-    "CommerceEngine:Engine.AuthoringUrl": "",
-    "CommerceEngine:Engine.ShopsUrl": "",
-    "CommerceEngine:Engine.MinionsUrl": "",
+    "CommerceEngine:Engine.AuthoringUrl": "[variable('Engine.AuthoringUrl')]",
+    "CommerceEngine:Engine.ShopsUrl": "[variable('Engine.ShopsUrl')]",
+    "CommerceEngine:Engine.MinionsUrl": "[variable('Engine.MinionsUrl')]",
     "Modules.DirDst": "[concat(parameter('InstallDir'), '\\App_Data\\packages')]",
     "Modules.BaseUrl": "[concat(variable('Site.RootUrl'), '/SiteUtilityPages')]",
     "Module-DirDst-EnsurePath:Full.Path": "[variable('Modules.DirDst')]",
@@ -911,69 +903,69 @@
     "RebuildDescendants:Base.Url": "[variable('Modules.BaseUrl')]"
   },
   "Includes": {
-    // "IdentityServer": {
-    //   "Source": ".\\Configuration\\Commerce\\IdentityServer\\IdentityServer.Config.json"
-    // },
-    // "Solr": {
-    //   "Source": ".\\Configuration\\Commerce\\Solr\\Solr.Install.json"
-    // },
-    // "CommerceEngine": {
-    //   "Source": ".\\Configuration\\Commerce\\CommerceEngine\\CommerceEngine.json"
-    // },
-    // "BizFx": {
-    //   "Source": ".\\Configuration\\Commerce\\SitecoreBizFx\\SitecoreBizFx.Install.json"
-    // },
-    // "StoreFront-PreconfigureInstance": {
-    //   "Source": ".\\Configuration\\Commerce\\SXAStorefront\\SXAStorefront.Preconfigure.json"
-    // },
-    // "Module-DirDst-EnsurePath": {
-    //   "Source": ".\\Configuration\\Commerce\\Common\\Common.EnsurePath.json"
-    // },
-    // "Publish-Extensions": {
-    //   "Source": ".\\Configuration\\Commerce\\Common\\Common.PublishToWeb.json"
-    // },
-    // "Module-HabitatImages": {
-    //   "Source": ".\\Configuration\\Commerce\\Common\\Common.InstallWdpModule.json"
-    // },
-    // "Module-AdventureWorksImages": {
-    //   "Source": ".\\Configuration\\Commerce\\Common\\Common.InstallWdpModule.json"
-    // },
-    // "Module-CommerceConnect": {
-    //   "Source": ".\\Configuration\\Commerce\\Common\\Common.InstallWdpModule.json"
-    // },
-    // "Module-CommercexProfiles": {
-    //   "Source": ".\\Configuration\\Commerce\\Common\\Common.InstallWdpModule.json"
-    // },
-    // "Module-CommercexAnalytics": {
-    //   "Source": ".\\Configuration\\Commerce\\Common\\Common.InstallWdpModule.json"
-    // },
-    // "CopyConnectModels": {
-    //   "Source": ".\\Configuration\\Commerce\\Connect\\Connect.CopyModels.json"
-    // },
-    // "Module-CommerceMarketingAutomation-EnsurePath": {
-    //   "Source": ".\\Configuration\\Commerce\\Common\\Common.EnsurePath.json"
-    // },
-    // "Module-CommerceMarketingAutomation": {
-    //   "Source": ".\\Configuration\\Commerce\\Common\\Common.InstallWdpModule.json"
-    // },
-    // "Module-CommerceMarketingAutomation-Post": {
-    //   "Source": ".\\Configuration\\Commerce\\Connect\\Connect.MarketingAutomationPost.json"
-    // },
-    // "Module-CEConnect-EnsurePath": {
-    //   "Source": ".\\Configuration\\Commerce\\Common\\Common.EnsurePath.json"
-    // },
-    // "Module-CEConnect": {
-    //   "Source": ".\\Configuration\\Commerce\\Common\\Common.InstallWdpModule.json"
-    // },
-    // "Module-CEConnect-Post": {
-    //   "Source": ".\\Configuration\\Commerce\\CEConnect\\CEConnect.Post.json"
-    // },
-    // "CEConnect-UsersAndRoles": {
-    //   "Source": ".\\Configuration\\Commerce\\CEConnect\\CEConnect.UsersAndRoles.json"
-    // },
-    // "SXAStorefront": {
-    //   "Source": ".\\Configuration\\Commerce\\SXAStorefront\\SXAStorefront.Storefront.json"
-    // },
+    "IdentityServer": {
+      "Source": ".\\Configuration\\Commerce\\IdentityServer\\IdentityServer.Config.json"
+    },
+    "Solr": {
+      "Source": ".\\Configuration\\Commerce\\Solr\\Solr.Install.json"
+    },
+    "CommerceEngine": {
+      "Source": ".\\Configuration\\Commerce\\CommerceEngine\\CommerceEngine.json"
+    },
+    "BizFx": {
+      "Source": ".\\Configuration\\Commerce\\SitecoreBizFx\\SitecoreBizFx.Install.json"
+    },
+    "StoreFront-PreconfigureInstance": {
+      "Source": ".\\Configuration\\Commerce\\SXAStorefront\\SXAStorefront.Preconfigure.json"
+    },
+    "Module-DirDst-EnsurePath": {
+      "Source": ".\\Configuration\\Commerce\\Common\\Common.EnsurePath.json"
+    },
+    "Publish-Extensions": {
+      "Source": ".\\Configuration\\Commerce\\Common\\Common.PublishToWeb.json"
+    },
+    "Module-HabitatImages": {
+      "Source": ".\\Configuration\\Commerce\\Common\\Common.InstallWdpModule.json"
+    },
+    "Module-AdventureWorksImages": {
+      "Source": ".\\Configuration\\Commerce\\Common\\Common.InstallWdpModule.json"
+    },
+    "Module-CommerceConnect": {
+      "Source": ".\\Configuration\\Commerce\\Common\\Common.InstallWdpModule.json"
+    },
+    "Module-CommercexProfiles": {
+      "Source": ".\\Configuration\\Commerce\\Common\\Common.InstallWdpModule.json"
+    },
+    "Module-CommercexAnalytics": {
+      "Source": ".\\Configuration\\Commerce\\Common\\Common.InstallWdpModule.json"
+    },
+    "CopyConnectModels": {
+      "Source": ".\\Configuration\\Commerce\\Connect\\Connect.CopyModels.json"
+    },
+    "Module-CommerceMarketingAutomation-EnsurePath": {
+      "Source": ".\\Configuration\\Commerce\\Common\\Common.EnsurePath.json"
+    },
+    "Module-CommerceMarketingAutomation": {
+      "Source": ".\\Configuration\\Commerce\\Common\\Common.InstallWdpModule.json"
+    },
+    "Module-CommerceMarketingAutomation-Post": {
+      "Source": ".\\Configuration\\Commerce\\Connect\\Connect.MarketingAutomationPost.json"
+    },
+    "Module-CEConnect-EnsurePath": {
+      "Source": ".\\Configuration\\Commerce\\Common\\Common.EnsurePath.json"
+    },
+    "Module-CEConnect": {
+      "Source": ".\\Configuration\\Commerce\\Common\\Common.InstallWdpModule.json"
+    },
+    "Module-CEConnect-Post": {
+      "Source": ".\\Configuration\\Commerce\\CEConnect\\CEConnect.Post.json"
+    },
+    "CEConnect-UsersAndRoles": {
+      "Source": ".\\Configuration\\Commerce\\CEConnect\\CEConnect.UsersAndRoles.json"
+    },
+    "SXAStorefront": {
+      "Source": ".\\Configuration\\Commerce\\SXAStorefront\\SXAStorefront.Storefront.json"
+    },
     "CEConnect-InitializeCommerce": {
       "Source": ".\\Configuration\\Commerce\\CEConnect\\CEConnect.InitializeCommerce.json"
     },
