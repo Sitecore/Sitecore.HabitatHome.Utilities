@@ -2,7 +2,8 @@
   "Parameters": {
     "InstallDir": {
       "Type": "string",
-      "Description": "The sitecore site content path."
+      "Description": "The sitecore site content path.",
+      "DefaultValue": ""
     }
   },
   "Variables": {
@@ -10,7 +11,9 @@
     "ContentSearchEnabledXpath": "//configuration/sitecore/settings/setting[@name='ContentSearch.Enabled']",
     "MarketingConfigDir": "[concat(parameter('InstallDir'), '\\App_Config\\Sitecore\\Marketing.Operations.xMgmt')]"
   },
-  "Modules": [ "SitecoreUtilityTasks" ],
+  "Modules": [
+    "SitecoreUtilityTasks"
+  ],
   "Tasks": {
     "EnableIndexUpdate": {
       "Type": "SetXml",
@@ -28,7 +31,9 @@
       "Type": "EnableConfigFiles",
       "Params": {
         "ConfigDir": "[variable('MarketingConfigDir')]",
-        "ConfigFileList": [ "Sitecore.Marketing.Search.config" ]
+        "ConfigFileList": [
+          "Sitecore.Marketing.Search.config"
+        ]
       }
     }
   }

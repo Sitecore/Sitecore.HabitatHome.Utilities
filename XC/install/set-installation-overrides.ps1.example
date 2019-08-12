@@ -31,14 +31,4 @@ $commerce.brainTreeAccountMerchandId = ""
 $commerce.brainTreeAccountPublicKey = ""
 $commerce.brainTreeAccountPrivateKey = ""
 
-
-# XConnect Parameters
-$xConnect = $json.settings.xConnect
-
-# Sitecore Parameters
-$sitecore = $json.settings.sitecore
-
-# Solr Parameters
-$solr = $json.settings.solr
-
 Set-Content $ConfigurationFile  (ConvertTo-Json -InputObject $json -Depth 4 )
