@@ -1,0 +1,65 @@
+{
+  "Parameters": {
+    "BaseUrl": {
+      "Type": "string",
+      "Description": "The utility pages base url.",
+      "DefaultValue": "string"
+    },
+    "SiteName": {
+      "Type": "string",
+      "Description": "The name of the site.",
+      "DefaultValue": ""
+    }
+  },
+  "variables" :{
+    "Base.Url": "[parameter('BaseUrl')]"
+  },
+  "Register": {
+    "Tasks" : {
+      "Sleep": "Start-Sleep"
+    }
+  },
+  "Modules": [ "SitecoreUtilityTasks" ],
+  "Tasks": {
+    "GenerateCatalogTemplates": {
+      "Type": "WebRequest",
+      "Params": {
+        "Uri": "[variable('Base.Url')]"
+      }
+    },
+    "StopWebsite": {
+      "Type": "ManageWebsite",
+      "Params": {
+        "Name": "[parameter('SiteName')]",
+        "Action": "Stop"
+      }
+    },
+    "StopAppPool": {
+      "Type": "ManageAppPool",
+      "Params": {
+        "Name": "[parameter('SiteName')]",
+        "Action": "Stop"
+      }
+    },
+    "Sleep": {
+      "Type": "Sleep",
+      "Params": {
+        "Milliseconds": "60000"
+      }
+    },
+    "StartAppPool": {
+      "Type": "ManageAppPool",
+      "Params": {
+        "Name": "[parameter('SiteName')]",
+        "Action": "Start"
+      }
+    },
+    "StartWebsite": {
+      "Type": "ManageWebsite",
+      "Params": {
+        "Name": "[parameter('SiteName')]",
+        "Action": "Start"
+      }
+    }
+  }
+}

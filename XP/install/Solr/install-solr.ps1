@@ -22,7 +22,7 @@ $nssmRoot = "$installFolder\nssm-$nssmVersion"
 $solrPackage = "http://archive.apache.org/dist/lucene/solr/$solrVersion/$solrName.zip"
 $nssmPackage = "http://nssm.cc/release/nssm-$nssmVersion.zip"
 
-$downloadFolder = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath("..\assets") 
+$downloadFolder = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath("..\assets")
 if (!(Test-Path $downloadFolder)){
 	New-Item -ItemType Directory -Path $downloadFolder
 }
@@ -38,7 +38,7 @@ $JavaMinVersionRequired = "8.0.1510"
 if (Get-Module("helper")) {
 	Remove-Module "helper"
  }
- Import-Module "$PSScriptRoot\helper.psm1"  
+ Import-Module "$PSScriptRoot\helper.psm1"
 
 $ErrorActionPreference = 'Stop'
 
@@ -111,7 +111,7 @@ Copy-Item $KeystorePath -Destination "$solrRoot\server\etc\solr-ssl.keystore.jks
  {
 		 Write-Host "Resetting solr.in.cmd" -ForegroundColor Green
 		 Remove-Item "$solrRoot\bin\solr.in.cmd"
-		 Rename-Item -Path "$solrRoot\bin\solr.in.cmd.old" -NewName "$solrRoot\bin\solr.in.cmd"   
+		 Rename-Item -Path "$solrRoot\bin\solr.in.cmd.old" -NewName "$solrRoot\bin\solr.in.cmd"
  }
 
 	 Write-Host "Rewriting solr config"
@@ -147,7 +147,7 @@ elseif ($svc.Status -eq "Running")
 	Restart-Service "$solrName"
 }
 
-        
+
 Start-Sleep -s 5
 
 # finally prove it's all working

@@ -1,0 +1,35 @@
+﻿{
+  "Parameters": {
+    "MergeTool": {
+      "Type": "string",
+      "Description": "The path to the Merge Tool.",
+      "DefaultValue": ""
+    },
+    "InputFile": {
+      "Type": "string",
+      "Description": "The path to input file to merge.",
+      "DefaultValue": ""
+    },
+    "WebConfig": {
+      "Type": "string",
+      "Description": "The path to the web config file.",
+      "DefaultValue": ""
+    }
+  },
+  "Modules": ["MergeWebConfig" ],
+  "Variables": {
+    "Merge.Tool": "[parameter('MergeTool')]",
+    "Input.File": "[parameter('InputFile')]",
+    "Web.Config": "[parameter('WebConfig')]"
+  },
+  "Tasks": {
+    "MergeWebConfig": {
+      "Type": "MergeWebConfig",
+      "Params": {
+        "MergeTool": "[variable('Merge.Tool')]",
+        "InputFile": "[variable('Input.File')]",
+        "WebConfig": "[variable('Web.Config')]"
+      }
+    }
+  }
+}

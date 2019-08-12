@@ -1,0 +1,132 @@
+{
+  "Parameters": {
+    "PackagePath": {
+      "Type": "string",
+      "Description": "The path to the SCWDP  to deploy.",
+      "DefaultValue": ""
+    },
+    "SiteName": {
+      "Type": "string",
+      "Description": "The name of the site to be deployed.",
+      "DefaultValue": ""
+    },
+    "SqlDbPrefix": {
+      "Type": "string",
+      "Description": "SQL DB Prefix",
+      "DefaultValue": ""
+    },
+    "SqlAdminUser": {
+      "Type": "string",
+      "Description": "The Sql admin user account to use when installing databases.",
+      "DefaultValue": ""
+    },
+    "SqlAdminPassword": {
+      "Type": "string",
+      "Description": "The Sql admin password to use when installing databases.",
+      "DefaultValue": ""
+    },
+    "SqlServer": {
+      "Type": "string",
+      "Description": "The Sql Server where databases will be installed.",
+      "DefaultValue": ""
+    },
+    "SqlModuleDatabase": {
+      "Type": "string",
+      "Description": "Databases required for module install: ('master','mastercore','core')",
+      "DefaultValue": ""
+    }
+  },
+  "Variables": {
+    "Package.Path": "[parameter('PackagePath')]",
+    "Sql.Server": "[parameter('SqlServer')]",
+    "Sql.Module.Database": "[parameter('SqlModuleDatabase')]",
+    "Sql.Database.Core": "[concat(parameter('SqlDbPrefix'), '_Core')]",
+    "Sql.Database.Master": "[concat(parameter('SqlDbPrefix'), '_Master')]",
+    "Sql.Core.ConnectionString": "[SqlConnectionString(variable('Sql.Server'),variable('Sql.Database.Core'), parameter('SqlAdminUser'), parameter('SqlAdminPassword'))]",
+    "Sql.Master.ConnectionString": "[SqlConnectionString(variable('Sql.Server'),variable('Sql.Database.Master'), parameter('SqlAdminUser'), parameter('SqlAdminPassword'))]",
+    "Skip.Master": "[not(equal(variable('Sql.Module.Database'), 'master'))]",
+    "Skip.MasterCore": "[not(equal(variable('Sql.Module.Database'), 'mastercore'))]",
+    "Skip.Core": "[not(equal(variable('Sql.Module.Database'), 'core'))]"
+  },
+  "Settings": {
+    "AutoRegisterExtensions": true
+  },
+  "Tasks": {
+    "InstallWDPModuleMasterCore": {
+      "Type": "WebDeploy",
+      "Skip": "[equal(variable('Skip.MasterCore'),'True')]",
+      "Params": {
+        "Verb": "Sync",
+        "Arguments": {
+          "Source": {
+            "Package": "[resolvepath(variable('Package.Path'))]"
+          },
+          "Dest": "Auto",
+          "EnableRule": "DoNotDeleteRule",
+          "SetParam": [
+            {
+              "Name": "Application Path",
+              "Value": "[parameter('SiteName')]"
+            },
+            {
+              "Name": "Core Admin Connection String",
+              "Value": "[variable('Sql.Core.ConnectionString')]"
+            },
+            {
+              "Name": "Master Admin Connection String",
+              "Value": "[variable('Sql.Master.ConnectionString')]"
+            }
+          ]
+        }
+      }
+    },
+    "InstallWDPModuleMaster": {
+      "Type": "WebDeploy",
+      "Skip": "[equal(variable('Skip.Master'),'True')]",
+      "Params": {
+        "Verb": "Sync",
+        "Arguments": {
+          "Source": {
+            "Package": "[resolvepath(variable('Package.Path'))]"
+          },
+          "Dest": "Auto",
+          "EnableRule": "DoNotDeleteRule",
+          "SetParam": [
+            {
+              "Name": "Application Path",
+              "Value": "[parameter('SiteName')]"
+            },
+            {
+              "Name": "Master Admin Connection String",
+              "Value": "[variable('Sql.Master.ConnectionString')]"
+            }
+          ]
+        }
+      }
+    },
+    "InstallWDPModuleCore": {
+      "Type": "WebDeploy",
+      "Skip": "[equal(variable('Skip.Core'),'True')]",
+      "Params": {
+        "Verb": "Sync",
+        "Arguments": {
+          "Source": {
+            "Package": "[resolvepath(variable('Package.Path'))]"
+          },
+          "Dest": "Auto",
+          "EnableRule": "DoNotDeleteRule",
+          "SetParam": [
+            {
+              "Name": "Application Path",
+              "Value": "[parameter('SiteName')]"
+            },
+            {
+              "Name": "Core Admin Connection String",
+              "Value": "[variable('Sql.Core.ConnectionString')]"
+            }
+          ]
+        }
+      }
+    }
+  }
+}
