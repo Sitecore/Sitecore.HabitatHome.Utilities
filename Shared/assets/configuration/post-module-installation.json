@@ -177,6 +177,9 @@
         "StartProcessingEngineService": {
             "Source": ".\\manage-service.json"
         },
+        "DeployModels": {
+            "Source": ".\\deploy-xconnect-models.json"
+        },
         "WarmUpSite": {
             "Source": ".\\warmup-instance.json"
         }

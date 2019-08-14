@@ -1,0 +1,35 @@
+{
+  "Parameters": {
+    "FullPath": {
+      "Type": "string",
+      "Description": "The path to check.",
+      "DefaultValue": ""
+    }
+  },
+  // "Register":{
+  //   "Tasks": {
+  //       //"RemoveItem": "Remove-Item",
+  //       "WriteInformation": "Write-Information"
+  //   }
+  // },  
+  "Variables": {
+    "Full.Path": "[parameter('FullPath')]"
+  },
+  "Tasks": {
+    // "ECHO": {
+    //   "Type": "WriteInformation",
+    //   "Params": {
+    //       "MessageData": "[concat('Path: ', variable('Full.Path'))]",
+    //       "InformationAction": "Continue"
+    //   }
+    // },    
+    "EnsurePath": {
+      "Type": "EnsurePath",
+      "Params": {
+        "Exists": [
+          "[variable('Full.Path')]"
+        ]
+      }
+    }
+  }
+}

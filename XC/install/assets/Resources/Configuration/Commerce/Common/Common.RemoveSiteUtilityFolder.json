@@ -1,0 +1,25 @@
+{
+  "Parameters": {
+    "SiteUtilitiesSrc": {
+      "Type": "string",
+      "Description": "Site Utilities source path",
+      "DefaultValue": ""
+    }
+  },
+  "Register":{
+    "Tasks": {
+        "RemoveItem": "Remove-Item"
+    }
+  },  
+  "Tasks": {
+    "RemoveSiteUtilityFolder": {
+      "Description": "Removes Site Utilities content.",
+      "Type": "RemoveItem",
+      "Params": {
+          "Path": "[parameter('SiteUtilitiesSrc')]",
+          "Recurse": true,
+          "ErrorAction": "SilentlyContinue"
+      }
+    }
+  }
+}

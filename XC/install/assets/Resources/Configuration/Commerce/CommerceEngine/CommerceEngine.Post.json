@@ -1,0 +1,17 @@
+﻿{
+  "Parameters": {
+  },
+  "Settings": {
+    "AutoRegisterExtensions": true
+  },
+  "Modules": [
+    "DeployCommerceContent"
+  ],
+  "Variables": {
+  },
+  "Tasks": {
+    "CreatePerformanceCounters": {
+      "Type": "CreatePerformanceCounters"
+    }
+  }
+}

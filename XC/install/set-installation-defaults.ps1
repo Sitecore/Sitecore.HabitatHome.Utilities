@@ -19,25 +19,25 @@ $assets.root = "$PSScriptRoot\assets"
 $assets.downloadFolder =  $assets.packageRepository
 
 #Commerce
-$assets.commerce.packageName = "Sitecore.Commerce.2019.04-3.0.163.zip"
-$assets.commerce.packageUrl = "https://dev.sitecore.net/~/media/EF8EE376257142B4BDFAFF7EB1E1CA3E.ashx"
+$assets.commerce.packageName = "Sitecore.Commerce.WDP.2019.07-4.0.165.zip"
+$assets.commerce.packageUrl = "https://dev.sitecore.net/~/media/07F9ABE455944146B37E9D71CA781A27.ashx"
 $assets.commerce.installationFolder = Join-Path $assets.packageRepository "Commerce"
 
 
 #Commerce Files to Extract
-$sifCommerceVersion = $assets.commerce.filesToExtract | Where-Object { $_.name -eq "SIF.Sitecore.Commerce"} 
-$sifCommerceVersion.version = "2.0.19"
+$sifCommerceVersion = $assets.commerce.filesToExtract | Where-Object { $_.name -eq "SIF.Sitecore.Commerce"}
+$sifCommerceVersion.version = "3.0.28"
 
 $assets.commerce.sifCommerceRoot = Join-Path $assets.commerce.installationFolder $($sifCommerceVersion.name + "." + $sifCommerceVersion.version)
 
-$commerceEngineVersion = $assets.commerce.filesToExtract | Where-Object { $_.name -eq "Sitecore.Commerce.Engine"} 
-$commerceEngineVersion.version = "3.0.163"
+$commerceEngineVersion = $assets.commerce.filesToExtract | Where-Object { $_.name -eq "Sitecore.Commerce.Engine"}
+$commerceEngineVersion.version = "4.0.165"
 
-$commerceEngineSDKVersion = $assets.commerce.filesToExtract | Where-Object { $_.name -eq "Sitecore.Commerce.Engine.SDK"} 
-$commerceEngineSDKVersion.version = "3.0.40"
+$commerceEngineSDKVersion = $assets.commerce.filesToExtract | Where-Object { $_.name -eq "Sitecore.Commerce.Engine.SDK"}
+$commerceEngineSDKVersion.version = "4.0.102"
 
-$bizFxVersion = $assets.commerce.filesToExtract | Where-Object { $_.name -eq "Sitecore.BizFX"} 
-$bizFxVersion.version = "2.0.3"
+$bizFxVersion = $assets.commerce.filesToExtract | Where-Object { $_.name -eq "Sitecore.BizFX"}
+$bizFxVersion.version = "3.0.7"
 
 # Settings
 $site = $json.settings.site
@@ -57,13 +57,6 @@ $commerce.brainTreeAccountPrivateKey = ""
 # Site Settings
 $site = $json.settings.site
 
-
-# Sitecore Parameters
-$sitecore = $json.settings.sitecore
-
-
-# Solr Parameters
-$solr = $json.settings.solr
 Write-Host
 Write-Host "Saving content to $ConfigurationFile" -ForegroundColor Green
 Set-Content $ConfigurationFile  (ConvertTo-Json -InputObject $json -Depth 4 )
