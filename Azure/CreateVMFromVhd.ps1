@@ -9,7 +9,7 @@ Param(
     [string] $version,
     [string] $resourceGroupName,
     [string] $virtualMachineSize = "Standard_D4s_v3",
-    [string] $sourceSnapshotSubscriptionId = "***REMOVED***",
+    [string] $sourceSnapshotSubscriptionId = "",
     [string] $deploymentName = "habitathome",
     [string] $sourceSnapshotPrefix = "habitathome"
 )
