@@ -8,7 +8,7 @@ Param(
     [Parameter(Mandatory = $true)]
     [string] $version,
     [string] $virtualMachineSize = "Standard_D4s_v3", 
-    [string] $sourceSnapshotSubscriptionId = "8ae723fd-8e32-44bd-bd0e-f3f71631e11e",    
+    [string] $sourceSnapshotSubscriptionId = "***REMOVED***",    
     [string] $deploymentName = "habitathome",
     [string] $sourceSnapshotPrefix = "habitathome"
 )
