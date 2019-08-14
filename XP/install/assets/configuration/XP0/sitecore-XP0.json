@@ -8,31 +8,41 @@
         "LicenseFile": {
             "Type": "string",
             "Description": "The path to the Sitecore license file.",
-            "DefaultValue": ".\\License.xml"
+            "DefaultValue" : ".\\License.xml"
         },
         "SqlDbPrefix": {
             "Type": "string",
             "Description": "The prefix used for all Sql databases.",
-            "DefaultValue": ""
+            "DefaultValue" : ""
         },
         "SolrCorePrefix": {
             "Type": "string",
             "Description": "The prefix used for all Solr cores.",
+            "DefaultValue" : ""
+        },
+        "SSLCert": {
+            "Type": "string",
+            "Description": "The certificate to use for HTTPS web bindings. Provide the name or the thumbprint. If not provided a certificate will be generated.",
             "DefaultValue": ""
         },
         "XConnectCert": {
             "Type": "string",
             "Description": "The certificate to use for encryption. Provide the name or the thumbprint.",
-            "DefaultValue": ""
+            "DefaultValue" : ""
         },
         "SiteName": {
             "Type": "string",
             "DefaultValue": "Sitecore",
             "Description": "The name of the site to be deployed."
         },
+        "SitePhysicalRoot": {
+            "Type": "String",
+            "Description": "Root folder to install the site to. If left on the default [systemdrive]:\\inetpub\\wwwroot will be used.",
+            "DefaultValue": ""
+        },
         "SitecoreAdminPassword": {
             "Type": "string",
-            "DefaultValue": "SIF-Default",
+            "DefaultValue": "",
             "Description": "The admin password for the Sitecore instance."
         },
         "SqlAdminUser": {
@@ -156,9 +166,9 @@
             "Description": "The Sql password for the EXM Master connection string in Sitecore."
         },
         "SqlMessagingUser": {
-            "Type": "string",
-            "DefaultValue": "messaginguser",
-            "Description": "The Sql user for the Messaging connection string in Sitecore."
+          "Type": "string",
+          "DefaultValue": "messaginguser",
+          "Description": "The Sql user for the Messaging connection string in Sitecore."
         },
         "SqlMessagingPassword": {
             "Type": "string",
@@ -171,18 +181,18 @@
             "Description": "The Sql Server where databases will be installed."
         },
         "ExmEdsProvider": {
-            "Type": "string",
-            "DefaultValue": "CustomSMTP",
-            "Description": "The default EDS provider to be used."
+          "Type": "string",
+          "DefaultValue": "CustomSMTP",
+          "Description": "The default EDS provider to be used."
         },
         "EXMCryptographicKey": {
             "Type": "string",
-            "DefaultValue": "SIF-Default",
+            "DefaultValue": "0x0123456789012345678901234567890123456789012345678901234678901234",
             "Description": "64 digits hexadecimal EXM Cryptographic Key. Takes the form 0x0000000000000000000000000000000000000000000000000000000000000000"
         },
         "EXMAuthenticationKey": {
             "Type": "string",
-            "DefaultValue": "SIF-Default",
+            "DefaultValue": "0x0123456789012345678901234567890123456789012345678901234678901234",
             "Description": "64 digits hexadecimal EXM Authentication Key. Takes the form 0x0000000000000000000000000000000000000000000000000000000000000000"
         },
         "SolrUrl": {
@@ -235,47 +245,71 @@
             "Reference": "SiteName",
             "Description": "The host mapping name of the site."
         },
-        "DnsName": {
+        "DnsName" :{
             "Type": "string",
             "Reference": "SiteName",
             "Description": "The dns name of the site."
         },
-        "WebRoot": {
-          "Type": "string",
-          "DefaultValue": "c:\\inetpub\\wwwroot",
-          "Description": "The physical path of the configured Web Root for the environment"
+        "SkipDatabaseInstallation": {
+            "Type": "bool",
+            "DefaultValue": false,
+            "Description": "Skip database installation."
+        },
+        "PackagesTempLocation": {
+            "Type": "String",
+            "Description": "Alternative location to save WDP packages. If left on the default $Env:Temp will be used.",
+            "DefaultValue": "",
+            "Validate": "[TestPath(variable('Temp.Location'))]"
+        },
+        "DownloadLocations": {
+            "Type": "String",
+            "Description": "File with URI and SHA256 hashes of dynamically downloadable WDPs.",
+            "DefaultValue": ".\\downloads.json"
         }
     },
     "Variables": {
-        "Sql.Database.Core": "[concat(parameter('SqlDbPrefix'), '_Core')]",
-        "Sql.Database.Security": "[concat(parameter('SqlDbPrefix'), '_Core')]",
-        "Sql.Database.Master": "[concat(parameter('SqlDbPrefix'), '_Master')]",
-        "Sql.Database.Web": "[concat(parameter('SqlDbPrefix'), '_Web')]",
-        "Sql.Database.Reporting": "[concat(parameter('SqlDbPrefix'), '_Reporting')]",
-        "Sql.Database.Reference": "[concat(parameter('SqlDbPrefix'), '_ReferenceData')]",
-        "Sql.Database.Forms": "[concat(parameter('SqlDbPrefix'), '_ExperienceForms')]",
-        "Sql.Database.Pools": "[concat(parameter('SqlDbPrefix'), '_Processing.Pools')]",
-        "Sql.Database.Tasks": "[concat(parameter('SqlDbPrefix'), '_Processing.Tasks')]",
+        "Sql.Database.Core":                "[concat(parameter('SqlDbPrefix'), '_Core')]",
+        "Sql.Database.Security":            "[concat(parameter('SqlDbPrefix'), '_Core')]",
+        "Sql.Database.Master":              "[concat(parameter('SqlDbPrefix'), '_Master')]",
+        "Sql.Database.Web":                 "[concat(parameter('SqlDbPrefix'), '_Web')]",
+        "Sql.Database.Reporting":           "[concat(parameter('SqlDbPrefix'), '_Reporting')]",
+        "Sql.Database.Reference":           "[concat(parameter('SqlDbPrefix'), '_ReferenceData')]",
+        "Sql.Database.Forms":               "[concat(parameter('SqlDbPrefix'), '_ExperienceForms')]",
+        "Sql.Database.Pools":               "[concat(parameter('SqlDbPrefix'), '_Processing.Pools')]",
+        "Sql.Database.Tasks":               "[concat(parameter('SqlDbPrefix'), '_Processing.Tasks')]",
         "Sql.Database.MarketingAutomation": "[concat(parameter('SqlDbPrefix'), '_MarketingAutomation')]",
-        "Sql.Database.EXM.Master": "[concat(parameter('SqlDbPrefix'), '_EXM.Master')]",
-        "Sql.Database.Messaging": "[concat(parameter('SqlDbPrefix'), '_Messaging')]",
-        "Security.CertificateStore": "Cert:\\Localmachine\\My",
-        "Security.XConnect.CertificateThumbprint": "[GetCertificateThumbprint(parameter('XConnectCert'), variable('Security.CertificateStore'))]",
-        "Security.XConnect.CertificatePath": "[joinpath(variable('Security.CertificateStore'), variable('Security.XConnect.CertificateThumbprint'))]",
-        "Solr.Core.Name": "[concat(parameter('SolrCorePrefix'), '_core_index')]",
-        "Solr.Master.Name": "[concat(parameter('SolrCorePrefix'), '_master_index')]",
-        "Solr.Web.Name": "[concat(parameter('SolrCorePrefix'), '_web_index')]",
-        "Solr.MD.Master.Name": "[concat(parameter('SolrCorePrefix'), '_marketingdefinitions_master')]",
-        "Solr.MD.Web.Name": "[concat(parameter('SolrCorePrefix'), '_marketingdefinitions_web')]",
-        "Solr.MA.Master.Name": "[concat(parameter('SolrCorePrefix'), '_marketing_asset_index_master')]",
-        "Solr.MA.Web.Name": "[concat(parameter('SolrCorePrefix'), '_marketing_asset_index_web')]",
-        "Solr.Testing.Name": "[concat(parameter('SolrCorePrefix'), '_testing_index')]",
-        "Solr.Suggested.Name": "[concat(parameter('SolrCorePrefix'), '_suggested_test_index')]",
+        "Sql.Database.EXM.Master":          "[concat(parameter('SqlDbPrefix'), '_EXM.Master')]",
+        "Sql.Database.Messaging":           "[concat(parameter('SqlDbPrefix'), '_Messaging')]",
+
+        "Security.CertificateStore":                "Cert:\\Localmachine\\My",
+        "Security.XConnect.CertificateThumbprint":  "[GetCertificateThumbprint(parameter('XConnectCert'), variable('Security.CertificateStore'))]",
+        "Security.XConnect.CertificatePath":        "[joinpath(variable('Security.CertificateStore'), variable('Security.XConnect.CertificateThumbprint'))]",
+        "Security.SSL.CertificateThumbprint":       "[GetCertificateThumbprint(parameter('SSLCert'), variable('Security.CertificateStore'))]",
+
+        "Solr.Core.Name":       "[concat(parameter('SolrCorePrefix'), '_core_index')]",
+        "Solr.Master.Name":     "[concat(parameter('SolrCorePrefix'), '_master_index')]",
+        "Solr.Web.Name":        "[concat(parameter('SolrCorePrefix'), '_web_index')]",
+        "Solr.MD.Master.Name":  "[concat(parameter('SolrCorePrefix'), '_marketingdefinitions_master')]",
+        "Solr.MD.Web.Name":     "[concat(parameter('SolrCorePrefix'), '_marketingdefinitions_web')]",
+        "Solr.MA.Master.Name":  "[concat(parameter('SolrCorePrefix'), '_marketing_asset_index_master')]",
+        "Solr.MA.Web.Name":     "[concat(parameter('SolrCorePrefix'), '_marketing_asset_index_web')]",
+        "Solr.Testing.Name":    "[concat(parameter('SolrCorePrefix'), '_testing_index')]",
+        "Solr.Suggested.Name":  "[concat(parameter('SolrCorePrefix'), '_suggested_test_index')]",
         "Solr.FXM.Master.Name": "[concat(parameter('SolrCorePrefix'), '_fxm_master_index')]",
-        "Solr.FXM.Web.Name": "[concat(parameter('SolrCorePrefix'), '_fxm_web_index')]",
-        "Site.PhysicalPath": "[concat(parameter('WebRoot'),'\\', parameter('SiteName'))]",
-        "Site.DataFolder": "[joinpath(variable('Site.PhysicalPath'), 'App_Data')]",
-        "Sitecore.Admin.Password": "[parameter('SitecoreAdminPassword'))]",
+        "Solr.FXM.Web.Name":    "[concat(parameter('SolrCorePrefix'), '_fxm_web_index')]",
+        "Solr.Personalization.Name": "[concat(parameter('SolrCorePrefix'), '_personalization_index')]",
+
+        "Site.PhysicalPath": "[if(variable('Test.Site.PhysicalPath'),variable('Default.Site.PhysicalPath'),variable('Custom.Site.PhysicalPath'))]",
+        "Default.Site.PhysicalPath": "[joinpath(environment('SystemDrive'), 'inetpub', 'wwwroot', parameter('SiteName'))]",
+        "Custom.Site.PhysicalPath": "[joinpath(parameter('SitePhysicalRoot'),parameter('SiteName'))]",
+        "Test.Site.PhysicalPath": "[equal(parameter('SitePhysicalRoot'),'')]",
+
+        "Site.DataFolder":   "[joinpath(variable('Site.PhysicalPath'), 'App_Data')]",
+
+        "Sitecore.Admin.Password": "[if(variable('Test.Admin.Password'),variable('Generate.Admin.Password'),parameter('SitecoreAdminPassword'))]",
+        "Test.Admin.Password": "[equal(parameter('SitecoreAdminPassword'),'')]",
+        "Generate.Admin.Password": "[randomstring(Length:20,DisAllowSpecial:True,EnforceComplexity:True)]",
+
         "SqlCore.Password": "[parameter('SqlCorePassword'))]",
         "SqlMaster.Password": "[parameter('SqlMasterPassword'))]",
         "SqlWeb.Password": "[parameter('SqlWebPassword'))]",
@@ -288,35 +322,72 @@
         "SqlMarketingAutomation.Password": "[parameter('SqlMarketingAutomationPassword')]",
         "SqlMessaging.Password": "[parameter('SqlMessagingPassword')]",
         "SqlReporting.Password": "[parameter('SqlReportingPassword')]",
-        "EXM.CryptographicKey": "[if(variable('Test.EXM.CryptographicKey'),variable('Generate.EXM.CryptographicKey'),parameter('EXMCryptographicKey'))]",
-        "Test.EXM.CryptographicKey": "[equal(parameter('EXMCryptographicKey'),'SIF-Default')]",
+
+        "EXM.CryptographicKey" : "[if(variable('Test.EXM.CryptographicKey'),variable('Generate.EXM.CryptographicKey'),parameter('EXMCryptographicKey'))]",
+        "Test.EXM.CryptographicKey": "[equal(parameter('EXMCryptographicKey'),'0x0123456789012345678901234567890123456789012345678901234678901234')]",
         "Generate.EXM.CryptographicKey": "[concat('0x',randomstring(Length:64,DisAllowSpecial:True,DisAllowCaps:True,DisAllowLower:True))]",
-        "EXM.AuthenticationKey": "[if(variable('Test.EXM.AuthenticationKey'),variable('Generate.EXM.AuthenticationKey'),parameter('EXMAuthenticationKey'))]",
-        "Test.EXM.AuthenticationKey": "[equal(parameter('EXMAuthenticationKey'),'SIF-Default')]",
+
+        "EXM.AuthenticationKey" : "[if(variable('Test.EXM.AuthenticationKey'),variable('Generate.EXM.AuthenticationKey'),parameter('EXMAuthenticationKey'))]",
+        "Test.EXM.AuthenticationKey": "[equal(parameter('EXMAuthenticationKey'),'0x0123456789012345678901234567890123456789012345678901234678901234')]",
         "Generate.EXM.AuthenticationKey": "[concat('0x',randomstring(Length:64,DisAllowSpecial:True,DisAllowCaps:True,DisAllowLower:True))]",
-        "Telerik.EncryptionKey": "[if(variable('Test.Telerik.EncryptionKey'),variable('Generate.Telerik.EncryptionKey'),parameter('TelerikEncryptionKey'))]",
+
+        "Telerik.EncryptionKey" : "[if(variable('Test.Telerik.EncryptionKey'),variable('Generate.Telerik.EncryptionKey'),parameter('TelerikEncryptionKey'))]",
         "Test.Telerik.EncryptionKey": "[equal(parameter('TelerikEncryptionKey'),'SIF-Default')]",
         "Generate.Telerik.EncryptionKey": "[randomstring(Length:256,DisAllowSpecial:True)]",
-        "Sitecore.IdentitySecret": "[parameter('SitecoreIdentitySecret')]",
-        "Sql.Secure.Password": "[ConvertToSecureString(String:parameter('SqlAdminPassword'),AsPlainText:true,Force:true)]"
+
+        "Sitecore.IdentitySecret" : "[parameter('SitecoreIdentitySecret')]",
+
+        "Sql.Secure.Password" : "[ConvertToSecureString(String:parameter('SqlAdminPassword'),AsPlainText:true,Force:true)]",
+
+        "Skip.dbDacFx": "[if(parameter('SkipDatabaseInstallation'),'dbDacFx','null')]",
+        "Skip.dbFullSql": "[if(parameter('SkipDatabaseInstallation'),'dbFullSql','null')]",
+
+        "Temp.Location" : "[if(variable('Test.Temp.Location'),Environment('Temp'),parameter('PackagesTempLocation'))]",
+        "Test.Temp.Location" : "[equal(parameter('PackagesTempLocation'),'')]",
+
+        "Settings.FileName": "sitecore-XP0.json",
+
+        "Dynamic.WDP": "[ReadJson(parameter('DownloadLocations'))]",
+        "Test.WDP.Download": "[TestPath(Path:Parameter('DownloadLocations'))]",
+        "WDP.Download": "[SelectObject(InputObject:variable('Dynamic.WDP'),ExpandProperty:variable('Settings.Filename'))]",
+        "WDP.Download.Uri": "[SelectObject(InputObject:variable('WDP.Download'),ExpandProperty:'Uri')]",
+        "WDP.Download.Hash": "[SelectObject(InputObject:variable('WDP.Download'),ExpandProperty:'Hash')]",
+        "WDP.Download.Path": "[JoinPath(variable('Temp.Location'),variable('WDP.Filename'))]",
+        "WDP.Download.Filename": "[SplitPath(Path:variable('WDP.Download.Uri'),Leaf:true)]",
+        "WDP.Filename": "[Split(String:variable('WDP.Download.Filename'),Characters:'?')]",
+        "Package": "[if(parameter('Package'),parameter('Package'),variable('WDP.Download.Path'))]",
+        "Test.Packaging": "[or(variable('Test.Null.Package'),not(variable('Test.WDP.Download')))]",
+        "Test.Null.Package": "[if(parameter('Package'),parameter('Package'),'')]"
     },
-    "Register": {
+    "Register":{
         "Tasks": {
             "RemoveItem": "Remove-Item",
             "WriteInformation": "Write-Information"
         },
         "ConfigFunction": {
-            "ConvertToSecureString": "ConvertTo-SecureString"
+            "ConvertToSecureString": "ConvertTo-SecureString",
+            "TestPath": "Test-Path",
+            "SelectObject": "Select-Object",
+            "SplitPath": "Split-Path",
+            "GetVariable": "Get-Variable"
         }
     },
     "Tasks": {
+        "DownloadWDP": {
+            "Description": "Download the WDP and verifies it against the stored hash.",
+            "Type": "DownloadFile",
+            "Params": {
+                "SourceUri": "[variable('WDP.Download.URI')]",
+                "DestinationPath": "[variable('WDP.Download.Path')]",
+                "Hash": "[variable('WDP.Download.Hash')]"
+            },
+            "Skip" : "[variable('Test.Packaging')]"
+        },
         "CreatePaths": {
             "Description": "Ensure the destination path for the site exists.",
             "Type": "EnsurePath",
             "Params": {
-                "Exists": [
-                    "[variable('Site.PhysicalPath')]"
-                ]
+                "Exists": [ "[variable('Site.PhysicalPath')]" ]
             }
         },
         "CreateAppPool": {
@@ -356,23 +427,29 @@
                 "Action": "Stop"
             }
         },
-        "CreateBindings": {
+        "RemoveDefaultBinding": {
+            "Description": "Removes the default *:80 web binding.",
+            "Type": "WebBinding",
+            "Params": {
+                "SiteName" : "[parameter('SiteName')]",
+                "Remove" : [ { "Port": "80", "IPAddress": "*" } ]
+            }
+        },
+        "CreateBindingsWithThumbprint": {
             "Description": "Configures the site bindings for the website.",
             "Type": "WebBinding",
             "Params": {
-                "SiteName": "[parameter('SiteName')]",
+                "SiteName" : "[parameter('SiteName')]",
                 "Add": [
                     {
-                        "HostHeader": "[parameter('DnsName')]"
-                    }
-                ],
-                "Remove": [
-                    {
-                        "Port": "80",
-                        "IPAddress": "*"
+                        "HostHeader": "[parameter('DnsName')]",
+                        "Protocol": "https",
+                        "SSLFlags": 1,
+                        "Thumbprint": "[variable('Security.SSL.CertificateThumbprint')]"
                     }
                 ]
-            }
+            },
+            "Skip": "[not(parameter('SSLCert'))]"
         },
         "CreateHostHeader": {
             "Description": "Sets a hostheader for the website.",
@@ -391,10 +468,7 @@
                     {
                         "User": "[concat('IIS AppPool\\', parameter('SiteName'))]",
                         "FileSystemRights": "FullControl",
-                        "InheritanceFlags": [
-                            "ContainerInherit",
-                            "ObjectInherit"
-                        ]
+                        "InheritanceFlags": [ "ContainerInherit", "ObjectInherit" ]
                     }
                 ]
             }
@@ -407,12 +481,8 @@
                 "Rights": [
                     {
                         "User": "[concat('IIS AppPool\\', parameter('SiteName'))]",
-                        "FileSystemRights": [
-                            "Read"
-                        ],
-                        "InheritanceFlags": [
-                            "None"
-                        ]
+                        "FileSystemRights": [ "Read" ],
+                        "InheritanceFlags": [ "None" ]
                     }
                 ]
             }
@@ -424,273 +494,93 @@
                 "Verb": "Sync",
                 "Arguments": {
                     "Source": {
-                        "Package": "[resolvepath(parameter('Package'))]"
+                        "Package": "[resolvepath(variable('Package'))]"
                     },
                     "Dest": "Auto",
                     "SetParam": [
-                        {
-                            "Name": "Application Path",
-                            "Value": "[parameter('SiteName')]"
-                        },
-                        {
-                            "Name": "Database Server Name",
-                            "Value": "[parameter('SqlServer')]"
-                        },
-                        {
-                            "Name": "Sitecore Admin New Password",
-                            "Value": "[variable('Sitecore.Admin.Password')]"
-                        },
-                        {
-                            "Name": "Database Admin User Name",
-                            "Value": "[parameter('SqlAdminUser')]"
-                        },
-                        {
-                            "Name": "Database Admin User Password",
-                            "Value": "[parameter('SqlAdminPassword')]"
-                        },
-                        {
-                            "Name": "Core DB Name",
-                            "Value": "[variable('Sql.Database.Core')]"
-                        },
-                        {
-                            "Name": "Security DB Name",
-                            "Value": "[variable('Sql.Database.Security')]"
-                        },
-                        {
-                            "Name": "Master DB Name",
-                            "Value": "[variable('Sql.Database.Master')]"
-                        },
-                        {
-                            "Name": "Web DB Name",
-                            "Value": "[variable('Sql.Database.Web')]"
-                        },
-                        {
-                            "Name": "Reporting DB Name",
-                            "Value": "[variable('Sql.Database.Reporting')]"
-                        },
-                        {
-                            "Name": "XDB Reference Data DB Name",
-                            "Value": "[variable('Sql.Database.Reference')]"
-                        },
-                        {
-                            "Name": "Experience Forms DB Name",
-                            "Value": "[variable('Sql.Database.Forms')]"
-                        },
-                        {
-                            "Name": "Marketing Automation DB Name",
-                            "Value": "[variable('Sql.Database.MarketingAutomation')]"
-                        },
-                        {
-                            "Name": "Processing Pools DB Name",
-                            "Value": "[variable('Sql.Database.Pools')]"
-                        },
-                        {
-                            "Name": "Processing Tasks DB Name",
-                            "Value": "[variable('Sql.Database.Tasks')]"
-                        },
-                        {
-                            "Name": "EXM Master DB Name",
-                            "Value": "[variable('Sql.Database.EXM.Master')]"
-                        },
-                        {
-                            "Name": "Messaging DB Name",
-                            "Value": "[variable('Sql.Database.Messaging')]"
-                        },
-                        {
-                            "Name": "Core DB User Name",
-                            "Value": "[parameter('SqlCoreUser')]"
-                        },
-                        {
-                            "Name": "Core DB User Password",
-                            "Value": "[variable('SqlCore.Password')]"
-                        },
-                        {
-                            "Name": "Security DB User Name",
-                            "Value": "[parameter('SqlSecurityUser')]"
-                        },
-                        {
-                            "Name": "Security DB User Password",
-                            "Value": "[variable('SqlSecurity.Password')]"
-                        },
-                        {
-                            "Name": "Master DB User Name",
-                            "Value": "[parameter('SqlMasterUser')]"
-                        },
-                        {
-                            "Name": "Master DB User Password",
-                            "Value": "[variable('SqlMaster.Password')]"
-                        },
-                        {
-                            "Name": "Web DB User Name",
-                            "Value": "[parameter('SqlWebUser')]"
-                        },
-                        {
-                            "Name": "Web DB User Password",
-                            "Value": "[variable('SqlWeb.Password')]"
-                        },
-                        {
-                            "Name": "Reporting DB User Name",
-                            "Value": "[parameter('SqlReportingUser')]"
-                        },
-                        {
-                            "Name": "Reporting DB User Password",
-                            "Value": "[variable('SqlReporting.Password')]"
-                        },
-                        {
-                            "Name": "XDB Reference Data DB User Name",
-                            "Value": "[parameter('SqlReferenceDataUser')]"
-                        },
-                        {
-                            "Name": "XDB Reference Data DB User Password",
-                            "Value": "[variable('SqlReferenceData.Password')]"
-                        },
-                        {
-                            "Name": "Experience Forms DB User Name",
-                            "Value": "[parameter('SqlFormsUser')]"
-                        },
-                        {
-                            "Name": "Experience Forms DB User Password",
-                            "Value": "[variable('SqlForms.Password')]"
-                        },
-                        {
-                            "Name": "EXM Master DB User Name",
-                            "Value": "[parameter('SqlExmMasterUser')]"
-                        },
-                        {
-                            "Name": "EXM Master DB User Password",
-                            "Value": "[variable('SqlExmMaster.Password')]"
-                        },
-                        {
-                            "Name": "Messaging DB User Name",
-                            "Value": "[parameter('SqlMessagingUser')]"
-                        },
-                        {
-                            "Name": "Messaging DB User Password",
-                            "Value": "[variable('SqlMessaging.Password')]"
-                        },
-                        {
-                            "Name": "Marketing Automation DB User Name",
-                            "Value": "[parameter('SqlMarketingAutomationUser')]"
-                        },
-                        {
-                            "Name": "Marketing Automation DB User Password",
-                            "Value": "[variable('SqlMarketingAutomation.Password')]"
-                        },
-                        {
-                            "Name": "Processing Pools DB User Name",
-                            "Value": "[parameter('SqlProcessingPoolsUser')]"
-                        },
-                        {
-                            "Name": "Processing Pools DB User Password",
-                            "Value": "[variable('SqlProcessingPools.Password')]"
-                        },
-                        {
-                            "Name": "Processing Tasks DB User Name",
-                            "Value": "[parameter('SqlProcessingTasksUser')]"
-                        },
-                        {
-                            "Name": "Processing Tasks DB User Password",
-                            "Value": "[variable('SqlProcessingTasks.Password')]"
-                        },
-                        {
-                            "Name": "XConnect Collection",
-                            "Value": "[parameter('XConnectCollectionService')]"
-                        },
-                        {
-                            "Name": "Xdb Reference Data Client",
-                            "Value": "[parameter('XConnectReferenceDataService')]"
-                        },
-                        {
-                            "Name": "XDB MA Reporting Client",
-                            "Value": "[parameter('MarketingAutomationReportingService')]"
-                        },
-                        {
-                            "Name": "XDB MA Ops Client",
-                            "Value": "[parameter('MarketingAutomationOperationsService')]"
-                        },
-                        {
-                            "Name": "Cortex Reporting Client",
-                            "Value": "[parameter('CortexReportingService')]"
-                        },
-                        {
-                            "Name": "XConnect Server Certificate Validation Thumbprint",
-                            "Value": "[variable('Security.XConnect.CertificateThumbprint')]"
-                        },
-                        {
-                            "Name": "SOLR Connection String",
-                            "Value": "[parameter('SolrUrl')]"
-                        },
-                        {
-                            "Name": "Solr Core Index Name",
-                            "Value": "[variable('Solr.Core.Name')]"
-                        },
-                        {
-                            "Name": "Solr Master Index Name",
-                            "Value": "[variable('Solr.Master.Name')]"
-                        },
-                        {
-                            "Name": "Solr Web Index Name",
-                            "Value": "[variable('Solr.Web.Name')]"
-                        },
-                        {
-                            "Name": "Solr Marketing Definitions Master Index Name",
-                            "Value": "[variable('Solr.MD.Master.Name')]"
-                        },
-                        {
-                            "Name": "Solr Marketing Definitions Web Index Name",
-                            "Value": "[variable('Solr.MD.Web.Name')]"
-                        },
-                        {
-                            "Name": "Solr Marketing Asset Master Index Name",
-                            "Value": "[variable('Solr.MA.Master.Name')]"
-                        },
-                        {
-                            "Name": "Solr Marketing Asset Web Index Name",
-                            "Value": "[variable('Solr.MA.Web.Name')]"
-                        },
-                        {
-                            "Name": "Solr Testing Index Name",
-                            "Value": "[variable('Solr.Testing.Name')]"
-                        },
-                        {
-                            "Name": "Solr Suggested Index Name",
-                            "Value": "[variable('Solr.Suggested.Name')]"
-                        },
-                        {
-                            "Name": "Solr FXM Master Index Name",
-                            "Value": "[variable('Solr.FXM.Master.Name')]"
-                        },
-                        {
-                            "Name": "Solr FXM Web Index Name",
-                            "Value": "[variable('Solr.FXM.Web.Name')]"
-                        },
-                        {
-                            "Name": "Telerik Encryption Key",
-                            "Value": "[variable('Telerik.EncryptionKey')]"
-                        },
-                        {
-                            "Name": "EXM EDS Provider",
-                            "Value": "[parameter('ExmEdsProvider')]"
-                        },
-                        {
-                            "Name": "EXM Cryptographic Key",
-                            "Value": "[variable('EXM.CryptographicKey')]"
-                        },
-                        {
-                            "Name": "EXM Authentication Key",
-                            "Value": "[variable('EXM.AuthenticationKey')]"
-                        },
-                        {
-                            "Name": "Sitecore Identity Authority",
-                            "Value": "[parameter('SitecoreIdentityAuthority')]"
-                        },
-                        {
-                            "Name": "Sitecore Identity Secret",
-                            "Value": "[variable('Sitecore.IdentitySecret')]"
-                        }
+                        { "Name": "Application Path", "Value": "[parameter('SiteName')]" },
+                        { "Name": "Database Server Name", "Value": "[parameter('SqlServer')]" },
+                        { "Name": "Sitecore Admin New Password", "Value": "[variable('Sitecore.Admin.Password')]" },
+                        { "Name": "Database Admin User Name", "Value": "[parameter('SqlAdminUser')]" },
+                        { "Name": "Database Admin User Password", "Value": "[parameter('SqlAdminPassword')]" },
+                        { "Name": "Core DB Name", "Value": "[variable('Sql.Database.Core')]" },
+                        { "Name": "Security DB Name", "Value": "[variable('Sql.Database.Security')]" },
+                        { "Name": "Master DB Name", "Value": "[variable('Sql.Database.Master')]" },
+                        { "Name": "Web DB Name", "Value": "[variable('Sql.Database.Web')]" },
+                        { "Name": "Reporting DB Name", "Value": "[variable('Sql.Database.Reporting')]" },
+                        { "Name": "XDB Reference Data DB Name", "Value": "[variable('Sql.Database.Reference')]" },
+                        { "Name": "Experience Forms DB Name", "Value": "[variable('Sql.Database.Forms')]" },
+                        { "Name": "Marketing Automation DB Name", "Value": "[variable('Sql.Database.MarketingAutomation')]" },
+                        { "Name": "Processing Pools DB Name", "Value": "[variable('Sql.Database.Pools')]" },
+                        { "Name": "Processing Tasks DB Name", "Value": "[variable('Sql.Database.Tasks')]" },
+                        { "Name": "EXM Master DB Name", "Value": "[variable('Sql.Database.EXM.Master')]" },
+                        { "Name": "Messaging DB Name", "Value": "[variable('Sql.Database.Messaging')]" },
+                        { "Name": "Core DB User Name", "Value": "[parameter('SqlCoreUser')]" },
+                        { "Name": "Core DB User Password", "Value": "[variable('SqlCore.Password')]" },
+                        { "Name": "Security DB User Name", "Value": "[parameter('SqlSecurityUser')]" },
+                        { "Name": "Security DB User Password", "Value": "[variable('SqlSecurity.Password')]" },
+                        { "Name": "Master DB User Name", "Value": "[parameter('SqlMasterUser')]" },
+                        { "Name": "Master DB User Password", "Value": "[variable('SqlMaster.Password')]" },
+                        { "Name": "Web DB User Name", "Value": "[parameter('SqlWebUser')]" },
+                        { "Name": "Web DB User Password", "Value": "[variable('SqlWeb.Password')]" },
+                        { "Name": "Reporting DB User Name", "Value": "[parameter('SqlReportingUser')]" },
+                        { "Name": "Reporting DB User Password", "Value": "[variable('SqlReporting.Password')]" },
+                        { "Name": "XDB Reference Data DB User Name", "Value": "[parameter('SqlReferenceDataUser')]" },
+                        { "Name": "XDB Reference Data DB User Password", "Value": "[variable('SqlReferenceData.Password')]" },
+                        { "Name": "Experience Forms DB User Name", "Value": "[parameter('SqlFormsUser')]" },
+                        { "Name": "Experience Forms DB User Password", "Value": "[variable('SqlForms.Password')]" },
+                        { "Name": "EXM Master DB User Name", "Value":  "[parameter('SqlExmMasterUser')]"},
+                        { "Name": "EXM Master DB User Password", "Value":  "[variable('SqlExmMaster.Password')]"},
+                        { "Name": "Messaging DB User Name", "Value":  "[parameter('SqlMessagingUser')]"},
+                        { "Name": "Messaging DB User Password", "Value":  "[variable('SqlMessaging.Password')]"},
+                        { "Name": "Marketing Automation DB User Name", "Value": "[parameter('SqlMarketingAutomationUser')]" },
+                        { "Name": "Marketing Automation DB User Password", "Value": "[variable('SqlMarketingAutomation.Password')]" },
+                        { "Name": "Processing Pools DB User Name", "Value": "[parameter('SqlProcessingPoolsUser')]" },
+                        { "Name": "Processing Pools DB User Password", "Value": "[variable('SqlProcessingPools.Password')]" },
+                        { "Name": "Processing Tasks DB User Name", "Value": "[parameter('SqlProcessingTasksUser')]" },
+                        { "Name": "Processing Tasks DB User Password", "Value": "[variable('SqlProcessingTasks.Password')]" },
+                        { "Name": "XConnect Collection", "Value": "[parameter('XConnectCollectionService')]" },
+                        { "Name": "Xdb Reference Data Client", "Value": "[parameter('XConnectReferenceDataService')]" },
+                        { "Name": "XDB MA Reporting Client", "Value": "[parameter('MarketingAutomationReportingService')]" },
+                        { "Name": "XDB MA Ops Client", "Value": "[parameter('MarketingAutomationOperationsService')]" },
+                        { "Name": "Cortex Reporting Client", "Value": "[parameter('CortexReportingService')]" },
+                        { "Name": "XConnect Server Certificate Validation Thumbprint", "Value": "[variable('Security.XConnect.CertificateThumbprint')]" },
+                        { "Name": "SOLR Connection String", "Value": "[parameter('SolrUrl')]" },
+                        { "Name": "Solr Core Index Name", "Value": "[variable('Solr.Core.Name')]" },
+                        { "Name": "Solr Master Index Name", "Value": "[variable('Solr.Master.Name')]" },
+                        { "Name": "Solr Web Index Name", "Value": "[variable('Solr.Web.Name')]" },
+                        { "Name": "Solr Marketing Definitions Master Index Name", "Value": "[variable('Solr.MD.Master.Name')]" },
+                        { "Name": "Solr Marketing Definitions Web Index Name", "Value": "[variable('Solr.MD.Web.Name')]" },
+                        { "Name": "Solr Marketing Asset Master Index Name", "Value": "[variable('Solr.MA.Master.Name')]" },
+                        { "Name": "Solr Marketing Asset Web Index Name", "Value": "[variable('Solr.MA.Web.Name')]" },
+                        { "Name": "Solr Testing Index Name", "Value": "[variable('Solr.Testing.Name')]" },
+                        { "Name": "Solr Suggested Index Name", "Value": "[variable('Solr.Suggested.Name')]" },
+                        { "Name": "Solr FXM Master Index Name", "Value": "[variable('Solr.FXM.Master.Name')]" },
+                        { "Name": "Solr FXM Web Index Name", "Value": "[variable('Solr.FXM.Web.Name')]" },
+                        { "Name": "Solr Personalization Index Name", "Value": "[variable('Solr.Personalization.Name')]" },						
+                        { "Name": "Telerik Encryption Key", "Value": "[variable('Telerik.EncryptionKey')]" },
+                        { "Name": "EXM EDS Provider", "Value": "[parameter('ExmEdsProvider')]"},
+                        { "Name": "EXM Cryptographic Key", "Value": "[variable('EXM.CryptographicKey')]" },
+                        { "Name": "EXM Authentication Key", "Value": "[variable('EXM.AuthenticationKey')]" },
+                        { "Name": "Sitecore Identity Authority", "Value":  "[parameter('SitecoreIdentityAuthority')]"},
+                        { "Name": "Sitecore Identity Secret", "Value":  "[variable('Sitecore.IdentitySecret')]"}
+                    ],
+                    "Skip":[
+                        {"ObjectName": "[variable('Skip.dbDacFx')]"},
+                        {"ObjectName": "[variable('Skip.dbFullSql')]"}
                     ]
                 }
             }
+        },
+        "CreateBindingsWithDevelopmentThumbprint": {
+            "Description": "Creates a new thumbprint with a custom CA.",
+            "Type": "AddWebFeatureSSL",
+            "Params": {
+                "SiteName": "[parameter('SiteName')]",
+                "HostName": "[parameter('DnsName')]",
+                "OutputDirectory": "[variable('Site.DataFolder')]"
+            },
+            "Skip": "[parameter('SSLCert')]"
         },
         "SetLicense": {
             "Description": "Copies the license file to the instance data folder.",
@@ -700,14 +590,7 @@
                 "Destination": "[variable('Site.DataFolder')]"
             }
         },
-        "CreateBindingsWithDevelopmentThumprint": {
-            "Type": "AddWebFeatureSSL",
-            "Params": {
-              "HostName": "[parameter('SiteName')]",
-              "OutputDirectory": "[variable('Site.DataFolder')]"
-            }
-          },
-           "StartAppPool": {
+        "StartAppPool": {
             "Description": "Starts the app pool.",
             "Type": "ManageAppPool",
             "Params": {
@@ -727,7 +610,7 @@
             "Description": "Update the solr schemas.",
             "Type": "SitecoreUrl",
             "Params": {
-                "SitecoreInstanceRoot": "[concat('http://', parameter('DnsName'))]",
+                "SitecoreInstanceRoot": "[concat('https://', parameter('DnsName'))]",
                 "SitecoreActionPath": "sitecore/admin/PopulateManagedSchema.aspx?indexes=all",
                 "UserName": "admin",
                 "Password": "[variable('Sitecore.Admin.Password')]"
@@ -765,14 +648,14 @@
             "Description": "Removes the AppPool.",
             "Type": "RemoveAppPool",
             "Params": {
-                "Name": "[parameter('SiteName')]"
+                "Name":  "[parameter('SiteName')]"
             }
         },
         "RemoveWebsite": {
             "Description": "Removes the website.",
             "Type": "RemoveWebsite",
             "Params": {
-                "Name": "[parameter('SiteName')]"
+                "Name":  "[parameter('SiteName')]"
             }
         },
         "RemoveContent": {
