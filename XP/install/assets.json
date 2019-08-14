@@ -1,13 +1,13 @@
 {
     "sitecore": [
-        {
-            "id": "xp",
-            "name": "Sitecore Experience Platform",
-            "fileName": "Sitecore 9.2.0 rev. 002893 (WDP XP0 packages).zip",
-            "url": "https://dev.sitecore.net/~/media/C91BB36E7DA34E8688E80E742995F186.ashx",
-            "extract": true,
-            "source": "sitecore"
-        }
+      {
+        "id": "xp",
+        "name": "Sitecore Experience Platform",
+        "fileName": "Sitecore 9.3.0 rev. 003269 (WDP XP0 packages).zip",
+        "url": "https://dev.sitecore.net/~/media/C91BB36E7DA34E8688E80E742995F186.ashx",
+        "extract": true,
+        "source": "sitecore"
+      }
     ],
     "modules": [
         {
