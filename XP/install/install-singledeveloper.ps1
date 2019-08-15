@@ -221,8 +221,7 @@ Function Install-SingleDeveloper {
 		SitecoreIdentityAuthority      = "https://" + $identityServer.name
 		XConnectCollectionService      = "https://" + $xConnect.siteName
 		ClientSecret                   = $identityServer.clientSecret
-		DownloadLocations							= (Resolve-Path "c:\repository\downloads.json")
-		AllowedCorsOrigins             = ("https://{0}|https://{1}" -f $site.hostName, "habitathomebasic.dev.local") # Need to add to proper config
+		AllowedCorsOrigins             = ("https://{0}" -f $site.hostName)
 	}
 
 	Push-Location (Join-Path $resourcePath "XP0")
