@@ -52,7 +52,7 @@ $sharedResourcePath = Join-Path $assets.sharedUtilitiesRoot "assets\configuratio
 Import-Module (Join-Path $assets.sharedUtilitiesRoot "assets\modules\SharedInstallationUtilities\SharedInstallationUtilities.psm1") -Force
 
 #Ensure the Correct SIF Version is Imported
-Import-SitecoreInstallFramework -version $assets.installerVersion
+Import-SitecoreInstallFramework -version $assets.installerVersion -repositoryName $assets.psRepositoryName -repositoryUrl $assets.psRepository
 
 Write-Host "*******************************************************" -ForegroundColor Green
 Write-Host " Installing Sitecore" -ForegroundColor Green
