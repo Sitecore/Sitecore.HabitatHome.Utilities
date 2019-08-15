@@ -20,6 +20,11 @@
             "DefaultValue": "IdentityServer",
             "Description": "The name of the site to be deployed."
         },
+        "SitePhysicalRoot": {
+            "Type": "String",
+            "Description": "Root folder to install the site to. If left on the default [systemdrive]:\\inetpub\\wwwroot will be used.",
+            "DefaultValue": ""
+        },
         "SqlServer": {
             "Type": "string",
             "DefaultValue": ".\\SQLSERVER",
@@ -70,43 +75,86 @@
             "Reference": "SiteName",
             "Description": "The host name of the site."
         },
-        "DnsName": {
+        "DnsName" :{
             "Type": "string",
             "Reference": "SiteName",
             "Description": "The dns name of the site."
         },
-        "WebRoot": {
-            "Type": "string",
-            "DefaultValue": "c:\\inetpub\\wwwroot",
-            "Description": "The physical path of the configured Web Root for the environment"
+        "PackagesTempLocation": {
+            "Type": "String",
+            "Description": "Alternative location to save WDP packages. If left on the default $Env:Temp will be used.",
+            "DefaultValue": "",
+            "Validate": "[TestPath(variable('Temp.Location'))]"
+        },
+        "DownloadLocations": {
+            "Type": "String",
+            "Description": "File with URI and SHA256 hashes of dynamically downloadable WDPs.",
+            "DefaultValue": ".\\downloads.json"
         }
     },
     "Variables": {
-        "Sql.Database.Name": "[concat(parameter('SqlDbPrefix'), parameter('SqlSecurityDbName'))]",
+        "Sql.Database.Name":                "[concat(parameter('SqlDbPrefix'), parameter('SqlSecurityDbName'))]",
         "Sql.Database.User": "[parameter('SqlSecurityUser')]",
         "Sql.Database.Password": "[parameter('SqlSecurityPassword')]",
         "Sql.Connection.String": "[concat('Data Source=', parameter('SqlServer'), ';Initial Catalog=', variable('Sql.Database.Name'), ';User ID=', variable('Sql.Database.User'), ';Password=', variable('Sql.Database.Password'))]",
-        "Security.CertificateStore": "Cert:\\Localmachine\\My",
-        "Security.IdentityServer.CertificateThumbprint": "[GetCertificateThumbprint(parameter('SitecoreIdentityCert'), variable('Security.CertificateStore'))]",
-        "Security.IdentityServer.CertificatePath": "[joinpath(variable('Security.CertificateStore'), variable('Security.IdentityServer.CertificateThumbprint'))]",
-        "Site.PhysicalPath": "[concat(parameter('WebRoot'),'\\', parameter('SiteName'))]",
+        "Security.CertificateStore":                "Cert:\\Localmachine\\My",
+        "Security.IdentityServer.CertificateThumbprint":  "[GetCertificateThumbprint(parameter('SitecoreIdentityCert'), variable('Security.CertificateStore'))]",
+        "Security.IdentityServer.CertificatePath":        "[joinpath(variable('Security.CertificateStore'), variable('Security.IdentityServer.CertificateThumbprint'))]",
+
+        "Site.PhysicalPath": "[if(variable('Test.Site.PhysicalPath'),variable('Default.Site.PhysicalPath'),variable('Custom.Site.PhysicalPath'))]",
+        "Default.Site.PhysicalPath": "[joinpath(environment('SystemDrive'), 'inetpub', 'wwwroot', parameter('SiteName'))]",
+        "Custom.Site.PhysicalPath": "[joinpath(parameter('SitePhysicalRoot'),parameter('SiteName'))]",
+        "Test.Site.PhysicalPath": "[equal(parameter('SitePhysicalRoot'),'')]",
+
         "Site.LicenseFolder": "[joinpath(variable('Site.PhysicalPath'), 'sitecoreruntime')]",
         "Site.ConfigFolder": "[joinpath(variable('Site.PhysicalPath'), 'Config', 'production')]",
-        "Client.Secret": "[parameter('ClientSecret'))]"
+
+        "Client.Secret" : "[parameter('ClientSecret'))]",
+
+        "Temp.Location" : "[if(variable('Test.Temp.Location'),Environment('Temp'),parameter('PackagesTempLocation'))]",
+        "Test.Temp.Location" : "[equal(parameter('PackagesTempLocation'),'')]",
+
+        "Settings.FileName": "IdentityServer.json",
+
+        "Dynamic.WDP": "[ReadJson(Path:parameter('DownloadLocations'))]",
+        "Test.WDP.Download": "[TestPath(Path:Parameter('DownloadLocations'))]",
+        "WDP.Download": "[SelectObject(InputObject:variable('Dynamic.WDP'),ExpandProperty:variable('Settings.Filename'))]",
+        "WDP.Download.Uri": "[SelectObject(InputObject:variable('WDP.Download'),ExpandProperty:'Uri')]",
+        "WDP.Download.Hash": "[SelectObject(InputObject:variable('WDP.Download'),ExpandProperty:'Hash')]",
+        "WDP.Download.Path": "[JoinPath(variable('Temp.Location'),variable('WDP.Filename'))]",
+        "WDP.Download.Filename": "[SplitPath(Path:variable('WDP.Download.Uri'),Leaf:true)]",
+        "WDP.Filename": "[Split(String:variable('WDP.Download.Filename'),Characters:'?')]",
+        "Package": "[if(parameter('Package'),parameter('Package'),variable('WDP.Download.Path'))]",
+        "Test.Packaging": "[or(variable('Test.Null.Package'),not(variable('Test.WDP.Download')))]",
+        "Test.Null.Package": "[if(parameter('Package'),parameter('Package'),'')]"
     },
-    "Register": {
+    "Register":{
         "Tasks": {
             "RemoveItem": "Remove-Item"
+        },
+        "ConfigFunction": {
+            "TestPath": "Test-Path",
+            "SelectObject": "Select-Object",
+            "SplitPath": "Split-Path",
+            "GetVariable": "Get-Variable"
         }
     },
     "Tasks": {
+        "DownloadWDP": {
+            "Description": "Download the WDP and verifies it against the stored hash.",
+            "Type": "DownloadFile",
+            "Params": {
+                "SourceUri": "[variable('WDP.Download.URI')]",
+                "DestinationPath": "[variable('WDP.Download.Path')]",
+                "Hash": "[variable('WDP.Download.Hash')]"
+            },
+            "Skip" :  "[variable('Test.Packaging')]"
+        },
         "CreatePaths": {
             "Description": "Ensure the destination path for the site exists.",
             "Type": "EnsurePath",
             "Params": {
-                "Exists": [
-                    "[variable('Site.PhysicalPath')]"
-                ]
+                "Exists": [ "[variable('Site.PhysicalPath')]" ]
             }
         },
         "CreateAppPool": {
@@ -120,7 +168,7 @@
                         "idleTimeoutAction": "Suspend",
                         "loadUserProfile": "True"
                     },
-                    "ManagedRuntimeVersion": ""
+                "ManagedRuntimeVersion": ""
                 }
             }
         },
@@ -128,16 +176,12 @@
             "Description": "Set permissions for the App Pool User to access the client certificate.",
             "Type": "FilePermissions",
             "Params": {
-                "Path": "[ResolveCertificatePath(variable('Security.IdentityServer.CertificatePath'))]",
+                "Path" : "[ResolveCertificatePath(variable('Security.IdentityServer.CertificatePath'))]",
                 "Rights": [
                     {
                         "User": "[concat('IIS AppPool\\', parameter('SiteName'))]",
-                        "FileSystemRights": [
-                            "Read"
-                        ],
-                        "InheritanceFlags": [
-                            "None"
-                        ]
+                        "FileSystemRights": ["Read"],
+                        "InheritanceFlags": ["None"]
                     }
                 ]
             }
@@ -179,20 +223,15 @@
             "Description": "Removes the default *:80 web binding.",
             "Type": "WebBinding",
             "Params": {
-                "SiteName": "[parameter('SiteName')]",
-                "Remove": [
-                    {
-                        "Port": "80",
-                        "IPAddress": "*"
-                    }
-                ]
+                "SiteName" : "[parameter('SiteName')]",
+                "Remove" : [ { "Port": "80", "IPAddress": "*" } ]
             }
         },
         "CreateBindingsWithThumbprint": {
             "Description": "Configures the site bindings for the website.",
             "Type": "WebBinding",
             "Params": {
-                "SiteName": "[parameter('SiteName')]",
+                "SiteName" : "[parameter('SiteName')]",
                 "Add": [
                     {
                         "HostHeader": "[parameter('DNSName')]",
@@ -221,10 +260,7 @@
                     {
                         "User": "[concat('IIS AppPool\\', parameter('SiteName'))]",
                         "FileSystemRights": "FullControl",
-                        "InheritanceFlags": [
-                            "ContainerInherit",
-                            "ObjectInherit"
-                        ]
+                        "InheritanceFlags": [ "ContainerInherit", "ObjectInherit" ]
                     }
                 ]
             }
@@ -236,34 +272,16 @@
                 "Verb": "Sync",
                 "Arguments": {
                     "Source": {
-                        "Package": "[resolvepath(parameter('Package'))]"
+                        "Package": "[resolvepath(variable('Package'))]"
                     },
                     "Dest": "Auto",
                     "SetParam": [
-                        {
-                            "Name": "IIS Web Application Name",
-                            "Value": "[parameter('SiteName')]"
-                        },
-                        {
-                            "Name": "Security Connection String",
-                            "Value": "[variable('Sql.Connection.String')]"
-                        },
-                        {
-                            "Name": "CertificateThumbprint",
-                            "Value": "[variable('Security.IdentityServer.CertificateThumbprint')]"
-                        },
-                        {
-                            "Name": "PasswordRecoveryUrl",
-                            "Value": "[parameter('PasswordRecoveryUrl')]"
-                        },
-                        {
-                            "Name": "AllowedCorsOrigins",
-                            "Value": "[parameter('AllowedCorsOrigins')]"
-                        },
-                        {
-                            "Name": "ClientSecret",
-                            "Value": "[variable('Client.Secret')]"
-                        }
+                        { "Name": "IIS Web Application Name", "Value": "[parameter('SiteName')]" },
+                        { "Name": "Security Connection String", "Value": "[variable('Sql.Connection.String')]" },
+                        { "Name": "CertificateThumbprint", "Value": "[variable('Security.IdentityServer.CertificateThumbprint')]" },
+                        { "Name": "PasswordRecoveryUrl", "Value": "[parameter('PasswordRecoveryUrl')]" },
+                        { "Name": "AllowedCorsOrigins", "Value": "[parameter('AllowedCorsOrigins')]" },
+                        { "Name": "ClientSecret", "Value": "[variable('Client.Secret')]" }
                     ]
                 }
             }
@@ -272,12 +290,10 @@
             "Description": "Ensure the destination path for the license exists.",
             "Type": "EnsurePath",
             "Params": {
-                "Exists": [
-                    "[variable('Site.LicenseFolder')]"
-                ]
+                "Exists": [ "[variable('Site.LicenseFolder')]" ]
             }
         },
-        "SetLicense": {
+        "SetLicense" : {
             "Description": "Copies the license file to the instance license folder.",
             "Type": "Copy",
             "Params": {
@@ -286,7 +302,7 @@
             },
             "Skip": "[not(parameter('LicenseFile'))]"
         },
-        "CustomConfigFile": {
+        "CustomConfigFile" : {
             "Description": "Copies the custom config file to the instance config folder.",
             "Type": "Copy",
             "Params": {
@@ -343,14 +359,14 @@
             "Description": "Removes the AppPool.",
             "Type": "RemoveAppPool",
             "Params": {
-                "Name": "[parameter('SiteName')]"
+                "Name":  "[parameter('SiteName')]"
             }
         },
         "RemoveWebsite": {
             "Description": "Removes the website.",
             "Type": "RemoveWebsite",
             "Params": {
-                "Name": "[parameter('SiteName')]"
+                "Name":  "[parameter('SiteName')]"
             }
         },
         "RemoveContent": {

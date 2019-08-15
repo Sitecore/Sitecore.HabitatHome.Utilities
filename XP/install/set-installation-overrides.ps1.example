@@ -18,6 +18,10 @@ $json = Get-Content -Raw $configurationFile |  ConvertFrom-Json
 $assets = $json.assets
 $assets.licenseFilePath = Join-Path $assets.packageRepository "license.xml"
 
+# Allows for custom SIF identityServerVersion
+$assets.psRepository = "https://sitecore.myget.org/F/sc-powershell/api/v2/"
+$assets.psRepositoryName = "SitecoreGallery"
+$assets.installerVersion = "2.1.0"
 # Settings
 
 # Site Settings
@@ -36,9 +40,9 @@ $sitecore.telerikEncryptionKey = "PutYourCustomEncryptionKeyHereFrom32To256Chara
 
 # Solr Parameters
 $solr = $json.settings.solr
-$solr.url = "https://localhost:8750/solr"
-$solr.root = "c:\solr\solr-7.5.0"
-$solr.serviceName = "Solr-7.5.0"
+$solr.url = "https://localhost:8811/solr"
+$solr.root = "c:\solr\solr-8.1.1"
+$solr.serviceName = "Solr-8.1.1"
 
 # SQL Settings
 $sql = $json.settings.sql
