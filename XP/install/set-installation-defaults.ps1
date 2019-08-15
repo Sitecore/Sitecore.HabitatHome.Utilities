@@ -128,7 +128,7 @@ $identityServer.clientSecret = "ClientSecret"
 Write-Host "Setting default 'Solr' parameters"
 # Solr Parameters
 $solr = $json.settings.solr
-$solr.url = "https://localhost:8750/solr"
+$solr.url = "https://localhost:8811/solr"
 $solr.root = "c:\solr"
 $solr.serviceName = "Solr"
 

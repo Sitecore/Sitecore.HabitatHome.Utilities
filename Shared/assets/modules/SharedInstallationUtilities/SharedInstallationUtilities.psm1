@@ -178,7 +178,8 @@ Function Import-SitecoreInstallFramework {
 
 	if ($version -like "*beta*") {
 		# always try to install latest version if a beta is specified
-		Install-Module SitecoreInstallFramework -Repository $repositoryName -AllowPrerelease -AllowClobber -Force -Verbose
+		Write-Host "*** Beta vesion of SIF specified. Forcing installation." -ForegroundColor Yellow
+		Install-Module SitecoreInstallFramework -Repository $repositoryName -AllowPrerelease -AllowClobber -Force 
 	}
 	else {
 		$module = Get-Module -ListAvailable -name SitecoreInstallFramework | Where-Object { $_.Version -eq "$sifVersion" } | Select-Object -First 1 -ExpandProperty Name

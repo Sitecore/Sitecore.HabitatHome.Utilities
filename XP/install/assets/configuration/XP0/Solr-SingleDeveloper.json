@@ -51,7 +51,22 @@
             "Type": "String",
             "Description": "Registry location of Windows Services.",
             "DefaultValue": "HKLM:SYSTEM\\CurrentControlSet\\Services"
-        }
+				},
+				"SolrMaxMemory" : {
+					"Type": "String",
+					"Description": "Maximum JVM Memory allowed for Solr.",
+					"DefaultValue": "512m"
+				},
+				"KeyStorePassword" : {
+					"Type": "String",
+					"Description": "Password for the Keystore",
+					"DefaultValue": "SIF-DEFAULT"
+				},
+				"SSLTrustPassword" : {
+					"Type": "String",
+					"Description": "Password for the Keystore",
+					"DefaultValue": "SIF-DEFAULT"
+				}
     },
     "Variables": {
         "Solr.Download.URL": "[join(Values:variable('Solr.Path'),Delimiter:'/')]",
@@ -209,7 +224,7 @@
             "Type": "StartProcess",
             "Params": {
                 "FilePath": "[variable('Java.KeyTool.Location')]",
-                "ArgumentList": "[concat('-genkeypair -alias solr-ssl -keyalg RSA -keysize 2048 -keypass secret -storepass secret -validity 9999 -keystore ',variable('Solr.JKS.Keystore.Path'),' -ext SAN=',concat('DNS:',parameter('solrdomain'),',DNS:localhost',',IP:127.0.0.1'),' -dname \"CN=solrcert, OU=Created by https://www.sitecore.com\"')]",
+                "ArgumentList": "[concat('-genkeypair -alias solr-ssl -keyalg RSA -keysize 2048 -keypass ', parameter('KeyStorePassword'), ' -storepass ', parameter('SSLTrustPassword'), ' -validity 9999 -keystore ',variable('Solr.JKS.Keystore.Path'),' -ext SAN=',concat('DNS:',parameter('solrdomain'),',DNS:localhost',',IP:127.0.0.1'),' -dname \"CN=solrcert, OU=Created by https://www.sitecore.com\"')]",
                 "Wait": true
             }
         },
@@ -218,7 +233,7 @@
             "Type": "StartProcess",
             "Params": {
                 "FilePath": "[variable('Java.KeyTool.Location')]",
-                "ArgumentList": "[concat('-importkeystore -srckeystore ',variable('Solr.JKS.Keystore.Path'),' -destkeystore ',variable('Solr.P12.Keystore.Path'),' -srcstoretype jks -deststoretype pkcs12 -deststorepass secret -srcstorepass secret')]",
+                "ArgumentList": "[concat('-importkeystore -srckeystore ',variable('Solr.JKS.Keystore.Path'),' -destkeystore ',variable('Solr.P12.Keystore.Path'),' -srcstoretype jks -deststoretype pkcs12 -deststorepass ', parameter('KeyStorePassword'), ' -srcstorepass ', parameter('SSLTrustPassword'))]",
                 "Wait": true
             }
         },
@@ -228,7 +243,7 @@
             "Params" : {
                 "FilePath": "certutil.exe",
                 "ArgumentList":
-                    "[concat('-f -p secret -importpfx ',variable('Solr.P12.Keystore.Path'))]",
+                    "[concat('-f -p ', parameter('SSLTrustPassword'), ' -importpfx ',variable('Solr.P12.Keystore.Path'))]",
                 "Wait" : true
             }
         },
@@ -239,11 +254,12 @@
                 "Value": [
                     "[concat('set SOLR_JAVA_HOME=\"',variable('Java.Install.Path'),'\"')]",
                     "set SOLR_SSL_KEY_STORE=etc/solr-ssl.keystore.jks",
-                    "set SOLR_SSL_KEY_STORE_PASSWORD=secret",
+                    "[concat('set SOLR_SSL_KEY_STORE_PASSWORD=', parameter('KeyStorePassword'))]",
                     "set SOLR_SSL_TRUST_STORE=etc/solr-ssl.keystore.jks",
-                    "set SOLR_SSL_TRUST_STORE_PASSWORD=secret",
+                    "[concat('set SOLR_SSL_TRUST_STORE_PASSWORD=',parameter('SSLTrustPassword'))]",
                     "[concat('set SOLR_HOST=\"',parameter('SolrDomain'),'\"')]",
-                    "[concat('set SOLR_Port=',parameter('SolrPort'))]"
+										"[concat('set SOLR_Port=',parameter('SolrPort'))]",
+										"[concat('set SOLR_JAVA_MEM=-Xms512m -Xmx',parameter('SolrMaxMemory'))]"
                 ],
                 "Path": "[variable('Solr.In.CMD.Location')]"
             }
