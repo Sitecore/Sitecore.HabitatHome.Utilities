@@ -1,0 +1,22 @@
+{
+  "Parameters": {
+    "BaseUrl": {
+      "Type": "string",
+      "Description": "The utility pages base url.",
+      "DefaultValue": ""
+    }
+  },
+  "Variables": {
+    "Base.Url": "[parameter('BaseUrl')]",
+    "Publish.Uri": "[concat(variable('Base.Url'), '/Publish.aspx')]"
+  },
+  "Tasks": {
+    "PublishToWeb": {
+      "Type": "WebRequest",
+      "Params": {
+        "Uri": "[variable('Publish.Uri')]",
+        "RequestTimeout": "720000"
+      }
+    }
+  }
+}

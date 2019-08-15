@@ -8,8 +8,8 @@ Param(
     [Parameter(Mandatory = $true)]
     [string] $version,
     [string] $resourceGroupName,
-    [string] $virtualMachineSize = "Standard_D4s_v3", 
-    [string] $sourceSnapshotSubscriptionId = "***REMOVED***",    
+    [string] $virtualMachineSize = "Standard_D4s_v3",
+    [string] $sourceSnapshotSubscriptionId = "",
     [string] $deploymentName = "habitathome",
     [string] $sourceSnapshotPrefix = "habitathome"
 )
@@ -21,7 +21,7 @@ if ($null -eq $account.Account) {
 
 #Provide the size of the virtual machine
 #Get all the vm sizes in a region using below script:
-#e.g. Get-AzureRmVMSize -Location eastus 
+#e.g. Get-AzureRmVMSize -Location eastus
 # available regions are "eastus", "australiaeast", "ukwest" and "eastasia"
 
 
@@ -81,11 +81,11 @@ $virtualMachineName = ("{0}-vm" -f $deploymentName)
 
 
 Function Enable-AzureRMVmAutoShutdown {
-    Param 
+    Param
     (
-        [Parameter(Mandatory = $true)] 
+        [Parameter(Mandatory = $true)]
         [string] $SubscriptionId,
-        [Parameter(Mandatory = $true)] 
+        [Parameter(Mandatory = $true)]
         [string] $ResourceGroupName,
         [Parameter(Mandatory = $true)]
         [string] $VirtualMachineName,
@@ -104,7 +104,7 @@ Function Enable-AzureRMVmAutoShutdown {
         $Properties.Add('timeZoneId', $TimeZone)
         $Properties.Add('notificationSettings', @{status = 'Disabled'; timeInMinutes = 15})
         $Properties.Add('targetResourceId', $VMResourceId)
-    
+
         New-AzureRmResource -Location $Location -ResourceId $ScheduledShutdownResourceId -Properties $Properties -Force
     }
     Catch {Write-Error $_}
@@ -128,25 +128,25 @@ $publicIp = Get-AzureRmPublicIpAddress -Name ("{0}_ip" -f $deploymentName) -Reso
 #Get the virtual network where virtual machine will be hosted
 Write-Host "Creating Virtual Network" -ForegroundColor Green
 New-AzureRmVirtualNetwork -Name $virtualNetworkName -ResourceGroupName $resourceGroupName -Location $location -AddressPrefix 10.0.0.0/24
-$vnet = Get-AzureRmVirtualNetwork -Name $virtualNetworkName -ResourceGroupName $resourceGroupName 
+$vnet = Get-AzureRmVirtualNetwork -Name $virtualNetworkName -ResourceGroupName $resourceGroupName
 Add-AzureRmVirtualNetworkSubnetConfig -Name sNet -VirtualNetwork $vnet -AddressPrefix 10.0.0.0/24
 $vnet | Set-AzureRmVirtualNetwork
 
 Write-Host "Setting up Network Security Rules" -ForegroundColor Green
 
 # set up network security rules and group
-$http = New-AzureRmNetworkSecurityRuleConfig  -Name "HTTP" -Description "Allow inbound HTTP" -Protocol Tcp -SourcePortRange * -DestinationPortRange 80 -SourceAddressPrefix * -DestinationAddressPrefix * -Access Allow -Priority 101 -Direction Inbound 
-$https = New-AzureRmNetworkSecurityRuleConfig -Name "HTTPS" -Description "Allow inbound HTTPS" -Protocol Tcp -SourcePortRange * -DestinationPortRange 443 -SourceAddressPrefix * -DestinationAddressPrefix * -Access Allow -Priority 105 -Direction Inbound 
+$http = New-AzureRmNetworkSecurityRuleConfig  -Name "HTTP" -Description "Allow inbound HTTP" -Protocol Tcp -SourcePortRange * -DestinationPortRange 80 -SourceAddressPrefix * -DestinationAddressPrefix * -Access Allow -Priority 101 -Direction Inbound
+$https = New-AzureRmNetworkSecurityRuleConfig -Name "HTTPS" -Description "Allow inbound HTTPS" -Protocol Tcp -SourcePortRange * -DestinationPortRange 443 -SourceAddressPrefix * -DestinationAddressPrefix * -Access Allow -Priority 105 -Direction Inbound
 $commerce = New-AzureRmNetworkSecurityRuleConfig -Name "Commerce" -Description "Allow Commerce Ports" -Protocol Tcp -SourcePortRange * -DestinationPortRange 5000-5100 -SourceAddressPrefix * -DestinationAddressPrefix * -Access Allow -Priority 110 -Direction Inbound
 $idserver = New-AzureRmNetworkSecurityRuleConfig -Name "IdentityServer" -Description "Allow Identity Server Ports" -Protocol Tcp -SourcePortRange * -DestinationPortRange 4200 -SourceAddressPrefix * -DestinationAddressPrefix * -Access Allow -Priority 120 -Direction Inbound
 $rdp = New-AzureRmNetworkSecurityRuleConfig -Name "rdp" -Description "Allow RDP" -Protocol Tcp -SourcePortRange * -DestinationPortRange 3389 -SourceAddressPrefix * -DestinationAddressPrefix * -Access Allow -Priority 1000 -Direction Inbound
 
-$smtpOutbound = New-AzureRmNetworkSecurityRuleConfig -Name "SMTP" -Description "Allow SMTP" -Protocol Tcp -SourcePortRange * -DestinationPortRange 25 -SourceAddressPrefix * -DestinationAddressPrefix * -Access Allow -Priority 1140 -Direction Outbound 
+$smtpOutbound = New-AzureRmNetworkSecurityRuleConfig -Name "SMTP" -Description "Allow SMTP" -Protocol Tcp -SourcePortRange * -DestinationPortRange 25 -SourceAddressPrefix * -DestinationAddressPrefix * -Access Allow -Priority 1140 -Direction Outbound
 
 $networkSecurityGroupName = ("{0}-nsg" -f $deploymentName)
 
 if ($demoType -eq "xc") {
-    # Only open ports 50xx and 4200 for an XC demo 
+    # Only open ports 50xx and 4200 for an XC demo
     $nsg = New-AzureRmNetworkSecurityGroup -Name $networkSecurityGroupName -ResourceGroupName $resourceGroupName  -Location  $location `
         -SecurityRules $http, $https, $commerce, $idserver, $rdp, $smtpOutbound
 }
@@ -162,7 +162,7 @@ Write-Host "Creating NIC" -ForegroundColor Green
 # Create NIC in the first subnet of the virtual network
 $nicName = $deploymentName.Replace("-", "_")
 New-AzureRmNetworkInterface -Name ("{0}_nic" -f $nicName)  -ResourceGroupName $resourceGroupName -Location $location -SubnetId $vnet.Subnets[0].Id -PublicIpAddressId $publicIp.Id -NetworkSecurityGroupId $nsg.Id
-$nic = Get-AzureRmNetworkInterface -Name ("{0}_nic" -f $nicName) -ResourceGroupName $resourceGroupName 
+$nic = Get-AzureRmNetworkInterface -Name ("{0}_nic" -f $nicName) -ResourceGroupName $resourceGroupName
 
 Write-Host "Creating OS Disk" -ForegroundColor Green
 # OS Disk

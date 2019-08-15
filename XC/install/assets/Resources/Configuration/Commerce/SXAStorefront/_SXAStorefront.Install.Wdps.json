@@ -1,0 +1,153 @@
+{
+    "Parameters": {
+        "SXAStorefrontWdpFullPath": {
+            "Type": "string",
+            "Description": "The path to the SXA Commerce Storefront module zip.",
+            "DefaultValue":""
+        },
+        "SXACommerceWdpFullPath": {
+            "Type": "string",
+            "DefaultValue":""
+        },
+        "SXAStorefrontThemeWdpFullPath": {
+            "Type": "string",
+            "Description": "The path to the SXA Commerce Storefront Theme module zip.",
+            "DefaultValue":""
+        },
+        "SXAStorefrontCatalogWdpFullPath": {
+            "Type": "string",
+            "Description": "The path to the SXA Commerce Storefront Catalog module zip.",
+            "DefaultValue":""
+        },
+        "SqlAdminUser": {
+            "Type": "string",
+            "DefaultValue": "sa",
+            "Description": "The Sql admin user account to use when installing databases."
+        },
+        "SqlAdminPassword": {
+            "Type": "string",
+            "DefaultValue": "12345",
+            "Description": "The Sql admin password to use when installing databases."
+        },
+        "SitecoreDbServer": {
+            "Type": "string",
+            "DefaultValue": ".\\SQLSERVER",
+            "Description": "The Sql Server where databases will be installed."
+
+        },
+        "SqlDbPrefix": {
+            "Type": "string",
+            "Description": "The Sql Server where databases will be installed.",
+            "DefaultValue":""
+        },
+        "SiteName": {
+            "Type": "string",
+            "Description": "The name of the site to be deployed.",
+            "DefaultValue":""
+        }
+    },
+    "Variables": {
+        "Sql.Database.Core": "[concat(parameter('SqlDbPrefix'), '_Core')]",
+        "Sql.Database.Master": "[concat(parameter('SqlDbPrefix'), '_Master')]",
+        "CoreDB": "[concat('Server=', parameter('SitecoreDbServer'), ';Database=', variable('Sql.Database.Core'), ';User Id=', parameter('SqlAdminUser'), ';Password=', parameter('SqlAdminPassword'))]",
+        "MasterDB": "[concat('Server=', parameter('SitecoreDbServer'), ';Database=', variable('Sql.Database.Master'), ';User Id=', parameter('SqlAdminUser'), ';Password=', parameter('SqlAdminPassword'))]"
+    },
+    "Tasks": {
+        "InstallCXAWDP": {
+            // Syncs the web deploy package with the website.
+            "Type": "WebDeploy",
+            "Params": {
+                "Verb": "Sync",
+                "Arguments": {
+                    "Source": {
+                        "Package": "[resolvepath(parameter('SXACommerceWdpFullPath'))]"
+                    },
+                    "Dest": "Auto",
+                    "enableRule": "DoNotDeleteRule",
+                    "SetParam": [
+                        {
+                            "Name": "Application Path",
+                            "Value": "[parameter('SiteName')]"
+                        },
+                        {
+                            "Name": "Master Admin Connection String",
+                            "Value": "[variable('MasterDB')]"
+                        }
+                    ]
+                }
+            }
+        },
+        "InstallSXAStorefrontWDP": {
+            // Syncs the web deploy package with the website.
+            "Type": "WebDeploy",
+            "Params": {
+                "Verb": "Sync",
+                "Arguments": {
+                    "Source": {
+                        "Package": "[resolvepath(parameter('SXAStorefrontWdpFullPath'))]"
+                    },
+                    "Dest": "Auto",
+                    "enableRule": "DoNotDeleteRule",
+                    "SetParam": [
+                        {
+                            "Name": "Application Path",
+                            "Value": "[parameter('SiteName')]"
+                        },
+                        {
+                            "Name": "Master Admin Connection String",
+                            "Value": "[variable('MasterDB')]"
+                        }
+                    ]
+                }
+            }
+        },
+        "InstallStorefrontThemesWDP": {
+            // Syncs the web deploy package with the website.
+            "Type": "WebDeploy",
+            "Params": {
+                "Verb": "Sync",
+                "Arguments": {
+                    "Source": {
+                        "Package": "[resolvepath(parameter('SXAStorefrontThemeWdpFullPath'))]"
+                    },
+                    "Dest": "Auto",
+                    "enableRule": "DoNotDeleteRule",
+                    "SetParam": [
+                        {
+                            "Name": "Application Path",
+                            "Value": "[parameter('SiteName')]"
+                        },
+                        {
+                            "Name": "Master Admin Connection String",
+                            "Value": "[variable('MasterDB')]"
+                        }
+                    ]
+                }
+            }
+        },
+        "InstallStorefrontCatalogWDP": {
+            // Syncs the web deploy package with the website.
+            "Type": "WebDeploy",
+            "Params": {
+                "Verb": "Sync",
+                "Arguments": {
+                    "Source": {
+                        "Package": "[resolvepath(parameter('SXAStorefrontCatalogWdpFullPath'))]"
+                    },
+                    "Dest": "Auto",
+                    "enableRule": "DoNotDeleteRule",
+                    "SetParam": [
+                        {
+                            "Name": "Application Path",
+                            "Value": "[parameter('SiteName')]"
+                        },
+                        {
+                            "Name": "Master Admin Connection String",
+                            "Value": "[variable('MasterDB')]"
+                        }
+                    ]
+                }
+            }
+        }
+    }
+}

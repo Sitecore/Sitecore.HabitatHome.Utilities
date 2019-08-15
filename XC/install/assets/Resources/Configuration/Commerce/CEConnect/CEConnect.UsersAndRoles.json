@@ -1,0 +1,217 @@
+﻿{
+  "Parameters": {
+    "SitecoreDbServer": {
+      "Type": "string",
+      "Description": "The Sitecore database server name.",
+      "DefaultValue": ""
+    },
+    "SitecoreCoreDbName": {
+      "Type": "string",
+      "Description": "The Sitecore Core database name.",
+      "DefaultValue": ""
+    },
+    "SqlAdminUser": {
+      "Type": "string",
+      "Description": "The Sql admin user.",
+      "DefaultValue": ""
+    },
+    "SqlAdminPassword": {
+      "Type": "string",
+      "Description": "The Sql admin password.",
+      "DefaultValue": ""
+    }
+  },
+  "Modules": [
+    "SitecoreUtilityTasks"
+  ],
+  "Variables": {
+    "ConnectionString": "[SqlConnectionString(parameter('SitecoreDbServer'), parameter('SitecoreCoreDbName'), parameter('SqlAdminUser'), parameter('SqlAdminPassword'))]"
+  },
+  "Tasks": {
+    "CommerceAdministrator": {
+      "Type": "CreateRole",
+      "Params": {
+        "ConnString": "[variable('ConnectionString')]",
+        "RoleName": "sitecore\\Commerce Administrator"
+      }
+    },
+    "CommerceBusinessUser": {
+      "Type": "CreateRole",
+      "Params": {
+        "ConnString": "[variable('ConnectionString')]",
+        "RoleName": "sitecore\\Commerce Business User"
+      }
+    },
+    "CustomerServiceRepresentative": {
+      "Type": "CreateRole",
+      "Params": {
+        "ConnString": "[variable('ConnectionString')]",
+        "RoleName": "sitecore\\Customer Service Representative"
+      }
+    },
+    "CustomerServiceRepresentativeAdministrator": {
+      "Type": "CreateRole",
+      "Params": {
+        "ConnString": "[variable('ConnectionString')]",
+        "RoleName": "sitecore\\Customer Service Representative Administrator"
+      }
+    },
+    "Merchandiser": {
+      "Type": "CreateRole",
+      "Params": {
+        "ConnString": "[variable('ConnectionString')]",
+        "RoleName": "sitecore\\Merchandiser"
+      }
+    },    
+    "Pricer": {
+      "Type": "CreateRole",
+      "Params": {
+        "ConnString": "[variable('ConnectionString')]",
+        "RoleName": "sitecore\\Pricer"
+      }
+    },    
+    "PricerManager": {
+      "Type": "CreateRole",
+      "Params": {
+        "ConnString": "[variable('ConnectionString')]",
+        "RoleName": "sitecore\\Pricer Manager"
+      }
+    },            
+    "Promotioner": {
+      "Type": "CreateRole",
+      "Params": {
+        "ConnString": "[variable('ConnectionString')]",
+        "RoleName": "sitecore\\Promotioner"
+      }
+    },    
+    "PromotionerManager": {
+      "Type": "CreateRole",
+      "Params": {
+        "ConnString": "[variable('ConnectionString')]",
+        "RoleName": "sitecore\\Promotioner Manager"
+      }
+    },    
+    "RelationshipAdministrator": {
+      "Type": "CreateRole",
+      "Params": {
+        "ConnString": "[variable('ConnectionString')]",
+        "RoleName": "sitecore\\Relationship Administrator"
+      }
+    },    
+    "QA": {
+      "Type": "CreateRole",
+      "Params": {
+        "ConnString": "[variable('ConnectionString')]",
+        "RoleName": "sitecore\\QA"
+      }
+    },    
+
+    "Admin-CommerceAdministrator": {
+      "Type": "AddRolesToUser",
+      "Params": {
+        "ConnString": "[variable('ConnectionString')]",
+        "UserName": "sitecore\\Admin",
+        "RoleNames": "sitecore\\Commerce Administrator"
+      }
+    },
+
+    "CustomerServiceRepresentative-CommerceBusinessUser": {
+      "Type": "AddRoleToRole",
+      "Params": {
+        "ConnString": "[variable('ConnectionString')]",
+        "MemberRoleName": "sitecore\\Customer Service Representative",
+        "TargetRoleName": "sitecore\\Commerce Business User"
+      }
+    },
+    "RelationshipAdministrator-CommerceBusinessUser": {
+      "Type": "AddRoleToRole",
+      "Params": {
+        "ConnString": "[variable('ConnectionString')]",
+        "MemberRoleName": "sitecore\\Relationship Administrator",
+        "TargetRoleName": "sitecore\\Commerce Business User"
+      }
+    },
+    "Pricer-CommerceBusinessUser": {
+      "Type": "AddRoleToRole",
+      "Params": {
+        "ConnString": "[variable('ConnectionString')]",
+        "MemberRoleName": "sitecore\\Pricer",
+        "TargetRoleName": "sitecore\\Commerce Business User"
+      }
+    },    
+    "Promotioner-CommerceBusinessUser": {
+      "Type": "AddRoleToRole",
+      "Params": {
+        "ConnString": "[variable('ConnectionString')]",
+        "MemberRoleName": "sitecore\\Promotioner",
+        "TargetRoleName": "sitecore\\Commerce Business User"
+      }
+    },       
+
+    "Merchandiser-RelationshipAdministrator": {
+      "Type": "AddRoleToRole",
+      "Params": {
+        "ConnString": "[variable('ConnectionString')]",
+        "MemberRoleName": "sitecore\\Merchandiser",
+        "TargetRoleName": "sitecore\\Relationship Administrator"
+      }
+    },
+    "PricerManager-Pricer": {
+      "Type": "AddRoleToRole",
+      "Params": {
+        "ConnString": "[variable('ConnectionString')]",
+        "MemberRoleName": "sitecore\\Pricer Manager",
+        "TargetRoleName": "sitecore\\Pricer"
+      }
+    },
+    "PromotionerManager-Promotioner": {
+      "Type": "AddRoleToRole",
+      "Params": {
+        "ConnString": "[variable('ConnectionString')]",
+        "MemberRoleName": "sitecore\\Promotioner Manager",
+        "TargetRoleName": "sitecore\\Promotioner"
+      }
+    },    
+    "CustomerServiceRepresentativeAdministrator-CustomerServiceRepresentative": {
+      "Type": "AddRoleToRole",
+      "Params": {
+        "ConnString": "[variable('ConnectionString')]",
+        "MemberRoleName": "sitecore\\Customer Service Representative Administrator",
+        "TargetRoleName": "sitecore\\Customer Service Representative"
+      }
+    },         
+
+    "CommerceAdministrator-CustomerServiceRepresentativeAdministrator": {
+      "Type": "AddRoleToRole",
+      "Params": {
+        "ConnString": "[variable('ConnectionString')]",
+        "MemberRoleName": "sitecore\\Commerce Administrator",
+        "TargetRoleName": "sitecore\\Customer Service Representative Administrator"
+      }
+    },
+    "CommerceAdministrator-PricerManager": {
+      "Type": "AddRoleToRole",
+      "Params": {
+        "ConnString": "[variable('ConnectionString')]",
+        "MemberRoleName": "sitecore\\Commerce Administrator",
+        "TargetRoleName": "sitecore\\Pricer Manager"
+      }
+    },
+    "CommerceAdministrator-PromotionerManager": {
+      "Type": "AddRoleToRole",
+      "Params": {
+        "ConnString": "[variable('ConnectionString')]",
+        "MemberRoleName": "sitecore\\Commerce Administrator",
+        "TargetRoleName": "sitecore\\Promotioner Manager"
+      }
+    },
+    "CommerceAdministrator-Merchandiser": {
+      "Type": "AddRoleToRole",
+      "Params": {
+        "ConnString": "[variable('ConnectionString')]",
+        "MemberRoleName": "sitecore\\Commerce Administrator",
+        "TargetRoleName": "sitecore\\Merchandiser"
+      }
+    }
+  }
+}
