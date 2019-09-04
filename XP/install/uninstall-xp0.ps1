@@ -99,7 +99,7 @@ $singleDeveloperParams = @{
     WebRoot                        = $site.webRoot
 }
 Push-Location (Join-Path $resourcePath "XP0")
-Install-SitecoreConfiguration @singleDeveloperParams -Uninstall -Verbose
+Install-SitecoreConfiguration @singleDeveloperParams -Uninstall
 Pop-Location
 
 $sxaSolrUninstallParams = @{
@@ -112,7 +112,7 @@ $sxaSolrUninstallParams = @{
     SitecoreAdminPassword = $sitecore.adminPassword
 }
 
-Install-SitecoreConfiguration @sxaSolrUninstallParams -Uninstall  *>&1 | Tee-Object XP0-SingleDeveloper.log
+Install-SitecoreConfiguration @sxaSolrUninstallParams -Uninstall
 
 Write-Host "Removing folders from webroot" -ForegroundColor Green
 $webRoot = $site.webRoot
