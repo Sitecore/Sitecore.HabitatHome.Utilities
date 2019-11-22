@@ -38,7 +38,7 @@ $assets.sitecoreazuretoolkit = Join-Path $assets.sharedUtilitiesRoot "sat"
 $assets.licenseFilePath = Join-Path $assets.packageRepository "license.xml"
 
 
-$assets.identityServerVersion = "4.0.0 rev. 00243"
+$assets.identityServerVersion = "4.0.0 rev. 00257"
 
 
 $assets.certificatesPath = Join-Path $assets.sharedUtilitiesRoot "Certificates"

@@ -153,7 +153,7 @@
         "PasswordRecoveryUrl": {
             "Type": "string",
             "Description": "Password recovery Url (Host name of CM instance).",
-            "DefaultValue": "http:\\"
+            "DefaultValue": "https:\\Sitecore"
         },
         "SitecorePackage": {
             "Type": "String",
