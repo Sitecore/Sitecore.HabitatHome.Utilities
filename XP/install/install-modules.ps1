@@ -52,7 +52,7 @@ $loginSession = $null
 Import-Module (Join-Path $assets.sharedUtilitiesRoot "assets\modules\SharedInstallationUtilities\SharedInstallationUtilities.psm1") -Force
 
 #Ensure the Correct SIF Version is Imported
-Import-SitecoreInstallFramework -version $assets.installerVersion
+Import-SitecoreInstallFramework -version $assets.installerVersion -repositoryName $assets.psRepositoryName -repositoryUrl $assets.psRepository
 
 if (!(Test-Path $packagesFolder)) {
     New-Item $packagesFolder -ItemType Directory -Force  > $null
@@ -206,7 +206,7 @@ Function Install-Modules {
     Pop-Location
 }
 
-Install-SitecoreAzureToolkit
+#Install-SitecoreAzureToolkit
 New-ModuleInstallationConfiguration
 Set-IncludesPath
 Install-Modules
