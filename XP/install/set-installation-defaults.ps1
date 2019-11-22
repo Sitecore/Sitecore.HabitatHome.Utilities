@@ -32,7 +32,7 @@ else {
 
 $assets.psRepository = "https://sitecore.myget.org/F/sc-powershell/api/v2/"
 $assets.psRepositoryName = "SitecoreGallery"
-$assets.installerVersion = "2.1.0"
+$assets.installerVersion = "2.3.0-beta002"
 $assets.sharedUtilitiesRoot = (Resolve-Path "..\..\Shared" | Select-Object -ExpandProperty Path)
 $assets.sitecoreazuretoolkit = Join-Path $assets.sharedUtilitiesRoot "sat"
 $assets.licenseFilePath = Join-Path $assets.packageRepository "license.xml"
