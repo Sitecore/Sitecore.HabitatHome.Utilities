@@ -1,168 +1,168 @@
 {
-    "sitecore": [
-      {
-        "id": "xp",
-        "name": "Sitecore Experience Platform",
-        "fileName": "Sitecore 9.3.0 rev. 003269 (WDP XP0 packages).zip",
-        "url": "https://dev.sitecore.net/~/media/C91BB36E7DA34E8688E80E742995F186.ashx",
-        "extract": true,
-        "source": "sitecore"
-      }
-    ],
-    "modules": [
-        {
-            "id": "sat",
-            "name": "Sitecore Azure Toolkit",
-            "fileName": "Sitecore Azure Toolkit 2.3.0 rev. 190410.zip",
-            "url": "https://dev.sitecore.net/~/media/0804C3F4CC524149B32AD25D52CDCA12.ashx",
-            "install": true,
-            "convert": false,
-            "source": "sitecore"
-        },
-        {
-            "id": "spe",
-            "name": "Sitecore PowerShell Extensions",
-            "fileName": "Sitecore PowerShell Extensions-5.0 for 9.2.scwdp.zip",
-            "url": "https://dev.sitecore.net/~/media/7AB15C0432624E6CA9786DF00DD653AB.ashx",
-            "install": true,
-            "convert": false,
-            "databases": "master,core"
-        },
-        {
-            "id": "sxa",
-            "name": "Sitecore Experience Accelerator",
-            "fileName": "Sitecore Experience Accelerator 1.9.0 rev. 190528 for 9.2.scwdp.zip",
-            "url": "https://dev.sitecore.net/~/media/1A7A3C021C7649C98DA83EF50E624C8E.ashx",
-            "install": true,
-            "convert": false,
-            "databases": "master,core",
-            "additionalInstallationSteps": "sxa-installation-poststeps.json"
-        },
-        {
-            "id": "def",
-            "name": "Data Exchange Framework",
-            "fileName": "Data Exchange Framework 2.1.0 rev. 181113.zip",
-            "url": "https://dev.sitecore.net/~/media/C10E96CD1EAC46C49C957D5C3445BFB2.ashx",
-            "install": false,
-            "convert": true,
-            "databases": "master,core"
-        },
-        {
-            "id": "defSitecore",
-            "name": "Sitecore Provider Data Exchange Framework",
-            "fileName": "Sitecore Provider for Data Exchange Framework 2.1.0 rev. 181113.zip",
-            "url": "https://dev.sitecore.net/~/media/D80B9AE68C71473E895608806A764332.ashx",
-            "install": false,
-            "convert": true,
-            "databases": "master"
-        },
-        {
-            "id": "defSql",
-            "name": "SQL Provider Data Exchange Framework",
-            "fileName": "SQL Provider for Data Exchange Framework 2.1.0 rev. 181113.zip",
-            "url": "https://dev.sitecore.net/~/media/52203CC3ADCD4668AF0D7568EF65A7BD.ashx",
-            "install": false,
-            "convert": true,
-            "databases": "master"
-        },
-        {
-            "id": "defxConnect",
-            "name": "xConnect Provider Data Exchange Framework",
-            "fileName": "XConnect Provider for Data Exchange Framework 2.1.0 rev. 181113.zip",
-            "url": "https://dev.sitecore.net/~/media/678E59D0B92C4F20B0025730958A15A0.ashx",
-            "install": false,
-            "convert": true,
-            "databases": "master,core"
-        },
-        {
-            "id": "defDynamics",
-            "name": "Dynamics Provider Data Exchange Framework",
-            "fileName": "Dynamics Provider for Data Exchange Framework 2.1.0 rev. 181113.zip",
-            "url": "https://dev.sitecore.net/~/media/EC7CD29A65854CB3ADA3EFB8971BC8E9.ashx",
-            "install": false,
-            "convert": true,
-            "databases": "master"
-        },
-        {
-            "id": "defDynamicsConnect",
-            "name": "Dynamics Connect Data Exchange Framework",
-            "fileName": "Connect for Microsoft Dynamics 2.1.0 rev. 181113.zip",
-            "url": "https://dev.sitecore.net/~/media/04D4BBC3E9D5428FB347161453F18714.ashx",
-            "install": false,
-            "convert": true,
-            "databases": "master"
-        },
-        {
-            "id": "defSalesforce",
-            "name": "Salesforce CRM Provider for Data Exchange Framework",
-            "fileName": "Salesforce Provider for Data Exchange Framework 2.1.0 rev. 181113.zip",
-            "url": "https://dev.sitecore.net/~/media/5F22998E037C4F0E9A951D811F67A424.ashx",
-            "install": false,
-            "convert": true,
-            "databases": "master"
-        },
-        {
-            "id": "defSalesforceConnect",
-            "name": "Connect for Salesforce",
-            "fileName": "Connect for Salesforce 2.1.0 rev. 181113.zip",
-            "url": "https://dev.sitecore.net/~/media/E1A8A968BEE347BA81255ADB132FD480.ashx",
-            "install": false,
-            "convert": true,
-            "databases": "master"
-        },
-        {
-            "id": "defFormsSaveAction",
-            "name": "Data Exchange Framework Save Action for Experience Forms",
-            "fileName": "Data Exchange Framework Save Action for Experience Forms 2.1.0 rev. 181113.zip",
-            "url": "https://dev.sitecore.net/~/media/B636578787724A97A95F9C42B2A144D6.ashx",
-            "install": false,
-            "convert": true,
-            "databases": "master"
-        },
-        {
-            "id": "sfmcConnect",
-            "name": "Sitecore Connect for Salesforce Marketing Cloud",
-            "fileName": "Sitecore Connect for Salesforce Marketing Cloud 1.0.0 rev. 180608.zip",
-            "url": "https://dev.sitecore.net/~/media/2AFF0DF06BD24985B1793807D806411D.ashx",
-            "install": false,
-            "convert": true,
-            "databases": "master,core"
-        },
-        {
-            "id": "stackla",
-            "name": "Stackla Module",
-            "fileName": "Stackla-module-1.4.0-sc9.0.zip",
-            "url": "https://s3-ap-southeast-2.amazonaws.com/stackla-plugin-assets/prod/sitecore/packages/Stackla-module-1.4.0-sc9.0.zip",
-            "install": false,
-            "convert": true,
-            "databases": "master,core"
-        },
-        {
-            "id": "xGen",
-            "name": "xGenerator",
-            "fileName": "ExperienceGenerator_91.zip",
-            "url": "https://github.com/Sitecore/xGenerator/releases/download/9.1.0.0/ExperienceGenerator_91.zip",
-            "install": false,
-            "convert": true,
-            "databases": "core"
-        },
-        {
-            "id": "stylelabs",
-            "name": "StyleLabs Plugin",
-            "fileName": "Stylelabs M Content Hub Plugin-1.0.0.zip",
-            "url": "https://dev.sitecore.net/~/media/9A683955F98249769E8D5CB7AFC2525C.ashx",
-            "install": false,
-            "convert": true,
-            "databases": "master,core"
-        },
-        {
-            "id": "jss",
-            "name": "JavaScript Services",
-            "fileName": "Sitecore JavaScript Services Server for Sitecore 9.2 XP 12.0.0 rev. 190522.scwdp.zip",
-            "url": "https://dev.sitecore.net/~/media/1D5D53DE1F4B43E8B3D70E0D0EE40A5D.ashx",
-            "install": false,
-            "convert": false,
-            "databases": "master,core"
-        }
-    ]
+  "sitecore": [
+    {
+      "id": "xp",
+      "name": "Sitecore Experience Platform",
+      "fileName": "Sitecore 9.3.0 rev. 003498 (WDP XP0 packages).zip",
+      "url": "https://dev.sitecore.net/~/media/C91BB36E7DA34E8688E80E742995F186.ashx",
+      "extract": true,
+      "source": "sitecore"
+    }
+  ],
+  "modules": [
+    {
+      "id": "sat",
+      "name": "Sitecore Azure Toolkit",
+      "fileName": "Sitecore Azure Toolkit 2.4.0 rev. 190625.zip",
+      "url": "https://dev.sitecore.net/~/media/0804C3F4CC524149B32AD25D52CDCA12.ashx",
+      "install": true,
+      "convert": false,
+      "source": "sitecore"
+    },
+    {
+      "id": "spe",
+      "name": "Sitecore PowerShell Extensions",
+      "fileName": "Sitecore.PowerShell.Extensions-6.0.scwdp.zip",
+      "url": "https://dev.sitecore.net/~/media/7AB15C0432624E6CA9786DF00DD653AB.ashx",
+      "install": true,
+      "convert": false,
+      "databases": "master,core"
+    },
+    {
+      "id": "sxa",
+      "name": "Sitecore Experience Accelerator",
+      "fileName": "Sitecore Experience Accelerator 9.3.0.2589.scwdp.zip",
+      "url": "https://dev.sitecore.net/~/media/1A7A3C021C7649C98DA83EF50E624C8E.ashx",
+      "install": true,
+      "convert": false,
+      "databases": "master,core",
+      "additionalInstallationSteps": "sxa-installation-poststeps.json"
+    },
+    {
+      "id": "def",
+      "name": "Data Exchange Framework",
+      "fileName": "Data Exchange Framework 2.1.0 rev. 181113.zip",
+      "url": "https://dev.sitecore.net/~/media/C10E96CD1EAC46C49C957D5C3445BFB2.ashx",
+      "install": false,
+      "convert": true,
+      "databases": "master,core"
+    },
+    {
+      "id": "defSitecore",
+      "name": "Sitecore Provider Data Exchange Framework",
+      "fileName": "Sitecore Provider for Data Exchange Framework 2.1.0 rev. 181113.zip",
+      "url": "https://dev.sitecore.net/~/media/D80B9AE68C71473E895608806A764332.ashx",
+      "install": false,
+      "convert": true,
+      "databases": "master"
+    },
+    {
+      "id": "defSql",
+      "name": "SQL Provider Data Exchange Framework",
+      "fileName": "SQL Provider for Data Exchange Framework 2.1.0 rev. 181113.zip",
+      "url": "https://dev.sitecore.net/~/media/52203CC3ADCD4668AF0D7568EF65A7BD.ashx",
+      "install": false,
+      "convert": true,
+      "databases": "master"
+    },
+    {
+      "id": "defxConnect",
+      "name": "xConnect Provider Data Exchange Framework",
+      "fileName": "XConnect Provider for Data Exchange Framework 2.1.0 rev. 181113.zip",
+      "url": "https://dev.sitecore.net/~/media/678E59D0B92C4F20B0025730958A15A0.ashx",
+      "install": false,
+      "convert": true,
+      "databases": "master,core"
+    },
+    {
+      "id": "defDynamics",
+      "name": "Dynamics Provider Data Exchange Framework",
+      "fileName": "Dynamics Provider for Data Exchange Framework 2.1.0 rev. 181113.zip",
+      "url": "https://dev.sitecore.net/~/media/EC7CD29A65854CB3ADA3EFB8971BC8E9.ashx",
+      "install": false,
+      "convert": true,
+      "databases": "master"
+    },
+    {
+      "id": "defDynamicsConnect",
+      "name": "Dynamics Connect Data Exchange Framework",
+      "fileName": "Connect for Microsoft Dynamics 2.1.0 rev. 181113.zip",
+      "url": "https://dev.sitecore.net/~/media/04D4BBC3E9D5428FB347161453F18714.ashx",
+      "install": false,
+      "convert": true,
+      "databases": "master"
+    },
+    {
+      "id": "defSalesforce",
+      "name": "Salesforce CRM Provider for Data Exchange Framework",
+      "fileName": "Salesforce Provider for Data Exchange Framework 2.1.0 rev. 181113.zip",
+      "url": "https://dev.sitecore.net/~/media/5F22998E037C4F0E9A951D811F67A424.ashx",
+      "install": false,
+      "convert": true,
+      "databases": "master"
+    },
+    {
+      "id": "defSalesforceConnect",
+      "name": "Connect for Salesforce",
+      "fileName": "Connect for Salesforce 2.1.0 rev. 181113.zip",
+      "url": "https://dev.sitecore.net/~/media/E1A8A968BEE347BA81255ADB132FD480.ashx",
+      "install": false,
+      "convert": true,
+      "databases": "master"
+    },
+    {
+      "id": "defFormsSaveAction",
+      "name": "Data Exchange Framework Save Action for Experience Forms",
+      "fileName": "Data Exchange Framework Save Action for Experience Forms 2.1.0 rev. 181113.zip",
+      "url": "https://dev.sitecore.net/~/media/B636578787724A97A95F9C42B2A144D6.ashx",
+      "install": false,
+      "convert": true,
+      "databases": "master"
+    },
+    {
+      "id": "sfmcConnect",
+      "name": "Sitecore Connect for Salesforce Marketing Cloud",
+      "fileName": "Sitecore Connect for Salesforce Marketing Cloud 1.0.0 rev. 180608.zip",
+      "url": "https://dev.sitecore.net/~/media/2AFF0DF06BD24985B1793807D806411D.ashx",
+      "install": false,
+      "convert": true,
+      "databases": "master,core"
+    },
+    {
+      "id": "stackla",
+      "name": "Stackla Module",
+      "fileName": "Stackla-module-1.4.0-sc9.0.zip",
+      "url": "https://s3-ap-southeast-2.amazonaws.com/stackla-plugin-assets/prod/sitecore/packages/Stackla-module-1.4.0-sc9.0.zip",
+      "install": false,
+      "convert": true,
+      "databases": "master,core"
+    },
+    {
+      "id": "xGen",
+      "name": "xGenerator",
+      "fileName": "ExperienceGenerator_91.zip",
+      "url": "https://github.com/Sitecore/xGenerator/releases/download/9.1.0.0/ExperienceGenerator_91.zip",
+      "install": false,
+      "convert": true,
+      "databases": "core"
+    },
+    {
+      "id": "stylelabs",
+      "name": "StyleLabs Plugin",
+      "fileName": "Stylelabs M Content Hub Plugin-1.0.0.zip",
+      "url": "https://dev.sitecore.net/~/media/9A683955F98249769E8D5CB7AFC2525C.ashx",
+      "install": false,
+      "convert": true,
+      "databases": "master,core"
+    },
+    {
+      "id": "jss",
+      "name": "JavaScript Services",
+      "fileName": "Sitecore JavaScript Services Server for Sitecore 9.2 XP 12.0.0 rev. 190522.scwdp.zip",
+      "url": "https://dev.sitecore.net/~/media/1D5D53DE1F4B43E8B3D70E0D0EE40A5D.ashx",
+      "install": false,
+      "convert": false,
+      "databases": "master,core"
+    }
+  ]
 }
