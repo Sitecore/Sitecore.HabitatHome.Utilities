@@ -28,15 +28,15 @@ if (!$config) {
 $assets = $config.assets
 $solrInstallConfigurationPath = Resolve-Path "assets\configuration\XP0\Solr-SingleDeveloper.json"
 
+Import-Module (Join-Path $assets.sharedUtilitiesRoot "assets\modules\SharedInstallationUtilities\SharedInstallationUtilities.psm1") -Force
+
+
 $params = @{
 	SolrVersion       = $solrVersion
 	SolrDomain        = "localhost"
 	SolrPort          = $solrPort
 	SolrServicePrefix = ""
 	SolrInstallRoot   = $installFolder
-	SolrMaxMemory			= $maxJvmMem
-	KeyStorePassword	= $keystoreSecret
-	SSLTrustPassword	= $keystoreSecret
 }
 
 Import-SitecoreInstallFramework -version $assets.installerVersion -repositoryName $assets.psRepositoryName -repositoryUrl $assets.psRepository
