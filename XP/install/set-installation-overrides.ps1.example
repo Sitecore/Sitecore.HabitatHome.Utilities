@@ -21,7 +21,7 @@ $assets.licenseFilePath = Join-Path $assets.packageRepository "license.xml"
 # Allows for custom SIF identityServerVersion
 $assets.psRepository = "https://sitecore.myget.org/F/sc-powershell/api/v2/"
 $assets.psRepositoryName = "SitecoreGallery"
-$assets.installerVersion = "2.1.0"
+$assets.installerVersion = "2.2.0"
 # Settings
 
 # Site Settings
