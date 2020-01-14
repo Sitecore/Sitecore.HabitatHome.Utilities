@@ -224,16 +224,11 @@ Function Install-Commerce {
 		SitecoreIdentityServerApplicationName    = $identityServer.name
 		SitecoreIdentityServerUrl                = $identityServer.url
 		SkipInstallDefaultStorefront             = $false
-		CommerceSearchProvider                   = "solr"
 		SolrUrl                                  = $solr.url
 		SolrRoot                                 = $solr.root
 		SolrService                              = $solr.serviceName
 		SolrSchemas                              = (Join-Path -Path $assets.commerce.sifCommerceRoot -ChildPath "SolrSchemas" )
 		SearchIndexPrefix                        = $site.prefix
-		AzureSearchServiceName                   = ""
-		AzureSearchAdminKey                      = ""
-		AzureSearchQueryKey                      = ""
-		CommerceEngineCertificateName            = $site.prefix + "storefront.engine"
 		CommerceEngineWdpFullPath                = $(Get-ChildItem -Path $assets.commerce.installationFolder -Include "Sitecore.Commerce.Engine.OnPrem.Solr*scwdp.zip" -Recurse)
 		CommerceServicesDbServer                 = $sql.server
 		CommerceServicesDbName                   = $($site.prefix + "_SharedEnvironments")
@@ -259,17 +254,17 @@ Function Install-Commerce {
 		UserPassword                             = $commerce.serviceAccountPassword
 		RedisConfiguration                       = "localhost"
 		RedisInstanceName                        = "Redis"
-		RedisInstallationPath                    = "C:\Program Files\Redis"
+		RedisInstallationPath                    = "$($Env:SYSTEMDRIVE)\Program Files\Redis"
 		HabitatImagesWdpFullPath                 = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include  "Habitat Home Product Images.scwdp.zip" -Recurse)
 		AdventureWorksImagesWdpFullPath          = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include  "Adventure Works Images.OnPrem*.scwdp.zip" -Recurse)
 		CommerceConnectWdpFullPath               = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include "Sitecore Commerce Connect Core*.scwdp.zip" -Recurse  )
 		CommercexProfilesWdpFullPath             = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include "Sitecore Commerce ExperienceProfile Core *.scwdp.zip" -Recurse)
 		CommercexAnalyticsWdpFullPath            = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include "Sitecore Commerce ExperienceAnalytics Core *.scwdp.zip"	-Recurse)
 		CommerceMAWdpFullPath                    = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include "Sitecore Commerce Marketing Automation Core *.scwdp.zip"	-Recurse)
-		CommerceMAForAutomationEngineWdpFullPath = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include "Sitecore Commerce Marketing Automation for AutomationEngine *.zip"	-Recurse)
+		CommerceMAForAutomationEngineZIPFullPath = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include "Sitecore Commerce Marketing Automation for AutomationEngine *.zip"	-Recurse)
 		CEConnectWdpFullPath                     = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include  "Sitecore Commerce Engine Connect*.scwdp.zip" -Recurse)
-		SXACommerceWdpFullPath                   = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include  "Sitecore Commerce Experience Accelerator 3*.scwdp.zip" -Recurse)
-		SXAStorefrontWdpFullPath                 = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include  "Sitecore Commerce Experience Accelerator Storefront 3*.scwdp.zip"-Recurse )
+		SXACommerceWdpFullPath                   = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include  "Sitecore Commerce Experience Accelerator 4*.scwdp.zip" -Recurse)
+		SXAStorefrontWdpFullPath                 = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include  "Sitecore Commerce Experience Accelerator Storefront 4*.scwdp.zip"-Recurse )
 		SXAStorefrontThemeWdpFullPath            = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include  "Sitecore Commerce Experience Accelerator Storefront Themes*.scwdp.zip"-Recurse )
 		SXAStorefrontCatalogWdpFullPath          = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include  "Sitecore Commerce Experience Accelerator Habitat Catalog*.scwdp.zip" -Recurse)
 		MergeToolFullPath                        = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include  "*Microsoft.Web.XmlTransform.dll" -Recurse | Select-Object -ExpandProperty FullName)
@@ -279,9 +274,13 @@ Function Install-Commerce {
 		BraintreeMerchantId                      = $commerce.brainTreeAccountMerchandId
 		BraintreePrivateKey                      = $commerce.brainTreeAccountPrivateKey
 		BraintreePublicKey                       = $commerce.brainTreeAccountPublicKey
+	    BraintreeEnvironment                     = ""
 		BizFxSiteName                            = $($site.prefix + "-SitecoreBizFx")
 		BizFxPort                                = "4200"
 		BizFxPackage                             = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include  "Sitecore.BizFx.OnPrem*.scwdp.zip" -Recurse)
+		StorefrontIndexPrefix					 = "storefront"
+		CommerceEngineConnectClientId            = $commerce.engineConnectClientId
+		CommerceEngineConnectClientSecret        = $commerce.engineConnectClientSecret
 	}
 
 	Import-Module (Join-Path $assets.sharedUtilitiesRoot "assets\modules\SharedInstallationUtilities\SharedInstallationUtilities.psm1") -Verbose -Force

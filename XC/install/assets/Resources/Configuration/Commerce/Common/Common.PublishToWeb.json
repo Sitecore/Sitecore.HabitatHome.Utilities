@@ -10,7 +10,18 @@
     "Base.Url": "[parameter('BaseUrl')]",
     "Publish.Uri": "[concat(variable('Base.Url'), '/Publish.aspx')]"
   },
+  "Register": {
+    "Tasks" : {
+      "Sleep": "Start-Sleep"
+    }
+  },
   "Tasks": {
+    "Sleep": {
+      "Type": "Sleep",
+      "Params": {
+        "Milliseconds": "60000"
+      }
+    },
     "PublishToWeb": {
       "Type": "WebRequest",
       "Params": {

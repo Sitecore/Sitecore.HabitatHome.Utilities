@@ -40,21 +40,25 @@
       "Description": "The postfix for Commerce Engine services host names",
       "DefaultValue": ""
     },
-    "EngineShopsUrl": {
-      "Type": "string",
-      "Description": "The url for Shops",
-      "DefaultValue": ""
-    },
     "EngineMinionsUrl": {
       "Type": "string",
       "Description": "The url for Minions",
+      "DefaultValue": ""
+    },
+    "EngineOpsUrl": {
+      "Type": "string",
+      "Description": "The url for Ops",
+      "DefaultValue": ""
+    },
+    "CommerceEngineConnectClientId": {
+      "Type": "string",
+      "Description": "The Commerce Engine Connect Client Id for the Sitecore Identity Server",
       "DefaultValue": ""
     }
   },
   "Variables": {
     "Sitecore.AdminAccount": "[parameter('SitecoreAdminAccount')]",
     "SitecoreIdentityServerGetTokenUrl": "[concat(parameter('SitecoreIdentityServerUrl'), '/connect/token')]",
-
     "CommerceOps": "[concat('CommerceOps_', parameter('CommerceServicesPostfix'))]",
     "CommerceShops": "[concat('CommerceShops_', parameter('CommerceServicesPostfix'))]",
     "CommerceAuthoring": "[concat('CommerceAuthoring_', parameter('CommerceServicesPostfix'))]",
@@ -63,20 +67,15 @@
     "CommerceShopsPhysicalPath": "[joinpath(parameter('CommerceInstallRoot'),  variable('CommerceShops'))]",
     "CommerceAuthoringPhysicalPath": "[joinpath(parameter('CommerceInstallRoot'),  variable('CommerceAuthoring'))]",
     "CommerceMinionsPhysicalPath": "[joinpath(parameter('CommerceInstallRoot'),  variable('CommerceMinions'))]",
-
-    "Engine.ShopsUrl": "[parameter('EngineShopsUrl')]",
     "Engine.MinionsUrl": "[parameter('EngineMinionsUrl')]",
-
-    "UrlCommerceShopsServicesBootstrap": "[concat(variable('Engine.ShopsUrl'), '/commerceops/Bootstrap()'))]",
-
+    "Engine.OpsUrl": "[parameter('EngineOpsUrl')]",
+    "UrlCommerceOpsServicesBootstrap": "[concat(variable('Engine.OpsUrl'), '/commerceops/Bootstrap()'))]",
     "InitializeParam": "/commerceops/InitializeEnvironment()",
-    "UrlInitializeEnvironment": "[concat(variable('Engine.ShopsUrl'), variable('InitializeParam')))]",
-
+    "UrlInitializeEnvironment": "[concat(variable('Engine.OpsUrl'), variable('InitializeParam')))]",
     "EnsureSyncDefaultContentPathsParam": "/commerceops/EnsureSyncDefaultContentPaths(environment='envNameValue',shopName='CommerceEngineDefaultStorefront')",
-    "UrlEnsureSyncDefaultContentPaths": "[concat(variable('Engine.ShopsUrl'), variable('EnsureSyncDefaultContentPathsParam')))]",
-
-    "UrlCheckCommandStatus": "[concat(variable('Engine.ShopsUrl'), '/commerceops/CheckCommandStatus(taskId=taskIdValue)'))]",
-
+    "UrlEnsureSyncDefaultContentPaths": "[concat(variable('Engine.OpsUrl'), variable('EnsureSyncDefaultContentPathsParam')))]",
+    "UrlCheckCommandStatus": "[concat(variable('Engine.OpsUrl'), '/commerceops/CheckCommandStatus(taskId=taskIdValue)'))]",
+    "UrlCheckRunMinionCommandStatus": "[concat(variable('Engine.MinionsUrl'), '/commerceops/CheckCommandStatus(taskId=taskIdValue)'))]",
     "UrlRunMinion": "[concat(variable('Engine.MinionsUrl'), '/commerceops/RunMinion()')]"
   },
   "Modules": [
@@ -92,6 +91,18 @@
           "[variable('CommerceAuthoringPhysicalPath')]",
           "[variable('CommerceMinionsPhysicalPath')]"
         ]
+      }
+    },
+    "UpdateCeConnectClientId": {
+      "Type": "UpdateCeConnectClientId",
+      "Params": {
+        "CommerceServicesPathCollection": [
+          "[variable('CommerceOpsPhysicalPath')]",
+          "[variable('CommerceShopsPhysicalPath')]",
+          "[variable('CommerceAuthoringPhysicalPath')]",
+          "[variable('CommerceMinionsPhysicalPath')]"
+        ],
+        "CommerceEngineConnectClientId": "[parameter('CommerceEngineConnectClientId')]"
       }
     },
     "RestartWebAppPoolOps": {
@@ -111,7 +122,7 @@
     "BootStrapCommerceServices": {
       "Type": "BootStrapCommerceServices",
       "Params": {
-        "UrlCommerceShopsServicesBootstrap": "[variable('UrlCommerceShopsServicesBootstrap')]"
+        "UrlCommerceOpsServicesBootstrap": "[variable('UrlCommerceOpsServicesBootstrap')]"
       }
     },
     "EnsureSyncDefaultContentPaths": {
@@ -131,10 +142,29 @@
       }
     },
     "IndexCatalogItems": {
-      "Type": "IndexCatalogItems",
+      "Type": "IndexEngineItems",
+      "Params": {
+        "ListToWatch": "Catalogs",
+        "UrlRunMinion": "[variable('UrlRunMinion')]",
+        "MinionEnvironments": "[parameter('MinionEnvironments')]",
+        "UrlCheckCommandStatus": "[variable('UrlCheckRunMinionCommandStatus')]"
+      }
+    },
+    "IndexPriceCardSnapshots": {
+      "Type": "IndexEngineItems",
+      "Params": {
+        "ListToWatch": "PriceCards",
+        "UrlRunMinion": "[variable('UrlRunMinion')]",
+        "MinionEnvironments": "[parameter('MinionEnvironments')]",
+        "UrlCheckCommandStatus": "[variable('UrlCheckRunMinionCommandStatus')]"
+      }
+    },
+    "IndexPromotions": {
+      "Type": "IndexPromotions",
       "Params": {
         "UrlRunMinion": "[variable('UrlRunMinion')]",
-        "MinionEnvironments": "[parameter('MinionEnvironments')]"
+        "MinionEnvironments": "[parameter('MinionEnvironments')]",
+        "UrlCheckCommandStatus": "[variable('UrlCheckRunMinionCommandStatus')]"
       }
     },
     "EnableCsrfValidation": {

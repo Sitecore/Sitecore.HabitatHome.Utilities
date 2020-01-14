@@ -30,5 +30,6 @@ $commerce.serviceAccountPassword = "Pu8azaCr"
 $commerce.brainTreeAccountMerchandId = ""
 $commerce.brainTreeAccountPublicKey = ""
 $commerce.brainTreeAccountPrivateKey = ""
+$commerce.brainTreeEnvironment = ""
 
 Set-Content $ConfigurationFile  (ConvertTo-Json -InputObject $json -Depth 4 )

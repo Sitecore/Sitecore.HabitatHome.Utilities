@@ -15,11 +15,6 @@
       "Description": "Sitecore Identity Server Url.",
       "DefaultValue": ""
     },
-    "CommerceSearchProvider": {
-      "Type": "string",
-      "Description": "The search provider used for the Commerce Engine - Accepted values are 'SOLR' and 'AZURE'",
-      "DefaultValue": ""
-    },
     "SolrUrl": {
       "Type": "string",
       "Description": "The Solr instance url.",
@@ -30,20 +25,10 @@
       "DefaultValue": "",
       "Description": "The search index prefix."
     },
-    "AzureSearchServiceName": {
+    "StorefrontIndexPrefix": {
       "Type": "string",
-      "Description": "The Azure search service name. Requires param CommerceSearchProvider to be set to 'AZURE'",
-      "DefaultValue": ""
-    },
-    "AzureSearchAdminKey": {
-      "Type": "string",
-      "Description": "The Azure search service admin key. Requires param CommerceSearchProvider to be set to 'AZURE'",
-      "DefaultValue": ""
-    },
-    "AzureSearchQueryKey": {
-      "Type": "string",
-      "Description": "The Azure search service query key. Requires param CommerceSearchProvider to be set to 'AZURE'",
-      "DefaultValue": ""
+      "DefaultValue": "",
+      "Description": "The storefront index prefix."
     },
     "CommerceOpsServicesPort": {
       "Type": "string",
@@ -63,11 +48,6 @@
     "CommerceMinionsServicesPort": {
       "Type": "string",
       "Description": "CommerceMinions Services Port",
-      "DefaultValue": ""
-    },
-    "CommerceEngineCertificateName": {
-      "Type": "string",
-      "Description": "The Commerce Engine certificate name for communication between Engine and Storefront.",
       "DefaultValue": ""
     },
     "CommerceServicesDbServer": {
@@ -155,7 +135,6 @@
       "Description": "Commerce Engine service wdp package full path.",
       "DefaultValue": ""
     },
-
     "BizFxPort": {
       "Type": "string",
       "Description": "Sitecore BizFx Server port",
@@ -191,9 +170,9 @@
       "Description": "Braintree Environment",
       "DefaultValue": ""
     },
-    "CommerceEngine-Pre:CommerceEngineCertificateName": {
+    "CommerceEngineConnectClientId": {
       "Type": "string",
-      "Reference": "CommerceEngineCertificateName"
+      "Reference": "CommerceEngineConnectClientId"
     },
     "CommerceEngine-Pre:CommerceServicesDbServer": {
       "Type": "string",
@@ -271,10 +250,6 @@
       "Type": "string",
       "Reference": "CommerceServicesHostPostfix"
     },
-    "CommerceEngine-Ops:CommerceEngineCertificateName": {
-      "Type": "string",
-      "Reference": "CommerceEngineCertificateName"
-    },
     "CommerceEngine-Ops:Port": {
       "Type": "string",
       "Reference": "CommerceOpsServicesPort"
@@ -282,6 +257,10 @@
     "CommerceEngine-Ops:SitecoreIdentityServerUrl": {
       "Type": "string",
       "Reference": "SitecoreIdentityServerUrl"
+    },
+    "CommerceEngine-Ops:CommerceEngineConnectClientId": {
+      "Type": "string",
+      "Reference": "CommerceEngineConnectClientId"
     },
     "CommerceEngine-Ops:BizFxPort": {
       "Type": "string",
@@ -319,10 +298,6 @@
       "Type": "string",
       "Reference": "UserPassword"
     },
-    "CommerceEngine-Ops:CommerceSearchProvider": {
-      "Type": "string",
-      "Reference": "CommerceSearchProvider"
-    },
     "CommerceEngine-Ops:SolrUrl": {
       "Type": "string",
       "Reference": "SolrUrl"
@@ -331,17 +306,9 @@
       "Type": "string",
       "Reference": "SearchIndexPrefix"
     },
-    "CommerceEngine-Ops:AzureSearchServiceName": {
+    "CommerceEngine-Ops:StorefrontIndexPrefix": {
       "Type": "string",
-      "Reference": "AzureSearchServiceName"
-    },
-    "CommerceEngine-Ops:AzureSearchAdminKey": {
-      "Type": "string",
-      "Reference": "AzureSearchAdminKey"
-    },
-    "CommerceEngine-Ops:AzureSearchQueryKey": {
-      "Type": "string",
-      "Reference": "AzureSearchQueryKey"
+      "Reference": "StorefrontIndexPrefix"
     },
     "CommerceEngine-Ops:BraintreeMerchantId": {
       "Type": "string",
@@ -391,10 +358,6 @@
       "Type": "string",
       "Reference": "CommerceServicesHostPostfix"
     },
-    "CommerceEngine-Shops:CommerceEngineCertificateName": {
-      "Type": "string",
-      "Reference": "CommerceEngineCertificateName"
-    },
     "CommerceEngine-Shops:Port": {
       "Type": "string",
       "Reference": "CommerceShopsServicesPort"
@@ -402,6 +365,10 @@
     "CommerceEngine-Shops:SitecoreIdentityServerUrl": {
       "Type": "string",
       "Reference": "SitecoreIdentityServerUrl"
+    },
+    "CommerceEngine-Shops:CommerceEngineConnectClientId": {
+      "Type": "string",
+      "Reference": "CommerceEngineConnectClientId"
     },
     "CommerceEngine-Shops:BizFxPort": {
       "Type": "string",
@@ -439,10 +406,6 @@
       "Type": "string",
       "Reference": "UserPassword"
     },
-    "CommerceEngine-Shops:CommerceSearchProvider": {
-      "Type": "string",
-      "Reference": "CommerceSearchProvider"
-    },
     "CommerceEngine-Shops:SolrUrl": {
       "Type": "string",
       "Reference": "SolrUrl"
@@ -451,17 +414,9 @@
       "Type": "string",
       "Reference": "SearchIndexPrefix"
     },
-    "CommerceEngine-Shops:AzureSearchServiceName": {
+    "CommerceEngine-Shops:StorefrontIndexPrefix": {
       "Type": "string",
-      "Reference": "AzureSearchServiceName"
-    },
-    "CommerceEngine-Shops:AzureSearchAdminKey": {
-      "Type": "string",
-      "Reference": "AzureSearchAdminKey"
-    },
-    "CommerceEngine-Shops:AzureSearchQueryKey": {
-      "Type": "string",
-      "Reference": "AzureSearchQueryKey"
+      "Reference": "StorefrontIndexPrefix"
     },
     "CommerceEngine-Shops:BraintreeMerchantId": {
       "Type": "string",
@@ -511,10 +466,6 @@
       "Type": "string",
       "Reference": "CommerceServicesHostPostfix"
     },
-    "CommerceEngine-Authoring:CommerceEngineCertificateName": {
-      "Type": "string",
-      "Reference": "CommerceEngineCertificateName"
-    },
     "CommerceEngine-Authoring:Port": {
       "Type": "string",
       "Reference": "CommerceAuthoringServicesPort"
@@ -522,6 +473,10 @@
     "CommerceEngine-Authoring:SitecoreIdentityServerUrl": {
       "Type": "string",
       "Reference": "SitecoreIdentityServerUrl"
+    },
+    "CommerceEngine-Authoring:CommerceEngineConnectClientId": {
+      "Type": "string",
+      "Reference": "CommerceEngineConnectClientId"
     },
     "CommerceEngine-Authoring:BizFxPort": {
       "Type": "string",
@@ -559,10 +514,6 @@
       "Type": "string",
       "Reference": "UserPassword"
     },
-    "CommerceEngine-Authoring:CommerceSearchProvider": {
-      "Type": "string",
-      "Reference": "CommerceSearchProvider"
-    },
     "CommerceEngine-Authoring:SolrUrl": {
       "Type": "string",
       "Reference": "SolrUrl"
@@ -571,17 +522,9 @@
       "Type": "string",
       "Reference": "SearchIndexPrefix"
     },
-    "CommerceEngine-Authoring:AzureSearchServiceName": {
+    "CommerceEngine-Authoring:StorefrontIndexPrefix": {
       "Type": "string",
-      "Reference": "AzureSearchServiceName"
-    },
-    "CommerceEngine-Authoring:AzureSearchAdminKey": {
-      "Type": "string",
-      "Reference": "AzureSearchAdminKey"
-    },
-    "CommerceEngine-Authoring:AzureSearchQueryKey": {
-      "Type": "string",
-      "Reference": "AzureSearchQueryKey"
+      "Reference": "StorefrontIndexPrefix"
     },
     "CommerceEngine-Authoring:BraintreeMerchantId": {
       "Type": "string",
@@ -631,10 +574,6 @@
       "Type": "string",
       "Reference": "CommerceServicesHostPostfix"
     },
-    "CommerceEngine-Minions:CommerceEngineCertificateName": {
-      "Type": "string",
-      "Reference": "CommerceEngineCertificateName"
-    },
     "CommerceEngine-Minions:Port": {
       "Type": "string",
       "Reference": "CommerceMinionsServicesPort"
@@ -642,6 +581,10 @@
     "CommerceEngine-Minions:SitecoreIdentityServerUrl": {
       "Type": "string",
       "Reference": "SitecoreIdentityServerUrl"
+    },
+    "CommerceEngine-Minions:CommerceEngineConnectClientId": {
+      "Type": "string",
+      "Reference": "CommerceEngineConnectClientId"
     },
     "CommerceEngine-Minions:BizFxPort": {
       "Type": "string",
@@ -679,10 +622,6 @@
       "Type": "string",
       "Reference": "UserPassword"
     },
-    "CommerceEngine-Minions:CommerceSearchProvider": {
-      "Type": "string",
-      "Reference": "CommerceSearchProvider"
-    },
     "CommerceEngine-Minions:SolrUrl": {
       "Type": "string",
       "Reference": "SolrUrl"
@@ -691,17 +630,9 @@
       "Type": "string",
       "Reference": "SearchIndexPrefix"
     },
-    "CommerceEngine-Minions:AzureSearchServiceName": {
+    "CommerceEngine-Minions:StorefrontIndexPrefix": {
       "Type": "string",
-      "Reference": "AzureSearchServiceName"
-    },
-    "CommerceEngine-Minions:AzureSearchAdminKey": {
-      "Type": "string",
-      "Reference": "AzureSearchAdminKey"
-    },
-    "CommerceEngine-Minions:AzureSearchQueryKey": {
-      "Type": "string",
-      "Reference": "AzureSearchQueryKey"
+      "Reference": "StorefrontIndexPrefix"
     },
     "CommerceEngine-Minions:BraintreeMerchantId": {
       "Type": "string",

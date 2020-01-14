@@ -19,25 +19,25 @@ $assets.root = "$PSScriptRoot\assets"
 $assets.downloadFolder =  $assets.packageRepository
 
 #Commerce
-$assets.commerce.packageName = "Sitecore.Commerce.WDP.2019.07-4.0.165.zip"
+$assets.commerce.packageName = "Sitecore.Commerce.WDP.2019.12-5.0.133.zip"
 $assets.commerce.packageUrl = "https://dev.sitecore.net/~/media/07F9ABE455944146B37E9D71CA781A27.ashx"
 $assets.commerce.installationFolder = Join-Path $assets.packageRepository "Commerce"
 
 
 #Commerce Files to Extract
 $sifCommerceVersion = $assets.commerce.filesToExtract | Where-Object { $_.name -eq "SIF.Sitecore.Commerce"}
-$sifCommerceVersion.version = "3.0.28"
+$sifCommerceVersion.version = "4.0.28"
 
 $assets.commerce.sifCommerceRoot = Join-Path $assets.commerce.installationFolder $($sifCommerceVersion.name + "." + $sifCommerceVersion.version)
 
 $commerceEngineVersion = $assets.commerce.filesToExtract | Where-Object { $_.name -eq "Sitecore.Commerce.Engine"}
-$commerceEngineVersion.version = "4.0.165"
+$commerceEngineVersion.version = "5.0.133"
 
 $commerceEngineSDKVersion = $assets.commerce.filesToExtract | Where-Object { $_.name -eq "Sitecore.Commerce.Engine.SDK"}
-$commerceEngineSDKVersion.version = "4.0.102"
+$commerceEngineSDKVersion.version = "5.0.70"
 
 $bizFxVersion = $assets.commerce.filesToExtract | Where-Object { $_.name -eq "Sitecore.BizFX"}
-$bizFxVersion.version = "3.0.7"
+$bizFxVersion.version = "4.0.7"
 
 # Settings
 $site = $json.settings.site
@@ -47,12 +47,16 @@ $commerce.engineConfigurationPath = ([IO.Path]::Combine($assets.root, "Resources
 $commerce.storefrontPrefix = $site.prefix
 $commerce.storefrontHostName = $commerce.storefrontPrefix + "." + $site.suffix
 
+$commerce.engineConnectClientId = "CommerceEngineConnect"
+$commerce.engineConnectClientSecret = ""
+
 $commerce.serviceAccountDomain = "$($Env:COMPUTERNAME)"
 $commerce.serviceAccountUserName = "CSFndRuntimeUser"
 $commerce.serviceAccountPassword = "Pu8azaCr"
 $commerce.brainTreeAccountMerchandId = ""
 $commerce.brainTreeAccountPublicKey = ""
 $commerce.brainTreeAccountPrivateKey = ""
+$commerce.brainTreeEnvironment = ""
 
 # Site Settings
 $site = $json.settings.site

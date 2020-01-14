@@ -15,33 +15,96 @@
       "Description": "The postfix for Commerce Engine services host names",
       "DefaultValue": ""
     },
-    "BaseConfigurationFolder": {
+    "CommerceAuthoringServicesPort": {
       "Type": "string",
-      "Description": "The base folder for SIF configuration.",
+      "Description": "The postfix for Commerce Engine services host names",
+      "DefaultValue": "5000"
+    },
+    "BizFxPort": {
+      "Type": "string",
+      "Description": "The postfix for Commerce Engine services host names",
+      "DefaultValue": "4200"
+    },
+    "SiteName": {
+      "Type": "string",
+      "Description": "The name of the site to be deployed.",
+      "DefaultValue": ""
+    },
+    "SiteHostHeaderName": {
+      "Type": "string",
+      "Description": "The host name for storefront.",
+      "DefaultValue": ""
+    },
+    "CommerceEngineConnectClientId": {
+      "Type": "string",
+      "Description": "The Commerce Engine Connect Client Id for the Sitecore Identity Server",
+      "DefaultValue": ""
+    },
+    "CommerceEngineConnectClientSecret": {
+      "Type": "string",
+      "Description": "Commerce Engine Connect Client Secret for Sitecore IDServer",
       "DefaultValue": ""
     }
   },
   "Variables": {
+    "AuthoringLocalhost": "[concat('https://localhost:', parameter('CommerceAuthoringServicesPort'))]",
+    "BizfxLocalhost": "[concat('https://localhost:', parameter('BizFxPort'))]",
+    "Group1": "[concat(variable('BizfxLocalhost'), '|', variable('AuthoringLocalhost')))]",
     "AuthoringUrl": "[concat('https://commerceauthoring.', parameter('CommerceServicesHostPostfix'))]",
     "BizfxUrl": "[concat('https://bizfx.', parameter('CommerceServicesHostPostfix'))]",
-    "Group2": "[concat(variable('BizfxUrl'),concat('|', variable('AuthoringUrl')))]",
-    "IdentityServerConfigurationPath": "[joinpath(parameter('BaseConfigurationFolder'),'.\\IdentityServer\\Sitecore.Commerce.IdentityServer.Host.xml')]"
+    "Group2": "[concat(variable('BizfxUrl'), '|', variable('AuthoringUrl'))]",
+    "SitecoreUrl": "[concat('https://', parameter('SiteName'), '|', 'http://', parameter('SiteName'))]",
+    "StorefrontUrl": "[concat('https://', parameter('SiteHostHeaderName'), '|', 'http://', parameter('SiteHostHeaderName'))]",
+    "CEConnectGroup": "[concat(variable('SitecoreUrl'), '|', variable('StorefrontUrl'))]",
+    "CE.ClientSecret": "[parameter('CommerceEngineConnectClientSecret')]"
   },
   "Tasks": {
-    "UpdateIdentityServerCommerceConfiguration": {
+    "UpdateAllowedCorsOriginsGroup1": {
+      "Type": "SetXml",
+      "Params": {
+        "FilePath": ".\\IdentityServer\\Sitecore.Commerce.IdentityServer.Host.xml",
+        "XPath": "//Settings/Sitecore/IdentityServer/Clients/CommerceClient/AllowedCorsOrigins/AllowedCorsOriginsGroup1",
+        "Value": "[variable('Group1')]"
+      }
+    },
+    "AddAllowedCorsOriginsGroup2": {
       "Skip": "[not(parameter('CommerceServicesHostPostfix'))]",
       "Type": "SetXml",
       "Params": {
-        "FilePath": "[variable('IdentityServerConfigurationPath')]",
+        "FilePath": ".\\IdentityServer\\Sitecore.Commerce.IdentityServer.Host.xml",
         "XPath": "//Settings/Sitecore/IdentityServer/Clients/CommerceClient/AllowedCorsOrigins",
         "Element": "AllowedCorsOriginsGroup2",
         "Value": "[variable('Group2')]"
       }
     },
+    "UpdateCEConnectAllowedCorsOriginsGroup1": {
+      "Type": "SetXml",
+      "Params": {
+        "FilePath": ".\\IdentityServer\\Sitecore.Commerce.IdentityServer.Host.xml",
+        "XPath": "//Settings/Sitecore/IdentityServer/Clients/CommerceEngineConnectClient/AllowedCorsOrigins/AllowedCorsOriginsGroup1",
+        "Value": "[variable('CEConnectGroup')]"
+      }
+    },
+    "UpdateCEConnectClientId": {
+      "Type": "SetXml",
+      "Params": {
+        "FilePath": ".\\IdentityServer\\Sitecore.Commerce.IdentityServer.Host.xml",
+        "XPath": "//Settings/Sitecore/IdentityServer/Clients/CommerceEngineConnectClient/ClientId",
+        "Value": "[parameter('CommerceEngineConnectClientId')]"
+      }
+    },
+    "UpdateCEConnectClientSecret": {
+      "Type": "SetXml",
+      "Params": {
+        "FilePath": ".\\IdentityServer\\Sitecore.Commerce.IdentityServer.Host.xml",
+        "XPath": "//Settings/Sitecore/IdentityServer/Clients/CommerceEngineConnectClient/ClientSecrets/ClientSecret1",
+        "Value": "[variable('CE.ClientSecret')]"
+      }
+    },
     "CopyIdentityServerCommerceConfiguration": {
       "Type": "Copy",
       "Params": {
-        "Source": "[variable('IdentityServerConfigurationPath')]",
+        "Source": ".\\IdentityServer\\Sitecore.Commerce.IdentityServer.Host.xml",
         "Destination": "[joinpath(parameter('CommerceInstallRoot'),  concat(parameter('SitecoreIdentityServerApplicationName'), '\\Config\\production\\Sitecore.Commerce.IdentityServer.Host.xml'))]"
       }
     }

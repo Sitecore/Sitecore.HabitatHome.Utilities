@@ -12,11 +12,34 @@
     }
   },
   "Variables": {
-    "XConnectModelSrc": "[joinpath(parameter('InstallDir'), '\\XConnectModels\\Sitecore.Commerce.Connect.XConnect.Models.json')]",
+    "XConnectModelSrc": "[joinpath(parameter('InstallDir'), '\\XConnectFiles\\Models\\Sitecore.Commerce.Connect.XConnect.Models.json')]",
     "XConnectDst": "[joinpath(parameter('XConnectInstallDir'), '\\App_data\\Models')]",
-    "IndexWorkerDst": "[joinpath(parameter('XConnectInstallDir'), '\\App_data\\jobs\\continuous\\IndexWorker\\App_data\\Models')]"
+    "IndexWorkerDst": "[joinpath(parameter('XConnectInstallDir'), '\\App_data\\jobs\\continuous\\IndexWorker\\App_data\\Models')]",
+
+    "XConnectModelDllSrc": "[joinpath(parameter('InstallDir'), '\\bin\\Sitecore.Commerce.Connect.Collection.Model.dll')]",
+    "XConnectBinDst": "[joinpath(parameter('XConnectInstallDir'), '\\bin')]",
+
+    "XConnectPluginsConfigSrc": "[joinpath(parameter('InstallDir'), '\\XConnectFiles\\Configs\\sc.XConnect.Collection.Model.Commerce.Plugins.xml')]",
+    "XconnectPluginsConfigDst": "[joinpath(parameter('XConnectInstallDir'), '\\App_Data\\Config\\Sitecore\\Collection')]",
+
+    "XConnectPredicateConfigSrc": "[joinpath(parameter('InstallDir'), '\\XConnectFiles\\Configs\\sc.XConnect.Segmentation.Commerce.Predicates.xml')]",
+    "XconnectPredicateConfigDst": "[joinpath(parameter('XConnectInstallDir'), '\\App_Data\\jobs\\continuous\\AutomationEngine\\App_Data\\Config\\sitecore\\Segmentation')]",
+
+    "Services.MarketingAutomationEngine.Name": "[concat(parameter('SiteName'), '_xconnect-MarketingAutomationService')]"
+
   },
   "Tasks": {
+    "StopServices": {
+      "Description": "Stops the services if they running.",
+      "Type": "ManageService",
+      "Params": [
+        {
+          "Name": "[variable('Services.MarketingAutomationEngine.Name')]",
+          "Status": "Stopped",
+          "PostDelay": 3000
+        }
+      ]
+    },
     "CopyModelsToXConnect": {
       "Type": "Copy",
       "Params": {
@@ -30,6 +53,37 @@
         "Source": "[variable('XConnectModelSrc')]",
         "Destination": "[variable('IndexWorkerDst')]"
       }
+    },
+    "CopyXConnectPluginConfigFiles": {
+      "Type": "Copy",
+      "Params": {
+        "Source": "[variable('XConnectPluginsConfigSrc')]",
+        "Destination": "[variable('XconnectPluginsConfigDst')]"
+      }
+    },
+    "CopyXConnectPredicateConfigFiles": {
+      "Type": "Copy",
+      "Params": {
+        "Source": "[variable('XConnectPredicateConfigSrc')]",
+        "Destination": "[variable('XconnectPredicateConfigDst')]"
+      }
+    },
+    "CopyModelDllToXConnect": {
+      "Type": "Copy",
+      "Params": {
+        "Source": "[variable('XConnectModelDllSrc')]",
+        "Destination": "[variable('XConnectBinDst')]"
+      }
+    },
+    "StartServices": {
+      "Description": "Starts the service.",
+      "Type": "ManageService",
+      "Params": [
+        {
+          "Name": "[variable('Services.MarketingAutomationEngine.Name')]",
+          "Status": "Running"
+        }
+      ]
     }
   }
 }

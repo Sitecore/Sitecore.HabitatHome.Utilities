@@ -16,7 +16,7 @@ Function Invoke-InstallModuleTask {
     Write-Host "Installing module: " $moduleToInstall -ForegroundColor Green
     $urlInstallModules = $BaseUrl + "/InstallModules.aspx?modules=" + $moduleToInstall
     Write-Host $urlInstallModules
-    Invoke-RestMethod $urlInstallModules -TimeoutSec 720
+    Invoke-RestMethod $urlInstallModules -TimeoutSec 1200
 }
 
 Function Invoke-CreateDefaultStorefrontTask {
@@ -303,7 +303,7 @@ Function Invoke-OpenConnectionTask {
 
     try {
         $global:SqlConnection = New-Object System.Data.SqlClient.SqlConnection
-        $global:SqlConnection.ConnectionString = $ConnString
+        $global:SqlConnection.ConnectionString = $ConnString.Replace('\\', '\')
         $global:SqlConnection.Open()
         $global:SqlTransaction = $global:SqlConnection.BeginTransaction()
     }
@@ -445,9 +445,14 @@ Function Invoke-ClearRedisTask {
 
     $redisCli = "$RedisInstallationPath\redis-cli.exe"
 
-    foreach ($envGuid in $EnvironmentsGuids) {
-        Write-Host "Clean Redis * $envGuid *" -ForegroundColor Green
-        & $redisCli KEYS "*$envGuid*" | ForEach-Object { & $redisCli DEL $_ }
+    if (!(Test-Path $redisCli)) {
+        Write-Host "Redis cache was not flush. Redis cli was not found." -ForegroundColor Yellow
+    }
+    else {
+        foreach ($envGuid in $EnvironmentsGuids) {
+            Write-Host "Clean Redis * $envGuid *" -ForegroundColor Green
+            & $redisCli KEYS "*$envGuid*" | ForEach-Object { & $redisCli DEL $_ }
+        }
     }
 }
 
@@ -463,11 +468,12 @@ Register-SitecoreInstallExtension -Command Invoke-CreateRoleTask -As CreateRole 
 Register-SitecoreInstallExtension -Command Invoke-AddRolesToUserTask -As AddRolesToUser -Type Task -Force
 Register-SitecoreInstallExtension -Command Invoke-AddRoleToRoleTask -As AddRoleToRole -Type Task -Force
 Register-SitecoreInstallExtension -Command Invoke-ClearRedisTask -As ClearRedis -Type Task -Force
+
 # SIG # Begin signature block
 # MIIXwQYJKoZIhvcNAQcCoIIXsjCCF64CAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUK9PwpRi7w5SrXbdkXfyuPvD7
-# FUegghL8MIID7jCCA1egAwIBAgIQfpPr+3zGTlnqS5p31Ab8OzANBgkqhkiG9w0B
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUsTYPg14BtUMD/pUNS3V/un1Y
+# E9qgghL8MIID7jCCA1egAwIBAgIQfpPr+3zGTlnqS5p31Ab8OzANBgkqhkiG9w0B
 # AQUFADCBizELMAkGA1UEBhMCWkExFTATBgNVBAgTDFdlc3Rlcm4gQ2FwZTEUMBIG
 # A1UEBxMLRHVyYmFudmlsbGUxDzANBgNVBAoTBlRoYXd0ZTEdMBsGA1UECxMUVGhh
 # d3RlIENlcnRpZmljYXRpb24xHzAdBgNVBAMTFlRoYXd0ZSBUaW1lc3RhbXBpbmcg
@@ -573,22 +579,22 @@ Register-SitecoreInstallExtension -Command Invoke-ClearRedisTask -As ClearRedis 
 # bTExMC8GA1UEAxMoRGlnaUNlcnQgU0hBMiBBc3N1cmVkIElEIENvZGUgU2lnbmlu
 # ZyBDQQIQB6Zc7QsNL9EyTYMCYZHvVTAJBgUrDgMCGgUAoHAwEAYKKwYBBAGCNwIB
 # DDECMAAwGQYJKoZIhvcNAQkDMQwGCisGAQQBgjcCAQQwHAYKKwYBBAGCNwIBCzEO
-# MAwGCisGAQQBgjcCARUwIwYJKoZIhvcNAQkEMRYEFEccAKLqzLAFirs9JutGMPcn
-# UaNfMA0GCSqGSIb3DQEBAQUABIIBAB6YVJaVej86LjJaeu9bsdGeGlMHEKy56MvZ
-# CGXNUp7IXQ2IBUyl3YdrJaI6If5Bb5TM5k/WPpeCHX8rsfM3Td/UY42nDVF3hWgH
-# nPb9kTsEaUio8MTlgCn7LWic63AD8IOScKKWliWxS8TAp35Iau1IZG2yOZZbSMBP
-# 6/f1lUpqWV7jMXegEoChHd6xB8PoOB6IT/h3LwJHOM2AhpQ4/mzKjLSfSD1Gj5pe
-# XQuTtZT91M2nv5s68P9u8xTmh4Jy2IwUbPXuJY6T/iz7adw7VHmdK8RbzdYqeDfV
-# dA8/JdG8FH1C3mspoFSGFdMDuzRzpcLPKHcsF5ZVsMFi3yvZDCehggILMIICBwYJ
+# MAwGCisGAQQBgjcCARUwIwYJKoZIhvcNAQkEMRYEFL8vUHhHXqDETnF9s6yG2MMD
+# aXamMA0GCSqGSIb3DQEBAQUABIIBADyNoD7CBjs9j0yH8lQTKjDQ1BWiX95CTjVZ
+# gjEW1KjGN0v1rLHMaFm5XQhzJVX8h8H0KkcwFDOg7re6+E38HJYQkfO36NTyi8D4
+# yPyDeFsQChFdhTZs/v/UhTRLvm/x5NdMzB+lsjE7m9UdfXyXSsDYHZZ6KyOtbLm6
+# jVM3K53Sp4SW43gh3RjinlHQDFUzHJTZdiLDO/Iav+wXvncQ6QIj97lrN+EsHj2j
+# 8tIcLFlJ+K6m46KgezY7kxLEUZcdZjj0PYA77YNVgMRJiZ2bKPeWgCb+aPM9fWzl
+# C3QrtGI176iPEecW4YF+J45H+1QLqhETcnL8Gon8xfjgVECM/lahggILMIICBwYJ
 # KoZIhvcNAQkGMYIB+DCCAfQCAQEwcjBeMQswCQYDVQQGEwJVUzEdMBsGA1UEChMU
 # U3ltYW50ZWMgQ29ycG9yYXRpb24xMDAuBgNVBAMTJ1N5bWFudGVjIFRpbWUgU3Rh
 # bXBpbmcgU2VydmljZXMgQ0EgLSBHMgIQDs/0OMj+vzVuBNhqmBsaUDAJBgUrDgMC
 # GgUAoF0wGAYJKoZIhvcNAQkDMQsGCSqGSIb3DQEHATAcBgkqhkiG9w0BCQUxDxcN
-# MTkwNzA0MTQwNjE5WjAjBgkqhkiG9w0BCQQxFgQUZDhGUy3M+fDBFgF0N7J/snM2
-# PdUwDQYJKoZIhvcNAQEBBQAEggEAbUiuCkI4iG/l9Fqb5miS+D5ZyTFoSBPxma5C
-# 3WlBzDCM6nCuk1Wyw8nNnx5+x1CWPbwBPrnDKUJyfr0ZAphoxZOCja66SP76VToh
-# e9bOyBKeL2RxQYpC2uOx+1LRfvOOxQTD5n5Pf/Ev3WHHsO3YYlUC4Yy4Pe13yY3C
-# w4iTlVqIqgK3JFCckA/kM1TX3B5S1ldu542gsCWnydms61WdwSL7W42TTtkz/mCB
-# Eo8WPZoVI23dmB9WtT7qQNQvO25neRVcm0KLig7/2y7ndZ79GDA5pQlbTXNBEmML
-# 70ruUQhaHbEz2GPBNHeJAeOhgqFRi519MzOOiFgt5luxnwaQ3g==
+# MTkxMjAzMTUyODMyWjAjBgkqhkiG9w0BCQQxFgQU8MDKAdQCY7Ia8oW2i/X0O4/B
+# Zf0wDQYJKoZIhvcNAQEBBQAEggEAkFflpFad8tFTL41SPN5T1fgmp4bah1bYYEhW
+# HH1m9rzMTWu8e8fQWgU2+lpFNXr6iFJQJuFSmIfPgBScIhZN1NSjCGHSlZmtNFoh
+# 5CXoLo2tee/HU/1E5asPBJGIO62XIQts/QAx7QFesf+y/KH43/En9dcIz57B12P/
+# xD9WeTWIfGPrR5ff/SRTQLw++/XrmhyeZHhschwCpQHu4VsAQznseKqc98m8nvXU
+# Qh+KeKQTNwKRclezQHjfcY4dRHy47nwyQWHryJ164vE+2pgY4bckb6FauGi2qiAl
+# rTtpUkEIBa6MPxfyvsssbXEhe3RI3UVPG5+rtdLS4Ak/lME7sA==
 # SIG # End signature block

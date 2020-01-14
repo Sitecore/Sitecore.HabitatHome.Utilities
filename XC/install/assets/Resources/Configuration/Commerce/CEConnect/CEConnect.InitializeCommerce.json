@@ -2,17 +2,12 @@
   "Parameters": {
     "EngineConnectIncludeDir": {
       "Type": "string",
-      "Description": "The path to the Engine Connect App_Confign directory",
+      "Description": "The path to the Engine Connect App_Config directory",
       "DefaultValue": ""
     },
     "CommerceInstallRoot": {
       "Type": "string",
       "Description": "The root path of commerce services.",
-      "DefaultValue": ""
-    },
-    "CommerceEngineCertificateName": {
-      "Type": "string",
-      "Description": "The Commerce Engine certificate name for communication between Engine and Storefront.",
       "DefaultValue": ""
     },
     "CommerceServicesPostfix": {
@@ -29,6 +24,26 @@
       "Type": "string",
       "Description": "Commerce Authoring Services port",
       "DefaultValue": ""
+    },
+    "CommerceMinionsServicesPort": {
+      "Type": "string",
+      "Description": "Commerce Minions Services port",
+      "DefaultValue": ""
+    },
+    "SitecoreIdentityServerUrl": {
+      "Type": "string",
+      "Description": "Sitecore IDServer url",
+      "DefaultValue": ""
+    },
+    "CommerceEngineConnectClientId": {
+      "Type": "string",
+      "Description": "Commerce Engine Connect Client Id for Sitecore IDServer",
+      "DefaultValue": ""
+    },
+    "CommerceEngineConnectClientSecret": {
+      "Type": "string",
+      "Description": "Commerce Engine Connect Client Secret for Sitecore IDServer",
+      "DefaultValue": ""
     }
   },
   "Variables": {
@@ -42,40 +57,36 @@
     "CommerceShopsPhysicalPath": "[joinpath(parameter('CommerceInstallRoot'),  variable('CommerceShops'))]",
     "CommerceAuthoringPhysicalPath": "[joinpath(parameter('CommerceInstallRoot'),  variable('CommerceAuthoring'))]",
     "CommerceMinionsPhysicalPath": "[joinpath(parameter('CommerceInstallRoot'),  variable('CommerceMinions'))]",
-    "Client.Cert.Store": "cert:\\LocalMachine\\My",
-    "Security.CertificateThumbprint": "[GetCertificateThumbprint(parameter('CommerceEngineCertificateName'), variable('Client.Cert.Store'))]"
+    "CE.ClientSecret": "[parameter('CommerceEngineConnectClientSecret')]"
   },
   "Modules": [
     "InitializeCommerce"
   ],
   "Tasks": {
-    "ApplyCertificate": {
-      "Type": "ApplyCertificate",
-      "Params": {
-        "EngineConnectIncludeDir": "[variable('EngineConnect.IncludeDir')]",
-        "CertificateThumbprint": "[variable('Security.CertificateThumbprint')]",
-        "CommerceServicesPathCollection": [
-          "[variable('CommerceOpsPhysicalPath')]",
-          "[variable('CommerceShopsPhysicalPath')]",
-          "[variable('CommerceAuthoringPhysicalPath')]",
-          "[variable('CommerceMinionsPhysicalPath')]"
-        ]
-      }
-    },
-    "UpdateShopsHostname": {
+    "UpdateHostnames": {
       "Skip": "[not(parameter('CommerceServicesHostPostfix'))]",
-      "Type": "UpdateShopsHostname",
+      "Type": "UpdateHostnames",
       "Params": {
         "EngineConnectIncludeDir": "[variable('EngineConnect.IncludeDir')]",
         "CommerceServicesHostPostfix": "[parameter('CommerceServicesHostPostfix')]"
       }
     },
-    "UpdateShopsPort": {
-      "Skip": "[parameter('CommerceServicesHostPostfix')]",
-      "Type": "UpdateShopsPort",
+    "UpdateIdServerSettings": {
+      "Type": "UpdateIdServerSettings",
       "Params": {
         "EngineConnectIncludeDir": "[variable('EngineConnect.IncludeDir')]",
-        "CommerceAuthoringServicesPort": "[parameter('CommerceAuthoringServicesPort')]"
+        "SitecoreIdentityServerUrl": "[parameter('SitecoreIdentityServerUrl')]",
+        "CommerceEngineConnectClientId": "[parameter('CommerceEngineConnectClientId')]",
+        "CommerceEngineConnectClientSecret": "[variable('CE.ClientSecret')]"
+      }
+    },
+    "UpdatePorts": {
+      "Skip": "[parameter('CommerceServicesHostPostfix')]",
+      "Type": "UpdatePorts",
+      "Params": {
+        "EngineConnectIncludeDir": "[variable('EngineConnect.IncludeDir')]",
+        "CommerceAuthoringServicesPort": "[parameter('CommerceAuthoringServicesPort')]",
+        "CommerceMinionsServicesPort": "[parameter('CommerceMinionsServicesPort')]"
       }
     }
   }

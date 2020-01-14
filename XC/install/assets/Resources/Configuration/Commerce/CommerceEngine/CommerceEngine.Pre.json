@@ -1,10 +1,5 @@
 ﻿{
   "Parameters": {
-    "CommerceEngineCertificateName": {
-      "Type": "string",
-      "Description": "The Commerce Engine certificate name for communication between Engine and Storefront.",
-      "DefaultValue": ""
-    },
     "RootCertFileName": {
       "Type": "string",
       "Description": "The file name of the root certificate to be created.",
@@ -101,17 +96,6 @@
       "Params": {
         "RedisInstallationPath": "[parameter('RedisInstallationPath')]",
         "EnvironmentsGuids": "[parameter('EnvironmentsGuids')]"
-      }
-    },
-    "CreateSignedEngineCert": {
-      "Type": "NewSignedCertificate",
-      "Params": {
-        "Signer": "[GetCertificate(variable('Root.Cert.DnsName'), variable('Root.Cert.Store'))]",
-        "Path": "[parameter('CertPath')]",
-        "CertStoreLocation": "[variable('Client.Cert.Store')]",
-        "Name": "[parameter('CommerceEngineCertificateName')]",
-        "DnsName": "[parameter('CommerceEngineCertificateName')]",
-        "IncludePrivateKey": true
       }
     },
     "CreateSignedCert": {
