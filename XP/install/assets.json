@@ -4,7 +4,7 @@
       "id": "xp",
       "name": "Sitecore Experience Platform",
       "fileName": "Sitecore 9.3.0 rev. 003498 (WDP XP0 packages).zip",
-      "url": "https://dev.sitecore.net/~/media/C91BB36E7DA34E8688E80E742995F186.ashx",
+      "url": "https://dev.sitecore.net/~/media/88666D3532F24973939C1CC140E12A27.ashx",
       "extract": true,
       "source": "sitecore"
     }
@@ -13,8 +13,8 @@
     {
       "id": "sat",
       "name": "Sitecore Azure Toolkit",
-      "fileName": "Sitecore Azure Toolkit 2.4.0 rev. 190625.zip",
-      "url": "https://dev.sitecore.net/~/media/0804C3F4CC524149B32AD25D52CDCA12.ashx",
+      "fileName": "Sitecore Azure Toolkit 2.4.0-r02514.1001.zip",
+      "url": "https://dev.sitecore.net/~/media/B627BFA7070B40AD854A0FF08719381D.ashx",
       "install": true,
       "convert": false,
       "source": "sitecore"
@@ -23,7 +23,7 @@
       "id": "spe",
       "name": "Sitecore PowerShell Extensions",
       "fileName": "Sitecore.PowerShell.Extensions-6.0.scwdp.zip",
-      "url": "https://dev.sitecore.net/~/media/7AB15C0432624E6CA9786DF00DD653AB.ashx",
+      "url": "https://dev.sitecore.net/~/media/A6BD2B77DEDD44F1BB8E8ED575D24D12.ashx",
       "install": true,
       "convert": false,
       "databases": "master,core"
@@ -32,7 +32,7 @@
       "id": "sxa",
       "name": "Sitecore Experience Accelerator",
       "fileName": "Sitecore Experience Accelerator 9.3.0.2589.scwdp.zip",
-      "url": "https://dev.sitecore.net/~/media/1A7A3C021C7649C98DA83EF50E624C8E.ashx",
+      "url": "https://dev.sitecore.net/~/media/BDB1DF40FC3A4FB3A64C0B8378BA9288.ashx",
       "install": true,
       "convert": false,
       "databases": "master,core",
