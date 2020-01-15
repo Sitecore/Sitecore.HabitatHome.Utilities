@@ -206,7 +206,7 @@ Function Install-Modules {
     Pop-Location
 }
 
-#Install-SitecoreAzureToolkit
+Install-SitecoreAzureToolkit
 New-ModuleInstallationConfiguration
 Set-IncludesPath
 Install-Modules
