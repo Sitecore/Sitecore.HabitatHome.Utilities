@@ -240,7 +240,7 @@ Function Install-Commerce {
 		CommerceAuthoringServicesPort            = "5000"
 		CommerceMinionsServicesPort              = "5010"
 		CommerceInstallRoot                      = $site.webRoot
-		EnvironmentsPrefix                       = $site.prefix
+		EnvironmentsPrefix                       = "Habitat"
 		Environments                             = @('HabitatAuthoring')
 		MinionEnvironments                       = @('HabitatMinions')
 		EnvironmentsGuids                        = @('40e77b7b4be94186b53b5bfd89a6a83b')
@@ -274,11 +274,11 @@ Function Install-Commerce {
 		BraintreeMerchantId                      = $commerce.brainTreeAccountMerchandId
 		BraintreePrivateKey                      = $commerce.brainTreeAccountPrivateKey
 		BraintreePublicKey                       = $commerce.brainTreeAccountPublicKey
-	    BraintreeEnvironment                     = ""
+		BraintreeEnvironment                     = ""
 		BizFxSiteName                            = $($site.prefix + "-SitecoreBizFx")
 		BizFxPort                                = "4200"
 		BizFxPackage                             = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include  "Sitecore.BizFx.OnPrem*.scwdp.zip" -Recurse)
-		StorefrontIndexPrefix					 = "storefront"
+		StorefrontIndexPrefix                    = "storefront"
 		CommerceEngineConnectClientId            = $commerce.engineConnectClientId
 		CommerceEngineConnectClientSecret        = $commerce.engineConnectClientSecret
 	}

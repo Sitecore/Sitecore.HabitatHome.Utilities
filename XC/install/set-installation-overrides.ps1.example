@@ -23,6 +23,9 @@ $commerce = $json.settings.commerce
 $commerce.storefrontPrefix = $site.prefix
 $commerce.storefrontHostName = $commerce.storefrontPrefix + "." + $site.suffix
 
+$commerce.engineConnectClientId = "CommerceEngineConnect"
+$commerce.engineConnectClientSecret = "J6qfqaKX1hAFIUjiNCAV6jVolLqwhF4OgM6dHT7c9dk="
+
 $commerce.serviceAccountDomain = "$($Env:COMPUTERNAME)"
 $commerce.serviceAccountUserName = "CSFndRuntimeUser"
 $commerce.serviceAccountPassword = "Pu8azaCr"

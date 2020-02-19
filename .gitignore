@@ -57,6 +57,7 @@ configuration-x*0.json
 /install/deploy/*
 */**/set-installation-overrides.ps1
 XC/install/assets/Commerce
+XP/install/assets/Commerce
 */**/Resources/Modules
 *.tgz
 *.update
