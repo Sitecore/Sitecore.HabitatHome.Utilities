@@ -215,7 +215,7 @@ Function Install-Commerce {
 	Get-ChildItem $configurationDir -exclude 'Master_SingleServer.json' -Include *.json -Recurse | Copy-Item -Destination "$configurationDir\Commerce"
 
 	$params = @{
-		Path                                     = $(Join-Path $configurationDir  'Commerce\Master_SingleServer.json')
+		Path                                     = $(Join-Path $configurationDir 'Commerce\Master_SingleServer.json')
 		SiteName                                 = $site.hostName
 		SiteHostHeaderName                       = $commerce.storefrontHostName
 		InstallDir                               = $(Join-Path $site.webRoot $site.hostName)
@@ -227,7 +227,7 @@ Function Install-Commerce {
 		SolrUrl                                  = $solr.url
 		SolrRoot                                 = $solr.root
 		SolrService                              = $solr.serviceName
-		SolrSchemas                              = (Join-Path -Path $assets.commerce.sifCommerceRoot -ChildPath "SolrSchemas" )
+		SolrSchemas                              = $(Join-Path -Path $assets.commerce.sifCommerceRoot -ChildPath "SolrSchemas")
 		SearchIndexPrefix                        = $site.prefix
 		CommerceEngineWdpFullPath                = $(Get-ChildItem -Path $assets.commerce.installationFolder -Include "Sitecore.Commerce.Engine.OnPrem.Solr*scwdp.zip" -Recurse)
 		CommerceServicesDbServer                 = $sql.server
@@ -255,19 +255,19 @@ Function Install-Commerce {
 		RedisConfiguration                       = "localhost"
 		RedisInstanceName                        = "Redis"
 		RedisInstallationPath                    = "$($Env:SYSTEMDRIVE)\Program Files\Redis"
-		HabitatImagesWdpFullPath                 = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include  "Habitat Home Product Images.scwdp.zip" -Recurse)
-		AdventureWorksImagesWdpFullPath          = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include  "Adventure Works Images.OnPrem*.scwdp.zip" -Recurse)
-		CommerceConnectWdpFullPath               = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include "Sitecore Commerce Connect Core*.scwdp.zip" -Recurse  )
-		CommercexProfilesWdpFullPath             = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include "Sitecore Commerce ExperienceProfile Core *.scwdp.zip" -Recurse)
-		CommercexAnalyticsWdpFullPath            = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include "Sitecore Commerce ExperienceAnalytics Core *.scwdp.zip"	-Recurse)
-		CommerceMAWdpFullPath                    = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include "Sitecore Commerce Marketing Automation Core *.scwdp.zip"	-Recurse)
-		CommerceMAForAutomationEngineZIPFullPath = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include "Sitecore Commerce Marketing Automation for AutomationEngine *.zip"	-Recurse)
-		CEConnectWdpFullPath                     = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include  "Sitecore Commerce Engine Connect*.scwdp.zip" -Recurse)
-		SXACommerceWdpFullPath                   = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include  "Sitecore Commerce Experience Accelerator 4*.scwdp.zip" -Recurse)
-		SXAStorefrontWdpFullPath                 = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include  "Sitecore Commerce Experience Accelerator Storefront 4*.scwdp.zip"-Recurse )
-		SXAStorefrontThemeWdpFullPath            = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include  "Sitecore Commerce Experience Accelerator Storefront Themes*.scwdp.zip"-Recurse )
-		SXAStorefrontCatalogWdpFullPath          = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include  "Sitecore Commerce Experience Accelerator Habitat Catalog*.scwdp.zip" -Recurse)
-		MergeToolFullPath                        = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include  "*Microsoft.Web.XmlTransform.dll" -Recurse | Select-Object -ExpandProperty FullName)
+		HabitatImagesWdpFullPath                 = $(Get-ChildItem -Path $assets.commerce.installationFolder -Include "Habitat Home Product Images.scwdp.zip" -Recurse)
+		AdventureWorksImagesWdpFullPath          = $(Get-ChildItem -Path $assets.commerce.installationFolder -Include "Adventure Works Images.OnPrem*.scwdp.zip" -Recurse)
+		CommerceConnectWdpFullPath               = $(Get-ChildItem -Path $assets.commerce.installationFolder -Include "Sitecore Commerce Connect Core*.scwdp.zip" -Recurse)
+		CommercexProfilesWdpFullPath             = $(Get-ChildItem -Path $assets.commerce.installationFolder -Include "Sitecore Commerce ExperienceProfile Core *.scwdp.zip" -Recurse)
+		CommercexAnalyticsWdpFullPath            = $(Get-ChildItem -Path $assets.commerce.installationFolder -Include "Sitecore Commerce ExperienceAnalytics Core *.scwdp.zip" -Recurse)
+		CommerceMAWdpFullPath                    = $(Get-ChildItem -Path $assets.commerce.installationFolder -Include "Sitecore Commerce Marketing Automation Core *.scwdp.zip" -Recurse)
+		CommerceMAForAutomationEngineZIPFullPath = $(Get-ChildItem -Path $assets.commerce.installationFolder -Include "Sitecore Commerce Marketing Automation for AutomationEngine *.zip" -Recurse)
+		CEConnectWdpFullPath                     = $(Get-ChildItem -Path $assets.commerce.installationFolder -Include "Sitecore Commerce Engine Connect*.scwdp.zip" -Recurse)
+		SXACommerceWdpFullPath                   = $(Get-ChildItem -Path $assets.commerce.installationFolder -Include "Sitecore Commerce Experience Accelerator 4*.scwdp.zip" -Recurse)
+		SXAStorefrontWdpFullPath                 = $(Get-ChildItem -Path $assets.commerce.installationFolder -Include "Sitecore Commerce Experience Accelerator Storefront 4*.scwdp.zip" -Recurse)
+		SXAStorefrontThemeWdpFullPath            = $(Get-ChildItem -Path $assets.commerce.installationFolder -Include "Sitecore Commerce Experience Accelerator Storefront Themes*.scwdp.zip" -Recurse)
+		SXAStorefrontCatalogWdpFullPath          = $(Get-ChildItem -Path $assets.commerce.installationFolder -Include "Sitecore Commerce Experience Accelerator Habitat Catalog*.scwdp.zip" -Recurse)
+		MergeToolFullPath                        = $(Get-ChildItem -Path $assets.commerce.installationFolder -Include "*Microsoft.Web.XmlTransform.dll" -Recurse | Select-Object -ExpandProperty FullName)
 		SitecoreDomain                           = "sitecore"
 		SitecoreUsername                         = "admin"
 		SitecoreUserPassword                     = $sitecore.adminPassword
