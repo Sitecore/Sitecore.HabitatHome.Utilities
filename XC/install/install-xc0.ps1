@@ -287,10 +287,10 @@ Function Install-Commerce {
 
 	Push-Location $resourcePath
 	If (!$SkipHabitatHomeInstall) {
-		Install-SitecoreConfiguration @params  -Verbose
+		Install-SitecoreConfiguration @params -Verbose *>&1 | Tee-Object "..\..\logs\output.log"
 	}
 	Else {
-		Install-SitecoreConfiguration @params -Skip "InitializeCommerceEngine", "GenerateCatalogTemplates", "InstallHabitatImagesModule", "Reindex" -Verbose *>&1 | Tee-Object "logs\output.log"
+		Install-SitecoreConfiguration @params -Skip "InitializeCommerceEngine", "GenerateCatalogTemplates", "InstallHabitatImagesModule", "Reindex" -Verbose *>&1 | Tee-Object "..\..\logs\output.log"
 	}
 }
 Pop-Location
