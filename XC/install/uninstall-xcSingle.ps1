@@ -5,11 +5,10 @@ Param(
 
 #####################################################
 #
-#  Install Sitecore
+#  Uninstall Sitecore
 #
 #####################################################
 $ErrorActionPreference = 'Stop'
-#Set-Location $PSScriptRoot
 
 if (!(Test-Path $ConfigurationFile)) {
     Write-Host 'Configuration file '$($ConfigurationFile)' not found.' -ForegroundColor Red
@@ -26,7 +25,6 @@ if (!$config) {
 $site = $config.settings.site
 $sql = $config.settings.sql
 $solr = $config.settings.solr
-$commerce = $config.settings.commerce
 Function Write-TaskHeader {
     param(
         [Parameter(Mandatory = $true)]
@@ -94,6 +92,8 @@ Function Remove-AppPool {
     & $appCmd delete apppool $appPoolName
 }
 
+# Solr
+
 #Stop Solr Service
 Write-TaskHeader -TaskName "Solr Services" -TaskType "Stop"
 Write-Host "Stopping solr service"
@@ -104,19 +104,21 @@ Write-Host "Solr service stopped successfully"
 Write-TaskHeader -TaskName "Solr Services" -TaskType "Delete Cores"
 Write-Host "Deleting Solr Cores"
 $pathToCores = "$($solr.root)\server\solr"
-$cores = @("CatalogItemsScope", "CustomersScope", "OrdersScope")
-
+$cores = @("CatalogItems", "Customers", "Orders", "PriceCards", "Promotions")
 foreach ($core in $cores) {
-    Remove-Item (Join-Path $pathToCores "$($site.prefix)$core") -recurse -force -ErrorAction SilentlyContinue
+    Remove-Item (Join-Path $pathToCores "$($site.prefix)$($core)Scope") -recurse -force -ErrorAction SilentlyContinue
+    Remove-Item (Join-Path $pathToCores "$($site.prefix)$($core)Scope-Rebuild") -recurse -force -ErrorAction SilentlyContinue
 }
 Write-Host "Solr Cores deleted successfully"
+
+#Start Solr Service
 Write-TaskHeader -TaskName "Solr Services" -TaskType "Start"
 Write-Host "Starting solr service"
 Start-Service $solr.serviceName  -ErrorAction SilentlyContinue
 Write-Host "Solr service started successfully"
+
 #Remove Sites and App Pools from IIS
 Write-TaskHeader -TaskName "Internet Information Services" -TaskType "Remove Websites"
-
 foreach ($environment in $Environments) {
     $siteName = ("{0}_{1}" -f $environment, $site.prefix)
     Write-Host ("Deleting Website  {0}" -f $siteName)
@@ -132,9 +134,8 @@ Remove-Website -siteName $bizfx -ErrorAction SilentlyContinue
 Remove-AppPool -appPoolName $bizfx
 Remove-Item ("$($site.webRoot)\{0}" -f $bizfx) -recurse -force -ErrorAction SilentlyContinue
 
-
-Write-TaskHeader -TaskName "SQL Server" -TaskType "Drop Databases"
 #Drop databases from SQL
+Write-TaskHeader -TaskName "SQL Server" -TaskType "Drop Databases"
 Write-Host "Dropping databases from SQL server"
 push-location
 import-module sqlps
@@ -146,7 +147,7 @@ foreach ($db in $databases) {
     Write-Host $("Query: $($sqlCommand)")
     invoke-sqlcmd -ServerInstance $sql.server -Username $sql.adminUser -Password $sql.adminPassword -Query $sqlCommand -ErrorAction SilentlyContinue
 }
-
 Write-Host "Databases dropped successfully"
+
 pop-location
 Write-TaskHeader -TaskName "Uninstallation Complete" -TaskType "Uninstall Complete"
