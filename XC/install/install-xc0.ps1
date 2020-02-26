@@ -274,11 +274,11 @@ Function Install-Commerce {
 		BraintreeMerchantId                      = $commerce.brainTreeAccountMerchandId
 		BraintreePrivateKey                      = $commerce.brainTreeAccountPrivateKey
 		BraintreePublicKey                       = $commerce.brainTreeAccountPublicKey
-		BraintreeEnvironment                     = ""
+		BraintreeEnvironment                     = $commerce.brainTreeEnvironment
 		BizFxSiteName                            = $($site.prefix + "-SitecoreBizFx")
 		BizFxPort                                = "4200"
-		BizFxPackage                             = $(Get-ChildItem -Path $assets.commerce.installationFolder  -Include  "Sitecore.BizFx.OnPrem*.scwdp.zip" -Recurse)
-		StorefrontIndexPrefix                    = "storefront"
+		BizFxPackage                             = $(Get-ChildItem -Path $assets.commerce.installationFolder -Include "Sitecore.BizFx.OnPrem*.scwdp.zip" -Recurse)
+		StorefrontIndexPrefix                    = $site.prefix
 		CommerceEngineConnectClientId            = $commerce.engineConnectClientId
 		CommerceEngineConnectClientSecret        = $commerce.engineConnectClientSecret
 	}
