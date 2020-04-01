@@ -25,6 +25,7 @@
         "EnableContainedDatabases": {
             "Type": "InvokeSqlcmd",
             "Params": {
+                "ServerInstance": "[parameter('SqlServer')]",
                 "UserName": "[parameter('SqlAdminUser')]",
                 "Password": "[parameter('SqlAdminPassword')]",
                 "Query": "[parameter('Script')]"

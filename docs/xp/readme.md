@@ -51,9 +51,7 @@ Let's move onto the final step: [Installing Modules](installing-modules.md)
 
 ## Next Steps
 
-[Warming up an Instance](../warmup.md)
-
-[Security Hardening](../securityHardening.md)
+[Warming up an Instance](../warmup/warmup.md)
 
 [Installing Experience Commerce (XC)](../xc/readme.md)
 

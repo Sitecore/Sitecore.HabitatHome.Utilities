@@ -51,6 +51,8 @@ $loginSession = $null
 
 Import-Module (Join-Path $assets.sharedUtilitiesRoot "assets\modules\SharedInstallationUtilities\SharedInstallationUtilities.psm1") -Force
 
+Import-Module SqlServer
+
 #Ensure the Correct SIF Version is Imported
 Import-SitecoreInstallFramework -version $assets.installerVersion -repositoryName $assets.psRepositoryName -repositoryUrl $assets.psRepository
 
