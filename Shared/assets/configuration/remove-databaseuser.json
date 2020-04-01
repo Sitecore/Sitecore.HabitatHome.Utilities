@@ -44,6 +44,7 @@
         "RemoveUser": {
             "Type": "InvokeSqlcmd",
             "Params": {
+                "ServerInstance": "[parameter('SqlServer')]",
                 "UserName": "[parameter('SqlAdminUser')]",
                 "Password": "[parameter('SqlAdminPassword')]",
                 "Database": "[variable('Sql.DatabaseName')]",
