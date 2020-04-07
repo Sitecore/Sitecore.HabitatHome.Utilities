@@ -1,9 +1,9 @@
 Param(
-    [string] $ConfigurationFile = "configuration-xp0.json",
-    [string] $LogFolder = ".\logs\",
-    [string] $LogFileName = "install-sitecore.log",
-    [string] $devSitecoreUsername,
-    [string] $devSitecorePassword
+	[string] $ConfigurationFile = "configuration-xp0.json",
+	[string] $LogFolder = ".\logs\",
+	[string] $LogFileName = "install-sitecore.log",
+	[string] $devSitecoreUsername,
+	[string] $devSitecorePassword
 )
 
 #####################################################
@@ -21,21 +21,21 @@ $StopWatch.Start()
 Set-Location $PSScriptRoot
 $LogFolder = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($LogFolder)
 if (!(Test-Path $LogFolder)) {
-    New-Item -ItemType Directory -Path $LogFolder
+	New-Item -ItemType Directory -Path $LogFolder
 }
 $LogFile = Join-Path $LogFolder $LogFileName
 if (Test-Path $LogFile) {
-    Get-Item $LogFile | Remove-Item
+	Get-Item $LogFile | Remove-Item
 }
 
 if (!(Test-Path $ConfigurationFile)) {
-    Write-Host "Configuration file '$($ConfigurationFile)' not found." -ForegroundColor Red
-    Write-Host  "Please use 'set-installation...ps1' files to generate a configuration file." -ForegroundColor Red
-    Exit 1
+	Write-Host "Configuration file '$($ConfigurationFile)' not found." -ForegroundColor Red
+	Write-Host  "Please use 'set-installation...ps1' files to generate a configuration file." -ForegroundColor Red
+	Exit 1
 }
 $config = Get-Content -Raw $ConfigurationFile | ConvertFrom-Json
 if (!$config) {
-    throw "Error trying to load configuration!"
+	throw "Error trying to load configuration!"
 }
 
 $site = $config.settings.site
@@ -52,7 +52,7 @@ $sharedResourcePath = Join-Path $assets.sharedUtilitiesRoot "assets\configuratio
 Import-Module (Join-Path $assets.sharedUtilitiesRoot "assets\modules\SharedInstallationUtilities\SharedInstallationUtilities.psm1") -Force
 
 #Ensure the Correct SIF Version is Imported
-Import-SitecoreInstallFramework -version $assets.installerVersion
+Import-SitecoreInstallFramework -version $assets.installerVersion -repositoryName $assets.psRepositoryName -repositoryUrl $assets.psRepository
 
 Write-Host "*******************************************************" -ForegroundColor Green
 Write-Host " Installing Sitecore" -ForegroundColor Green
@@ -62,237 +62,237 @@ Write-Host " identityserver: $($identityServer.name)" -ForegroundColor Green
 Write-Host "*******************************************************" -ForegroundColor Green
 
 Function Get-SitecoreCredentials {
-    if ($null -eq $global:credentials) {
-        if ([string]::IsNullOrEmpty($devSitecoreUsername)) {
-            $global:credentials = Get-Credential -Message "Please provide dev.sitecore.com credentials"
-        }
-        elseif (![string]::IsNullOrEmpty($devSitecoreUsername) -and ![string]::IsNullOrEmpty($devSitecorePassword)) {
-            $secpasswd = ConvertTo-SecureString $devSitecorePassword -AsPlainText -Force
-            $global:credentials = New-Object System.Management.Automation.PSCredential ($devSitecoreUsername, $secpasswd)
-        }
-        else {
-            throw "Credentials required for download"
-        }
-    }
-    $user = $global:credentials.GetNetworkCredential().UserName
-    $password = $global:credentials.GetNetworkCredential().Password
+	if ($null -eq $global:credentials) {
+		if ([string]::IsNullOrEmpty($devSitecoreUsername)) {
+			$global:credentials = Get-Credential -Message "Please provide dev.sitecore.com credentials"
+		}
+		elseif (![string]::IsNullOrEmpty($devSitecoreUsername) -and ![string]::IsNullOrEmpty($devSitecorePassword)) {
+			$secpasswd = ConvertTo-SecureString $devSitecorePassword -AsPlainText -Force
+			$global:credentials = New-Object System.Management.Automation.PSCredential ($devSitecoreUsername, $secpasswd)
+		}
+		else {
+			throw "Credentials required for download"
+		}
+	}
+	$user = $global:credentials.GetNetworkCredential().UserName
+	$password = $global:credentials.GetNetworkCredential().Password
 
-    Invoke-RestMethod -Uri https://dev.sitecore.net/api/authorization -Method Post -ContentType "application/json" -Body "{username: '$user', password: '$password'}" -SessionVariable loginSession -UseBasicParsing
-    $global:loginSession = $loginSession
+	Invoke-RestMethod -Uri https://dev.sitecore.net/api/authorization -Method Post -ContentType "application/json" -Body "{username: '$user', password: '$password'}" -SessionVariable loginSession -UseBasicParsing
+	$global:loginSession = $loginSession
 }
 
 Function Get-Assets {
-    $downloadFolder = $assets.packageRepository
+	$downloadFolder = $assets.packageRepository
 
-    # Download Sitecore
-    if (!(Test-Path $downloadFolder)) {
-        New-Item -ItemType Directory -Force -Path $downloadFolder
-    }
-    Get-SitecoreCredentials
-    $downloadJsonPath = $([io.path]::combine($sharedResourcePath, 'download-assets.json'))
-    Set-Alias sz 'C:\Program Files\7-Zip\7z.exe'
-    $package = $modules | Where-Object { $_.id -eq "xp" }
+	# Download Sitecore
+	if (!(Test-Path $downloadFolder)) {
+		New-Item -ItemType Directory -Force -Path $downloadFolder
+	}
+	Get-SitecoreCredentials
+	$downloadJsonPath = $([io.path]::combine($sharedResourcePath, 'download-assets.json'))
+	Set-Alias sz 'C:\Program Files\7-Zip\7z.exe'
+	$package = $modules | Where-Object { $_.id -eq "xp" }
 
-    Write-Host ("Downloading {0}  -  if required" -f $package.name )
+	Write-Host ("Downloading {0}  -  if required" -f $package.name )
 
-    $destination = $package.fileName
+	$destination = $package.fileName
 
-    if (!(Test-Path $destination)) {
-        $params = @{
-            Path         = $downloadJsonPath
-            LoginSession = $global:loginSession
-            Source       = $package.url
-            Destination  = $destination
-        }
-        $Global:ProgressPreference = 'SilentlyContinue'
-        Install-SitecoreConfiguration  @params  *>&1 | Tee-Object $LogFile -Append
-        $Global:ProgressPreference = 'Continue'
-    }
-    if ((Test-Path $destination) -and ( $package.extract -eq $true)) {
-        sz x -o"$DownloadFolder" $destination  -y -aoa
-    }
+	if (!(Test-Path $destination)) {
+		$params = @{
+			Path         = $downloadJsonPath
+			LoginSession = $global:loginSession
+			Source       = $package.url
+			Destination  = $destination
+		}
+		$Global:ProgressPreference = 'SilentlyContinue'
+		Install-SitecoreConfiguration  @params  *>&1 | Tee-Object $LogFile -Append
+		$Global:ProgressPreference = 'Continue'
+	}
+	if ((Test-Path $destination) -and ( $package.extract -eq $true)) {
+		sz x -o"$DownloadFolder" $destination  -y -aoa
+	}
 }
 
 Function Confirm-Prerequisites {
-    #Enable Contained Databases
-    Write-Host "Enable contained databases" -ForegroundColor Green
+	#Enable Contained Databases
+	Write-Host "Enable contained databases" -ForegroundColor Green
 
-    Function Enable-ContainedDatabases {
-        #Enable Contained Databases
-        Write-Host "Enable contained databases" -ForegroundColor Green
-        $params = @{
-            Path             = (Join-Path $$sharedResourcePath "enable-contained-databases.json")
-            SqlServer        = $sql.server
-            SqlAdminUser     = $sql.adminUser
-            SqlAdminPassword = $sql.adminPassword
-        }
-        Install-SitecoreConfiguration @params -Verbose -WorkingDirectory $(Join-Path $PWD "logs")
-    }
+	Function Enable-ContainedDatabases {
+		#Enable Contained Databases
+		Write-Host "Enable contained databases" -ForegroundColor Green
+		$params = @{
+			Path             = (Join-Path $$sharedResourcePath "enable-contained-databases.json")
+			SqlServer        = $sql.server
+			SqlAdminUser     = $sql.adminUser
+			SqlAdminPassword = $sql.adminPassword
+		}
+		Install-SitecoreConfiguration @params -Verbose -WorkingDirectory $(Join-Path $PWD "logs")
+	}
 
-    # Reset location to script root
-    Set-Location $PSScriptRoot
+	# Reset location to script root
+	Set-Location $PSScriptRoot
 
-    # Verify Solr
-    Write-Host "Verifying Solr connection" -ForegroundColor Green
-    if (-not $solr.url.ToLower().StartsWith("https")) {
-        throw "Solr URL ($SolrUrl) must be secured with https"
-    }
-    Write-Host "Solr URL: $($solr.url)"
-    $SolrRequest = [System.Net.WebRequest]::Create($solr.url)
-    $SolrResponse = $SolrRequest.GetResponse()
-    try {
-        If ($SolrResponse.StatusCode -ne 200) {
-            Write-Host "Could not contact Solr on '$($solr.url)'. Response status was '$SolrResponse.StatusCode'" -ForegroundColor Red
+	# Verify Solr
+	Write-Host "Verifying Solr connection" -ForegroundColor Green
+	if (-not $solr.url.ToLower().StartsWith("https")) {
+		throw "Solr URL ($SolrUrl) must be secured with https"
+	}
+	Write-Host "Solr URL: $($solr.url)"
+	$SolrRequest = [System.Net.WebRequest]::Create($solr.url)
+	$SolrResponse = $SolrRequest.GetResponse()
+	try {
+		If ($SolrResponse.StatusCode -ne 200) {
+			Write-Host "Could not contact Solr on '$($solr.url)'. Response status was '$SolrResponse.StatusCode'" -ForegroundColor Red
 
-        }
-    }
-    finally {
-        $SolrResponse.Close()
-    }
+		}
+	}
+	finally {
+		$SolrResponse.Close()
+	}
 
-    Write-Host "Verifying Solr directory" -ForegroundColor Green
-    if (-not (Test-Path "$($solr.root)\server")) {
-        throw "The Solr root path '$($solr.root)' appears invalid. A 'server' folder should be present in this path to be a valid Solr distributive."
-    }
+	Write-Host "Verifying Solr directory" -ForegroundColor Green
+	if (-not (Test-Path "$($solr.root)\server")) {
+		throw "The Solr root path '$($solr.root)' appears invalid. A 'server' folder should be present in this path to be a valid Solr distributive."
+	}
 
-    Write-Host "Verifying Solr service" -ForegroundColor Green
-    try {
-        $null = Get-Service $solr.serviceName
-    }
-    catch {
-        throw "The Solr service '$($solr.serviceName)' does not exist. Perhaps it's incorrect in settings.ps1?"
-    }
+	Write-Host "Verifying Solr service" -ForegroundColor Green
+	try {
+		$null = Get-Service $solr.serviceName
+	}
+	catch {
+		throw "The Solr service '$($solr.serviceName)' does not exist. Perhaps it's incorrect in settings.ps1?"
+	}
 
-    #Verify that assets are present
-    if (!(Test-Path $assets.root)) {
-        throw "$($assets.root) not found"
-    }
+	#Verify that assets are present
+	if (!(Test-Path $assets.root)) {
+		throw "$($assets.root) not found"
+	}
 
-    #Verify license file
-    if (!(Test-Path $assets.licenseFilePath)) {
-        throw "License file $($assets.licenseFilePath) not found"
-    }
+	#Verify license file
+	if (!(Test-Path $assets.licenseFilePath)) {
+		throw "License file $($assets.licenseFilePath) not found"
+	}
 
-    #Verify Sitecore package
-    if (!(Test-Path $sitecore.packagePath)) {
-        throw "Sitecore package $($sitecore.packagePath) not found"
-    }
+	#Verify Sitecore package
+	if (!(Test-Path $sitecore.packagePath)) {
+		throw "Sitecore package $($sitecore.packagePath) not found"
+	}
 
-    #Verify xConnect package
-    if (!(Test-Path $xConnect.packagePath)) {
-        throw "XConnect package $($xConnect.packagePath) not found"
-    }
+	#Verify xConnect package
+	if (!(Test-Path $xConnect.packagePath)) {
+		throw "XConnect package $($xConnect.packagePath) not found"
+	}
 }
 
 Function Install-SingleDeveloper {
-    $singleDeveloperParams = @{
-        Path                           = $sitecore.singleDeveloperConfigurationPath
-        SqlServer                      = $sql.server
-        SqlAdminUser                   = $sql.adminUser
-        SqlAdminPassword               = $sql.adminPassword
-        SqlCollectionPassword          = $sql.collectionPassword
-        SqlReferenceDataPassword       = $sql.referenceDataPassword
-        SqlMarketingAutomationPassword = $sql.marketingAutomationPassword
-        SqlMessagingPassword           = $sql.messagingPassword
-        SqlProcessingEnginePassword    = $sql.processingEnginePassword
-        SqlReportingPassword           = $sql.reportingPassword
-        SqlCorePassword                = $sql.corePassword
-        SqlSecurityPassword            = $sql.securityPassword
-        SqlMasterPassword              = $sql.masterPassword
-        SqlWebPassword                 = $sql.webPassword
-        SqlProcessingTasksPassword     = $sql.processingTasksPassword
-        SqlFormsPassword               = $sql.formsPassword
-        SqlExmMasterPassword           = $sql.exmMasterPassword
-        SitecoreAdminPassword          = $sitecore.adminPassword
-        SolrUrl                        = $solr.url
-        SolrRoot                       = $solr.root
-        SolrService                    = $solr.serviceName
-        Prefix                         = $site.prefix
-        XConnectCertificateName        = $xconnect.siteName
-        IdentityServerCertificateName  = $identityServer.name
-        IdentityServerSiteName         = $identityServer.name
-        LicenseFile                    = $assets.licenseFilePath
-        XConnectPackage                = $xConnect.packagePath
-        SitecorePackage                = $sitecore.packagePath
-        IdentityServerPackage          = $identityServer.packagePath
-        XConnectSiteName               = $xConnect.siteName
-        SitecoreSitename               = $site.hostName
-        PasswordRecoveryUrl            = "https://" + $site.hostName
-        SitecoreIdentityAuthority      = "https://" + $identityServer.name
-        XConnectCollectionService      = "https://" + $xConnect.siteName
-        ClientSecret                   = $identityServer.clientSecret
-        AllowedCorsOrigins             = ("https://{0}|https://{1}" -f $site.hostName, "habitathomebasic.dev.local") # Need to add to proper config
-        WebRoot                        = $site.webRoot
-    }
+	$singleDeveloperParams = @{
+		Path                           = $sitecore.singleDeveloperConfigurationPath
+		SqlServer                      = $sql.server
+		SqlAdminUser                   = $sql.adminUser
+		SqlAdminPassword               = $sql.adminPassword
+		SqlCollectionPassword          = $sql.collectionPassword
+		SqlReferenceDataPassword       = $sql.referenceDataPassword
+		SqlMarketingAutomationPassword = $sql.marketingAutomationPassword
+		SqlMessagingPassword           = $sql.messagingPassword
+		SqlProcessingEnginePassword    = $sql.processingEnginePassword
+		SqlReportingPassword           = $sql.reportingPassword
+		SqlCorePassword                = $sql.corePassword
+		SqlSecurityPassword            = $sql.securityPassword
+		SqlMasterPassword              = $sql.masterPassword
+		SqlWebPassword                 = $sql.webPassword
+		SqlProcessingTasksPassword     = $sql.processingTasksPassword
+		SqlFormsPassword               = $sql.formsPassword
+		SqlExmMasterPassword           = $sql.exmMasterPassword
+		SitecoreAdminPassword          = $sitecore.adminPassword
+		SolrUrl                        = $solr.url
+		SolrRoot                       = $solr.root
+		SolrService                    = $solr.serviceName
+		Prefix                         = $site.prefix
+		XConnectCertificateName        = $xconnect.siteName
+		IdentityServerCertificateName  = $identityServer.name
+		IdentityServerSiteName         = $identityServer.name
+		LicenseFile                    = $assets.licenseFilePath
+		XConnectPackage                = $xConnect.packagePath
+		SitecorePackage                = $sitecore.packagePath
+		IdentityServerPackage          = $identityServer.packagePath
+		XConnectSiteName               = $xConnect.siteName
+		SitecoreSitename               = $site.hostName
+		PasswordRecoveryUrl            = "https://" + $site.hostName
+		SitecoreIdentityAuthority      = "https://" + $identityServer.name
+		XConnectCollectionService      = "https://" + $xConnect.siteName
+		ClientSecret                   = $identityServer.clientSecret
+		AllowedCorsOrigins             = ("https://{0}" -f $site.hostName)
+		SitePhysicalRoot               = $site.webRoot
+	}
 
-    Push-Location (Join-Path $resourcePath "XP0")
-    Install-SitecoreConfiguration @singleDeveloperParams
-    Pop-Location
+	Push-Location (Join-Path $resourcePath "XP0")
+	Install-SitecoreConfiguration @singleDeveloperParams
+	Pop-Location
 }
 
 Function Add-AppPoolMembership {
-    #Add ApplicationPoolIdentity to performance log users to avoid Sitecore log errors (https://kb.sitecore.net/articles/404548)
+	#Add ApplicationPoolIdentity to performance log users to avoid Sitecore log errors (https://kb.sitecore.net/articles/404548)
 
-    try {
-        Add-LocalGroupMember "Performance Log Users" "IIS AppPool\$($site.hostName)"
-        Write-Host "Added IIS AppPool\$($site.hostName) to Performance Log Users" -ForegroundColor Green
-    }
-    catch {
-        Write-Host "Warning: Couldn't add IIS AppPool\$($site.hostName) to Performance Log Users -- user may already exist" -ForegroundColor Yellow
-    }
-    try {
-        Add-LocalGroupMember "Performance Monitor Users" "IIS AppPool\$($site.hostName)"
-        Write-Host "Added IIS AppPool\$($site.hostName) to Performance Monitor Users" -ForegroundColor Green
-    }
-    catch {
-        Write-Host "Warning: Couldn't add IIS AppPool\$($site.hostName) to Performance Monitor Users -- user may already exist" -ForegroundColor Yellow
-    }
-    try {
-        Add-LocalGroupMember "Performance Monitor Users" "IIS AppPool\$($xConnect.siteName)"
-        Write-Host "Added IIS AppPool\$($xConnect.siteName) to Performance Monitor Users" -ForegroundColor Green
-    }
-    catch {
-        Write-Host "Warning: Couldn't add IIS AppPool\$($site.hostName) to Performance Monitor Users -- user may already exist" -ForegroundColor Yellow
-    }
-    try {
-        Add-LocalGroupMember "Performance Log Users" "IIS AppPool\$($xConnect.siteName)"
-        Write-Host "Added IIS AppPool\$($xConnect.siteName) to Performance Log Users" -ForegroundColor Green
-    }
-    catch {
-        Write-Host "Warning: Couldn't add IIS AppPool\$($xConnect.siteName) to Performance Log Users -- user may already exist" -ForegroundColor Yellow
-    }
+	try {
+		Add-LocalGroupMember "Performance Log Users" "IIS AppPool\$($site.hostName)"
+		Write-Host "Added IIS AppPool\$($site.hostName) to Performance Log Users" -ForegroundColor Green
+	}
+	catch {
+		Write-Host "Warning: Couldn't add IIS AppPool\$($site.hostName) to Performance Log Users -- user may already exist" -ForegroundColor Yellow
+	}
+	try {
+		Add-LocalGroupMember "Performance Monitor Users" "IIS AppPool\$($site.hostName)"
+		Write-Host "Added IIS AppPool\$($site.hostName) to Performance Monitor Users" -ForegroundColor Green
+	}
+	catch {
+		Write-Host "Warning: Couldn't add IIS AppPool\$($site.hostName) to Performance Monitor Users -- user may already exist" -ForegroundColor Yellow
+	}
+	try {
+		Add-LocalGroupMember "Performance Monitor Users" "IIS AppPool\$($xConnect.siteName)"
+		Write-Host "Added IIS AppPool\$($xConnect.siteName) to Performance Monitor Users" -ForegroundColor Green
+	}
+	catch {
+		Write-Host "Warning: Couldn't add IIS AppPool\$($site.hostName) to Performance Monitor Users -- user may already exist" -ForegroundColor Yellow
+	}
+	try {
+		Add-LocalGroupMember "Performance Log Users" "IIS AppPool\$($xConnect.siteName)"
+		Write-Host "Added IIS AppPool\$($xConnect.siteName) to Performance Log Users" -ForegroundColor Green
+	}
+	catch {
+		Write-Host "Warning: Couldn't add IIS AppPool\$($xConnect.siteName) to Performance Log Users -- user may already exist" -ForegroundColor Yellow
+	}
 }
 
 Function Add-AdditionalBindings {
-    foreach ($binding in $site.additionalBindings) {
-        $params = @{
-            Path            = $site.addSiteBindingWithSSLPath
-            SiteName        = $site.hostName
-            WebRoot         = $site.webRoot
-            HostHeader      = $binding.hostName
-            Port            = $binding.port
-            CertPath        = $assets.certificatesPath
-            CertificateName = $binding.hostName
-            Skip            = @()
-        }
-        if ($false -eq $binding.createCertificate) {
-            $params.Skip += "CreatePaths", "CreateRootCert", "ImportRootCertificate", "CreateSignedCert"
-        }
-        if ($binding.sslOnly) {
-            $params.Skip += "CreateBindings"
-        }
+	foreach ($binding in $site.additionalBindings) {
+		$params = @{
+			Path            = $site.addSiteBindingWithSSLPath
+			SiteName        = $site.hostName
+			WebRoot         = $site.webRoot
+			HostHeader      = $binding.hostName
+			Port            = $binding.port
+			CertPath        = $assets.certificatesPath
+			CertificateName = $binding.hostName
+			Skip            = @()
+		}
+		if ($false -eq $binding.createCertificate) {
+			$params.Skip += "CreatePaths", "CreateRootCert", "ImportRootCertificate", "CreateSignedCert"
+		}
+		if ($binding.sslOnly) {
+			$params.Skip += "CreateBindings"
+		}
 
-        Install-SitecoreConfiguration  @params   -WorkingDirectory $(Join-Path $PWD "logs") -Verbose
-    }
+		Install-SitecoreConfiguration  @params   -WorkingDirectory $(Join-Path $PWD "logs") -Verbose
+	}
 }
 
 Function Edit-CryptographyAlgorithmsBindingRedirect {
-    $webConfigFilePath = Join-Path (Join-Path $site.webRoot $site.hostName) "Web.config"
-    [xml]$text = Get-Content -Path $webConfigFilePath
+	$webConfigFilePath = Join-Path (Join-Path $site.webRoot $site.hostName) "Web.config"
+	[xml]$text = Get-Content -Path $webConfigFilePath
 
-    ($text.configuration.runtime.assemblyBinding.dependentAssembly | Where-Object { $_.assemblyIdentity.name -eq "System.Security.Cryptography.Algorithms" }).bindingRedirect.newVersion = "4.0.0.0"
+	($text.configuration.runtime.assemblyBinding.dependentAssembly | Where-Object { $_.assemblyIdentity.name -eq "System.Security.Cryptography.Algorithms" }).bindingRedirect.newVersion = "4.0.0.0"
 
-    $text.save($webConfigFilePath)
+	$text.save($webConfigFilePath)
 }
 
 Get-Assets

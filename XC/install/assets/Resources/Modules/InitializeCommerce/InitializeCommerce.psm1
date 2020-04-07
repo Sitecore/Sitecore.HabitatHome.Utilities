@@ -1,64 +1,68 @@
 
-Function Invoke-UpdateShopsHostnameTask {
+Function Invoke-UpdateHostnamesTask {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory = $true)]
         [string]$EngineConnectIncludeDir,
         [Parameter(Mandatory = $true)]
-        [string]$CommerceServicesHostPostfix                   
-    )      
+        [string]$CommerceServicesHostPostfix
+    )
 
-    $pathToConfig = $(Join-Path -Path $EngineConnectIncludeDir -ChildPath "\Sitecore.Commerce.Engine.Connect.config") 
+    $pathToConfig = $(Join-Path -Path $EngineConnectIncludeDir -ChildPath "\Sitecore.Commerce.Engine.Connect.config")
+
     $xml = [xml](Get-Content $pathToConfig)
-
     $node = $xml.configuration.sitecore.commerceEngineConfiguration
     $node.shopsServiceUrl = $node.shopsServiceUrl -replace "localhost:5000", "commerceauthoring.$CommerceServicesHostPostfix"
     $node.commerceOpsServiceUrl = $node.commerceOpsServiceUrl -replace "localhost:5000", "commerceauthoring.$CommerceServicesHostPostfix"
-    $xml.Save($pathToConfig)      
+    $node.commerceMinionsServiceUrl = $node.commerceMinionsServiceUrl -replace "localhost:5000", "commerceminions.$CommerceServicesHostPostfix"
+
+    $xml.Save($pathToConfig)
 }
 
-Function Invoke-UpdateShopsPortTask {
+Function Invoke-UpdateIdServerSettingsTask {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory = $true)]
         [string]$EngineConnectIncludeDir,
         [Parameter(Mandatory = $true)]
-        [string]$CommerceAuthoringServicesPort                  
-    )      
-    $pathToConfig = $(Join-Path -Path $EngineConnectIncludeDir -ChildPath "\Sitecore.Commerce.Engine.Connect.config") 
+        [string]$SitecoreIdentityServerUrl,
+        [Parameter(Mandatory = $true)]
+        [string]$CommerceEngineConnectClientId,
+        [Parameter(Mandatory = $true)]
+        [string]$CommerceEngineConnectClientSecret
+    )
+
+    $pathToConfig = $(Join-Path -Path $EngineConnectIncludeDir -ChildPath "\Sitecore.Commerce.Engine.Connect.config")
+
+    $xml = [xml](Get-Content $pathToConfig)
+    $node = $xml.configuration.sitecore.commerceEngineConfiguration
+    $node.sitecoreIdentityServerUrl = $SitecoreIdentityServerUrl
+    $node.commerceEngineConnectClientId = $CommerceEngineConnectClientId
+    $node.clientSecretHash = $CommerceEngineConnectClientSecret
+
+    $xml.Save($pathToConfig)
+}
+
+Function Invoke-UpdatePortsTask {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$EngineConnectIncludeDir,
+        [Parameter(Mandatory = $true)]
+        [string]$CommerceAuthoringServicesPort,
+        [Parameter(Mandatory = $true)]
+        [string]$CommerceMinionsServicesPort
+    )
+
+    $pathToConfig = $(Join-Path -Path $EngineConnectIncludeDir -ChildPath "\Sitecore.Commerce.Engine.Connect.config")
+
     $xml = [xml](Get-Content $pathToConfig)
     $node = $xml.configuration.sitecore.commerceEngineConfiguration
     $node.shopsServiceUrl = $node.shopsServiceUrl -replace "5000", $CommerceAuthoringServicesPort
     $node.commerceOpsServiceUrl = $node.commerceOpsServiceUrl -replace "5000", $CommerceAuthoringServicesPort
-    $xml.Save($pathToConfig)      
-}
+    $node.commerceMinionsServiceUrl = $node.commerceMinionsServiceUrl -replace "5000", $CommerceMinionsServicesPort
 
-Function Invoke-ApplyCertificateTask {
-    [CmdletBinding()]
-    param(
-        [Parameter(Mandatory = $true)]
-        [string]$EngineConnectIncludeDir,
-        [Parameter(Mandatory = $true)]
-        [string]$CertificateThumbprint,
-        [Parameter(Mandatory = $true)]
-        [string[]]$CommerceServicesPathCollection
-    )      
-
-    Write-Host "Applying certificate: $($CertificateThumbprint)" -ForegroundColor Green
-
-    $pathToConfig = $(Join-Path -Path $EngineConnectIncludeDir -ChildPath "\Sitecore.Commerce.Engine.Connect.config") 
-    $xml = [xml](Get-Content $pathToConfig)
-    $node = $xml.configuration.sitecore.commerceEngineConfiguration
-    $node.certificateThumbprint = $CertificateThumbprint
-    $xml.Save($pathToConfig)  
-
-    foreach ($path in $CommerceServicesPathCollection) {
-        $pathToJson = $(Join-Path -Path $path -ChildPath "wwwroot\config.json") 
-        $originalJson = Get-Content $pathToJson -Raw | ConvertFrom-Json
-        $certificateNode = $originalJson.Certificates.Certificates[0]
-        $certificateNode.Thumbprint = $CertificateThumbprint      
-        $originalJson | ConvertTo-Json -Depth 100 -Compress | set-content $pathToJson
-    } 
+    $xml.Save($pathToConfig)
 }
 
 Function Invoke-GetIdServerTokenTask {
@@ -67,7 +71,7 @@ Function Invoke-GetIdServerTokenTask {
         [Parameter(Mandatory = $true)]
         [psobject[]]$SitecoreAdminAccount,
         [Parameter(Mandatory = $true)]
-        [string]$UrlIdentityServerGetToken        
+        [string]$UrlIdentityServerGetToken
     )
 
     $headers = New-Object "System.Collections.Generic.Dictionary[[String],[String]]"
@@ -93,18 +97,18 @@ Function Invoke-BootStrapCommerceServicesTask {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory = $true)]
-        [string]$UrlCommerceShopsServicesBootstrap        
+        [string]$UrlCommerceOpsServicesBootstrap
     )
-    Write-Host "BootStrapping Commerce Services: $($urlCommerceShopsServicesBootstrap)" -ForegroundColor Yellow
+    Write-Host "BootStrapping Commerce Services: $($UrlCommerceOpsServicesBootstrap)" -ForegroundColor Yellow
     $headers = New-Object "System.Collections.Generic.Dictionary[[String],[String]]"
     $headers.Add("Authorization", $global:sitecoreIdToken)
-    Invoke-RestMethod $UrlCommerceShopsServicesBootstrap -TimeoutSec 1200 -Method PUT -Headers $headers
+    Invoke-RestMethod $UrlCommerceOpsServicesBootstrap -TimeoutSec 1200 -Method PUT -Headers $headers
     Write-Host "Commerce Services BootStrapping completed" -ForegroundColor Green
 }
 
 Function Invoke-InitializeCommerceServicesTask {
     [CmdletBinding()]
-    param(        
+    param(
         [Parameter(Mandatory = $true)]
         [string]$UrlInitializeEnvironment,
         [Parameter(Mandatory = $true)]
@@ -121,10 +125,10 @@ Function Invoke-InitializeCommerceServicesTask {
         $initializeUrl = $UrlInitializeEnvironment
 
         $payload = @{
-            "environment"=$env;
+            "environment" = $env;
         }
 
-        $result = Invoke-RestMethod $initializeUrl -TimeoutSec 1200 -Method POST -Body ($payload|ConvertTo-Json) -Headers $headers -ContentType "application/json"
+        $result = Invoke-RestMethod $initializeUrl -TimeoutSec 1200 -Method POST -Body ($payload | ConvertTo-Json) -Headers $headers -ContentType "application/json"
         $checkUrl = $UrlCheckCommandStatus -replace "taskIdValue", $result.TaskId
 
         $sw = [system.diagnostics.stopwatch]::StartNew()
@@ -142,16 +146,67 @@ Function Invoke-InitializeCommerceServicesTask {
         Write-Host "Initialization for $($env) completed ..." -ForegroundColor Green
     }
 
-    Write-Host "Initialization completed ..." -ForegroundColor Green 
+    Write-Host "Initialization completed ..." -ForegroundColor Green
 }
 
-Function Invoke-IndexCatalogItemsTask {
+Function Invoke-IndexEngineItemsTask {
     [CmdletBinding()]
-    param(        
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$ListToWatch,
         [Parameter(Mandatory = $true)]
         [string]$UrlRunMinion,
         [Parameter(Mandatory = $true)]
-        [string[]]$MinionEnvironments)
+        [string[]]$MinionEnvironments,
+        [Parameter(Mandatory = $true)]
+        [string]$UrlCheckCommandStatus)
+
+    $headers = New-Object "System.Collections.Generic.Dictionary[[String],[String]]"
+    $headers.Add("Authorization", $global:sitecoreIdToken);
+
+    foreach ($env in $MinionEnvironments) {
+        Write-Host "Indexing $($env) ..." -ForegroundColor Yellow
+        Write-Host "ListToWatch: $($ListToWatch) ..." -ForegroundColor Yellow
+
+        $payload = @{
+            'minionFullName'  = 'Sitecore.Commerce.Plugin.Search.FullIndexMinion, Sitecore.Commerce.Plugin.Search';
+            'environmentName' = $env;
+            'policies'        = @(@{
+                    '$type'           = 'Sitecore.Commerce.Core.RunMinionPolicy, Sitecore.Commerce.Core';
+                    'WithListToWatch' = "$ListToWatch";
+                })
+        }
+
+        $result = Invoke-RestMethod $UrlRunMinion -TimeoutSec 1200 -Method POST -Body ($payload | ConvertTo-Json) -Headers $headers -ContentType "application/json"
+        $checkUrl = $UrlCheckCommandStatus -replace "taskIdValue", $result.TaskId
+
+        $sw = [system.diagnostics.stopwatch]::StartNew()
+        $tp = New-TimeSpan -Minute 10
+        do {
+            Start-Sleep -s 30
+            Write-Host "Checking if $($checkUrl) has completed ..." -ForegroundColor White
+            $result = Invoke-RestMethod $checkUrl -TimeoutSec 1200 -Method Get -Headers $headers -ContentType "application/json"
+
+            if ($result.ResponseCode -ne "Ok") {
+                $(throw Write-Host "Indexing catalog items for $($env) failed, please check Engine service logs for more info." -Foregroundcolor Red)
+            }
+        } while ($result.Status -ne "RanToCompletion" -and $sw.Elapsed -le $tp)
+
+        Write-Host "Indexing for $($env) completed ..." -ForegroundColor Green
+    }
+
+    Write-Host "Indexing completed ..." -ForegroundColor Green
+}
+
+Function Invoke-IndexPromotionsTask {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$UrlRunMinion,
+        [Parameter(Mandatory = $true)]
+        [string[]]$MinionEnvironments,
+        [Parameter(Mandatory = $true)]
+        [string]$UrlCheckCommandStatus)
 
     $headers = New-Object "System.Collections.Generic.Dictionary[[String],[String]]"
     $headers.Add("Authorization", $global:sitecoreIdToken);
@@ -159,55 +214,84 @@ Function Invoke-IndexCatalogItemsTask {
     foreach ($env in $MinionEnvironments) {
         Write-Host "Indexing $($env) ..." -ForegroundColor Yellow
 
-        $payload = @{            
-            'minionFullName'='Sitecore.Commerce.Plugin.Search.FullIndexMinion, Sitecore.Commerce.Plugin.Search';
-            'environmentName'=$env;
-            'policies'=@(@{
-                '$type'='Sitecore.Commerce.Core.RunMinionPolicy, Sitecore.Commerce.Core';
-                'WithListToWatch'='CatalogItems';
-            })
+        $payload = @{
+            'minionFullName'  = 'Sitecore.Commerce.Plugin.Search.FullIndexMinion, Sitecore.Commerce.Plugin.Search';
+            'environmentName' = $env;
+            'policies'        = @(@{
+                    '$type'           = 'Sitecore.Commerce.Core.RunMinionPolicy, Sitecore.Commerce.Core';
+                    'WithListToWatch' = 'Promotions';
+                })
         }
 
-        $result = Invoke-RestMethod $UrlRunMinion -TimeoutSec 1200 -Method POST -Body ($payload|ConvertTo-Json) -Headers $headers -ContentType "application/json"
+        $result = Invoke-RestMethod $UrlRunMinion -TimeoutSec 1200 -Method POST -Body ($payload | ConvertTo-Json) -Headers $headers -ContentType "application/json"
+        $checkUrl = $UrlCheckCommandStatus -replace "taskIdValue", $result.TaskId
+
+        $sw = [system.diagnostics.stopwatch]::StartNew()
+        $tp = New-TimeSpan -Minute 10
+        do {
+            Start-Sleep -s 30
+            Write-Host "Checking if $($checkUrl) has completed ..." -ForegroundColor White
+            $result = Invoke-RestMethod $checkUrl -TimeoutSec 1200 -Method Get -Headers $headers -ContentType "application/json"
+
+            if ($result.ResponseCode -ne "Ok") {
+                $(throw Write-Host "Indexing promotions for $($env) failed, please check Engine service logs for more info." -Foregroundcolor Red)
+            }
+        } while ($result.Status -ne "RanToCompletion" -and $sw.Elapsed -le $tp)
 
         Write-Host "Indexing for $($env) completed ..." -ForegroundColor Green
     }
 
-    Write-Host "Indexing completed ..." -ForegroundColor Green 
+    Write-Host "Indexing completed ..." -ForegroundColor Green
 }
 
 Function Invoke-EnableCsrfValidationTask {
     [CmdletBinding()]
-    param(        
+    param(
         [Parameter(Mandatory = $true)]
         [string[]]$CommerceServicesPathCollection
     )
 
     foreach ($path in $CommerceServicesPathCollection) {
         $pathToJson = $(Join-Path -Path $path -ChildPath "wwwroot\config.json")
-        $originalJson = Get-Content $pathToJson -Raw  | ConvertFrom-Json
+        $originalJson = Get-Content $pathToJson -Raw | ConvertFrom-Json
         $originalJson.AppSettings.AntiForgeryEnabled = $true
-        $originalJson | ConvertTo-Json -Depth 100 -Compress | set-content $pathToJson
+        $originalJson | ConvertTo-Json -Depth 100 | set-content $pathToJson
     }
 }
 
 Function Invoke-DisableCsrfValidationTask {
     [CmdletBinding()]
-    param(        
+    param(
         [Parameter(Mandatory = $true)]
         [string[]]$CommerceServicesPathCollection
     )
     foreach ($path in $CommerceServicesPathCollection) {
         $pathToJson = $(Join-Path -Path $path -ChildPath "wwwroot\config.json")
-        $originalJson = Get-Content $pathToJson -Raw  | ConvertFrom-Json
+        $originalJson = Get-Content $pathToJson -Raw | ConvertFrom-Json
         $originalJson.AppSettings.AntiForgeryEnabled = $false
-        $originalJson | ConvertTo-Json -Depth 100 -Compress | set-content $pathToJson
+        $originalJson | ConvertTo-Json -Depth 100 | set-content $pathToJson
+    }
+}
+
+Function Invoke-UpdateCeConnectClientId {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)]
+        [string[]]$CommerceServicesPathCollection,
+        [Parameter(Mandatory = $true)]
+        [string]$CommerceEngineConnectClientId
+    )
+    foreach ($path in $CommerceServicesPathCollection) {
+        $pathToJson = $(Join-Path -Path $path -ChildPath "wwwroot\config.json")
+        $originalJson = Get-Content $pathToJson -Raw  | ConvertFrom-Json
+        $originalJson.CommerceConnector.ClientId = $CommerceEngineConnectClientId
+        $originalJson | ConvertTo-Json -Depth 100 | set-content $pathToJson
     }
 }
 
 Function Invoke-EnsureSyncDefaultContentPathsTask {
     [CmdletBinding()]
-    param(        
+    param(
         [Parameter(Mandatory = $true)]
         [string]$UrlEnsureSyncDefaultContentPaths,
         [Parameter(Mandatory = $true)]
@@ -217,12 +301,12 @@ Function Invoke-EnsureSyncDefaultContentPathsTask {
 
     $headers = New-Object "System.Collections.Generic.Dictionary[[String],[String]]"
     $headers.Add("Authorization", $global:sitecoreIdToken);
-   
+
     foreach ($env in $Environments) {
-        Write-Host "Ensure/Sync default content paths for: $($env)" -ForegroundColor Yellow 
+        Write-Host "Ensure/Sync default content paths for: $($env)" -ForegroundColor Yellow
 
         $ensureUrl = $UrlEnsureSyncDefaultContentPaths -replace "envNameValue", $env
-        $result = Invoke-RestMethod $ensureUrl -TimeoutSec 1200 -Method PUT -Headers $headers  -ContentType "application/json" 
+        $result = Invoke-RestMethod $ensureUrl -TimeoutSec 1200 -Method PUT -Headers $headers  -ContentType "application/json"
         $checkUrl = $UrlCheckCommandStatus -replace "taskIdValue", $result.TaskId
 
         $sw = [system.diagnostics.stopwatch]::StartNew()
@@ -235,7 +319,7 @@ Function Invoke-EnsureSyncDefaultContentPathsTask {
             if ($result.ResponseCode -ne "Ok") {
                 $(throw Write-Host "Ensure/Sync default content paths for environment $($env) failed, please check Engine service logs for more info." -Foregroundcolor Red)
             }
-            
+
         } while ($result.Status -ne "RanToCompletion" -and $sw.Elapsed -le $tp)
 
         Write-Host "Ensure/Sync default content paths for $($env) completed ..." -ForegroundColor Green
@@ -244,11 +328,11 @@ Function Invoke-EnsureSyncDefaultContentPathsTask {
     Write-Host "Ensure/Sync default content paths completed ..." -ForegroundColor Green
 }
 
-Register-SitecoreInstallExtension -Command Invoke-UpdateShopsHostnameTask -As UpdateShopsHostname -Type Task -Force
+Register-SitecoreInstallExtension -Command Invoke-UpdateHostnamesTask -As UpdateHostnames -Type Task -Force
 
-Register-SitecoreInstallExtension -Command Invoke-UpdateShopsPortTask -As UpdateShopsPort -Type Task -Force
+Register-SitecoreInstallExtension -Command Invoke-UpdateIdServerSettingsTask -As UpdateIdServerSettings -Type Task -Force
 
-Register-SitecoreInstallExtension -Command Invoke-ApplyCertificateTask -As ApplyCertificate -Type Task -Force
+Register-SitecoreInstallExtension -Command Invoke-UpdatePortsTask -As UpdatePorts -Type Task -Force
 
 Register-SitecoreInstallExtension -Command Invoke-GetIdServerTokenTask -As GetIdServerToken -Type Task -Force
 
@@ -256,18 +340,23 @@ Register-SitecoreInstallExtension -Command Invoke-BootStrapCommerceServicesTask 
 
 Register-SitecoreInstallExtension -Command Invoke-InitializeCommerceServicesTask -As InitializeCommerceServices -Type Task -Force
 
-Register-SitecoreInstallExtension -Command Invoke-IndexCatalogItemsTask -As IndexCatalogItems -Type Task -Force
+Register-SitecoreInstallExtension -Command Invoke-IndexEngineItemsTask -As IndexEngineItems -Type Task -Force
+
+Register-SitecoreInstallExtension -Command Invoke-IndexPromotionsTask -As IndexPromotions -Type Task -Force
 
 Register-SitecoreInstallExtension -Command Invoke-EnableCsrfValidationTask -As EnableCsrfValidation -Type Task -Force
 
 Register-SitecoreInstallExtension -Command Invoke-DisableCsrfValidationTask -As DisableCsrfValidation -Type Task -Force
 
 Register-SitecoreInstallExtension -Command Invoke-EnsureSyncDefaultContentPathsTask -As EnsureSyncDefaultContentPaths -Type Task -Force
+
+Register-SitecoreInstallExtension -Command Invoke-UpdateCeConnectClientId -As UpdateCeConnectClientId -Type Task -Force
+
 # SIG # Begin signature block
 # MIIXwQYJKoZIhvcNAQcCoIIXsjCCF64CAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUR2wiDjPq+6XOZOBiqCYVHZok
-# OWSgghL8MIID7jCCA1egAwIBAgIQfpPr+3zGTlnqS5p31Ab8OzANBgkqhkiG9w0B
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUYlyF5Q9VDcUwrdmwAag6wtLi
+# rd2gghL8MIID7jCCA1egAwIBAgIQfpPr+3zGTlnqS5p31Ab8OzANBgkqhkiG9w0B
 # AQUFADCBizELMAkGA1UEBhMCWkExFTATBgNVBAgTDFdlc3Rlcm4gQ2FwZTEUMBIG
 # A1UEBxMLRHVyYmFudmlsbGUxDzANBgNVBAoTBlRoYXd0ZTEdMBsGA1UECxMUVGhh
 # d3RlIENlcnRpZmljYXRpb24xHzAdBgNVBAMTFlRoYXd0ZSBUaW1lc3RhbXBpbmcg
@@ -373,22 +462,22 @@ Register-SitecoreInstallExtension -Command Invoke-EnsureSyncDefaultContentPathsT
 # bTExMC8GA1UEAxMoRGlnaUNlcnQgU0hBMiBBc3N1cmVkIElEIENvZGUgU2lnbmlu
 # ZyBDQQIQB6Zc7QsNL9EyTYMCYZHvVTAJBgUrDgMCGgUAoHAwEAYKKwYBBAGCNwIB
 # DDECMAAwGQYJKoZIhvcNAQkDMQwGCisGAQQBgjcCAQQwHAYKKwYBBAGCNwIBCzEO
-# MAwGCisGAQQBgjcCARUwIwYJKoZIhvcNAQkEMRYEFPaX3QIlBaKo6iAl8iMoF5gs
-# dCxjMA0GCSqGSIb3DQEBAQUABIIBACf+nfSB9h/kUNYLzXXIYGcGLUeXF8ACoouE
-# 3uFac5/tO1Lr/w5nl/tmUHhWLBqtn7SdQXCFDBtCrsm5RByoRIo3gP60LSDOMcR9
-# u1NZvfzHg5CXBTgXUdh00Y0sx2M/fEd/ypEDEDAhA2wSLE1dHOqa0IeUv967lYJg
-# AuAZvevnoA60YDRkiUPR1nFfhJ62Kj2+PdBtpDMP7QZ7751Bij4wGbfpGVDysU0M
-# QTzeOOAlCAsKLgtw74f2lw3Kyc8xjnfS8MlhUmh8hRKELGRENnX4iifzCpab0GxQ
-# 49MH2nDfLn0R8Nk/4wY8cNFu5/Q+05OSG4qS1u02dvAiA2xCbmKhggILMIICBwYJ
+# MAwGCisGAQQBgjcCARUwIwYJKoZIhvcNAQkEMRYEFF+dRdXu9xJLuy4xBjuzAugy
+# zFynMA0GCSqGSIb3DQEBAQUABIIBAKDNtWzbpwtMzZ6CQTJL7AeGowqnosLKmKVy
+# 5aKZcnZAZN2xOMG0lI97oi33YLqW2rBWXumlFfKE5/IuCouWfJvi0jNJ8xQAkuYw
+# NwIkU7aGGKaO2ksD22F526BbTVruQ2Apk+7xdnUDehfdHeCxr3QanFWI2v399YZJ
+# R23fbd0kzdkrjQ+klQfKCjxzpFgymxa0jI0cFjyZiFSguSo6r1O0BPkbtpci6FoT
+# D+m5c2Z0hKcyCaTk9TPi1HejztjhZTtexK76G+yheFEQbECKMXR9LWC/C6+2gH9L
+# c537AV0vdfEC7vd9DE0bV5kTwYhgT4AVYqfe/zqFFayTw7eK2MOhggILMIICBwYJ
 # KoZIhvcNAQkGMYIB+DCCAfQCAQEwcjBeMQswCQYDVQQGEwJVUzEdMBsGA1UEChMU
 # U3ltYW50ZWMgQ29ycG9yYXRpb24xMDAuBgNVBAMTJ1N5bWFudGVjIFRpbWUgU3Rh
 # bXBpbmcgU2VydmljZXMgQ0EgLSBHMgIQDs/0OMj+vzVuBNhqmBsaUDAJBgUrDgMC
 # GgUAoF0wGAYJKoZIhvcNAQkDMQsGCSqGSIb3DQEHATAcBgkqhkiG9w0BCQUxDxcN
-# MTkwNzA0MTQwNjA5WjAjBgkqhkiG9w0BCQQxFgQUgxTrjxIQB/ugFl0PVk62xp40
-# ICkwDQYJKoZIhvcNAQEBBQAEggEAdcx1v+n7ZZnqPmfmRvxXDBiSB91X7y22me0A
-# mvo4as0XLSKRnrwvAtjFdBSN7jbjPL0+fP5CsfgfCEzfLLxAPL3iLK+2mLi/Og6i
-# F9wxefYP1toWnQSYsLtdp+nbWo2NBG3Y9gEM+vhqr4HQGds/CXpK4rBHQLNM/vKP
-# ExBrBCAFubOmxU5u0F4vQg6xJuMSIndyXd5Wx2Duwaemv3+fmx/z6z+FGy3YTh4C
-# TnH8TUueW+uxLK59SgXVBXntBzu6GQEjvMPjLfXXldg8b2rd8b5kz7DnKMgPihPn
-# v8vFzAdA37d1fAiBstmL7qtjvV7Z7pWHmv/m7GcUuLN2mZKYLA==
+# MjAwMTA5MjAzNDM2WjAjBgkqhkiG9w0BCQQxFgQUx9nPhwRc8/o7fCwnQnja0g9o
+# hhYwDQYJKoZIhvcNAQEBBQAEggEAVOsI+SDZplQupdPnnUSP5S+hqB5Oa7rqH0wf
+# 8MT6UDUcJkpS/KayAgr2DqrUIOTWUEm6EsiGKWAqK+19czbZ2ZBhdjMb2XaBM7+B
+# Fi6ZubD3FwIqI0znkjCIsidEebp4tHhCTDYfJKmRlMBhVdKB1PuaG0vUE55japJz
+# /RqcYME6ZmFvBozMIWPimrC8pw67JbsnjhAVkAgtrZniRLFXUfN+S9Suu013P85M
+# aMRPN1Y+PvcpqKgiL2wV9kgEg4ySUPMej18wtZNG83Y4JMI/x7GX7alFzRqMvpma
+# PBAO5lsd/CpAMG5cly3bHamr6mK2EuMomNT0klKar1vxiTW+xA==
 # SIG # End signature block

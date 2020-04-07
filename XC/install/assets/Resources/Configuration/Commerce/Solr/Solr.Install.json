@@ -1,19 +1,19 @@
 {
-  "Parameters": {  
+  "Parameters": {
     "SolrUrl": {
       "Type": "string",
       "Description": "The Solr instance url.",
-      "DefaultValue": "https://localhost:8993/solr"
+      "DefaultValue": "https://localhost:8994/solr"
     },
     "SolrRoot": {
       "Type": "string",
       "Description": "The file path to the Solr instance.",
-      "DefaultValue": "c:\\solr-7.5.0"
+      "DefaultValue": "c:\\solr-8.1.1"
     },
     "SolrService": {
       "Type": "string",
       "Description": "The name of the Solr service.",
-      "DefaultValue": "solr-7.5.0"
+      "DefaultValue": "solr-8.1.1"
     },
     "SolrSchemas": {
       "Type": "string",
@@ -29,12 +29,7 @@
       "Type": "string",
       "Description": "The prefix for each of the created indexes.",
       "DefaultValue": ""
-    },
-    "CommerceSearchProvider": {
-      "Type": "string",
-      "Description": "The search provider used for the Commerce Engine - Accepted values are 'SOLR' and 'AZURE'",
-      "DefaultValue": "SOLR"
-    } 
+    }
   },
   "Variables": {
     // Variables are values calculated in a configuration.
@@ -53,23 +48,50 @@
     "Solr.CustomersSchema": "[concat(parameter('SolrSchemas'), '\\Customers')]",
     "Solr.OrdersSchema": "[concat(parameter('SolrSchemas'), '\\Orders')]",
     "Solr.CatalogItemsSchema": "[concat(parameter('SolrSchemas'), '\\CatalogItems')]",
+    "Solr.PromotionsSchema": "[concat(parameter('SolrSchemas'), '\\Promotions')]",
+    "Solr.PriceCardsSchema": "[concat(parameter('SolrSchemas'), '\\PriceCards')]",
 
     // The names of the cores to create.
     "Customers.Name": "[concat(parameter('SearchIndexPrefix'), 'CustomersScope')]",
     "Orders.Name": "[concat(parameter('SearchIndexPrefix'), 'OrdersScope')]",
     "CatalogItems.Name": "[concat(parameter('SearchIndexPrefix'), 'CatalogItemsScope')]",
+    "Promotions.Name": "[concat(parameter('SearchIndexPrefix'), 'PromotionsScope')]",
+    "PriceCards.Name": "[concat(parameter('SearchIndexPrefix'), 'PriceCardsScope')]",
 
     // The destination paths of the cores to create.
     "Customers.Root": "[joinpath(variable('Solr.Server'), variable('Customers.Name'))]",
     "Orders.Root": "[joinpath(variable('Solr.Server'), variable('Orders.Name'))]",
     "CatalogItems.Root": "[joinpath(variable('Solr.Server'), variable('CatalogItems.Name'))]",
+    "Promotions.Root": "[joinpath(variable('Solr.Server'), variable('Promotions.Name'))]",
+    "PriceCards.Root": "[joinpath(variable('Solr.Server'), variable('PriceCards.Name'))]",
 
     // The destination paths for the base configurations of each core.
     "Customers.Conf": "[joinpath(variable('Customers.Root'), 'conf')]",
     "Orders.Conf": "[joinpath(variable('Orders.Root'), 'conf')]",
     "CatalogItems.Conf": "[joinpath(variable('CatalogItems.Root'), 'conf')]",
+    "Promotions.Conf": "[joinpath(variable('Promotions.Root'), 'conf')]",
+    "PriceCards.Conf": "[joinpath(variable('PriceCards.Root'), 'conf')]",
 
-    "Skip.SOLR": "[not(equal(parameter('CommerceSearchProvider'), 'SOLR'))]"
+    // The secondary names of the cores to create for SwitchOnRebuild feature.
+    "Customers.Secondary.Name": "[concat(parameter('SearchIndexPrefix'), 'CustomersScope-Rebuild')]",
+    "Orders.Secondary.Name": "[concat(parameter('SearchIndexPrefix'), 'OrdersScope-Rebuild')]",
+    "CatalogItems.Secondary.Name": "[concat(parameter('SearchIndexPrefix'), 'CatalogItemsScope-Rebuild')]",
+    "Promotions.Secondary.Name": "[concat(parameter('SearchIndexPrefix'), 'PromotionsScope-Rebuild')]",
+    "PriceCards.Secondary.Name": "[concat(parameter('SearchIndexPrefix'), 'PriceCardsScope-Rebuild')]",
+
+    // The secondary destination paths of the cores to create for SwitchOnRebuild feature.
+    "Customers.Secondary.Root": "[joinpath(variable('Solr.Server'), variable('Customers.Secondary.Name'))]",
+    "Orders.Secondary.Root": "[joinpath(variable('Solr.Server'), variable('Orders.Secondary.Name'))]",
+    "CatalogItems.Secondary.Root": "[joinpath(variable('Solr.Server'), variable('CatalogItems.Secondary.Name'))]",
+    "Promotions.Secondary.Root": "[joinpath(variable('Solr.Server'), variable('Promotions.Secondary.Name'))]",
+    "PriceCards.Secondary.Root": "[joinpath(variable('Solr.Server'), variable('PriceCards.Secondary.Name'))]",
+
+    // The secondary destination paths for the base configurations of each core and for SwitchOnRebuild feature.
+    "Customers.Secondary.Conf": "[joinpath(variable('Customers.Secondary.Root'), 'conf')]",
+    "Orders.Secondary.Conf": "[joinpath(variable('Orders.Secondary.Root'), 'conf')]",
+    "CatalogItems.Secondary.Conf": "[joinpath(variable('CatalogItems.Secondary.Root'), 'conf')]",
+    "Promotions.Secondary.Conf": "[joinpath(variable('Promotions.Secondary.Root'), 'conf')]",
+    "PriceCards.Secondary.Conf": "[joinpath(variable('PriceCards.Secondary.Root'), 'conf')]"
   },
   "Tasks": {
     // Tasks are separate units of work in a configuration.
@@ -78,7 +100,6 @@
     // Tasks may reference Parameters, Variables, and config functions.
 
     "StopSolr": {
-      "Skip": "[equal(variable('Skip.SOLR'),'True')]",
       "Type": "ManageService",
       "Params": {
         "Name": "[parameter('SolrService')]",
@@ -87,36 +108,53 @@
       }
     },
     "CleanCores": {
-      "Skip": "[equal(variable('Skip.SOLR'),'True')]",
       "Type": "EnsurePath",
       "Params": {
         "Clean": [
           "[variable('Customers.Root')]",
+          "[variable('Customers.Secondary.Root')]",
           "[variable('Orders.Root')]",
-          "[variable('CatalogItems.Root')]"
+          "[variable('Orders.Secondary.Root')]",
+          "[variable('CatalogItems.Root')]",
+          "[variable('CatalogItems.Secondary.Root')]",
+          "[variable('Promotions.Root')]",
+          "[variable('Promotions.Secondary.Root')]",
+          "[variable('PriceCards.Root')]",
+          "[variable('PriceCards.Secondary.Root')]"
         ]
       }
     },
     "PrepareCores": {
-      "Skip": "[equal(variable('Skip.SOLR'),'True')]",
       "Type": "Copy",
       "Params": [
         { "Source": "[joinpath(variable('Solr.BaseConfigs'), '*')]", "Destination": "[variable('Customers.Root')]" },
+        { "Source": "[joinpath(variable('Solr.BaseConfigs'), '*')]", "Destination": "[variable('Customers.Secondary.Root')]" },
         { "Source": "[joinpath(variable('Solr.BaseConfigs'), '*')]", "Destination": "[variable('Orders.Root')]" },
-        { "Source": "[joinpath(variable('Solr.BaseConfigs'), '*')]", "Destination": "[variable('CatalogItems.Root')]" }
+        { "Source": "[joinpath(variable('Solr.BaseConfigs'), '*')]", "Destination": "[variable('Orders.Secondary.Root')]" },
+        { "Source": "[joinpath(variable('Solr.BaseConfigs'), '*')]", "Destination": "[variable('CatalogItems.Root')]" },
+        { "Source": "[joinpath(variable('Solr.BaseConfigs'), '*')]", "Destination": "[variable('CatalogItems.Secondary.Root')]" },
+        { "Source": "[joinpath(variable('Solr.BaseConfigs'), '*')]", "Destination": "[variable('PriceCards.Root')]" },
+        { "Source": "[joinpath(variable('Solr.BaseConfigs'), '*')]", "Destination": "[variable('PriceCards.Secondary.Root')]" },
+        { "Source": "[joinpath(variable('Solr.BaseConfigs'), '*')]", "Destination": "[variable('Promotions.Root')]" },
+        { "Source": "[joinpath(variable('Solr.BaseConfigs'), '*')]", "Destination": "[variable('Promotions.Secondary.Root')]" }
       ]
     },
     "CopySchemaFiles": {
-      "Skip": "[equal(variable('Skip.SOLR'),'True')]",      
       "Type": "Copy",
       "Params": [
         { "Source": "[joinpath(variable('Solr.CustomersSchema'), '*')]", "Destination": "[variable('Customers.Conf')]" },
+        { "Source": "[joinpath(variable('Solr.CustomersSchema'), '*')]", "Destination": "[variable('Customers.Secondary.Conf')]" },
         { "Source": "[joinpath(variable('Solr.OrdersSchema'), '*')]", "Destination": "[variable('Orders.Conf')]" },
-        { "Source": "[joinpath(variable('Solr.CatalogItemsSchema'), '*')]", "Destination": "[variable('CatalogItems.Conf')]" }
+        { "Source": "[joinpath(variable('Solr.OrdersSchema'), '*')]", "Destination": "[variable('Orders.Secondary.Conf')]" },
+        { "Source": "[joinpath(variable('Solr.CatalogItemsSchema'), '*')]", "Destination": "[variable('CatalogItems.Conf')]" },
+        { "Source": "[joinpath(variable('Solr.CatalogItemsSchema'), '*')]", "Destination": "[variable('CatalogItems.Secondary.Conf')]" },
+        { "Source": "[joinpath(variable('Solr.PromotionsSchema'), '*')]", "Destination": "[variable('Promotions.Conf')]" },
+        { "Source": "[joinpath(variable('Solr.PromotionsSchema'), '*')]", "Destination": "[variable('Promotions.Secondary.Conf')]" },
+        { "Source": "[joinpath(variable('Solr.PriceCardsSchema'), '*')]", "Destination": "[variable('PriceCards.Conf')]" },
+        { "Source": "[joinpath(variable('Solr.PriceCardsSchema'), '*')]", "Destination": "[variable('PriceCards.Secondary.Conf')]" }
       ]
     },
     "StartSolr": {
-      "Skip": "[equal(variable('Skip.SOLR'),'True')]",
       "Type": "ManageService",
       "Params": {
         "Name": "[parameter('SolrService')]",
@@ -125,7 +163,6 @@
       }
     },
     "CreateCores": {
-      "Skip": "[equal(variable('Skip.SOLR'),'True')]",
       "Type": "ManageSolrCore",
       "Params": [
         {
@@ -133,6 +170,15 @@
           "Address": "[parameter('SolrUrl')]",
           "Arguments": {
             "name": "[variable('Customers.Name')]",
+            "configset": "[parameter('BaseConfig')]",
+            "property.update.autoCreateFields": "false"
+          }
+        },
+        {
+          "Action": "Create",
+          "Address": "[parameter('SolrUrl')]",
+          "Arguments": {
+            "name": "[variable('Customers.Secondary.Name')]",
             "configset": "[parameter('BaseConfig')]",
             "property.update.autoCreateFields": "false"
           }
@@ -150,7 +196,61 @@
           "Action": "Create",
           "Address": "[parameter('SolrUrl')]",
           "Arguments": {
+            "name": "[variable('Orders.Secondary.Name')]",
+            "configset": "[parameter('BaseConfig')]",
+            "property.update.autoCreateFields": "false"
+          }
+        },
+        {
+          "Action": "Create",
+          "Address": "[parameter('SolrUrl')]",
+          "Arguments": {
             "name": "[variable('CatalogItems.Name')]",
+            "configset": "[parameter('BaseConfig')]",
+            "property.update.autoCreateFields": "false"
+          }
+        },
+        {
+          "Action": "Create",
+          "Address": "[parameter('SolrUrl')]",
+          "Arguments": {
+            "name": "[variable('CatalogItems.Secondary.Name')]",
+            "configset": "[parameter('BaseConfig')]",
+            "property.update.autoCreateFields": "false"
+          }
+        },
+        {
+          "Action": "Create",
+          "Address": "[parameter('SolrUrl')]",
+          "Arguments": {
+            "name": "[variable('Promotions.Name')]",
+            "configset": "[parameter('BaseConfig')]",
+            "property.update.autoCreateFields": "false"
+          }
+        },
+        {
+          "Action": "Create",
+          "Address": "[parameter('SolrUrl')]",
+          "Arguments": {
+            "name": "[variable('Promotions.Secondary.Name')]",
+            "configset": "[parameter('BaseConfig')]",
+            "property.update.autoCreateFields": "false"
+          }
+        },
+        {
+          "Action": "Create",
+          "Address": "[parameter('SolrUrl')]",
+          "Arguments": {
+            "name": "[variable('PriceCards.Name')]",
+            "configset": "[parameter('BaseConfig')]",
+            "property.update.autoCreateFields": "false"
+          }
+        },
+        {
+          "Action": "Create",
+          "Address": "[parameter('SolrUrl')]",
+          "Arguments": {
+            "name": "[variable('PriceCards.Secondary.Name')]",
             "configset": "[parameter('BaseConfig')]",
             "property.update.autoCreateFields": "false"
           }
@@ -161,14 +261,13 @@
   "UninstallTasks": {
     "RemoveSolrCores": {
       "Description": "Removes the SOLR cores and instance folders.",
-      "Skip": "[equal(variable('Skip.SOLR'),'True')]",
       "Type": "ManageSolrCore",
       "Params": [
         {
           "Action": "Unload",
           "Address": "[parameter('SolrUrl')]",
           "Arguments": {
-            "core": "CatalogItemsScope",
+            "core": "[variable('Customers.Name')]",
             "deleteInstanceDir": "true"
           },
           "ErrorAction": "SilentlyContinue"
@@ -177,7 +276,7 @@
           "Action": "Unload",
           "Address": "[parameter('SolrUrl')]",
           "Arguments": {
-            "core": "CustomersScope",
+            "core": "[variable('Customers.Secondary.Name')]",
             "deleteInstanceDir": "true"
           },
           "ErrorAction": "SilentlyContinue"
@@ -186,12 +285,75 @@
           "Action": "Unload",
           "Address": "[parameter('SolrUrl')]",
           "Arguments": {
-            "core": "OrdersScope",
+            "core": "[variable('Orders.Name')]",
+            "deleteInstanceDir": "true"
+          },
+          "ErrorAction": "SilentlyContinue"
+        },
+        {
+          "Action": "Unload",
+          "Address": "[parameter('SolrUrl')]",
+          "Arguments": {
+            "core": "[variable('Orders.Secondary.Name')]",
+            "deleteInstanceDir": "true"
+          },
+          "ErrorAction": "SilentlyContinue"
+        },
+        {
+          "Action": "Unload",
+          "Address": "[parameter('SolrUrl')]",
+          "Arguments": {
+            "core": "[variable('CatalogItems.Name')]",
+            "deleteInstanceDir": "true"
+          },
+          "ErrorAction": "SilentlyContinue"
+        },
+        {
+          "Action": "Unload",
+          "Address": "[parameter('SolrUrl')]",
+          "Arguments": {
+            "core": "[variable('CatalogItems.Secondary.Name')]",
+            "deleteInstanceDir": "true"
+          },
+          "ErrorAction": "SilentlyContinue"
+        },
+        {
+          "Action": "Unload",
+          "Address": "[parameter('SolrUrl')]",
+          "Arguments": {
+            "core": "[variable('Promotions.Name')]",
+            "deleteInstanceDir": "true"
+          },
+          "ErrorAction": "SilentlyContinue"
+        },
+        {
+          "Action": "Unload",
+          "Address": "[parameter('SolrUrl')]",
+          "Arguments": {
+            "core": "[variable('Promotions.Secondary.Name')]",
+            "deleteInstanceDir": "true"
+          },
+          "ErrorAction": "SilentlyContinue"
+        },
+        {
+          "Action": "Unload",
+          "Address": "[parameter('SolrUrl')]",
+          "Arguments": {
+            "core": "[variable('PriceCards.Name')]",
+            "deleteInstanceDir": "true"
+          },
+          "ErrorAction": "SilentlyContinue"
+        },
+        {
+          "Action": "Unload",
+          "Address": "[parameter('SolrUrl')]",
+          "Arguments": {
+            "core": "[variable('PriceCards.Secondary.Name')]",
             "deleteInstanceDir": "true"
           },
           "ErrorAction": "SilentlyContinue"
         }
       ]
     }
-  }  
+  }
 }

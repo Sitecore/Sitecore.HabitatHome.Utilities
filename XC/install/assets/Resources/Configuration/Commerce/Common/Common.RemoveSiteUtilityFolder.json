@@ -1,24 +1,24 @@
 {
   "Parameters": {
-    "SiteUtilitiesSrc": {
+    "InstallDir": {
       "Type": "string",
-      "Description": "Site Utilities source path",
+      "Description": "Sitecore website path.",
       "DefaultValue": ""
     }
   },
-  "Register":{
+  "Register": {
     "Tasks": {
-        "RemoveItem": "Remove-Item"
+      "RemoveItem": "Remove-Item"
     }
-  },  
+  },
   "Tasks": {
     "RemoveSiteUtilityFolder": {
       "Description": "Removes Site Utilities content.",
       "Type": "RemoveItem",
       "Params": {
-          "Path": "[parameter('SiteUtilitiesSrc')]",
-          "Recurse": true,
-          "ErrorAction": "SilentlyContinue"
+        "Path": "[joinpath(parameter('InstallDir'), '\\SiteUtilityPages')]",
+        "Recurse": true,
+        "ErrorAction": "SilentlyContinue"
       }
     }
   }

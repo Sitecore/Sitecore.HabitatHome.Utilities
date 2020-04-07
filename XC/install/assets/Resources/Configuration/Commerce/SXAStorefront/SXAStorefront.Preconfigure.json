@@ -73,7 +73,8 @@
       "Type": "ManageAppPool",
       "Params": {
         "Name": "[parameter('SiteName')]",
-        "Action": "Stop"
+        "Action": "Stop",
+        "Timeout": 60
       }
     },
     "CreateBindingsWithThumprint": {
@@ -106,7 +107,8 @@
       "Type": "ManageAppPool",
       "Params": {
         "Name": "[parameter('SiteName')]",
-        "Action": "Start"
+        "Action": "Start",
+        "Timeout": 60
       }
     },
     "StartWebsite": {

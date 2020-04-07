@@ -54,7 +54,7 @@ Import-Module (Join-Path $assets.sharedUtilitiesRoot "assets\modules\SharedInsta
 Import-Module SqlServer
 
 #Ensure the Correct SIF Version is Imported
-Import-SitecoreInstallFramework -version $assets.installerVersion
+Import-SitecoreInstallFramework -version $assets.installerVersion -repositoryName $assets.psRepositoryName -repositoryUrl $assets.psRepository
 
 if (!(Test-Path $packagesFolder)) {
     New-Item $packagesFolder -ItemType Directory -Force  > $null
@@ -173,7 +173,7 @@ Function Set-IncludesPath {
 }
 
 Function Install-Modules {
-    $bootLoaderPackagePath = [IO.Path]::Combine($assets.sitecoreazuretoolkit, "resources\9.2.0\Addons\Sitecore.Cloud.Integration.Bootload.wdp.zip")
+    $bootLoaderPackagePath = [IO.Path]::Combine($assets.sitecoreazuretoolkit, "resources\9.3.0\Addons\Sitecore.Cloud.Integration.Bootload.wdp.zip")
     $bootloaderConfigurationOverride = $([io.path]::combine($assets.sharedUtilitiesRoot, "assets", 'Sitecore.Cloud.Integration.Bootload.InstallJob.exe.config'))
     $bootloaderInstallationPath = $([io.path]::combine($site.webRoot, $site.hostName, "App_Data\tools\InstallJob"))
 

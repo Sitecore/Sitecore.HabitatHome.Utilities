@@ -45,11 +45,6 @@
       "Description": "The environment name.",
       "DefaultValue": ""
     },
-    "CommerceEngineCertificateName": {
-      "Type": "string",
-      "Description": "The Commerce Engine certificate name for communication between Engine and Storefront.",
-      "DefaultValue": ""
-    },
     "Port": {
       "Type": "string",
       "Description": "The port of the site to be deployed.",
@@ -58,6 +53,11 @@
     "SitecoreIdentityServerUrl": {
       "Type": "string",
       "Description": "The identity server full hostname.",
+      "DefaultValue": ""
+    },
+    "CommerceEngineConnectClientId": {
+      "Type": "string",
+      "Description": "Commerce Engine Connect Client Id used for the Sitecore Identity Server.",
       "DefaultValue": ""
     },
     "MinionInstance": {
@@ -110,35 +110,20 @@
       "Description": "User Password for Commerce Services App Pool",
       "DefaultValue": ""
     },
-    "CommerceSearchProvider": {
-      "Type": "string",
-      "Description": "The search provider used for the Commerce Engine - Accepted values are 'SOLR' and 'AZURE'",
-      "DefaultValue": "SOLR"
-    },
     "SolrUrl": {
       "Type": "string",
       "Description": "The Solr instance url.",
-      "DefaultValue": "https://localhost:8993/solr"
+      "DefaultValue": "https://localhost:8994/solr"
     },
     "SearchIndexPrefix": {
       "Type": "string",
       "DefaultValue": "",
       "Description": "The search index prefix."
     },
-    "AzureSearchServiceName": {
+    "StorefrontIndexPrefix": {
       "Type": "string",
-      "Description": "The Azure search service name.",
-      "DefaultValue": ""
-    },
-    "AzureSearchAdminKey": {
-      "Type": "string",
-      "Description": "The Azure search service admin key.",
-      "DefaultValue": ""
-    },
-    "AzureSearchQueryKey": {
-      "Type": "string",
-      "Description": "The Azure search service query key.",
-      "DefaultValue": ""
+      "DefaultValue": "",
+      "Description": "The storefront index prefix."
     },
     "BraintreeMerchantId": {
       "Type": "string",
@@ -199,18 +184,18 @@
     "Site.PhysicalPath": "[joinpath(environment('SystemDrive'), 'inetpub', 'wwwroot', variable('Site.Name'))]",
     "Client.Cert.Store": "cert:\\LocalMachine\\My",
     "Security.Localhost.CertificateThumbprint": "[GetCertificateThumbprint('localhost', variable('Client.Cert.Store'))]",
-    "Security.CertificateThumbprint": "[GetCertificateThumbprint(parameter('CommerceEngineCertificateName'), variable('Client.Cert.Store'))]",
     "DnsName": "[concat('*.', parameter('CommerceServicesHostPostfix'))]",
     "Security.Dns.CertificateThumbprint": "[GetCertificateThumbprint(variable('DnsName'), variable('Client.Cert.Store'))]",
     "Sql.Global.ConnectionString": "[SqlConnectionString(parameter('CommerceServicesDbServer'), parameter('CommerceServicesGlobalDbName'), parameter('SqlAdminUser'), parameter('SqlAdminPassword'))]",
     "Sql.Shared.ConnectionString": "[SqlConnectionString(parameter('CommerceServicesDbServer'), parameter('CommerceServicesDbName'), parameter('SqlAdminUser'), parameter('SqlAdminPassword'))]",
     "WebsiteHostName": "[concat(variable('Host.Prefix'), concat('.', parameter('CommerceServicesHostPostfix')))]",
-    "Skip.SOLR": "[not(equal(parameter('CommerceSearchProvider'), 'SOLR'))]",
-    "Skip.AZURE": "[not(equal(parameter('CommerceSearchProvider'), 'AZURE'))]",
     "Engine.ShopsUrl": "[parameter('EngineShopsUrl')]",
     "Engine.AuthoringUrl": "[parameter('EngineAuthoringUrl')]",
     "Engine.MinionsUrl": "[parameter('EngineMinionsUrl')]",
-    "BizFxBindings": "[if(equal(parameter('CommerceServicesHostPostfix'), ''), concat('https://localhost:', parameter('BizFxPort')), concat('https://localhost:', parameter('BizFxPort'), '\", \"https://bizfx.', parameter('CommerceServicesHostPostfix')))]"
+    "IsCommerceServicesHostPostfixEmpty": "[equal(parameter('CommerceServicesHostPostfix'), '')]",
+    "BizFxBindingLocalhost": "[concat('https://localhost:', parameter('BizFxPort'))]",
+    "BizFxBindingLocalhostAndHost": "[concat('https://localhost:', parameter('BizFxPort'), '\", \"https://bizfx.', parameter('CommerceServicesHostPostfix'))]",
+    "BizFxBindings": "[if(variable('IsCommerceServicesHostPostfixEmpty'), variable('BizFxBindingLocalhost'), variable('BizFxBindingLocalhostAndHost'))]"
   },
   "Tasks": {
     "CreatePaths": {
@@ -385,7 +370,6 @@
       }
     },
     "InstallWdpSOLR": {
-      "Skip": "[equal(variable('Skip.SOLR'),'True')]",
       "Type": "WebDeploy",
       "Params": {
         "Verb": "Sync",
@@ -426,10 +410,6 @@
             {
               "Name": "SxaStorefrontUrl",
               "Value": "[concat('https://', parameter('SiteHostHeaderName'))]"
-            },
-            {
-              "Name": "CertificateThumbprint",
-              "Value": "[variable('Security.CertificateThumbprint')]"
             },
             {
               "Name": "CommerceServicesHostPostfix",
@@ -520,159 +500,12 @@
               "Value": "[parameter('SearchIndexPrefix')]"
             },
             {
-              "Name": "Configuration",
-              "Value": "[parameter('RedisConfiguration')]"
+              "Name": "StorefrontIndexPrefix",
+              "Value": "[parameter('StorefrontIndexPrefix')]"
             },
             {
-              "Name": "InstanceName",
-              "Value": "[parameter('RedisInstanceName')]"
-            }
-          ]
-        }
-      }
-    },
-    "InstallWdpAZURE": {
-      "Skip": "[equal(variable('Skip.AZURE'),'True')]",
-      "Type": "WebDeploy",
-      "Params": {
-        "Verb": "Sync",
-        "Arguments": {
-          "Source": {
-            "Package": "[resolvepath(parameter('CommerceEngineWdpFullPath'))]"
-          },
-          "Dest": "Auto",
-          "SetParam": [
-            {
-              "Name": "IIS Web Application Name",
-              "Value": "[variable('Site.Name')]"
-            },
-            {
-              "Name": "CommerceEngineGlobalConnectionString-Admin",
-              "Value": "[variable('Sql.Global.ConnectionString')]"
-            },
-            {
-              "Name": "CommerceEngineSharedConnectionString-Admin",
-              "Value": "[variable('Sql.Shared.ConnectionString')]"
-            },
-            {
-              "Name": "SiteTitle",
-              "Value": "[variable('Site.Name')]"
-            },
-            {
-              "Name": "EnvironmentName",
-              "Value": "[variable('Environment.Name')]"
-            },
-            {
-              "Name": "SitecoreIdentityServerUrl",
-              "Value": "[parameter('SitecoreIdentityServerUrl')]"
-            },
-            {
-              "Name": "BizFxUrl",
-              "Value": "[variable('BizFxBindings')]"
-            },
-            {
-              "Name": "SxaStorefrontUrl",
-              "Value": "[concat('https://', parameter('SiteHostHeaderName'))]"
-            },
-            {
-              "Name": "CertificateThumbprint",
-              "Value": "[variable('Security.CertificateThumbprint')]"
-            },
-            {
-              "Name": "CommerceServicesHostPostfix",
-              "Value": "[parameter('CommerceServicesHostPostfix')]"
-            },
-            {
-              "Name": "GlobalDatabaseName",
-              "Value": "[parameter('CommerceServicesGlobalDbName')))]"
-            },
-            {
-              "Name": "GlobalDatabaseUserName",
-              "Value": "[concat(parameter('UserDomain'), concat('\\\\', parameter('UserName')))]"
-            },
-            {
-              "Name": "GlobalDatabasePassword",
-              "Value": "[parameter('SqlAdminPassword')]"
-            },
-            {
-              "Name": "GlobalDatabaseServer",
-              "Value": "[parameter('CommerceServicesDbServer')]"
-            },
-            {
-              "Name": "SharedDatabaseName",
-              "Value": "[parameter('CommerceServicesDbName')))]"
-            },
-            {
-              "Name": "SharedDatabaseUserName",
-              "Value": "[concat(parameter('UserDomain'), concat('\\\\', parameter('UserName')))]"
-            },
-            {
-              "Name": "SharedDatabasePassword",
-              "Value": "[parameter('SqlAdminPassword')]"
-            },
-            {
-              "Name": "SharedDatabaseServer",
-              "Value": "[parameter('CommerceServicesDbServer')]"
-            },
-            {
-              "Name": "SitecoreHost",
-              "Value": "[parameter('SiteHostHeaderName')]"
-            },
-            {
-              "Name": "SitecoreUsername",
-              "Value": "[parameter('SitecoreUsername')]"
-            },
-            {
-              "Name": "SitecoreDomain",
-              "Value": "[parameter('SitecoreDomain')]"
-            },
-            {
-              "Name": "SitecorePassword",
-              "Value": "[parameter('SitecoreUserPassword')]"
-            },
-            {
-              "Name": "EngineShopsUrl",
-              "Value": "[variable('Engine.ShopsUrl')]"
-            },
-            {
-              "Name": "EngineAuthoringUrl",
-              "Value": "[variable('Engine.AuthoringUrl')]"
-            },
-            {
-              "Name": "EngineMinionsUrl",
-              "Value": "[variable('Engine.MinionsUrl')]"
-            },
-            {
-              "Name": "BraintreeMerchantId",
-              "Value": "[parameter('BraintreeMerchantId')]"
-            },
-            {
-              "Name": "BraintreePublicKey",
-              "Value": "[parameter('BraintreePublicKey')]"
-            },
-            {
-              "Name": "BraintreePrivateKey",
-              "Value": "[parameter('BraintreePrivateKey')]"
-            },
-            {
-              "Name": "BraintreeEnvironment",
-              "Value": "[parameter('BraintreeEnvironment')]"
-            },
-            {
-              "Name": "AzureSearchServiceName",
-              "Value": "[parameter('AzureSearchServiceName')]"
-            },
-            {
-              "Name": "AzureSearchServiceAdminApiKey",
-              "Value": "[parameter('AzureSearchAdminKey')]"
-            },
-            {
-              "Name": "AzureSearchServiceQueryApiKey",
-              "Value": "[parameter('AzureSearchQueryKey')]"
-            },
-            {
-              "Name": "SearchIndexPrefix",
-              "Value": "[parameter('SearchIndexPrefix')]"
+              "Name": "StorefrontSolrIndexPrefix",
+              "Value": "[parameter('StorefrontIndexPrefix')]"
             },
             {
               "Name": "Configuration",
@@ -681,6 +514,10 @@
             {
               "Name": "InstanceName",
               "Value": "[parameter('RedisInstanceName')]"
+            },
+            {
+              "Name": "CommerceEngineConnectClientId",
+              "Value": "[parameter('CommerceEngineConnectClientId')]"
             }
           ]
         }

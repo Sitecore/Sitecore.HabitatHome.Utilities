@@ -166,11 +166,11 @@ Register-SitecoreInstallExtension -Command Invoke-MergeWebConfigTask -As MergeWe
 # U3ltYW50ZWMgQ29ycG9yYXRpb24xMDAuBgNVBAMTJ1N5bWFudGVjIFRpbWUgU3Rh
 # bXBpbmcgU2VydmljZXMgQ0EgLSBHMgIQDs/0OMj+vzVuBNhqmBsaUDAJBgUrDgMC
 # GgUAoF0wGAYJKoZIhvcNAQkDMQsGCSqGSIb3DQEHATAcBgkqhkiG9w0BCQUxDxcN
-# MTkwNzA0MTQwNjE2WjAjBgkqhkiG9w0BCQQxFgQUoTpvelM9LuzicxNafyoaH0bT
-# +kUwDQYJKoZIhvcNAQEBBQAEggEAW4YjN8EG+3ZSITatZzoz9cNz7yhgiHBil0XE
-# amYnMpgDx047Lz9EiFIwSWRPZ4VUEAFiYl3OyyWFhfM8KC7K+1we/DX9SeCumoQ0
-# nlG69OnYT5LhlfnVN1KA8hKbYUBTtMaM9InrmnotXJ6ir/UsvmAaXV8wCbHc7Vr8
-# 29BWrTqjosEUTpqqKtRWCoXfu/DNa+68rC/9wuYbLuf1SZTtiCCEGtgFjsCmsoJT
-# bLO2tnj6XP9N8a8X1DtrRHER0CAum1d5kNdyrgML/3mVQxrzhZZPh1xnroqLBVKe
-# jVANdwshIWvlG6L9w8o/dy8w9Qf/7M+ePdFxxlBzUOeSqQcNTw==
+# MjAwMTA5MjAzNDM5WjAjBgkqhkiG9w0BCQQxFgQUoTpvelM9LuzicxNafyoaH0bT
+# +kUwDQYJKoZIhvcNAQEBBQAEggEAibPMggyW3L8rO0kZghEZ6ZzSFzzoda2cfZ+2
+# pGsxBti8uHatwbWkOoa7bEapGA+jxJLKchdZyKKddivU86F+V9ZUv8PHHM/CIchI
+# Zz/0Yd6RJpC+dRPnoev8IHo7iU6bCpbev8HP+Ark4nvv0Gufb6rbFU2Y5Ec8kb5O
+# z11IxaD64w6ekzSLtLj6MKorQU9BbjzgcSbXnMVJQUOgURGIprcyXoByGSkOZBpH
+# rDnysLrLzYqczA6LAZKZEdrb01y9ust1/RUg9YvhI/kpZNuCvV9m8ZavEhkbHgYd
+# iWgrY/8Gct8uPKiSimz4Nw8onJKbsY8irxKdnk/+Mwwwjt2rUw==
 # SIG # End signature block

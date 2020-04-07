@@ -7,12 +7,12 @@
         },
         "SolrRoot": {
             "Type": "string",
-            "DefaultValue": "c:\\solr-7.2.1",
+            "DefaultValue": "c:\\solr-8.1.1",
             "Description": "The file path to the Solr instance."
         },
         "SolrService": {
             "Type": "string",
-            "DefaultValue": "Solr-7.2.1",
+            "DefaultValue": "Solr-8.1.1",
             "Description": "The name of the Solr service."
         },
         "BaseConfig": {
@@ -43,7 +43,7 @@
                 { "Action": "Unload", "Address": "[parameter('SolrUrl')]", "Arguments": { "core": "[variable('Xdb.Name')]", "deleteInstanceDir": "true" }, "ErrorAction": "SilentlyContinue" },
                 { "Action": "Unload", "Address": "[parameter('SolrUrl')]", "Arguments": { "core": "[variable('Xdb.Rebuild.Name')]", "deleteInstanceDir": "true" }, "ErrorAction": "SilentlyContinue" }
          ]
-            
+
         },
         "CleanCores": {
             "Description" : "Creates/clears core paths.",
@@ -77,8 +77,8 @@
             "Description": "Removes the cores and instance folders.",
             "Type": "ManageSolrCore",
             "Params": [
-                { "Action": "unload", "Address": "[parameter('SolrUrl')]", "Arguments": { "core": "[variable('Xdb.Name')]", "deleteInstanceDir": "true" }, "ErrorAction": "SilentlyContinue" },
-                { "Action": "unload", "Address": "[parameter('SolrUrl')]", "Arguments": { "core": "[variable('Xdb.Rebuild.Name')]", "deleteInstanceDir": "true" }, "ErrorAction": "SilentlyContinue" }
+                { "Action": "Unload", "Address": "[parameter('SolrUrl')]", "Arguments": { "core": "[variable('Xdb.Name')]", "deleteInstanceDir": "true" }, "ErrorAction": "SilentlyContinue" },
+                { "Action": "Unload", "Address": "[parameter('SolrUrl')]", "Arguments": { "core": "[variable('Xdb.Rebuild.Name')]", "deleteInstanceDir": "true" }, "ErrorAction": "SilentlyContinue" }
             ]
         }
     }
